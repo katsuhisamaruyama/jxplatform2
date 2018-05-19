@@ -20,8 +20,8 @@ import java.util.HashSet;
  */
 public class CFGNode extends GraphNode {
     
-    protected ASTNode astNode;
-    protected Kind kind;
+    private ASTNode astNode;
+    private Kind kind;
     private PDGNode pdgNode = null;
     private BasicBlock basicBlock = null;
     

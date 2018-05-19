@@ -16,9 +16,9 @@ import java.util.HashSet;
  */
 public class CFGClassEntry extends CFGEntry {
     
-    protected Set<CFG> methods = new HashSet<CFG>();
-    protected Set<CFG> fields = new HashSet<CFG>();
-    protected Set<CFG> types = new HashSet<CFG>();
+    private Set<CFG> methods = new HashSet<CFG>();
+    private Set<CFG> fields = new HashSet<CFG>();
+    private Set<CFG> types = new HashSet<CFG>();
     
     protected CFGClassEntry() {
     }

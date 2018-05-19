@@ -12,11 +12,11 @@ import org.eclipse.jdt.core.dom.ASTNode;
  * The entry node of a CFG.
  * @author Katsuhisa Maruyama
  */
-public class CFGEntry extends CFGNode {
+public abstract class CFGEntry extends CFGNode {
     
-    protected String name;
-    protected String fqn;
-    protected CFG cfg = null;
+    private String name;
+    private String fqn;
+    private CFG cfg = null;
     
     protected CFGEntry() {
     }

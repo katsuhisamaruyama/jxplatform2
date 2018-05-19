@@ -24,7 +24,7 @@ public class CFGStore {
     
     private static CFGStore instance = new CFGStore();
     
-    protected Map<String, CFG> cfgStore = new HashMap<String, CFG>();
+    private Map<String, CFG> cfgStore = new HashMap<String, CFG>();
     private boolean creatingActualNodes = false;
     
     private CFGStore() {

@@ -18,11 +18,8 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
  */
 public class JFieldAccess extends JVariable {
     
-    protected boolean isField;
-    protected boolean isEnumConstant;
-    
-    protected JFieldAccess() {
-    }
+    private boolean isField;
+    private boolean isEnumConstant;
     
     public JFieldAccess(ASTNode node, IVariableBinding vbinding) {
         super(node);

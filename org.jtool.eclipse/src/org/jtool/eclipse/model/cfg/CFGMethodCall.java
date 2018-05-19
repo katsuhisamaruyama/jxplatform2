@@ -16,11 +16,11 @@ import java.util.ArrayList;
  */
 public class CFGMethodCall extends CFGStatement {
     
-    protected JMethodCall jmethodCall;
-    protected JVariable primary = null;
+    private JMethodCall jmethodCall;
+    private JVariable primary = null;
     
-    protected List<CFGParameter> actualIns = new ArrayList<CFGParameter>();
-    protected List<CFGParameter> actualOuts = new ArrayList<CFGParameter>();
+    private List<CFGParameter> actualIns = new ArrayList<CFGParameter>();
+    private List<CFGParameter> actualOuts = new ArrayList<CFGParameter>();
     
     protected CFGMethodCall() {
         super();
@@ -90,16 +90,12 @@ public class CFGMethodCall extends CFGStatement {
         actualOuts.add(node);
     }
     
-    void setActualIns(List<CFGParameter> params) {
-        for (CFGParameter param : params) {
-            addActualIn(param);
-        }
+    public void setActualIns(List<CFGParameter> nodes) {
+        actualIns.addAll(nodes);
     }
     
-    void setActualOuts(List<CFGParameter> params) {
-        for (CFGParameter param : params) {
-            addActualOut(param);
-        }
+    public void setActualOuts(List<CFGParameter> nodes) {
+        actualOuts.addAll(nodes);
     }
     
     public List<CFGParameter> getActualIns() {

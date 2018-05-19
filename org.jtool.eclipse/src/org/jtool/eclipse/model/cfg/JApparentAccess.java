@@ -18,9 +18,6 @@ import org.eclipse.jdt.core.dom.Modifier;
  */
 public class JApparentAccess extends JVariable {
     
-    protected JApparentAccess() {
-    }
-    
     public JApparentAccess(ASTNode node, String name, IVariableBinding vbinding) {
         super(node);
         

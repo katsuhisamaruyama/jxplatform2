@@ -15,10 +15,7 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
  */
 public class JLocalAccess extends JVariable {
     
-    protected boolean isParameter;
-    
-    protected JLocalAccess() {
-    }
+    private boolean isParameter;
     
     public JLocalAccess(ASTNode node, IVariableBinding vbinding) {
         super(node);

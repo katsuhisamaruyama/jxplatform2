@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class CFGFieldEntry extends CFGEntry {
     
-    protected String type;
+    private String type;
     
     protected CFGFieldEntry() {
     }

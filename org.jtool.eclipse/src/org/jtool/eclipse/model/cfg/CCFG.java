@@ -12,6 +12,7 @@ package org.jtool.eclipse.model.cfg;
  */
 public class CCFG extends CFG {
     
+    @Override
     public CFGClassEntry getStartNode() {
         return (CFGClassEntry)start;
     }

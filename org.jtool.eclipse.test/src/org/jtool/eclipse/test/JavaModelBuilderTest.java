@@ -83,6 +83,15 @@ public class JavaModelBuilderTest {
         builder.unbuild();
     }
     
+    @Test
+    public void testJdk8() {
+        String target = "/Users/maru/Desktop/TestSamples/jdk1.8.0_131/src/";
+        String classpathdir = "/Users/maru/Desktop/TestSamples/jdk1.8.0_131/lib";
+        JavaModelBuilder builder = new JavaModelBuilder(target, target, target, classpathdir);
+        builder.build(true);
+        builder.unbuild();
+    }
+    
     public static void main(String[] args) {
         JavaModelBuilderTest tester = new JavaModelBuilderTest();
         //tester.testSimple();
@@ -92,6 +101,7 @@ public class JavaModelBuilderTest {
         //tester.testLambda();
         //tester.testCSSample();
         //tester.testFindbugs();
-        tester.testApacheAnt();
+        //tester.testApacheAnt();
+        tester.testJdk8();
     }
 }

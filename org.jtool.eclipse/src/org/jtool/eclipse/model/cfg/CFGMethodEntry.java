@@ -16,10 +16,10 @@ import java.util.ArrayList;
  */
 public class CFGMethodEntry extends CFGEntry {
     
-    protected String returnType;
-    protected String simpleName;
-    protected List<CFGParameter> formalIns = new ArrayList<CFGParameter>();
-    protected List<CFGParameter> formalOuts = new ArrayList<CFGParameter>();
+    private String returnType;
+    private String simpleName;
+    private List<CFGParameter> formalIns = new ArrayList<CFGParameter>();
+    private List<CFGParameter> formalOuts = new ArrayList<CFGParameter>();
     
     protected CFGMethodEntry() {
     }

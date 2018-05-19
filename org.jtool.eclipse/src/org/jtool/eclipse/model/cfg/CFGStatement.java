@@ -16,8 +16,8 @@ import java.util.ArrayList;
  */
 public class CFGStatement extends CFGNode {
     
-    protected List<JVariable> defs = new ArrayList<JVariable>();
-    protected List<JVariable> uses = new ArrayList<JVariable>();
+    private List<JVariable> defs = new ArrayList<JVariable>();
+    private List<JVariable> uses = new ArrayList<JVariable>();
     
     protected CFGStatement() {
     }
@@ -40,38 +40,24 @@ public class CFGStatement extends CFGNode {
         return false;
     }
     
-    public boolean addDefVariables(List<JVariable> jvars) {
-        if (jvars == null) {
-            return false;
-        }
+    public void addDefVariables(List<JVariable> jvars) {
         for (JVariable jvar : jvars) {
             addDefVariable(jvar);
         }
-        return true;
     }
     
-    public boolean addUseVariables(List<JVariable> jvars) {
-        if (jvars == null) {
-            return false;
-        }
+    public void addUseVariables(List<JVariable> jvars) {
         for (JVariable jvar : jvars) {
             addUseVariable(jvar);
         }
-        return true;
     }
     
     public boolean removeDefVariable(JVariable jvar) {
-        if (jvar != null) {
-            return defs.remove(jvar);
-        }
-        return false;
+        return defs.remove(jvar);
     }
     
     public boolean removeUseVariable(JVariable jvar) {
-        if (jvar != null) {
-            return uses.remove(jvar);
-        }
-        return false;
+        return uses.remove(jvar);
     }
     
     public void clearDefVariables() {

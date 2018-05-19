@@ -20,15 +20,12 @@ import java.util.ArrayList;
  */
 public class JMethodCall extends JVariable {
     
-    protected boolean isMethod;
-    protected boolean isConstructor;
-    protected boolean isLocalCall;
+    private boolean isMethod;
+    private boolean isConstructor;
+    private boolean isLocalCall;
     
-    protected List<Expression> arguments = new ArrayList<Expression>();
-    protected List<String> argumentTypes = new ArrayList<String>();
-    
-    protected JMethodCall() {
-    }
+    private List<Expression> arguments = new ArrayList<Expression>();
+    private List<String> argumentTypes = new ArrayList<String>();
     
     public JMethodCall(ASTNode node, IMethodBinding mbinding, List<Expression> args) {
         super(node);
