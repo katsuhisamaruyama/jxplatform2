@@ -146,7 +146,7 @@ public class CFGStatement extends CFGNode {
     
     @Override
     public CFGStatement clone() {
-        CFGStatement cloneNode = new CFGStatement(astNode, kind);
+        CFGStatement cloneNode = new CFGStatement(getASTNode(), getKind());
         super.setClone(cloneNode);
         setClone(cloneNode);
         return cloneNode;
