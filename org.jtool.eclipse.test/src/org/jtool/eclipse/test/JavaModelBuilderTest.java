@@ -94,13 +94,13 @@ public class JavaModelBuilderTest {
     
     public static void main(String[] args) {
         JavaModelBuilderTest tester = new JavaModelBuilderTest();
-        //tester.testSimple();
-        //tester.testJrb();
-        //tester.testTetris();
-        //tester.testDrawTool();
-        //tester.testLambda();
-        //tester.testCSSample();
-        //tester.testFindbugs();
+        tester.testSimple();
+        tester.testJrb();
+        tester.testTetris();
+        tester.testDrawTool();
+        tester.testLambda();
+        tester.testCSSample();
+        tester.testFindbugs();
         tester.testApacheAnt();
         //tester.testJdk8();
     }
