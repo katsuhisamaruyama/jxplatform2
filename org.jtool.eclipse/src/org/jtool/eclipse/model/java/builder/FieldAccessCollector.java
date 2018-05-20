@@ -99,16 +99,14 @@ public class FieldAccessCollector extends ASTVisitor {
                         }
                     } else {
                         bindingOk = false;
-                        jfile.getProject().addUnresolvedBindingError(binding.getName() + " of " +
-                                vbinding.getDeclaringClass().getQualifiedName());
+                        jfile.getProject().printUnresolvedError(binding.getName() + " of " + vbinding.getDeclaringClass().getQualifiedName());
                     }
                 }
             }
         } else {
             bindingOk = false;
             if (name != null) {
-                jfile.getProject().addUnresolvedBindingError(name.getIdentifier() + " in " +
-                        jclass.getQualifiedName());
+                jfile.getProject().printUnresolvedError(name.getIdentifier() + " in " + jclass.getQualifiedName());
             }
         }
     }

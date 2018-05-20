@@ -4,7 +4,7 @@
  *  Department of Computer Science, Ritsumeikan University
  */
 
-package org.jtool.eclipse.plugin;
+package org.jtool.eclipse;
 
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.IConsole;
@@ -16,13 +16,17 @@ import org.eclipse.ui.console.MessageConsoleStream;
  * Displays a message on the console.
  * @author Katsuhisa Maruyama
  */
-public class JtoolConsole {
+public class JXConsole {
     
-    private static final String CONSOLE_NAME = "JTool Console";
+    private static final String CONSOLE_NAME = "JXConsole";
     
-    private static MessageConsoleStream consoleStream;
+    private MessageConsoleStream consoleStream = null;
     
-    private static void showConsole() {
+    JXConsole() {
+        if (ConsolePlugin.getDefault() == null) {
+            return;
+        }
+        
         IConsoleManager consoleManager = ConsolePlugin.getDefault().getConsoleManager();
         IConsole[] consoles = consoleManager.getConsoles();
         MessageConsole console = null;
@@ -40,17 +44,15 @@ public class JtoolConsole {
         consoleStream = console.newMessageStream();
     }
     
-    public static void print(String mesg) {
-        if (consoleStream == null) {
-            showConsole();
+    public void print(String mesg) {
+        if (consoleStream != null) {
+            consoleStream.print(mesg);
         }
-        consoleStream.print(mesg);
     }
     
-    public static void println(String mesg) {
-        if (consoleStream == null) {
-            showConsole();
+    public void println(String mesg) {
+        if (consoleStream != null) {
+            consoleStream.println(mesg);
         }
-        consoleStream.println(mesg);
     }
 }

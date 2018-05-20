@@ -128,40 +128,28 @@ public class JavaField extends JavaVariable {
         return buf.toString();
     }
     
-    protected boolean bindingOk = true;
-    protected boolean bindingFin = false;
-    
+    protected boolean resolved = false;
     protected Set<JavaMethod> calledMethods = new HashSet<JavaMethod>();
     protected Set<JavaMethod> accessingMethods = new HashSet<JavaMethod>();
     protected Set<JavaField> accessedFields = new HashSet<JavaField>();
     protected Set<JavaField> accessingFields = new HashSet<JavaField>();
     
-    public boolean isBindingOk() {
-        return bindingOk;
-    }
-    
-    private void bindingFin() {
-        if (!bindingFin) {
-            System.err.println("This API can be used after resolving binding information of field " + fqn + ".");
-        }
-    }
-    
-    protected boolean collectBindingInfo() {
+    protected void collectInfo() {
+        boolean resolveOk = true;
         if (binding != null && inProject) {
-            bindingOk = bindingOk && findCalledMethods();
-            bindingOk = bindingOk && findAccessedFields();
+            resolveOk = resolveOk && findCalledMethods();
+            resolveOk = resolveOk && findAccessedFields();
         } else {
-            bindingOk = false;
+            resolveOk = false;
         }
-        if (!bindingOk) {
+        if (!resolveOk) {
             if (declaringClass != null) {
-                jfile.getProject().addUnresolvedBindingError(getQualifiedName() + " of " + declaringClass.getQualifiedName());
+                jfile.getProject().printUnresolvedError(getQualifiedName() + " of " + declaringClass.getQualifiedName());
             } else {
-                jfile.getProject().addUnresolvedBindingError(getQualifiedName());
+                jfile.getProject().printUnresolvedError(getQualifiedName());
             }
         }
-        bindingFin = true;
-        return bindingOk;
+        resolved = true;
     }
     
     private boolean findCalledMethods() {
@@ -198,17 +186,18 @@ public class JavaField extends JavaVariable {
         accessingFields.add(jfield);
     }
     
-    /* ================================================================================
-     * The following APIs can be used after resolving binding information.
-     * ================================================================================ */
-    
     public Set<JavaField> getAccessedFields() {
-        bindingFin();
+        collectInfo();
         return accessedFields;
     }
     
+    public Set<JavaField> getAccessingFields() {
+        collectInfo();
+        return accessingFields;
+    }
+    
     public Set<JavaField> getAccessedFieldsInProject() {
-        bindingFin();
+        collectInfo();
         Set<JavaField> jfields = new HashSet<JavaField>();
         for (JavaField jf : accessedFields) {
             if (jf.isInProject()) {
@@ -218,13 +207,8 @@ public class JavaField extends JavaVariable {
         return jfields;
     }
     
-    public Set<JavaField> getAccessingFields() {
-        bindingFin();
-        return accessingFields;
-    }
-    
     public Set<JavaField> getAccessingFieldsInProject() {
-        bindingFin();
+        collectInfo();
         Set<JavaField> jfields = new HashSet<JavaField>();
         for (JavaField jf : accessingFields) {
             if (jf.isInProject()) {
@@ -235,12 +219,17 @@ public class JavaField extends JavaVariable {
     }
     
     public Set<JavaMethod> getCalledMethods() {
-        bindingFin();
+        collectInfo();
         return calledMethods;
     }
     
+    public Set<JavaMethod> getAccessingMethods() {
+        collectInfo();
+        return accessingMethods;
+    }
+    
     public Set<JavaMethod> getCalledMethodsInProject() {
-        bindingFin();
+        collectInfo();
         Set<JavaMethod> jmethods = new HashSet<JavaMethod>();
         for (JavaMethod jm : calledMethods) {
             if (jm.isInProject()) {
@@ -250,13 +239,8 @@ public class JavaField extends JavaVariable {
         return jmethods;
     }
     
-    public Set<JavaMethod> getAccessingMethods() {
-        bindingFin();
-        return accessingMethods;
-    }
-    
     public Set<JavaMethod> getAccessingMethodsInProject() {
-        bindingFin();
+        collectInfo();
         Set<JavaMethod> jmethods = new HashSet<JavaMethod>();
         for (JavaMethod jm : accessingMethods) {
             if (jm.isInProject()) {

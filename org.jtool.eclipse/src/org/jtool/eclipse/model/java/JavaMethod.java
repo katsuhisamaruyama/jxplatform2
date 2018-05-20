@@ -426,9 +426,7 @@ public class JavaMethod extends JavaElement {
         return buf.toString();
     }
     
-    protected boolean bindingOk = true;
-    protected boolean bindingFin = false;
-    
+    protected boolean resolved = false;
     protected Set<JavaClass> exceptions = new HashSet<JavaClass>();
     protected Set<JavaMethod> calledMethods = new HashSet<JavaMethod>();
     protected Set<JavaMethod> callingMethods = new HashSet<JavaMethod>();
@@ -436,49 +434,41 @@ public class JavaMethod extends JavaElement {
     protected Set<JavaField> accessingFields = new HashSet<JavaField>();
     protected Set<JavaMethod> overriddenMethods = null;
     protected Set<JavaMethod> overridingMethods = null;
+    protected StatementCollector statementCollector = null;
     
-    public boolean isBindingOk() {
-        return bindingOk;
-    }
-    
-    private void bindingFin() {
-        if (!bindingFin) {
-            System.err.println("This API can be used after resolving binding information of method " + fqn + ".");
-        }
-    }
-    
-    protected boolean collectBindingInfo() {
-        if (binding != null && inProject) {
-            bindingOk = bindingOk && findExceptions();
+    protected void collectInfo() {
+        boolean resolveOk = true;
+        if (binding != null) {
+            resolveOk = resolveOk && findExceptions();
         }
         if (inProject) {
-            bindingOk = bindingOk && findCalledMethods();
-            bindingOk = bindingOk && findAccessedFields();
+            resolveOk = resolveOk && findCalledMethods();
+            resolveOk = resolveOk && findAccessedFields();
         } else {
-            bindingOk = false;
+            resolveOk = false;
         }
-        if (!bindingOk) {
+        if (!resolveOk) {
             if (declaringClass != null) {
-                jfile.getProject().addUnresolvedBindingError(getName() + " of " + declaringClass.getQualifiedName());
+                jfile.getProject().printUnresolvedError(getName() + " of " + declaringClass.getQualifiedName());
             } else {
-                jfile.getProject().addUnresolvedBindingError(getName());
+                jfile.getProject().printUnresolvedError(getName());
             }
         }
-        bindingFin = true;
-        return bindingOk;
+        resolved = true;
     }
     
     private boolean findExceptions() {
+        boolean resolveOk = true;
         for (ITypeBinding tb : binding.getExceptionTypes()) {
             JavaClass jc = findDeclaringClass(jfile.getProject(), tb);
             if (jc != null) {
                 exceptions.add(jc);
             } else {
-                jfile.getProject().addUnresolvedBindingError(tb.getQualifiedName());
-                return false;
+                resolveOk = false;
+                jfile.getProject().printUnresolvedError(tb.getQualifiedName());
             }
         }
-        return true;
+        return resolveOk;
     }
     
     private boolean findCalledMethods() {
@@ -515,22 +505,18 @@ public class JavaMethod extends JavaElement {
         accessingFields.add(jfield);
     }
     
-    /* ================================================================================
-     * The following APIs can be used after resolving binding information.
-     * ================================================================================ */
-    
     public Set<JavaClass> getExceptions() {
-        bindingFin();
+        collectInfo();
         return exceptions;
     }
     
     public Set<JavaMethod> getCalledMethods() {
-        bindingFin();
+        collectInfo();
         return calledMethods;
     }
     
     public Set<JavaMethod> getCalledMethodsInProject() {
-        bindingFin();
+        collectInfo();
         Set<JavaMethod> methods = new HashSet<JavaMethod>();
         for (JavaMethod jm : calledMethods) {
             if (jm.isInProject()) {
@@ -541,12 +527,12 @@ public class JavaMethod extends JavaElement {
     }
     
     public Set<JavaMethod> getCallingMethods() {
-        bindingFin();
+        collectInfo();
         return callingMethods;
     }
     
     public Set<JavaMethod> getCallingMethodsInProject() {
-        bindingFin();
+        collectInfo();
         Set<JavaMethod> methods = new HashSet<JavaMethod>();
         for (JavaMethod jm : callingMethods) {
             if (jm.isInProject()) {
@@ -557,12 +543,12 @@ public class JavaMethod extends JavaElement {
     }
     
     public Set<JavaField> getAccessedFields() {
-        bindingFin();
+        collectInfo();
         return accessedFields;
     }
     
     public Set<JavaField> getAccessedFieldsInProject() {
-        bindingFin();
+        collectInfo();
         Set<JavaField> fields = new HashSet<JavaField>();
         for (JavaField jf : accessedFields) {
             if (jf.isInProject()) {
@@ -573,12 +559,12 @@ public class JavaMethod extends JavaElement {
     }
     
     public Set<JavaField> getAccessingFields() {
-        bindingFin();
+        collectInfo();
         return accessingFields;
     }
     
     public Set<JavaField> getAccessingFieldsInProject() {
-        bindingFin();
+        collectInfo();
         Set<JavaField> fields = new HashSet<JavaField>();
         for (JavaField jf : accessingFields) {
             if (jf.isInProject()) {
@@ -589,7 +575,7 @@ public class JavaMethod extends JavaElement {
     }
     
     public Set<JavaMethod> getOverriddenMethods() {
-        bindingFin();
+        collectInfo();
         if (overriddenMethods == null) {
             findOverriddenMethods();
         }
@@ -597,7 +583,7 @@ public class JavaMethod extends JavaElement {
     }
     
     public Set<JavaMethod> getOverridingMethods() {
-        bindingFin();
+        collectInfo();
         if (overridingMethods == null) {
             findOverriddenMethods();
         }
@@ -620,8 +606,6 @@ public class JavaMethod extends JavaElement {
     void addOverridingMethod(JavaMethod jm) {
         overridingMethods.add(jm);
     }
-    
-    private StatementCollector statementCollector = null;
     
     public int getNumberOfStatements() {
         if (statementCollector == null) {

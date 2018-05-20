@@ -8,6 +8,9 @@ package org.jtool.eclipse.model.java;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.jtool.eclipse.ProjectStore;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,9 +30,6 @@ public class JavaProject {
     protected Map<String, JavaPackage> packageStore = new HashMap<String, JavaPackage>();
     protected Map<String, JavaClass> classStore = new HashMap<String, JavaClass>();
     protected Map<String, JavaClass> externalClasseStore = new HashMap<String, JavaClass>();
-    
-    protected List<String> logMessages = new ArrayList<String>();
-    protected List<String> errorMessages = new ArrayList<String>();
     
     public JavaProject(String name, String path) {
         this.name = name;
@@ -56,8 +56,6 @@ public class JavaProject {
             jclass.dispose();
         }
         externalClasseStore.clear();
-        logMessages.clear();
-        errorMessages.clear();
     }
     
     public void dispose() {
@@ -66,8 +64,6 @@ public class JavaProject {
         packageStore = null;
         classStore = null;
         externalClasseStore = null;
-        logMessages = null;
-        errorMessages = null;
     }
     
     public String getName() {
@@ -78,38 +74,16 @@ public class JavaProject {
         return path;
     }
     
-    public void addLog(String mesg) {
-        logMessages.add(mesg);
-        System.out.println(mesg);
-        System.out.flush();
-    }
-    
-    public List<String> getLogMessages() {
-        return logMessages;
-    }
-    
-    public void addUnresolvedBindingError(String mesg) {
-        addError("!Unresolved bindings: " + mesg);
-    }
-    
-    public void addError(String mesg) {
-        logMessages.add(mesg);
-        System.err.println(mesg);
-        System.err.flush();
-    }
-    
-    public List<String> getErrorMessages() {
-        return errorMessages;
-    }
-    
     public void addFile(JavaFile jfile) {
         fileStore.put(jfile.getPath(), jfile);
     }
     
     public void removeFile(String path) {
         JavaFile jfile = fileStore.get(path);
-        fileStore.remove(path);
-        jfile.dispose();
+        if (jfile != null) {
+            fileStore.remove(path);
+            jfile.dispose();
+        }
     }
     
     public JavaFile getFile(String path) {
@@ -183,20 +157,13 @@ public class JavaProject {
         return null;
     }
     
-    public void collectBindingInfo() {
+    public void collectInfo() {
         int count = 0;
         int num = classStore.values().size();
         for (JavaClass jclass : classStore.values()) {
             count++;
-            if (jclass.collectBindingInfo()) {
-                String log = " - " + jclass.getQualifiedName() + " (" + count + "/" + num + ")";
-                addLog(log);
-            } else {
-                addUnresolvedBindingError(jclass.getQualifiedName());
-            }
-        }
-        for (JavaPackage jpackage : packageStore.values()) {
-            jpackage.collectBindingInfo();
+            jclass.collectInfo();
+            printLog(" - " + jclass.getQualifiedName() + " (" + count + "/" + num + ")");
         }
     }
     
@@ -240,5 +207,17 @@ public class JavaProject {
             }
         });
         return jclasses;
+    }
+    
+    public void printLog(String mesg) {
+        ProjectStore.getInstance().printLog(mesg);
+    }
+    
+    public void printError(String mesg) {
+        ProjectStore.getInstance().printError(mesg);
+    }
+    
+    public void printUnresolvedError(String mesg) {
+        ProjectStore.getInstance().printUnresolvedError(mesg);
     }
 }

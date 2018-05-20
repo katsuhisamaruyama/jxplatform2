@@ -138,8 +138,8 @@ public class JavaModelBuilder {
         jproject.clear();
     }
     
-    public void collectBindingInfo() {
-        jproject.collectBindingInfo();
+    public void collectInfo() {
+        jproject.collectInfo();
     }
     
     private void run(boolean resolveBinding) {
@@ -176,6 +176,7 @@ public class JavaModelBuilder {
                     JavaFile jfile = new JavaFile(cu, path, sources.get(path), charsets.get(path), jproject);
                     if (count % tick == 0) {
                         System.out.print(".");
+                        System.out.flush();
                     }
                     count++;
                     JavaASTVisitor visitor = new JavaASTVisitor(jfile);
@@ -185,17 +186,18 @@ public class JavaModelBuilder {
                 }
             };
             
-            jproject.addLog("TARGET = " + jproject.getPath());
+            jproject.printLog("TARGET = " + jproject.getPath());
             
             String parseLog = "** Parsing " + sourceFiles.size() + " files";
-            jproject.addLog(parseLog);
+            jproject.printLog(parseLog);
             parser.createASTs(paths, encodings, new String[]{ }, requestor, null);
             System.out.println();
+            System.out.flush();
             
             if (resolveBinding) {
                 String bindingLog = "** Building models of " + jproject.getClasses().size() + " classes";
-                jproject.addLog(bindingLog);
-                jproject.collectBindingInfo();
+                jproject.printLog(bindingLog);
+                jproject.collectInfo();
             }
         }
     }

@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Eclipse
 Bundle-SymbolicName: org.jtool.eclipse;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: org.jtool.eclipse.plugin.Activator
+Bundle-Activator: org.jtool.eclipse.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jdt.core,
@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.console
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
-Export-Package: org.jtool.eclipse.model.cfg,
+Export-Package: org.jtool.eclipse,
+ org.jtool.eclipse.model.cfg,
  org.jtool.eclipse.model.cfg.builder,
  org.jtool.eclipse.model.graph,
  org.jtool.eclipse.model.java,
@@ -19,5 +20,4 @@ Export-Package: org.jtool.eclipse.model.cfg,
  org.jtool.eclipse.model.pdg,
  org.jtool.eclipse.model.pdg.builder,
  org.jtool.eclipse.model.standalone,
- org.jtool.eclipse.plugin,
  org.jtool.eclipse.util

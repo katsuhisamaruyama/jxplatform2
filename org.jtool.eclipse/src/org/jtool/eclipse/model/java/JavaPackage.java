@@ -107,32 +107,11 @@ public class JavaPackage extends JavaElement {
         return buf.toString();
     }
     
-    protected boolean bindingOk = true;
-    protected boolean bindingFin = true;
-    
+    protected boolean resolved = false;
     protected Set<JavaPackage> afferentPackages = null;
     protected Set<JavaPackage> efferentPackages = null;
     
-    public boolean isBindingOk() {
-        return bindingOk;
-    }
-    
-    private void bindingFin() {
-        if (!bindingFin) {
-            System.err.println("This API can be used after resolving binding information of package " + name + ".");
-        }
-    }
-    
-    public boolean collectBindingInfo() {
-        return bindingOk;
-    }
-    
-    /* ================================================================================
-     * The following APIs can be used after resolving binding information.
-     * ================================================================================ */
-    
     public Set<JavaPackage> getAfferentJavaPackages() {
-        bindingFin();
         if (afferentPackages == null) {
             findEfferentPackages();
         }
@@ -140,7 +119,6 @@ public class JavaPackage extends JavaElement {
     }
     
     public Set<JavaPackage> getEfferentJavaPackages() {
-        bindingFin();
         if (efferentPackages == null) {
             findEfferentPackages();
         }
@@ -150,9 +128,7 @@ public class JavaPackage extends JavaElement {
     private void findEfferentPackages() {
         afferentPackages = new HashSet<JavaPackage>();
         efferentPackages = new HashSet<JavaPackage>();
-        
         for (JavaClass jclass : classes) {
-            jclass.collectBindingInfo();
             for (JavaClass jc : jclass.getEfferentClassesInProject()) {
                 JavaPackage jp = jc.getPackage();
                 if (jp != null) {

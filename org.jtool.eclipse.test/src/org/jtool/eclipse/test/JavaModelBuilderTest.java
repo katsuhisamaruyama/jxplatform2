@@ -101,7 +101,7 @@ public class JavaModelBuilderTest {
         //tester.testLambda();
         //tester.testCSSample();
         //tester.testFindbugs();
-        //tester.testApacheAnt();
-        tester.testJdk8();
+        tester.testApacheAnt();
+        //tester.testJdk8();
     }
 }

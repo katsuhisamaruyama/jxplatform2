@@ -118,8 +118,7 @@ public class MethodCallCollector extends ASTVisitor {
                 }
             } else {
                 if (!mbinding.getDeclaringClass().isEnum() || !isImplicitMethodOfEnum(mbinding.getName())) {
-                    jproject.addUnresolvedBindingError(mbinding.getName() + " of " +
-                            mbinding.getDeclaringClass().getQualifiedName());
+                    jproject.printUnresolvedError(mbinding.getName() + " of " + mbinding.getDeclaringClass().getQualifiedName());
                     bindingOk = false;
                 }
             }
@@ -129,7 +128,7 @@ public class MethodCallCollector extends ASTVisitor {
     private void addMethodCall(MethodInvocation node, SimpleName name) {
         if (name != null) {
             bindingOk = false;
-            jproject.addUnresolvedBindingError(name.getIdentifier() + " in " + jclass.getQualifiedName());
+            jproject.printUnresolvedError(name.getIdentifier() + " in " + jclass.getQualifiedName());
         }
     }
     
@@ -138,7 +137,7 @@ public class MethodCallCollector extends ASTVisitor {
             JavaClass jc = JavaElement.findDeclaringClass(jproject, type.resolveBinding());
             if (jc.isInProject()) {
                 bindingOk = false;
-                jproject.addUnresolvedBindingError("$ClassInstanceCreation" + " of " + jc.getQualifiedName());
+                jproject.printUnresolvedError("$ClassInstanceCreation" + " of " + jc.getQualifiedName());
             }
         }
     }

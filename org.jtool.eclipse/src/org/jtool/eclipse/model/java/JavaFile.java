@@ -7,11 +7,8 @@
 package org.jtool.eclipse.model.java;
 
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.compiler.IProblem;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.List;
-import java.util.ArrayList;
 import java.io.File;
 
 /**
@@ -28,8 +25,6 @@ public class JavaFile {
     protected JavaPackage jpackage;
     protected Set<JavaClass> classes = new HashSet<JavaClass>();
     
-    protected List<String> errorMessages = new ArrayList<String>();
-    
     protected JavaFile() {
     }
     
@@ -39,12 +34,6 @@ public class JavaFile {
         this.code = code;
         this.charset = charset;
         jproject.addFile(this);
-        IProblem[] errors = cu.getProblems();
-        if (errors != null && errors.length > 0) {
-            for (IProblem problem : errors) {
-                errorMessages.add(problem.getMessage() + problem.getSourceStart());
-            }
-        }
     }
     
     public void dispose() {
@@ -55,8 +44,6 @@ public class JavaFile {
         jpackage = null;
         classes.clear();
         classes = null;
-        errorMessages.clear();
-        errorMessages = null;
     }
     
     public JavaProject getProject() {
@@ -73,28 +60,6 @@ public class JavaFile {
     
     public String getCharset() {
         return charset;
-    }
-    
-    public JavaProject getJavaProject() {
-        return jproject;
-    }
-    
-    public void setParseErrors(List<IProblem> errors) {
-        if (errors != null && errors.size() > 0) {
-            for (IProblem problem : errors) {
-                errorMessages.add(problem.getMessage() + problem.getSourceStart());
-            }
-        }
-    }
-    
-    public List<String> getErrorMessages() {
-        return errorMessages;
-    }
-    
-    public void printErrorMessages() {
-        for (String message  : errorMessages) {
-            System.err.println(message);
-        }
     }
     
     public void setPackage(JavaPackage jpackage) {
@@ -123,7 +88,7 @@ public class JavaFile {
     }
     
     public boolean equals(JavaFile jfile) {
-        if ( jfile == null) {
+        if (jfile == null) {
             return false;
         }
         return this == jfile || path.equals(jfile.path);

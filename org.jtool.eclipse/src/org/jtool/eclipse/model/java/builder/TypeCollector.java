@@ -149,7 +149,7 @@ public class TypeCollector extends ASTVisitor {
                 jc.addUsedClass(jc2);
             } else {
                 bindingOk = false;
-                jfile.getProject().addUnresolvedBindingError(tbinding.getQualifiedName());
+                jfile.getProject().printUnresolvedError(tbinding.getQualifiedName());
             }
         } else if (tbinding.isParameterizedType()) {
             JavaClass jc2 = JavaElement.findDeclaringClass(jfile.getProject(), tbinding);
@@ -160,7 +160,7 @@ public class TypeCollector extends ASTVisitor {
                 }
             } else {
                 bindingOk = false;
-                jfile.getProject().addUnresolvedBindingError(tbinding.getQualifiedName());
+                jfile.getProject().printUnresolvedError(tbinding.getQualifiedName());
             }
         }
     }

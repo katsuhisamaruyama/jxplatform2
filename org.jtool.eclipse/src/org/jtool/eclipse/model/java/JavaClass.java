@@ -6,9 +6,9 @@
 
 package org.jtool.eclipse.model.java;
 
+import org.jtool.eclipse.model.java.builder.TypeCollector;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.jtool.eclipse.model.java.builder.TypeCollector;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.LambdaExpression;
@@ -462,52 +462,39 @@ public class JavaClass extends JavaElement {
         return ms;
     }
     
-    protected boolean bindingOk = true;
-    protected boolean bindingFin = false;
-    
+    protected boolean resolved = false;
     protected JavaClass superClass = null;
     protected Set<JavaClass> superInterfaces = new HashSet<JavaClass>();
     protected Set<JavaClass> usedClasses = new HashSet<JavaClass>();
     protected Set<JavaClass> afferentClasses = null;
     protected Set<JavaClass> efferentClasses= null;
     
-    public boolean isBindingOk() {
-        return bindingOk;
-    }
-    
-    private void bindingFin() {
-        if (!bindingFin) {
-            System.err.println("This API can be used after resolving binding information of class " + fqn + ".");
-        }
-    }
-    
-    protected boolean collectBindingInfo() {
-        if (bindingFin) {
-            return bindingOk;
+    protected void collectInfo() {
+        if (resolved) {
+            return;
         }
         
+        boolean resolveOk = true;
         if (binding != null) {
-            bindingOk = bindingOk & findSuperClass();
-            bindingOk = bindingOk & findSuperInterfaces();
-            bindingOk = bindingOk & findUsedClass();
-            if (!bindingOk) {
-                jfile.getProject().addUnresolvedBindingError(getQualifiedName());
-            }
+            resolveOk = resolveOk & findSuperClass();
+            resolveOk = resolveOk & findSuperInterfaces();
+            resolveOk = resolveOk & findUsedClass();
             
             if (inProject) {
                 for (JavaMethod jmethod : methods) {
-                    bindingOk = bindingOk & jmethod.collectBindingInfo();
+                    jmethod.collectInfo();
                 }
                 for (JavaField jfield : fields) {
-                    bindingOk = bindingOk & jfield.collectBindingInfo();
+                    jfield.collectInfo();
                 }
             }
         } else {
-            bindingOk = false;
-            jfile.getProject().addUnresolvedBindingError(getQualifiedName());
+            resolveOk = false;
         }
-        bindingFin = true;
-        return bindingOk;
+        if (!resolveOk) {
+            jfile.getProject().printUnresolvedError(getQualifiedName());
+        }
+        resolved = true;
     }
     
     private boolean findSuperClass() {
@@ -517,7 +504,11 @@ public class JavaClass extends JavaElement {
         
         if (binding.getSuperclass() != null) {
             superClass = findDeclaringClass(jfile.getProject(), binding.getSuperclass());
-            return superClass != null;
+            if (superClass != null) {
+                return true;
+            } else {
+                jfile.getProject().printUnresolvedError(binding.getSuperclass().getQualifiedName());
+            }
         }
         return false;
     }
@@ -528,19 +519,23 @@ public class JavaClass extends JavaElement {
             if (jclass != null) {
                 superInterfaces.add(jclass);
                 return true;
+            } else {
+                jfile.getProject().printUnresolvedError(binding.getQualifiedName());
             }
             return false;
         }
         
-        for (ITypeBinding b : binding.getInterfaces()) {
-            JavaClass jclass = findDeclaringClass(jfile.getProject(), b);
+        boolean resolveOk = true;
+        for (ITypeBinding bt : binding.getInterfaces()) {
+            JavaClass jclass = findDeclaringClass(jfile.getProject(), bt);
             if (jclass != null) {
                 superInterfaces.add(jclass);
             } else {
-                return false;
+                resolveOk = false;
+                jfile.getProject().printUnresolvedError(bt.getQualifiedName());
             }
         }
-        return true;
+        return resolveOk;
     }
     
     private boolean findUsedClass() {
@@ -555,22 +550,18 @@ public class JavaClass extends JavaElement {
         }
     }
     
-    /* ================================================================================
-     * The following APIs can be used after resolving binding information.
-     * ================================================================================ */
-    
     public JavaClass getSuperClass() {
-        bindingFin();
+        collectInfo();
         return superClass;
     }
     
     public Set<JavaClass> getSuperInterfaces() {
-        bindingFin();
+        collectInfo();
         return superInterfaces;
     }
     
     public List<JavaClass> getChildren() {
-        bindingFin();
+        collectInfo();
         List<JavaClass> jclasses = new ArrayList<JavaClass>(); 
         for (JavaClass jclass : jfile.getProject().getClasses()) {
             if (jclass.isChildOf(this)) {
@@ -581,7 +572,7 @@ public class JavaClass extends JavaElement {
     }
     
     public boolean isChildOf(JavaClass jclass) {
-        bindingFin();
+        collectInfo();
         if (superClass != null && superClass.getQualifiedName().equals(jclass.getQualifiedName())) {
             return true;
         }
@@ -594,7 +585,7 @@ public class JavaClass extends JavaElement {
     }
     
     public List<JavaClass> getAllSuperClasses() {
-        bindingFin();
+        collectInfo();
         List<JavaClass> types = new ArrayList<JavaClass>();
         JavaClass parent = this.getSuperClass();
         while (parent != null) {
@@ -605,7 +596,7 @@ public class JavaClass extends JavaElement {
     }
     
     public List<JavaClass> getAllSuperInterfaces() {
-        bindingFin();
+        collectInfo();
         List<JavaClass> jclasses = new ArrayList<JavaClass>();
         getAllSuperInterfaces(this, jclasses);
         return jclasses;
@@ -628,7 +619,7 @@ public class JavaClass extends JavaElement {
     }
     
     public List<JavaClass> getAncestors() {
-        bindingFin();
+        collectInfo();
         List<JavaClass> jclasses = new ArrayList<JavaClass>();
         jclasses.addAll(getAllSuperClasses());
         jclasses.addAll(getAllSuperInterfaces());
@@ -636,14 +627,14 @@ public class JavaClass extends JavaElement {
     }
     
     public List<JavaClass> getDescendants() {
-        bindingFin();
+        collectInfo();
         List<JavaClass> jclasses = new ArrayList<JavaClass>();
         getAllChildren(this, jclasses);
         return jclasses;
     }
     
     public Set<JavaClass> getAfferentClasses() {
-        bindingFin();
+        collectInfo();
         if (afferentClasses == null) {
             findEfferentClasses();
         }
@@ -651,7 +642,7 @@ public class JavaClass extends JavaElement {
     }
     
     public Set<JavaClass> getAfferentClassesInProject() {
-        bindingFin();
+        collectInfo();
         if (afferentClasses == null) {
             findEfferentClasses();
         }
@@ -665,7 +656,7 @@ public class JavaClass extends JavaElement {
     }
     
     public Set<JavaClass> getEfferentClasses() {
-        bindingFin();
+        collectInfo();
         if (efferentClasses == null) {
             findEfferentClasses();
         }
@@ -673,7 +664,7 @@ public class JavaClass extends JavaElement {
     }
     
     public Set<JavaClass> getEfferentClassesInProject() {
-        bindingFin();
+        collectInfo();
         if (efferentClasses == null) {
             findEfferentClasses();
         }
@@ -689,7 +680,6 @@ public class JavaClass extends JavaElement {
     private void findEfferentClasses() {
         afferentClasses = new HashSet<JavaClass>();
         efferentClasses = new HashSet<JavaClass>();
-        
         for (JavaClass jclass : usedClasses) {
             efferentClasses.add(jclass);
             jclass.addAfferentClass(this);

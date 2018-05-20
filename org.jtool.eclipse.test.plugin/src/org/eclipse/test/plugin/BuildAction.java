@@ -14,9 +14,8 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.jtool.eclipse.plugin.ProjectStore;
+import org.jtool.eclipse.ProjectStore;
 
 /**
  * Performs the build action for a project of interest.
@@ -28,20 +27,14 @@ public class BuildAction extends AbstractHandler {
     }
     
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
         ISelection selection = HandlerUtil.getActiveMenuSelection(event);
         if (selection instanceof IStructuredSelection) {
             IStructuredSelection structured = (IStructuredSelection)selection;
             Object elem = structured.getFirstElement();
-            IJavaProject project = null;
             if (elem instanceof IJavaProject) {
-                project = (IJavaProject)elem;
+                ProjectStore.getInstance().build((IJavaProject)elem);
             } else if (elem instanceof IProject) {
-                project = (IJavaProject)JavaCore.create((IProject)elem);
-            }
-            if (project != null) {
-                ProjectStore.getInstance().setShell(window.getShell());
-                ProjectStore.getInstance().build(project, true);
+                ProjectStore.getInstance().build((IJavaProject)JavaCore.create((IProject)elem));
             }
         }
         return null;

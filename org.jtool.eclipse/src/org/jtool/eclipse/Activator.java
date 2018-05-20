@@ -4,7 +4,7 @@
  *  Department of Computer Science, Ritsumeikan University
  */
 
-package org.jtool.eclipse.plugin;
+package org.jtool.eclipse;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -22,9 +22,6 @@ public class Activator extends AbstractUIPlugin implements IStartup {
     
     private static Activator plugin;
     
-    private ResourceChangeListener resourceChangeListener;
-    private CommandListener commandListener;
-    
     public Activator() {
     }
     
@@ -34,10 +31,6 @@ public class Activator extends AbstractUIPlugin implements IStartup {
     
     @Override
     public void earlyStartup() {
-        resourceChangeListener = new ResourceChangeListener();
-        resourceChangeListener.register();
-        commandListener = new CommandListener();
-        commandListener.register();
     }
     
     @Override
@@ -49,12 +42,6 @@ public class Activator extends AbstractUIPlugin implements IStartup {
     @Override
     public void stop(BundleContext context) throws Exception {
         plugin = null;
-        if (resourceChangeListener != null) {
-            resourceChangeListener.unregister();
-        }
-        if (commandListener != null) {
-            commandListener.unregister();
-        }
         super.stop(context);
     }
     
