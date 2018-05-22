@@ -29,11 +29,11 @@ public class TimeInfo {
         return time.toInstant().toEpochMilli();
     }
     
-    public String getTimeAsISOString(ZonedDateTime time) {
+    public static String getTimeAsISOString(ZonedDateTime time) {
         return time.format(DateTimeFormatter.ISO_ZONED_DATE_TIME);
     }
     
-    public String getFormatedTime(ZonedDateTime time) {
+    public static String getFormatedTime(ZonedDateTime time) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.SSS");
         return time.format(formatter);
     }

@@ -18,12 +18,19 @@ public class Options {
     private Map<String, String> options = new HashMap<String, String>();
     
     public Options(String[] args) {
-        for (int count = 0; count < args.length; count++) {
-            String key = args[count].trim().substring(1);
-            count++;
-            if (count < args.length) {
-                String value = args[count];
-                options.put(key, value.trim());
+        for (int count = 0; count < args.length; ) {
+            if (args[count].charAt(0) == '-') {
+                String key = args[count].trim().substring(1);
+                count++;
+                if (count < args.length) {
+                    if (args[count].charAt(0) != '-') {
+                        String value = args[count];
+                        options.put(key, value.trim());
+                        count++;
+                    } else {
+                        options.put(key, "yes");
+                    }
+                }
             }
         }
     }

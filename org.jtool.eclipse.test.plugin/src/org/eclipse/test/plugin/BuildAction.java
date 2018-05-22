@@ -6,6 +6,7 @@
  
 package org.eclipse.test.plugin;
 
+import org.jtool.eclipse.javamodel.plugin.ProjectManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.core.commands.AbstractHandler;
@@ -15,10 +16,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.jtool.eclipse.ProjectStore;
 
 /**
- * Performs the build action for a project of interest.
+ * Performs the action that builds java models of elements within a project.
  * @author Katsuhisa Maruyama
  */
 public class BuildAction extends AbstractHandler {
@@ -32,9 +32,9 @@ public class BuildAction extends AbstractHandler {
             IStructuredSelection structured = (IStructuredSelection)selection;
             Object elem = structured.getFirstElement();
             if (elem instanceof IJavaProject) {
-                ProjectStore.getInstance().build((IJavaProject)elem);
+                ProjectManager.getInstance().build((IJavaProject)elem);
             } else if (elem instanceof IProject) {
-                ProjectStore.getInstance().build((IJavaProject)JavaCore.create((IProject)elem));
+                ProjectManager.getInstance().build((IJavaProject)JavaCore.create((IProject)elem));
             }
         }
         return null;

@@ -6,12 +6,12 @@
 
 package org.jtool.eclipse.test;
 
-import org.jtool.eclipse.model.cfg.CFG;
-import org.jtool.eclipse.model.cfg.CFGStore;
-import org.jtool.eclipse.model.java.JavaClass;
-import org.jtool.eclipse.model.java.JavaField;
-import org.jtool.eclipse.model.java.JavaMethod;
-import org.jtool.eclipse.model.standalone.JavaModelBuilder;
+import org.jtool.eclipse.cfg.CFG;
+import org.jtool.eclipse.cfg.CFGStore;
+import org.jtool.eclipse.javamodel.JavaClass;
+import org.jtool.eclipse.javamodel.JavaField;
+import org.jtool.eclipse.javamodel.JavaMethod;
+import org.jtool.eclipse.standalone.JavaModelBuilder;
 //import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Test;
  * @author Katsuhisa Maruyama
  */
 public class CFGModelBuilderTest {
+    
+    private final String TEST_PROECT_DIR = "/Users/maru/Desktop/TestSamples/";
     
     @SuppressWarnings("unused")
     private boolean checkDetails(JavaModelBuilder builder) {
@@ -42,7 +44,7 @@ public class CFGModelBuilderTest {
     
     @Test
     public void testSimple() {
-        String target = "/Users/maru/Desktop/TestSamples/Simple/";
+        String target = TEST_PROECT_DIR + "Simple/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         builder.build(false);
         CFGStore.getInstance().create(false);
@@ -53,7 +55,7 @@ public class CFGModelBuilderTest {
     
     @Test
     public void testJrb() {
-        String target = "/Users/maru/Desktop/TestSamples/jrb-1.0.2/src/";
+        String target = TEST_PROECT_DIR + "jrb-1.0.2/src/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         builder.build(false);
         CFGStore.getInstance().create(false);
@@ -64,7 +66,7 @@ public class CFGModelBuilderTest {
     
     @Test
     public void testTetris() {
-        String target = "/Users/maru/Desktop/TestSamples/Tetris/src";
+        String target = TEST_PROECT_DIR + "Tetris/src/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         builder.build(false);
         CFGStore.getInstance().create(false);
@@ -75,7 +77,7 @@ public class CFGModelBuilderTest {
     
     @Test
     public void testDrawTool() {
-        String target = "/Users/maru/Desktop/TestSamples/DrawTool/src";
+        String target = TEST_PROECT_DIR + "DrawTool/src/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         builder.build(false);
         CFGStore.getInstance().create(false);
@@ -85,7 +87,7 @@ public class CFGModelBuilderTest {
     
     @Test
     public void testLambda() {
-        String target = "/Users/maru/Desktop/TestSamples/Lambda/";
+        String target = TEST_PROECT_DIR + "Lambda/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         builder.build(false);
         CFGStore.getInstance().create(false);
