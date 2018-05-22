@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Eclipse
+Bundle-Name: JavaModel Plugin
 Bundle-SymbolicName: org.jtool.eclipse.javamodel;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.jtool.eclipse.javamodel.plugin.Activator
