@@ -207,7 +207,7 @@ public class JavaModelBuilder {
                 
                 pm.work(1);
                 count++;
-                Logger.getInstance().printLog("-Parsed " + jfile.getRelativePath() + " (" + count + "/" + size + ")" + jfile.getName());
+                Logger.getInstance().printLog("-Parsed " + jfile.getRelativePath() + " (" + count + "/" + size + ")");
             }
         };
         
