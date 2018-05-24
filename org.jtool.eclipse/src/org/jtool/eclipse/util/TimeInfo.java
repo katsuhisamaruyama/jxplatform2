@@ -38,6 +38,11 @@ public class TimeInfo {
         return time.format(formatter);
     }
     
+    public static String getFormatedDate(ZonedDateTime time) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+        return time.format(formatter);
+    }
+    
     public static ZonedDateTime getTime(String str) {
         return ZonedDateTime.parse(str, DateTimeFormatter.ISO_ZONED_DATE_TIME);
     }
