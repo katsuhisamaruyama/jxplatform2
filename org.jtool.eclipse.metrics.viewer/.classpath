@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swt_3.106.2.v20171129-0543.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swt.cocoa.macosx.x86_64_3.106.2.v20171129-0543.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.swt.cocoa.macosx.x86_64.source_3.106.2.v20171129-0543.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jface_3.13.2.v20171022-1656.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jface.text_3.12.1.v20171114-1359.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/org.jtool.eclipse.metrics"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
