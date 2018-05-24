@@ -38,16 +38,16 @@ public class JavaModelBuilder {
     private String logfile = "";
     
     public JavaModelBuilder(String[] args) {
-        Options options = new Options(args);
-        String target = options.get("-target", ".");
-        String classpath = options.get("-classpath", ".");
-        String name = options.get("-name", target);
-        logfile = options.get("-logfile", "aaaa");
-        
         String cdir = new File(".").getAbsoluteFile().getParent();
-        File targetDir = new File(cdir + File.separatorChar + target);
+        Options options = new Options(args);
+        String target = removeLastFileSeparator(options.get("-target", "."));
+        String classpath = options.get("-classpath", ".");
+        String name = options.get("-name", getProjectName(target, cdir));
+        logfile = options.get("-logfile", "");
+        
+        File dir = new File(getFullPath(target, cdir));
         try {
-            jproject = new JavaProject(name, targetDir.getCanonicalPath());
+            jproject = new JavaProject(name, dir.getCanonicalPath());
             ProjectStore.getInstance().setCurrentProject(jproject);
             setClasspath(classpath, cdir);
         } catch (IOException e) {
@@ -61,6 +61,9 @@ public class JavaModelBuilder {
     
     public JavaModelBuilder(String name, String target, String classpath) {
         try {
+            target = removeLastFileSeparator(target);
+            name = replaceFileSeparator(name);
+            
             File dir = new File(target);
             jproject = new JavaProject(name, dir.getCanonicalPath());
             ProjectStore.getInstance().setCurrentProject(jproject);
@@ -72,30 +75,56 @@ public class JavaModelBuilder {
         }
     }
     
+    private String removeLastFileSeparator(String path) {
+        if (path.charAt(path.length() - 1) == File.separatorChar) {
+            return path.substring(0, path.length() - 1);
+        }
+        return path;
+    }
+    
+    private String getProjectName(String target, String cdir) {
+        String name = removeLastFileSeparator(target);
+        if (name.startsWith(cdir)) {
+            name = name.substring(cdir.length() + 1);
+        }
+        int index = name.lastIndexOf(File.separatorChar + "src");
+        if (index > 0) {
+            name = name.substring(0, index);
+        }
+        return replaceFileSeparator(name);
+    }
+    
+    private String replaceFileSeparator(String path) {
+        return path.replace(File.separatorChar, '.');
+    }
+    
     private void setClasspath(String classpath, String cdir) throws IOException {
         if (classpath != null && classpath.length() != 0) {
             String[] paths = classpath.split(":");
             if (paths != null) {
                 for (int i = 0; i < paths.length; i++) {
-                    String fullPath; 
-                    if (paths[i].startsWith(File.separator)) {
-                        fullPath = paths[i];
-                    } else {
-                        fullPath = cdir + File.separatorChar + paths[i];
-                    }
-                    if (paths[i].endsWith(File.separator + "*")) {
-                        fullPath = fullPath.substring(0, fullPath.length() - 1);
-                        File dir = new File(fullPath);
+                    String path = getFullPath(paths[i], cdir); 
+                    if (path.endsWith(File.separator + "*")) {
+                        path = path.substring(0, path.length() - 1);
+                        File dir = new File(path);
                         for (File file : dir.listFiles()) {
                             if (file.getAbsolutePath().endsWith(".jar")) {
                                 classpaths.add(file.getCanonicalPath());
                             }
                         }
                     } else {
-                        classpaths.add(fullPath);
+                        classpaths.add(path);
                     }
                 }
             }
+        }
+    }
+    
+    private String getFullPath(String path, String cdir) {
+        if (path.charAt(0) == File.separatorChar) {
+            return path;
+        } else {
+            return cdir + File.separatorChar + path;
         }
     }
     
@@ -167,11 +196,11 @@ public class JavaModelBuilder {
                     cu.accept(visitor);
                     visitor.terminate();
                     jproject.addFile(jfile);
-                    ProjectStore.getInstance().printLog("-Parsed " + jfile.getPath() + " (" + count + "/" + size + ")");
+                    ProjectStore.getInstance().printLog("-Parsed " + jfile.getRelativePath() + " (" + count + "/" + size + ")" + jfile.getName());
                 }
             };
             
-            ProjectStore.getInstance().printMessage("TARGET = " + jproject.getPath());
+            ProjectStore.getInstance().printMessage("Target = " + jproject.getPath() + " (" + jproject.getName() + ")");
             
             ProjectStore.getInstance().printMessage("** Ready to parse " + sourceFiles.size() + " files");
             parser.createASTs(paths, encodings, new String[]{ }, requestor, null);

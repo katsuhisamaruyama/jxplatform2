@@ -280,7 +280,7 @@ public class ProjectManager {
             if (code != null) {
                 JavaFile jfile = new JavaFile(cu, icu.getPath().toString(), code, JavaCore.getEncoding(), jproject);
                 if (getParseErrors(cu).size() != 0) {
-                    ProjectStore.getInstance().printError("Incomplete parse: " + icu.getPath().toString());
+                    ProjectStore.getInstance().printError("Incomplete parse: " + icu.getPath().makeRelative().toString());
                 }
                 
                 JavaASTVisitor visitor = new JavaASTVisitor(jfile);

@@ -269,6 +269,10 @@ public class JavaMethod extends JavaElement {
         return JavaElement.isVoid(returnType);
     }
     
+    public List<JavaLocal> getLocalVariables() {
+        return localDecls;
+    }
+    
     public int getModifiers() {
         return modifiers;
     }
@@ -622,7 +626,7 @@ public class JavaMethod extends JavaElement {
         return statementCollector.getNumberOfStatements();
     }
     
-    public int getMaximumNuberOfNesting() {
+    public int getMaximumNumberOfNesting() {
         if (statementCollector == null) {
             statementCollector = new StatementCollector();
             astNode.accept(statementCollector);

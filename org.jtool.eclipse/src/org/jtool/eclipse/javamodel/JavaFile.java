@@ -54,6 +54,14 @@ public class JavaFile {
         return path;
     }
     
+    public String getRelativePath() {
+        return path.substring(jproject.getPath().length() + 1);
+    }
+    
+    public String getName() {
+        return path.substring(path.lastIndexOf(File.separator) + 1);
+    }
+    
     public String getCode() {
         return code;
     }
