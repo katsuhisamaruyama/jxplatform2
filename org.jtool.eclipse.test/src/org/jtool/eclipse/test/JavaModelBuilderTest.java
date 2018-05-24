@@ -28,7 +28,7 @@ public class JavaModelBuilderTest {
     
     @Test
     public void testJrb() {
-        String target = TEST_PROECT_DIR + "jrb-1.0.2/src/";
+        String target = TEST_PROECT_DIR + "jrb-1.0.2/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         builder.build(true);
         builder.unbuild();
@@ -36,7 +36,7 @@ public class JavaModelBuilderTest {
     
     @Test
     public void testTetris() {
-        String target = TEST_PROECT_DIR + "Tetris/src/";
+        String target = TEST_PROECT_DIR + "Tetris/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         builder.build(true);
         builder.unbuild();
@@ -44,7 +44,7 @@ public class JavaModelBuilderTest {
     
     @Test
     public void testDrawTool() {
-        String target = TEST_PROECT_DIR + "DrawTool/src/";
+        String target = TEST_PROECT_DIR + "DrawTool/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         builder.build(true);
         builder.unbuild();
@@ -69,7 +69,7 @@ public class JavaModelBuilderTest {
     
     @Test
     public void testFindbugs() {
-        String target = TEST_PROECT_DIR + "findbugs/src/";
+        String target = TEST_PROECT_DIR + "findbugs/";
         String classpath = TEST_PROECT_DIR + "findbugs/lib/*";
         JavaModelBuilder builder = new JavaModelBuilder(target, target, classpath);
         builder.build(true);
@@ -78,7 +78,7 @@ public class JavaModelBuilderTest {
     
     @Test
     public void testApacheAnt() {
-        String target = TEST_PROECT_DIR + "apache-ant/src/";
+        String target = TEST_PROECT_DIR + "apache-ant/";
         String classpath = TEST_PROECT_DIR + "apache-ant/lib/*";
         JavaModelBuilder builder = new JavaModelBuilder(target, target, classpath);
         builder.build(true);
@@ -87,7 +87,7 @@ public class JavaModelBuilderTest {
     
     @Test
     public void testJdk8() {
-        String target = "/Users/maru/Desktop/TestSamples/jdk1.8.0_131/src/";
+        String target = "/Users/maru/Desktop/TestSamples/jdk1.8.0_131/";
         String classpath = "/Users/maru/Desktop/TestSamples/jdk1.8.0_131/lib/*";
         JavaModelBuilder builder = new JavaModelBuilder(target, target, classpath);
         builder.build(true);
@@ -104,6 +104,6 @@ public class JavaModelBuilderTest {
         tester.testCSSample();
         tester.testFindbugs();
         tester.testApacheAnt();
-        //ester.testJdk8();
+        //tester.testJdk8();
     }
 }

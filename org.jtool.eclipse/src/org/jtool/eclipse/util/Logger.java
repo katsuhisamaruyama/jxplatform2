@@ -8,6 +8,9 @@ package org.jtool.eclipse.util;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 
 /**
@@ -60,6 +63,10 @@ public class Logger {
     
     public void setLogFile(String logfile) {
         this.logfile = logfile;
+        File file = new File(logfile);
+        if (file.exists()) {
+            file.delete();
+        }
     }
     
     public void writeLog() {
@@ -73,7 +80,10 @@ public class Logger {
             buf.append("\n");
         }
         try {
-            FileWriter.write(logfile, buf.toString());
+            BufferedWriter writer = new BufferedWriter(new FileWriter(new File(logfile), true));
+            writer.append(buf.toString());
+            writer.flush();
+            writer.close();
         } catch (IOException e) {
             System.err.println(e.getMessage());
             System.err.flush();

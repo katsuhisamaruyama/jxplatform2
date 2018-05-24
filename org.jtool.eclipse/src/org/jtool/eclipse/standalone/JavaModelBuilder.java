@@ -230,7 +230,7 @@ public class JavaModelBuilder {
             
             pm.work(1);
             count++;
-            Logger.getInstance().printLog(" -Built " + jclass.getQualifiedName() + " (" + count + "/" + size + ")");
+            Logger.getInstance().printLog("-Built " + jclass.getQualifiedName() + " (" + count + "/" + size + ")");
         }
         pm.done();
     }
