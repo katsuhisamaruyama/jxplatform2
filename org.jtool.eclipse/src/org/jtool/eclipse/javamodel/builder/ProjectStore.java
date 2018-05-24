@@ -7,12 +7,8 @@
 package org.jtool.eclipse.javamodel.builder;
 
 import org.jtool.eclipse.javamodel.JavaProject;
-import org.jtool.eclipse.util.FileWriter;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.io.IOException;
 
 /**
  * An object representing a Eclipse's project.
