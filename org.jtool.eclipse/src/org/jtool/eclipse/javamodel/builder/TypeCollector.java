@@ -8,6 +8,7 @@ package org.jtool.eclipse.javamodel.builder;
 
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaElement;
+import org.jtool.eclipse.util.Logger;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.PrimitiveType;
@@ -146,7 +147,7 @@ public class TypeCollector extends ASTVisitor {
                 jc.addUsedClass(jc2);
             } else {
                 bindingOk = false;
-                ProjectStore.getInstance().printUnresolvedError(tbinding.getQualifiedName());
+                Logger.getInstance().printUnresolvedError(tbinding.getQualifiedName());
             }
         } else if (tbinding.isParameterizedType()) {
             JavaClass jc2 = JavaElement.findDeclaringClass(tbinding);
@@ -157,7 +158,7 @@ public class TypeCollector extends ASTVisitor {
                 }
             } else {
                 bindingOk = false;
-                ProjectStore.getInstance().printUnresolvedError(tbinding.getQualifiedName());
+                Logger.getInstance().printUnresolvedError(tbinding.getQualifiedName());
             }
         }
     }

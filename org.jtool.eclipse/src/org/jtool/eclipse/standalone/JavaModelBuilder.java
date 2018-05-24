@@ -13,6 +13,8 @@ import org.jtool.eclipse.javamodel.builder.JavaASTVisitor;
 import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import org.jtool.eclipse.util.DetectCharset;
 import org.jtool.eclipse.util.Options;
+import org.jtool.eclipse.util.Logger;
+import org.jtool.eclipse.util.ProgressMonitor;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -50,6 +52,9 @@ public class JavaModelBuilder {
             jproject = new JavaProject(name, dir.getCanonicalPath());
             ProjectStore.getInstance().setCurrentProject(jproject);
             setClasspath(classpath, cdir);
+            if (logfile.length() > 0) {
+                Logger.getInstance().setLogFile(jproject.getPath() + File.separator + logfile);
+            }
         } catch (IOException e) {
             jproject = null;
         }
@@ -148,10 +153,7 @@ public class JavaModelBuilder {
             return;
         }
         run(resolveBinding);
-        
-        if (logfile.length() > 0) {
-            ProjectStore.getInstance().writeLog(jproject.getPath() + File.separator + logfile);
-        }
+        Logger.getInstance().writeLog();
     }
     
     public void unbuild() {
@@ -161,13 +163,13 @@ public class JavaModelBuilder {
     }
     
     private void run(boolean resolveBinding) {
-        ASTParser parser = getParser();
         List<File> sourceFiles = collectAllJavaFiles(jproject.getPath());
         if (sourceFiles.size() > 0) {
             String[] paths = new String[sourceFiles.size()];
             String[] encodings = new String[sourceFiles.size()];
             Map<String, String> sources = new HashMap<String, String>();
             Map<String, String> charsets = new HashMap<String, String>();
+            
             int count = 0;
             for (File file : sourceFiles) {
                 try {
@@ -179,69 +181,58 @@ public class JavaModelBuilder {
                     sources.put(path, source);
                     charsets.put(path, charset);
                     count++;
-                } catch (IOException e) { /* empty */ }
+                } catch (IOException e) { /* rmpty */ }
             }
             
-            final int size = paths.length;
-            asterisk = 0;
-            FileASTRequestor requestor = new FileASTRequestor() {
-                private int count = 0;
-                public void acceptAST(String path, CompilationUnit cu) {
-                    JavaFile jfile = new JavaFile(cu, path, sources.get(path), charsets.get(path), jproject);
-                    if (displayAsterisk(count, size)) {
-                        ProjectStore.getInstance().printProgress(".");
-                    }
-                    count++;
-                    JavaASTVisitor visitor = new JavaASTVisitor(jfile);
-                    cu.accept(visitor);
-                    visitor.terminate();
-                    jproject.addFile(jfile);
-                    ProjectStore.getInstance().printLog("-Parsed " + jfile.getRelativePath() + " (" + count + "/" + size + ")" + jfile.getName());
-                }
-            };
-            
-            ProjectStore.getInstance().printMessage("Target = " + jproject.getPath() + " (" + jproject.getName() + ")");
-            
-            ProjectStore.getInstance().printMessage("** Ready to parse " + sourceFiles.size() + " files");
-            parser.createASTs(paths, encodings, new String[]{ }, requestor, null);
-            ProjectStore.getInstance().printProgress("\n");
-            
+            parse(paths, encodings, sources, charsets);
             if (resolveBinding) {
-                ProjectStore.getInstance().printMessage("** Ready to build java models of " + jproject.getClasses().size() + " classes");
                 collectInfo();
-                ProjectStore.getInstance().printProgress("\n");
             }
         }
+    }
+    
+    private void parse(String[] paths, String[] encodings, Map<String, String> sources, Map<String, String> charsets) {
+        final int size = paths.length;
+        ProgressMonitor pm = new ProgressMonitor();
+        pm.begin(size);
+        FileASTRequestor requestor = new FileASTRequestor() {
+            private int count = 0;
+            
+            public void acceptAST(String path, CompilationUnit cu) {
+                JavaFile jfile = new JavaFile(cu, path, sources.get(path), charsets.get(path), jproject);
+                JavaASTVisitor visitor = new JavaASTVisitor(jfile);
+                cu.accept(visitor);
+                visitor.terminate();
+                jproject.addFile(jfile);
+                
+                pm.work(1);
+                count++;
+                Logger.getInstance().printLog("-Parsed " + jfile.getRelativePath() + " (" + count + "/" + size + ")" + jfile.getName());
+            }
+        };
+        
+        Logger.getInstance().printMessage("Target = " + jproject.getPath() + " (" + jproject.getName() + ")");
+        
+        Logger.getInstance().printMessage("** Ready to parse " + size + " files");
+        ASTParser parser = getParser();
+        parser.createASTs(paths, encodings, new String[]{ }, requestor, null);
+        pm.done();
     }
     
     public void collectInfo() {
         int size = jproject.getClasses().size();
-        asterisk = 0;
+        Logger.getInstance().printMessage("** Ready to build java models of " + size + " classes");
+        ProgressMonitor pm = new ProgressMonitor();
+        pm.begin(size);
         int count = 0;
         for (JavaClass jclass : jproject.getClasses()) {
-            if (displayAsterisk(count, size)) {
-                ProjectStore.getInstance().printProgress(".");
-            }
-            count++;
             jproject.collectInfo(jclass);
-            ProjectStore.getInstance().printLog(" -Built " + jclass.getQualifiedName() + " (" + count + "/" + size + ")");
+            
+            pm.work(1);
+            count++;
+            Logger.getInstance().printLog(" -Built " + jclass.getQualifiedName() + " (" + count + "/" + size + ")");
         }
-    }
-    
-    private int asterisk;
-    
-    private boolean displayAsterisk(int count, int size) {
-        if (size <= 100) {
-            asterisk++;
-            return true;
-        }
-        
-        if (count * 100 >= size * asterisk) {
-            asterisk++;
-            return true;
-        } else {
-            return false;
-        }
+        pm.done();
     }
     
     @SuppressWarnings("deprecation")

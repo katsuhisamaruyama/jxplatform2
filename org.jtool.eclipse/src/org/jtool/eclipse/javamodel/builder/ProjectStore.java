@@ -23,12 +23,7 @@ public class ProjectStore {
     private static ProjectStore instance = new ProjectStore();
     
     private Map<String, JavaProject> projectStore = new HashMap<String, JavaProject>();
-    
     private JavaProject currentProject;
-    
-    private List<String> logMessages = new ArrayList<String>();
-    
-    private JXConsole console = new JXConsole();
     
     private ProjectStore() {
     }
@@ -86,48 +81,5 @@ public class ProjectStore {
     
     public JavaProject getProject(String path) {
         return projectStore.get(path);
-    }
-    
-    public void writeLog(String path) {
-        StringBuilder buf = new StringBuilder();
-        for (String mesg : logMessages) {
-            buf.append(mesg);
-            buf.append("\n");
-        }
-        try {
-            FileWriter.write(path, buf.toString());
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            System.err.flush();
-        }
-        logMessages.clear();
-    }
-    
-    public void printProgress(String mesg) {
-        System.out.print(mesg);
-        System.out.flush();
-    }
-    
-    public void printMessage(String mesg) {
-        logMessages.add(mesg);
-        
-        System.out.println(mesg);
-        System.out.flush();
-    }
-    
-    public void printLog(String mesg) {
-        logMessages.add(mesg);
-    }
-    
-    public void printError(String mesg) {
-        logMessages.add(mesg);
-        
-        System.err.println(mesg);
-        System.err.flush();
-        console.println(mesg);
-    }
-    
-    public void printUnresolvedError(String mesg) {
-        printError("!Unresolved : " + mesg);
     }
 }

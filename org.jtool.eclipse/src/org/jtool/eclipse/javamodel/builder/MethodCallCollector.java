@@ -9,6 +9,7 @@ package org.jtool.eclipse.javamodel.builder;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaElement;
 import org.jtool.eclipse.javamodel.JavaMethod;
+import org.jtool.eclipse.util.Logger;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -111,7 +112,7 @@ public class MethodCallCollector extends ASTVisitor {
                 }
             } else {
                 if (!mbinding.getDeclaringClass().isEnum() || !isImplicitMethodOfEnum(mbinding.getName())) {
-                    ProjectStore.getInstance().printUnresolvedError(mbinding.getName() + " of " + mbinding.getDeclaringClass().getQualifiedName());
+                    Logger.getInstance().printUnresolvedError(mbinding.getName() + " of " + mbinding.getDeclaringClass().getQualifiedName());
                     bindingOk = false;
                 }
             }
@@ -123,7 +124,7 @@ public class MethodCallCollector extends ASTVisitor {
             JavaClass jc = JavaElement.findDeclaringClass(type.resolveBinding());
             if (jc.isInProject()) {
                 bindingOk = false;
-                ProjectStore.getInstance().printUnresolvedError("$ClassInstanceCreation" + " of " + jc.getQualifiedName());
+                Logger.getInstance().printUnresolvedError("$ClassInstanceCreation" + " of " + jc.getQualifiedName());
             }
         }
     }

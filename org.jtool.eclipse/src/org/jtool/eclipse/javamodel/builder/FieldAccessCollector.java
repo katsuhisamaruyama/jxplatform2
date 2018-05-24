@@ -8,6 +8,7 @@ package org.jtool.eclipse.javamodel.builder;
 
 import org.jtool.eclipse.javamodel.JavaElement;
 import org.jtool.eclipse.javamodel.JavaField;
+import org.jtool.eclipse.util.Logger;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -93,7 +94,7 @@ public class FieldAccessCollector extends ASTVisitor {
                         }
                     } else {
                         bindingOk = false;
-                        ProjectStore.getInstance().printUnresolvedError(binding.getName() + " of " + vbinding.getDeclaringClass().getQualifiedName());
+                        Logger.getInstance().printUnresolvedError(binding.getName() + " of " + vbinding.getDeclaringClass().getQualifiedName());
                     }
                 }
             }

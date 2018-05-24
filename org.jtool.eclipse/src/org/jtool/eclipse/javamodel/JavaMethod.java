@@ -10,8 +10,8 @@ import org.jtool.eclipse.javamodel.builder.FieldAccessCollector;
 import org.jtool.eclipse.javamodel.builder.LambdaCollector;
 import org.jtool.eclipse.javamodel.builder.LocalDeclarationCollector;
 import org.jtool.eclipse.javamodel.builder.MethodCallCollector;
-import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import org.jtool.eclipse.javamodel.builder.StatementCollector;
+import org.jtool.eclipse.util.Logger;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Initializer;
@@ -456,9 +456,9 @@ public class JavaMethod extends JavaElement {
         }
         if (!resolveOk) {
             if (declaringClass != null) {
-                ProjectStore.getInstance().printUnresolvedError(getName() + " of " + declaringClass.getQualifiedName());
+                Logger.getInstance().printUnresolvedError(getName() + " of " + declaringClass.getQualifiedName());
             } else {
-                ProjectStore.getInstance().printUnresolvedError(getName());
+                Logger.getInstance().printUnresolvedError(getName());
             }
         }
         resolved = true;
@@ -476,7 +476,7 @@ public class JavaMethod extends JavaElement {
                 exceptions.add(jc);
             } else {
                 resolveOk = false;
-                ProjectStore.getInstance().printUnresolvedError(tbinding.getQualifiedName());
+                Logger.getInstance().printUnresolvedError(tbinding.getQualifiedName());
             }
         }
         return resolveOk;

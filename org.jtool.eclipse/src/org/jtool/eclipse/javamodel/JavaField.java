@@ -8,7 +8,7 @@ package org.jtool.eclipse.javamodel;
 
 import org.jtool.eclipse.javamodel.builder.FieldInitializerCollector;
 import org.jtool.eclipse.javamodel.builder.MethodCallCollector;
-import org.jtool.eclipse.javamodel.builder.ProjectStore;
+import org.jtool.eclipse.util.Logger;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -147,9 +147,9 @@ public class JavaField extends JavaVariable {
         }
         if (!resolveOk) {
             if (declaringClass != null) {
-                ProjectStore.getInstance().printUnresolvedError(getQualifiedName() + " of " + declaringClass.getQualifiedName());
+                Logger.getInstance().printUnresolvedError(getQualifiedName() + " of " + declaringClass.getQualifiedName());
             } else {
-                ProjectStore.getInstance().printUnresolvedError(getQualifiedName());
+                Logger.getInstance().printUnresolvedError(getQualifiedName());
             }
         }
         resolved = true;

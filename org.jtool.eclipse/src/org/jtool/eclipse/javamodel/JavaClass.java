@@ -6,8 +6,8 @@
 
 package org.jtool.eclipse.javamodel;
 
-import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import org.jtool.eclipse.javamodel.builder.TypeCollector;
+import org.jtool.eclipse.util.Logger;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
@@ -496,7 +496,7 @@ public class JavaClass extends JavaElement {
             resolveOk = false;
         }
         if (!resolveOk) {
-            ProjectStore.getInstance().printUnresolvedError(getQualifiedName());
+            Logger.getInstance().printUnresolvedError(getQualifiedName());
         }
         resolved = true;
     }

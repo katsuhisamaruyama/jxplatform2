@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * Tests a class that builds a Java Model.
+ * Collects command-line options.
  * @author Katsuhisa Maruyama
  */
 public class Options {

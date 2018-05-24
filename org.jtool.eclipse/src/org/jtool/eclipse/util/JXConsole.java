@@ -4,7 +4,7 @@
  *  Department of Computer Science, Ritsumeikan University
  */
 
-package org.jtool.eclipse.javamodel.builder;
+package org.jtool.eclipse.util;
 
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.IConsole;

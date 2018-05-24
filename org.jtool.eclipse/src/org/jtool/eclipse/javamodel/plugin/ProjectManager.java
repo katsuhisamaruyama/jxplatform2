@@ -15,6 +15,7 @@ import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import org.jtool.eclipse.javamodel.plugin.Activator;
 import org.jtool.eclipse.javamodel.plugin.IFileChangeListener;
 import org.jtool.eclipse.javamodel.plugin.ResourceChangeListener;
+import org.jtool.eclipse.util.Logger;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -210,7 +211,7 @@ public class ProjectManager {
                 }
             }
         } catch (JavaModelException e) {
-            ProjectStore.getInstance().printError("JavaModelException occurred: " + e.getMessage());
+            Logger.getInstance().printError("JavaModelException occurred: " + e.getMessage());
         }
         return compilationUnits;
     }
@@ -243,7 +244,7 @@ public class ProjectManager {
                         try {
                             buildJavaModel(parser, icu, jproject);
                         } catch (NullPointerException e) {
-                            ProjectStore.getInstance().printError("* Fatal error occurred. Skip the paser of " + icu.getPath().toString());
+                            Logger.getInstance().printError("* Fatal error occurred. Skip the paser of " + icu.getPath().toString());
                             e.printStackTrace();
                         }
                         if (monitor.isCanceled()) {
@@ -259,7 +260,7 @@ public class ProjectManager {
             
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
-            ProjectStore.getInstance().printError("* InvocationTargetException occurred because " + cause);
+            Logger.getInstance().printError("* InvocationTargetException occurred because " + cause);
             return false;
         } catch (InterruptedException e) {
             return false;
@@ -280,7 +281,7 @@ public class ProjectManager {
             if (code != null) {
                 JavaFile jfile = new JavaFile(cu, icu.getPath().toString(), code, JavaCore.getEncoding(), jproject);
                 if (getParseErrors(cu).size() != 0) {
-                    ProjectStore.getInstance().printError("Incomplete parse: " + icu.getPath().makeRelative().toString());
+                    Logger.getInstance().printError("Incomplete parse: " + icu.getPath().makeRelative().toString());
                 }
                 
                 JavaASTVisitor visitor = new JavaASTVisitor(jfile);
