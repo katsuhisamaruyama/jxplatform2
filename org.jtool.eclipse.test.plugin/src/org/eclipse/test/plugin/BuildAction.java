@@ -6,7 +6,7 @@
  
 package org.eclipse.test.plugin;
 
-import org.jtool.eclipse.javamodel.plugin.ProjectManager;
+import org.jtool.eclipse.plugin.ProjectManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.core.commands.AbstractHandler;

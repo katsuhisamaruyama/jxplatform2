@@ -1,0 +1,58 @@
+/*
+ *  Copyright 2018
+ *  Software Science and Technology Lab.
+ *  Department of Computer Science, Ritsumeikan University
+ */
+
+buildscript {
+  repositories {
+    maven {
+      url 'https://plugins.gradle.org/m2/'
+    }
+  }
+  dependencies {
+    classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+  }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+group = 'com.jtool.eclipse'
+
+jar {
+    baseName = 'jxplatform'
+    classifier = 'lib'
+    version = '1.0'
+}
+shadowJar {
+    baseName = 'jxplatform'
+    classifier = 'all'
+    version = '1.0'
+}
+test.enabled = false
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.eclipse.jdt:org.eclipse.jdt.core:3.13.+'
+    testCompile 'junit:junit:4.+'
+}
+
+compileJava {
+    exclude '**/plugin/*'
+}
+
+shadowJar {
+    manifest {
+        attributes('Main-Class' : 'org.jtool.eclipse.standalone.JavaModelBuilder')
+        exclude '**/plugin/*'
+    }
+}
