@@ -4,4 +4,4 @@
  *  Department of Computer Science, Ritsumeikan University
  */
 
-//rootProject.name = 'org.jtool'
+rootProject.name = 'org.jtool.eclipse'
