@@ -100,7 +100,7 @@ If your stand-alone application employs JxPlatform2, you should use `jxplatform-
     JavaModelBuilder builder = new JavaModelBuilder(name, target, classpath);
     builder.build(true);
 
-### As an Eclipse plug-ins
+### As an Eclipse plug-in
 
 You put `jxplatform-1.0-lib.jar` in the 'plug-ins' directory under the Eclipse. Eclipse needs to be restarted. 
 
