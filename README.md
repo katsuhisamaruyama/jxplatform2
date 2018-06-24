@@ -1,10 +1,10 @@
 # JxPlatform2 (JxPlatform v2) 
 
-JxPlatform is a module that provides three types of easy-to-use models of Java source code. It facilitates the development and maintenance of various kinds of software tools. 
+JxPlatform2 is a module that provides three types of easy-to-use models of Java source code. It facilitates the development and maintenance of various kinds of software tools. 
 
 ### Source Code Model 
 
-JxPlatform builds a Java model consisting of the following elements: 
+JxPlatform2 builds a Java model consisting of the following elements: 
 
 * JavaProject - Stores a collection of Java source files, packages, and classes 
 * JavaFile - Provides information on a Java source file 
@@ -16,7 +16,7 @@ JxPlatform builds a Java model consisting of the following elements:
 
 ### CFG (Control Flow Graph) 
 
-JxPlatform creates a CFG for each method existing in Java source code. 
+JxPlatform2 creates a CFG for each method existing in Java source code. 
 
 * CFGStore - Stores a collection of CFGs created from Java source code 
 * CFG - Provides information about a CFG 
@@ -36,7 +36,7 @@ Each CFG consists of nodes and edges between two nodes.
 
 ### PDG (Program Dependence Graph) 
 
-JxPlatform creates a PDG from a CFG for each method existing in Java source code. 
+JxPlatform2 creates a PDG from a CFG for each method existing in Java source code. 
 
 * PDGStore - Stores a collection of PDGs created from CFGs 
 * PDG - Provides information about a PDG 
@@ -45,6 +45,7 @@ JxPlatform creates a PDG from a CFG for each method existing in Java source code
 * Slice - Provides information about a program slice 
 
 Each PDG consists of nodes and edges between two nodes. 
+
 * PDGNode - Represents a node of a PDG 
 * PDGEntry- Represents an entry node of a PDG for a method, a constructor, a field declaration, or an enum-constant 
 * PDGClassEntry - Represents an entry node of a ClDG for a class or an interface 
@@ -78,7 +79,7 @@ You can build jxplatform2 with the following commands:
     cd jxplatform2/org.jtool.eclipse
     ./gradlew build jar shadowJar
 
-Jar files of jxplatform2 can be found in the 'build/libs' folder.
+Jar files of JxPlatform2 can be found in the 'build/libs' folder.
 
 ## Usage
 
@@ -94,7 +95,7 @@ Jar files of jxplatform2 can be found in the 'build/libs' folder.
 
 These three options can be eliminated if they are needless. 
 
-If your stand-alone application employs jxplatform2, you should use `jxplatform-1.0-lib.jar` instead of `jxplatform-1.0-all.jar`. The following API calls build a Java model. 
+If your stand-alone application employs JxPlatform2, you should use `jxplatform-1.0-lib.jar` instead of `jxplatform-1.0-all.jar`. The following API calls build a Java model. 
 
     JavaModelBuilder builder = new JavaModelBuilder(name, target, classpath);
     builder.build(true);
