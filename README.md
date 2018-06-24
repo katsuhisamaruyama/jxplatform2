@@ -106,8 +106,9 @@ You put `jxplatform-1.0-lib.jar` in the 'plug-ins' directory under the Eclipse. 
 
 Your code builds a Java model for the source code and return a project containing the generated model with either of the following two API calls:
 
-    ProjectManager.getInstance().build(IJavaProject project);
-    ProjectManager.getInstance().buildWhole(IJavaProject project);
+    IJavaProject project;
+    ProjectManager.getInstance().build(project);
+    ProjectManager.getInstance().buildWhole(project);
 
 ### Building CFGs and PDGs
 
