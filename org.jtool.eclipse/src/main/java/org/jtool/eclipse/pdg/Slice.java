@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.HashSet;
 
 /**
- * An object storing information about program slice.
+ * An object storing information about a program slice.
  * @author Katsuhisa Maruyama
  */
 public class Slice extends PDG {

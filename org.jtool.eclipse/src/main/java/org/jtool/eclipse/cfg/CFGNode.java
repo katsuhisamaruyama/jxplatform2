@@ -36,7 +36,7 @@ public class CFGNode extends GraphNode {
         constructorEntry,           // CFGMethodEntry (MethodDeclaration)
         initializerEntry,           // CFGInitializerEntry (Initializer)
         fieldEntry,                 // CFGFieldEntry (VariableDeclarationFragment/FieldDeclaration)
-        enumConstantEntry,          // CFGEnumConstantEntry (EnumConstantDeclaration)
+        enumConstantEntry,          // CFGFieldEntry (EnumConstantDeclaration)
         
         classExit,                  // CFGExit
         interfaceExit,              // CFGExit

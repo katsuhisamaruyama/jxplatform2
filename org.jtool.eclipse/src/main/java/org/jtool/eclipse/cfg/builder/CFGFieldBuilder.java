@@ -69,7 +69,7 @@ public class CFGFieldBuilder {
         
         CFGFieldEntry entry;
         if (vbinding.isEnumConstant()) {
-            entry = new CFGFieldEntry(node, CFGNode.Kind.enumConstantExit, name, fqn);
+            entry = new CFGFieldEntry(node, CFGNode.Kind.enumConstantEntry, name, fqn);
         } else {
             entry = new CFGFieldEntry(node, CFGNode.Kind.fieldEntry, name, fqn);
         }
@@ -105,7 +105,12 @@ public class CFGFieldBuilder {
             }
         }
         
-        CFGExit exit = new CFGExit(node, CFGNode.Kind.fieldExit);
+        CFGExit exit;
+        if (vbinding.isEnumConstant()) {
+            exit = new CFGExit(node, CFGNode.Kind.enumConstantExit);
+        } else {
+            exit = new CFGExit(node, CFGNode.Kind.fieldExit);
+        }
         cfg.setEndNode(exit);
         cfg.add(exit);
         

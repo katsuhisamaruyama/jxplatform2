@@ -9,7 +9,7 @@ package org.jtool.eclipse.cfg;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 /**
- * The exit node of CFGs.
+ * The exit node of a CFG.
  * @author Katsuhisa Maruyama
  */
 public class CFGExit extends CFGNode {
