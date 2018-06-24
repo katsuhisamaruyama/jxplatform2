@@ -68,7 +68,7 @@ JDK 1.8
 
 ### From a release
 
-You can directly download jar files of jxplatform2 on [GitHub](<https://opensource.org/licenses/eclipse-1.0.php>). 
+You can directly download jar files of jxplatform2 on [GitHub](<https://github.com/katsuhisamaruyama/jxplatform2/tree/master/org.jtool.eclipse/releases>). 
 
 ### From the sources
 
