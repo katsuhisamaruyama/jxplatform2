@@ -1,6 +1,6 @@
 # JxPlatform2 (JxPlatform v2) 
 
-JxPlatform is an Eclipse plug-in that provides three types of easy-to-use models of Java source code. It facilitates the development and maintenance of various kinds of software tools. 
+JxPlatform is a module that provides three types of easy-to-use models of Java source code. It facilitates the development and maintenance of various kinds of software tools. 
 
 ### Source Code Model 
 
