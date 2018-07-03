@@ -191,7 +191,9 @@ public class ProjectManager {
     private JavaProject buildWhole(IJavaProject project) {
         String name = project.getProject().getName();
         String path = project.getProject().getFullPath().toString();
-        JavaProject jproject = new JavaProject(name, path);
+        String dir = project.getProject().getLocation().toString();
+        JavaProject jproject = new JavaProject(name, path, dir);
+        
         ProjectStore.getInstance().addProject(jproject);
         ProjectStore.getInstance().setCurrentProject(jproject);
         

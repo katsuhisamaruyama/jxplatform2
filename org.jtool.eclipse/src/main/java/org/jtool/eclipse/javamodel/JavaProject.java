@@ -22,6 +22,7 @@ public class JavaProject {
     
     protected String name;
     protected String path;
+    protected String dir;
     
     protected Map<String, JavaFile> fileStore = new HashMap<String, JavaFile>();
     protected Map<String, JavaPackage> packageStore = new HashMap<String, JavaPackage>();
@@ -30,8 +31,13 @@ public class JavaProject {
     private Map<String, JavaClass> externalClasseStore = new HashMap<String, JavaClass>();
     
     public JavaProject(String name, String path) {
+        this(name, path, path);
+    }
+    
+    public JavaProject(String name, String path, String dir) {
         this.name = name;
         this.path = path;
+        this.dir = dir;
     }
     
     public void clear() {
@@ -73,6 +79,10 @@ public class JavaProject {
     
     public String getPath() {
         return path;
+    }
+    
+    public String getDir() {
+        return dir;
     }
     
     public void addFile(JavaFile jfile) {

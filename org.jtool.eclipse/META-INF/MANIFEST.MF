@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: jxplatform2
-Bundle-SymbolicName: org.jtool.eclipse
+Bundle-SymbolicName: org.jtool.eclipse;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Export-Package: org.jtool.eclipse.javamodel,
  org.jtool.eclipse.javamodel.builder,
@@ -15,3 +15,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.console
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: org.jtool.eclipse
+Bundle-Activator: org.jtool.eclipse.plugin.Activator
+Bundle-ActivationPolicy: lazy

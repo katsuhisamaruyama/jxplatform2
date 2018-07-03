@@ -7,7 +7,7 @@
             allPopups="false"
             locationURI="popup:org.eclipse.ui.popup.any">
          <separator
-               name="org.eclipse.test.plugin.separator1">
+               name="org.eclipse.test.plugin.separator">
          </separator>
          <command
                commandId="org.jtool.eclipse.commands.build"

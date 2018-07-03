@@ -49,7 +49,7 @@ public class JavaModelBuilder {
         
         File dir = new File(getFullPath(target, cdir));
         try {
-            jproject = new JavaProject(name, dir.getCanonicalPath());
+            jproject = new JavaProject(name, dir.getCanonicalPath(), dir.getCanonicalPath());
             ProjectStore.getInstance().setCurrentProject(jproject);
             setClasspath(classpath, cdir);
             if (logfile.length() > 0) {
