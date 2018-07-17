@@ -108,6 +108,7 @@ public class JavaClass extends JavaElement {
             jfile.setPackage(jpackage);
         }
         jpackage.addClass(this);
+        jfile.addClass(this);
     }
     
     public JavaClass(LambdaExpression node, String name, ITypeBinding tbinding, JavaMethod jmethod) {
