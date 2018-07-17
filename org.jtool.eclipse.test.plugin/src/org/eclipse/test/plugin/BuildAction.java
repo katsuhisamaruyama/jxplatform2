@@ -34,7 +34,7 @@ public class BuildAction extends AbstractHandler {
             if (elem instanceof IJavaProject) {
                 ProjectManager.getInstance().build((IJavaProject)elem);
             } else if (elem instanceof IProject) {
-                ProjectManager.getInstance().build((IJavaProject)JavaCore.create((IProject)elem));
+                ProjectManager.getInstance().build(JavaCore.create((IProject)elem));
             }
         }
         return null;
