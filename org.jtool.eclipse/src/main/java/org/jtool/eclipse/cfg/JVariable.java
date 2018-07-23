@@ -106,7 +106,7 @@ public abstract class JVariable {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof JApparentAccess)) {
+        if (obj == null || !(obj instanceof JVariable)) {
             return false;
         }
         return equals((JVariable)obj);
