@@ -3,8 +3,13 @@ Bundle-ManifestVersion: 2
 Bundle-Name: jxplatform2
 Bundle-SymbolicName: org.jtool.eclipse;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Export-Package: org.jtool.eclipse.javamodel,
+Export-Package: org.jtool.eclipse.cfg,
+ org.jtool.eclipse.cfg.builder,
+ org.jtool.eclipse.graph,
+ org.jtool.eclipse.javamodel,
  org.jtool.eclipse.javamodel.builder,
+ org.jtool.eclipse.pdg,
+ org.jtool.eclipse.pdg.builder,
  org.jtool.eclipse.plugin,
  org.jtool.eclipse.standalone,
  org.jtool.eclipse.util
