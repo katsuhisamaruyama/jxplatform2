@@ -175,41 +175,41 @@ public class TypeCollector extends ASTVisitor {
     
     @Override
     public boolean visit(TypeDeclaration node) {
-        return false;
+        return true;
     }
     
     @Override
     public boolean visit(AnonymousClassDeclaration node) {
-        return false;
+        return true;
     }
     
     @Override
     public boolean visit(EnumDeclaration node) {
-        return false;
+        return true;
     }
     
     @Override
     public boolean visit(LambdaExpression node) {
-        return false;
+        return true;
     }
     
     @Override
     public boolean visit(CreationReference node) {
-        return false;
+        return true;
     }
     
     @Override
     public boolean visit(ExpressionMethodReference node) {
-        return false;
+        return true;
     }
     
     @Override
     public boolean visit(SuperMethodReference node) {
-        return false;
+        return true;
     }
     
     @Override
     public boolean visit(TypeMethodReference node) {
-        return false;
+        return true;
     }
 }
