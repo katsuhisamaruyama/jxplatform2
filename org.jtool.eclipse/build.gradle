@@ -21,11 +21,18 @@ apply plugin: 'com.github.johnrengelman.shadow'
 
 group = 'com.jtool.eclipse'
 
+eclipse {
+    classpath {
+        containers 'org.eclipse.pde.core.requiredPlugins'
+    }
+}
+
 jar {
     baseName = 'jxplatform'
     classifier = 'lib'
     version = '1.0'
 }
+
 shadowJar {
     baseName = 'jxplatform'
     classifier = 'all'
