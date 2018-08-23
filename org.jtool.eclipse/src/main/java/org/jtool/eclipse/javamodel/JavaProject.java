@@ -161,7 +161,7 @@ public class JavaProject {
         externalClasseStore.put(jclass.getQualifiedName(), jclass);
     }
     
-    JavaClass getExternalClass(String fqn) {
+    public JavaClass getExternalClass(String fqn) {
         if (fqn != null && fqn.length() > 0) {
             return externalClasseStore.get(fqn);
         }
