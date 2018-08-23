@@ -478,9 +478,8 @@ public class ExpressionVisitor extends ASTVisitor {
         
         String type = callNode.getReturnType();
         boolean primitive = callNode.isPrimitiveType();
-        String name = "$" + String.valueOf(paramNumber);
-        JVariable actualIn = new JApparentAccess(callNode.getASTNode(), name, type, primitive);
-        JVariable actualOut = new JApparentAccess(callNode.getASTNode(), name + "!" + callNode.getName(), type, primitive);
+        JVariable actualIn = new JApparentAccess(callNode.getASTNode(), "$" + String.valueOf(paramNumber), type, primitive);
+        JVariable actualOut = new JApparentAccess(callNode.getASTNode(), "$" + String.valueOf(paramNumber), type, primitive);
         returnNode.addDefVariable(actualIn);
         returnNode.addUseVariable(actualOut);
         paramNumber++;
@@ -508,7 +507,7 @@ public class ExpressionVisitor extends ASTVisitor {
         String type = callNode.getReturnType();
         boolean primitive = callNode.isPrimitiveType();
         String name = "$" + String.valueOf(paramNumber);
-        JVariable jvar = new JApparentAccess(callNode.getASTNode(), name + "!" + callNode.getName(), type, primitive);
+        JVariable jvar = new JApparentAccess(callNode.getASTNode(), name, type, primitive);
         
         callNode.addDefVariable(jvar);
         paramNumber++;

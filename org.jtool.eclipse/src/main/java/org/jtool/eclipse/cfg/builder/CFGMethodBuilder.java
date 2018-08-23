@@ -164,7 +164,6 @@ public class CFGMethodBuilder {
             formalInNode.setParent(entry);
             entry.addFormalIn(formalInNode);
             cfg.add(formalInNode);
-            ordinal++;
             
             JVariable jvout = new JLocalAccess(param, param.resolveBinding());
             formalInNode.setDefVariable(jvout);
@@ -197,7 +196,7 @@ public class CFGMethodBuilder {
         formalOutNode.addDefVariable(jvout);
         ExpressionVisitor.paramNumber++;
         
-        JVariable jvin = new JApparentAccess(node, "$" + entry.getSimpleName(), entry.getReturnType(), entry.isPrimitiveType());
+        JVariable jvin = new JApparentAccess(node, "$_", entry.getReturnType(), entry.isPrimitiveType());
         formalOutNode.addUseVariable(jvin);
         
         return formalOutNode;
