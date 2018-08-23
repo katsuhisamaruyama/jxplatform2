@@ -104,7 +104,7 @@ public class ExpressionVisitor extends ASTVisitor {
     
     protected static int paramNumber = 1;
     
-    private boolean creatingActuals = false;
+    private boolean creatingActuals;
     protected Stack<AnalysisMode> analysisMode = new Stack<AnalysisMode>();
     private enum AnalysisMode {
         DEF, USE,
@@ -318,6 +318,9 @@ public class ExpressionVisitor extends ASTVisitor {
             analysisMode.push(AnalysisMode.USE);
             primary.accept(this);
             analysisMode.pop();
+            analysisMode.push(AnalysisMode.DEF);
+            primary.accept(this);
+            analysisMode.pop();
         }
         return false;
     }
@@ -401,6 +404,7 @@ public class ExpressionVisitor extends ASTVisitor {
     
     private void setActualNodes(CFGMethodCall callNode, ASTNode node, List<Expression> arguments) {
         boolean actual = creatingActuals && callNode.getMethodCall().isInProject() && !callNode.getMethodCall().callSelfDirectly();
+        
         if (actual) {
             createActualIns(callNode, arguments);
         } else {

@@ -49,11 +49,11 @@ public class CD extends DependenceEdge {
         StringBuilder buf = new StringBuilder();
         buf.append(super.toString());
         if (kind == Kind.trueControlDependence) {
-            buf.append("T");
+            buf.append(" T");
         } else if (kind == Kind.falseControlDependence) {
-            buf.append("F");
+            buf.append(" F");
         } else if (kind == Kind.fallControlDependence) {
-            buf.append("Fall:");
+            buf.append(" Fall:");
         }
         return buf.toString();
     }

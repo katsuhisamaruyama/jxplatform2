@@ -162,21 +162,21 @@ public class DD extends DependenceEdge {
         }
         buf.append(" ]");
         if (kind == Kind.loopIndependentDefUseDependence) {
-            buf.append("LIDD: ");
+            buf.append(" LIDD");
         } else if (kind == Kind.loopCarriedDefUseDependence) {
-            buf.append( "LCDD: ");
+            buf.append(" LCDD");
         } else if (kind == Kind.defOrderDependence) {
-            buf.append("DO: ");
+            buf.append(" DO");
         } else if (kind == Kind.outputDependence) {
-            buf.append("OD: ");
+            buf.append(" OD");
         } else if (kind == Kind.antiDependence) {
-            buf.append("AD: ");
+            buf.append(" AD");
         } else if (kind == Kind.parameterIn) {
-            buf.append("PIN: ");
+            buf.append(" PIN");
         } else if (kind == Kind.parameterOut) {
-            buf.append("POUT: ");
+            buf.append(" POUT");
         } else if (kind == Kind.summary) {
-            buf.append("SUMM: ");
+            buf.append(" SUMM");
         }
         return buf.toString();
     }
