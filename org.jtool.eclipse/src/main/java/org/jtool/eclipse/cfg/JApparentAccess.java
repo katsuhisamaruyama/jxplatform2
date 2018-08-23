@@ -6,8 +6,6 @@
 
 package org.jtool.eclipse.cfg;
 
-import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
-
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -33,33 +31,35 @@ public class JApparentAccess extends JVariable {
     public JApparentAccess(ASTNode node, String name, ITypeBinding tbinding) {
         super(node);
         
-        setProperties(node);
         this.name = name;
         isPrimitiveType = false;
         ITypeBinding binding = tbinding.getTypeDeclaration();
         type = binding.getQualifiedName();
         modifiers = binding.getModifiers();
-    }
-    
-    public JApparentAccess(ASTNode node, String name, String type) {
-        super(node);
         
         setProperties(node);
+    }
+    
+    public JApparentAccess(ASTNode node, String name, String type, boolean primitive) {
+        super(node);
+        
         this.name = name;
         this.type = type;
-        isPrimitiveType = false;
+        isPrimitiveType = primitive;
         modifiers = Modifier.NONE;
+        setProperties(node);
     }
     
-    public JApparentAccess(ASTNode node, String name) {
+    public JApparentAccess(ASTNode node, String name, boolean primitive) {
         super(node);
         
-        setProperties(node);
         ITypeBinding binding = findEnclosingClass(node).getTypeDeclaration();
         this.name = name;
         this.type = binding.getQualifiedName();
-        isPrimitiveType = false;
+        isPrimitiveType = primitive;
         modifiers = binding.getModifiers();
+        
+        setProperties(node);
     }
     
     private void setProperties(ASTNode node) {
@@ -69,7 +69,7 @@ public class JApparentAccess extends JVariable {
         declaringMethodName = enclosingMethodName;
         
         signature = name;
-        fqn = declaringClassName + "!" + declaringMethodName + QualifiedNameSeparator + name;
+        fqn = declaringMethodName + "!" + name;
         inProject = true;
     }
     

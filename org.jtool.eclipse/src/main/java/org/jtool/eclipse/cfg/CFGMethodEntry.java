@@ -17,6 +17,7 @@ import java.util.ArrayList;
 public class CFGMethodEntry extends CFGEntry {
     
     private String returnType;
+    private boolean isPrimitiveType;
     private String simpleName;
     private List<CFGParameter> formalIns = new ArrayList<CFGParameter>();
     private List<CFGParameter> formalOuts = new ArrayList<CFGParameter>();
@@ -35,6 +36,14 @@ public class CFGMethodEntry extends CFGEntry {
     
     public String getReturnType() {
         return returnType;
+    }
+    
+    public void setPrimitiveType(boolean primitive) {
+        isPrimitiveType = primitive;
+    }
+    
+    public boolean isPrimitiveType() {
+        return isPrimitiveType;
     }
     
     public String getSimpleName() {

@@ -28,6 +28,7 @@ public class JMethodCall extends JVariable {
     
     private List<Expression> arguments = new ArrayList<Expression>();
     private List<String> argumentTypes = new ArrayList<String>();
+    private List<Boolean> argumentPrimitiveTypes = new ArrayList<Boolean>();
     
     public JMethodCall(ASTNode node, IMethodBinding mbinding, List<Expression> args) {
         super(node);
@@ -89,6 +90,7 @@ public class JMethodCall extends JVariable {
         ITypeBinding[] types = mbinding.getParameterTypes();
         for (int i = 0; i < types.length; i++) {
             argumentTypes.add(types[i].getTypeDeclaration().getQualifiedName());
+            argumentPrimitiveTypes.add(types[i].getTypeDeclaration().isPrimitive());
         }
     }
     
@@ -97,6 +99,14 @@ public class JMethodCall extends JVariable {
             return argumentTypes.get(ordinal);
         } else {
             return "";
+        }
+    }
+    
+    public boolean getArgumentPrimitiveType(int ordinal) {
+        if (ordinal >= 0 && ordinal < arguments.size()) {
+            return argumentPrimitiveTypes.get(ordinal);
+        } else {
+            return false;
         }
     }
     

@@ -88,13 +88,16 @@ public class CFGMethodBuilder {
         if (mbinding == null) {
             entry = new CFGMethodEntry(node, CFGNode.Kind.initializerEntry, name, sig, fqn);
             entry.setReturnType("void");
+            entry.setPrimitiveType(false);
         } else {
             if (mbinding.isConstructor()) {
                 entry = new CFGMethodEntry(node, CFGNode.Kind.constructorEntry, name, sig, fqn);
                 entry.setReturnType(mbinding.getReturnType().getTypeDeclaration().getQualifiedName());
+                entry.setPrimitiveType(mbinding.getReturnType().isPrimitive());
             } else {
                 entry = new CFGMethodEntry(node, CFGNode.Kind.methodEntry, name, sig, fqn);
                 entry.setReturnType(mbinding.getReturnType().getTypeDeclaration().getQualifiedName());
+                entry.setPrimitiveType(mbinding.getReturnType().isPrimitive());
             }
         }
         
@@ -166,7 +169,7 @@ public class CFGMethodBuilder {
             JVariable jvout = new JLocalAccess(param, param.resolveBinding());
             formalInNode.setDefVariable(jvout);
             
-            JVariable jvin = new JApparentAccess(param, "$" + String.valueOf(ExpressionVisitor.paramNumber), jvout.getType());
+            JVariable jvin = new JApparentAccess(param, "$" + String.valueOf(ExpressionVisitor.paramNumber), jvout.getType(), jvout.isPrimitiveType());
             formalInNode.setUseVariable(jvin);
             ExpressionVisitor.paramNumber++;
             
@@ -190,11 +193,11 @@ public class CFGMethodBuilder {
         entry.addFormalOut(formalOutNode);
         cfg.add(formalOutNode);
         
-        JVariable jvout = new JApparentAccess(node, "$" + String.valueOf(ExpressionVisitor.paramNumber), entry.getReturnType());
+        JVariable jvout = new JApparentAccess(node, "$" + String.valueOf(ExpressionVisitor.paramNumber), entry.getReturnType(), entry.isPrimitiveType());
         formalOutNode.addDefVariable(jvout);
         ExpressionVisitor.paramNumber++;
         
-        JVariable jvin = new JApparentAccess(node, "$" + entry.getSimpleName(), entry.getReturnType());
+        JVariable jvin = new JApparentAccess(node, "$" + entry.getSimpleName(), entry.getReturnType(), entry.isPrimitiveType());
         formalOutNode.addUseVariable(jvin);
         
         return formalOutNode;

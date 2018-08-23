@@ -570,7 +570,7 @@ public class StatementVisitor extends ASTVisitor {
             ExpressionVisitor exprVisitor = new ExpressionVisitor(cfg, returnNode);
             expression.accept(exprVisitor);
             CFGMethodEntry methodNode = (CFGMethodEntry)cfg.getStartNode();
-            JVariable jvar = new JApparentAccess(methodNode.getASTNode(), "$" + methodNode.getName(), methodNode.getReturnType());
+            JVariable jvar = new JApparentAccess(methodNode.getASTNode(), "$_", methodNode.getReturnType(), methodNode.isPrimitiveType());
             returnNode.addDefVariable(jvar);
             curNode = exprVisitor.getExitNode();
         }

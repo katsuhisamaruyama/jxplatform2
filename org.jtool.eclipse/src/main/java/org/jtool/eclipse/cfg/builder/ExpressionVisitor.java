@@ -253,7 +253,7 @@ public class ExpressionVisitor extends ASTVisitor {
         if (name != null) {
             jvar = new JApparentAccess(node, "$this", name.resolveTypeBinding());
         } else {
-            jvar = new JApparentAccess(node, "$this");
+            jvar = new JApparentAccess(node, "$this", false);
         }
         curNode.addUseVariable(jvar);
         return false;
@@ -429,7 +429,9 @@ public class ExpressionVisitor extends ASTVisitor {
         actualInNode.setParent(callNode);
         callNode.addActualIn(actualInNode);
         
-        JVariable actualIn = new JApparentAccess(node, "$" + String.valueOf(paramNumber), callNode.getMethodCall().getArgumentType(ordinal));
+        String type = callNode.getMethodCall().getArgumentType(ordinal);
+        boolean primitive = callNode.getMethodCall().getArgumentPrimitiveType(ordinal);
+        JVariable actualIn = new JApparentAccess(node, "$" + String.valueOf(paramNumber), type, primitive);
         actualInNode.addDefVariable(actualIn);
         paramNumber++;
         
@@ -474,8 +476,11 @@ public class ExpressionVisitor extends ASTVisitor {
         returnNode .setParent(callNode);
         callNode.addActualOut(returnNode );
         
-        JVariable actualIn = new JApparentAccess(callNode.getASTNode(), "$" + String.valueOf(paramNumber), callNode.getReturnType());
-        JVariable actualOut = new JApparentAccess(callNode.getASTNode(), "$" + String.valueOf(paramNumber) + "!" + callNode.getName(), callNode.getReturnType());
+        String type = callNode.getReturnType();
+        boolean primitive = callNode.isPrimitiveType();
+        String name = "$" + String.valueOf(paramNumber);
+        JVariable actualIn = new JApparentAccess(callNode.getASTNode(), name, type, primitive);
+        JVariable actualOut = new JApparentAccess(callNode.getASTNode(), name + "!" + callNode.getName(), type, primitive);
         returnNode.addDefVariable(actualIn);
         returnNode.addUseVariable(actualOut);
         paramNumber++;
@@ -500,8 +505,11 @@ public class ExpressionVisitor extends ASTVisitor {
     }
     
     private void mergeActualOut(CFGMethodCall callNode) {
-        JVariable jvar = new JApparentAccess(callNode.getASTNode(),
-                "$" + String.valueOf(paramNumber) + "!" + callNode.getName(), callNode.getReturnType());
+        String type = callNode.getReturnType();
+        boolean primitive = callNode.isPrimitiveType();
+        String name = "$" + String.valueOf(paramNumber);
+        JVariable jvar = new JApparentAccess(callNode.getASTNode(), name + "!" + callNode.getName(), type, primitive);
+        
         callNode.addDefVariable(jvar);
         paramNumber++;
     }
