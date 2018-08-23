@@ -127,7 +127,6 @@ public class JavaMethod extends JavaElement {
             modifiers = binding.getModifiers();
             kind = JavaMethod.Kind.J_LAMBDA;
             inProject = true;
-            
             declaringClass = jclass;
             
             collectParameters(node.parameters());
@@ -155,8 +154,9 @@ public class JavaMethod extends JavaElement {
             modifiers = binding.getModifiers();
             kind = getKind(binding);
             this.inProject = inProject;
-            
             declaringClass = jclass;
+            
+            collectParameters(mbinding.getParameterTypes());
         }
         
         jclass.addMethod(this);
@@ -204,6 +204,13 @@ public class JavaMethod extends JavaElement {
     protected void collectParameters(List<VariableDeclaration> params) {
         for (VariableDeclaration decl : params) {
             JavaLocal param = new JavaLocal(decl, this);
+            parameters.add(param);
+        }
+    }
+    
+    protected void collectParameters(ITypeBinding[] types) {
+        for (ITypeBinding tbinding : types) {
+            JavaLocal param = new JavaLocal(tbinding, this);
             parameters.add(param);
         }
     }

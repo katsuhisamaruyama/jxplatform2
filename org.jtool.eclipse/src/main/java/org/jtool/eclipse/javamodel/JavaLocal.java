@@ -8,6 +8,7 @@ package org.jtool.eclipse.javamodel;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 
 /**
@@ -45,6 +46,22 @@ public class JavaLocal extends JavaVariable {
             fqn = ".UNKNOWN";
             kind = JavaVariable.Kind.UNKNOWN;
         }
+    }
+    
+    protected JavaLocal(ITypeBinding tbinding, JavaMethod jmethod) {
+        super(null, jmethod.getFile());
+        
+        tbinding = tbinding.getTypeDeclaration();
+        name = tbinding.getName().toLowerCase();
+        fqn = tbinding.getName();
+        type = tbinding.getQualifiedName();
+        isPrimitive = tbinding.isPrimitive();
+        modifiers = tbinding.getModifiers();
+        kind = JavaVariable.Kind.J_PARAMETER;
+        variableId = -1;
+        
+        declaringClass = jmethod.getDeclaringClass();
+        declaringMethod = jmethod;
     }
     
     public JavaLocal(JavaMethod jmethod, String name) {
