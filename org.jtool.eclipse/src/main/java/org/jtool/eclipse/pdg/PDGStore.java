@@ -32,6 +32,8 @@ public class PDGStore {
     protected Map<String, PDG> pdgStore = new HashMap<String, PDG>();
     private boolean isConservative = true;
     
+    private boolean visible = true;
+    
     private PDGStore() {
     }
     
@@ -53,7 +55,9 @@ public class PDGStore {
     public PDG getPDG(JavaClass jclass) {
         PDG cldg = getPDG(jclass.getQualifiedName());
         if (cldg == null) {
-            System.out.print(" - " + jclass.getQualifiedName() + " - PDG");
+            if (visible) {
+                System.out.print(" - " + jclass.getQualifiedName() + " - PDG");
+            }
             cldg = buildPDG(jclass);
         }
         return cldg;
@@ -62,7 +66,9 @@ public class PDGStore {
     public PDG getPDG(JavaMethod jmethod) {
         PDG pdg = getPDG(jmethod.getQualifiedName());
         if (pdg == null) {
-            System.out.print(" - " + jmethod.getQualifiedName() + " - PDG");
+            if (visible) {
+                System.out.print(" - " + jmethod.getQualifiedName() + " - PDG");
+            }
             pdg = buildPDG(jmethod);
         }
         return pdg;
@@ -71,7 +77,9 @@ public class PDGStore {
     public PDG getPDG(JavaField jfield) {
         PDG pdg = getPDG(jfield.getQualifiedName());
         if (pdg == null) {
-            System.out.print(" - " + jfield.getQualifiedName() + " - PDG");
+            if (visible) {
+                System.out.print(" - " + jfield.getQualifiedName() + " - PDG");
+            }
             pdg = buildPDG(jfield);
         }
         return pdg;
@@ -141,14 +149,26 @@ public class PDGStore {
     
     public void buildPDGs(List<JavaClass> jclasses) {
         int size = jclasses.size();
-        System.out.println();
-        System.out.println("** Building PDGs of " + size + " classes ");
+        if (visible) {
+            System.out.println();
+            System.out.println("** Building PDGs of " + size + " classes ");
+        }
         int count = 1;
         for (JavaClass jclass : jclasses) {
             PDGStore.getInstance().getPDG(jclass);
-            System.out.println(" (" + count + "/" + size + ")");
+            if (visible) {
+                System.out.println(" (" + count + "/" + size + ")");
+            }
             count++;
         }
         PDGStore.getInstance().destroy();
+    }
+    
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+    
+    public boolean isVisible() {
+        return visible;
     }
 }

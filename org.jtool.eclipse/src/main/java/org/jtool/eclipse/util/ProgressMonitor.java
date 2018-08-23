@@ -26,8 +26,10 @@ public class ProgressMonitor {
     }
     
     public void done() {
-        System.out.println();
-        System.out.flush();
+        if (Logger.getInstance().isVisible()) {
+            System.out.println();
+            System.out.flush();
+        }
     }
     
     public void work(int done) {
@@ -44,7 +46,9 @@ public class ProgressMonitor {
     }
     
     private void display(char ch) {
-        System.out.print(ch);
-        System.out.flush();
+        if (Logger.getInstance().isVisible()) {
+            System.out.print(ch);
+            System.out.flush();
+        }
     }
 }

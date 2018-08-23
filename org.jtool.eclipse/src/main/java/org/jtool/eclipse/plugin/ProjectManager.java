@@ -324,6 +324,10 @@ public class ProjectManager {
         }
     }
     
+    public void setVisible(boolean visible) {
+        Logger.getInstance().setVisible(visible);
+    }
+    
     private void printError(String mesg) {
         Logger.getInstance().printError(mesg);
         console.println(mesg);

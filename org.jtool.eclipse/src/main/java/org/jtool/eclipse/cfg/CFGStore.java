@@ -28,6 +28,8 @@ public class CFGStore {
     private Map<String, CFG> cfgStore = new HashMap<String, CFG>();
     private boolean creatingActualNodes = false;
     
+    private boolean visible = true;
+    
     private CFGStore() {
         CFGNode.resetId();
     }
@@ -66,7 +68,9 @@ public class CFGStore {
     public CFG getCFG(JavaClass jclass) {
         CFG ccfg = getCFG(jclass.getQualifiedName());
         if (ccfg == null) {
-            System.out.print(" - " + jclass.getQualifiedName() + " - CFG");
+            if (visible) {
+                System.out.print(" - " + jclass.getQualifiedName() + " - CFG");
+            }
             ccfg = build(jclass);
         }
         return ccfg;
@@ -75,7 +79,9 @@ public class CFGStore {
     public CFG getCFG(JavaMethod jmethod) {
         CFG cfg = getCFG(jmethod.getQualifiedName());
         if (cfg == null) {
-            System.out.print(" - " + jmethod.getQualifiedName() + " - CFG");
+            if (visible) {
+                System.out.print(" - " + jmethod.getQualifiedName() + " - CFG");
+            }
             cfg = build(jmethod);
         }
         return cfg;
@@ -84,7 +90,9 @@ public class CFGStore {
     public CFG getCFG(JavaField jfield) {
         CFG cfg = getCFG(jfield.getQualifiedName());
         if (cfg == null) {
-            System.out.print(" - " + jfield.getQualifiedName() + " - CFG");
+            if (visible) {
+                System.out.print(" - " + jfield.getQualifiedName() + " - CFG");
+            }
             cfg = build(jfield);
         }
         return cfg;
@@ -131,5 +139,13 @@ public class CFGStore {
             System.out.println(" (" + count + "/" + size + ")");
             count++;
         }
+    }
+    
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+    
+    public boolean isVisible() {
+        return visible;
     }
 }

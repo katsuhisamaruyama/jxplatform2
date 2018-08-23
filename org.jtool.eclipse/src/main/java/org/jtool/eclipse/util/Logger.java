@@ -24,6 +24,8 @@ public class Logger {
     private List<String> logMessages = new ArrayList<String>();
     private String logfile;
     
+    private boolean visible = true;
+    
     private Logger() {
     }
     
@@ -31,16 +33,28 @@ public class Logger {
         return instance;
     }
     
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
+    
+    public boolean isVisible() {
+        return visible;
+    }
+    
     public void printProgress(String mesg) {
-        System.out.print(mesg);
-        System.out.flush();
+        if (visible) {
+            System.out.print(mesg);
+            System.out.flush();
+        }
     }
     
     public void printMessage(String mesg) {
         logMessages.add(mesg);
         
-        System.out.println(mesg);
-        System.out.flush();
+        if (visible) {
+            System.out.println(mesg);
+            System.out.flush();
+        }
     }
     
     public void printLog(String mesg) {
@@ -50,8 +64,10 @@ public class Logger {
     public void printError(String mesg) {
         logMessages.add(mesg);
         
-        System.err.println(mesg);
-        System.err.flush();
+        if (visible) {
+            System.err.println(mesg);
+            System.err.flush();
+        }
     }
     
     public void printUnresolvedError(String mesg) {
