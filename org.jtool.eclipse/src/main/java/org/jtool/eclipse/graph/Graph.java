@@ -90,7 +90,7 @@ public class Graph<N extends GraphNode, E extends GraphEdge> {
     
     protected String getNodeInfo() {
         StringBuilder buf = new StringBuilder();
-        for (N node : getNodes()) {
+        for (GraphNode node : GraphNode.sortGraphNode(getNodes())) {
             buf.append(node.toString());
             buf.append("\n");
         }
@@ -99,7 +99,7 @@ public class Graph<N extends GraphNode, E extends GraphEdge> {
     
     protected String getEdgeInfo() {
         StringBuilder buf = new StringBuilder();
-        for (E edge : getEdges()) {
+        for (GraphEdge edge : GraphEdge.sortGrapgEdge(getEdges())) {
             buf.append(edge.toString());
             buf.append("\n");
         }

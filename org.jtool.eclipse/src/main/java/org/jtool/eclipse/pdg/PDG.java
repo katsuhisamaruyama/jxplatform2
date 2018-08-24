@@ -98,7 +98,7 @@ public class PDG extends Graph<PDGNode, DependenceEdge> {
     protected String getEdgeInfo() {
         StringBuffer buf = new StringBuffer();
         int index = 1;
-        for (DependenceEdge edge : getEdges()) {
+        for (DependenceEdge edge : DependenceEdge.sortDependenceEdge(getEdges())) {
             buf.append(String.valueOf(index));
             buf.append(": ");
             buf.append(edge.toString());
@@ -132,7 +132,7 @@ public class PDG extends Graph<PDGNode, DependenceEdge> {
     
     protected String getCDEdgeInfo() {
         StringBuffer buf = new StringBuffer();
-        for (DependenceEdge edge : getEdges()) {
+        for (DependenceEdge edge : DependenceEdge.sortDependenceEdge(getEdges())) {
             if (edge.isCD()) {
                 buf.append(edge.toString());
                 buf.append("\n");
@@ -143,7 +143,7 @@ public class PDG extends Graph<PDGNode, DependenceEdge> {
     
     protected String getDDEdgeInfo() {
         StringBuffer buf = new StringBuffer();
-        for (DependenceEdge edge : getEdges()) {
+        for (DependenceEdge edge : DependenceEdge.sortDependenceEdge(getEdges())) {
             if (edge.isDD()) {
                 buf.append(edge.toString());
                 buf.append("\n");

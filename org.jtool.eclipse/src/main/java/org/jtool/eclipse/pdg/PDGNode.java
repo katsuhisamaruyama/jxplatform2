@@ -11,7 +11,12 @@ import org.jtool.eclipse.graph.GraphEdge;
 import org.jtool.eclipse.graph.GraphElement;
 import org.jtool.eclipse.graph.GraphNode;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * A node of a PDG.
@@ -166,6 +171,22 @@ public class PDGNode extends GraphNode {
     
     public void print() {
         System.out.println(toString());
+    }
+    
+    public static List<PDGNode> sortPDGNode(Collection<? extends PDGNode> co) {
+        List<PDGNode> nodes = new ArrayList<PDGNode>(co);
+        Collections.sort(nodes, new Comparator<PDGNode>() {
+            public int compare(PDGNode node1, PDGNode node2) {
+                if (node2.id == node1.id) {
+                    return 0;
+                } else if (node1.id > node2.id) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        });
+        return nodes;
     }
     
     @Override

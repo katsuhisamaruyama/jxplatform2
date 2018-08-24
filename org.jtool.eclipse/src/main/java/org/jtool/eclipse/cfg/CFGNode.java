@@ -12,7 +12,12 @@ import org.jtool.eclipse.graph.GraphNode;
 import org.jtool.eclipse.pdg.PDGNode;
 import org.eclipse.jdt.core.dom.ASTNode;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * A node of a CFG.
@@ -433,6 +438,22 @@ public class CFGNode extends GraphNode {
     
     public void print() {
         System.out.println(toString());
+    }
+    
+    public static List<CFGNode> sortCFGNode(Collection<? extends CFGNode> co) {
+        List<CFGNode> nodes = new ArrayList<CFGNode>(co);
+        Collections.sort(nodes, new Comparator<CFGNode>() {
+            public int compare(CFGNode node1, CFGNode node2) {
+                if (node2.id == node1.id) {
+                    return 0;
+                } else if (node1.id > node2.id) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        });
+        return nodes;
     }
     
     @Override

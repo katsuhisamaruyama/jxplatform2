@@ -165,13 +165,13 @@ public abstract class GraphNode extends GraphElement {
         return buf.toString();
     }
     
-    protected List<GraphNode> sortGraphNodes(Collection<? extends GraphNode> co) {
+    public static List<GraphNode> sortGraphNode(Collection<? extends GraphNode> co) {
         List<GraphNode> nodes = new ArrayList<GraphNode>(co);
         Collections.sort(nodes, new Comparator<GraphNode>() {
             public int compare(GraphNode node1, GraphNode node2) {
                 if (node2.id == node1.id) {
                     return 0;
-                } else if (node2.id > node1.id) {
+                } else if (node1.id > node2.id) {
                     return 1;
                 } else {
                     return -1;

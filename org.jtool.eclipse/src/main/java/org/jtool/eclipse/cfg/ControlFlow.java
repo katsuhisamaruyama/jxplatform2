@@ -145,7 +145,7 @@ public class ControlFlow extends GraphEdge {
         return buf.toString();
     }
     
-    protected List<ControlFlow> sortControlFlows(Collection<? extends ControlFlow> co) {
+    public static List<ControlFlow> sortControlFlow(Collection<? extends ControlFlow> co) {
         List<ControlFlow> edges = new ArrayList<ControlFlow>(co);
         Collections.sort(edges, new Comparator<ControlFlow>() {
             
@@ -153,12 +153,12 @@ public class ControlFlow extends GraphEdge {
                 if (edge2.src.getId() == edge1.src.getId()) {
                     if (edge2.dst.getId() == edge1.dst.getId()) {
                         return edge2.kind.toString().compareTo(edge1.kind.toString());
-                    } else if (edge2.dst.getId() > edge1.dst.getId()) {
+                    } else if (edge1.dst.getId() > edge2.dst.getId()) {
                         return 1;
                     } else {
                         return -1;
                     }
-                } else if (edge2.src.getId() > edge1.src.getId()) {
+                } else if (edge1.src.getId() > edge2.src.getId()) {
                     return 1;
                 } else {
                     return -1;

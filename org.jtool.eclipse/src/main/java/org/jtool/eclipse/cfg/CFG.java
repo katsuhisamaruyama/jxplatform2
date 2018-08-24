@@ -274,7 +274,7 @@ public class CFG extends Graph<CFGNode, ControlFlow> {
     @Override
     protected String getNodeInfo() {
         StringBuilder buf = new StringBuilder();
-        for (CFGNode node : getNodes()) {
+        for (CFGNode node : CFGNode.sortCFGNode(getNodes())) {
             buf.append(node.toString());
             buf.append("\n");
         }
@@ -285,7 +285,7 @@ public class CFG extends Graph<CFGNode, ControlFlow> {
     protected String getEdgeInfo() {
         StringBuilder buf = new StringBuilder();
         int index = 1;
-        for (ControlFlow edge : getEdges()) {
+        for (ControlFlow edge : ControlFlow.sortControlFlow(getEdges())) {
             buf.append(String.valueOf(index));
             buf.append(": ");
             buf.append(edge.toString());

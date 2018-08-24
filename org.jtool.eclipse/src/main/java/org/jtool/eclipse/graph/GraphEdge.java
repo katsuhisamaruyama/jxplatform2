@@ -81,19 +81,19 @@ public abstract class GraphEdge extends GraphElement {
         return buf.toString();
     }
     
-    protected List<GraphEdge> sortGraphEdges(Collection<? extends GraphEdge> co) {
+    protected static List<GraphEdge> sortGrapgEdge(Collection<? extends GraphEdge> co) {
         List<GraphEdge> edges = new ArrayList<GraphEdge>(co);
         Collections.sort(edges, new Comparator<GraphEdge>() {
             public int compare(GraphEdge edge1, GraphEdge edge2) {
                 if (edge2.src.id == edge1.src.id) {
                     if (edge2.dst.id == edge1.dst.id) {
                         return 0;
-                    } else if (edge2.dst.id > edge1.dst.id) {
+                    } else if (edge1.dst.id > edge2.dst.id) {
                         return 1;
                     } else {
                         return -1;
                     }
-                } else if (edge2.src.id > edge1.src.id) {
+                } else if (edge1.src.id > edge2.src.id) {
                     return 1;
                 } else {
                     return -1;

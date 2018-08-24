@@ -115,7 +115,7 @@ public class DependenceEdge extends GraphEdge {
         return buf.toString();
     }
     
-    protected List<DependenceEdge> sortControlFlows(Collection<? extends DependenceEdge> co) {
+    public static List<DependenceEdge> sortDependenceEdge(Collection<? extends DependenceEdge> co) {
         List<DependenceEdge> edges = new ArrayList<DependenceEdge>(co);
         Collections.sort(edges, new Comparator<DependenceEdge>() {
             
@@ -123,12 +123,12 @@ public class DependenceEdge extends GraphEdge {
                 if (edge2.src.getId() == edge1.src.getId()) {
                     if (edge2.dst.getId() == edge1.dst.getId()) {
                         return edge2.kind.toString().compareTo(edge1.kind.toString());
-                    } else if (edge2.dst.getId() > edge1.dst.getId()) {
+                    } else if (edge1.dst.getId() > edge2.dst.getId()) {
                         return 1;
                     } else {
                         return -1;
                     }
-                } else if (edge2.src.getId() > edge1.src.getId()) {
+                } else if (edge1.src.getId() > edge2.src.getId()) {
                     return 1;
                 } else {
                     return -1;
