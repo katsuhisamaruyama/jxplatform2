@@ -17,7 +17,6 @@ import java.util.ArrayList;
 public class CFGMethodCall extends CFGStatement {
     
     private JMethodCall jmethodCall;
-    private JVariable primary = null;
     
     private List<CFGParameter> actualIns = new ArrayList<CFGParameter>();
     private List<CFGParameter> actualOuts = new ArrayList<CFGParameter>();
@@ -36,22 +35,15 @@ public class CFGMethodCall extends CFGStatement {
     }
     
     public boolean hasPrimary() {
-        return primary != null;
-    }
-    
-    public void setPrimary(JVariable jvar) {
-        primary = jvar;
+        return jmethodCall.hasPrimary();
     }
     
     public JVariable getPrimary() {
-        return primary;
+        return jmethodCall.getPrimary();
     }
     
     public String getPrimaryType() {
-        if (primary != null) {
-            primary.getType();
-        }
-        return "";
+        return jmethodCall.getPrimaryType();
     }
     
     public String getName() {

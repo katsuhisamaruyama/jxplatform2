@@ -315,12 +315,19 @@ public class ExpressionVisitor extends ASTVisitor {
         
         Expression primary = node.getExpression();
         if (primary != null) {
+            int defVarNumBefore = curNode.getDefVariables().size();
+            
             analysisMode.push(AnalysisMode.USE);
             primary.accept(this);
             analysisMode.pop();
             analysisMode.push(AnalysisMode.DEF);
             primary.accept(this);
             analysisMode.pop();
+            
+            int defVarNumAfter = curNode.getDefVariables().size();
+            if (defVarNumAfter - defVarNumBefore == 1) {
+                jcall.setPrimary(curNode.getDefVariables().get(defVarNumAfter - 1));
+            }
         }
         return false;
     }
@@ -404,7 +411,6 @@ public class ExpressionVisitor extends ASTVisitor {
     
     private void setActualNodes(CFGMethodCall callNode, ASTNode node, List<Expression> arguments) {
         boolean actual = creatingActuals && callNode.getMethodCall().isInProject() && !callNode.getMethodCall().callSelfDirectly();
-        
         if (actual) {
             createActualIns(callNode, arguments);
         } else {

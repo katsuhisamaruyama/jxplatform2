@@ -30,6 +30,8 @@ public class JMethodCall extends JVariable {
     private List<String> argumentTypes = new ArrayList<String>();
     private List<Boolean> argumentPrimitiveTypes = new ArrayList<Boolean>();
     
+    private JVariable primary = null;
+    
     public JMethodCall(ASTNode node, IMethodBinding mbinding, List<Expression> args) {
         super(node);
         
@@ -108,6 +110,25 @@ public class JMethodCall extends JVariable {
         } else {
             return false;
         }
+    }
+    
+    public boolean hasPrimary() {
+        return primary != null;
+    }
+    
+    public void setPrimary(JVariable jvar) {
+        primary = jvar;
+    }
+    
+    public JVariable getPrimary() {
+        return primary;
+    }
+    
+    public String getPrimaryType() {
+        if (primary != null) {
+            primary.getType();
+        }
+        return "";
     }
     
     public boolean callSelfDirectly() {
