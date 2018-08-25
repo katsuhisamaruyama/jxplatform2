@@ -30,6 +30,10 @@ public class JavaProject {
     
     private Map<String, JavaClass> externalClasseStore = new HashMap<String, JavaClass>();
     
+    private String[] classPath;
+    private String[] sourcePath;
+    private String binaryPath;
+    
     public JavaProject(String name, String path) {
         this(name, path, path);
     }
@@ -166,6 +170,27 @@ public class JavaProject {
             return externalClasseStore.get(fqn);
         }
         return null;
+    }
+    
+    public void setClassPath(String[] classPath) {
+        this.classPath = classPath;
+    }
+    
+    public void setSourceBinaryPaths(String[] sourcePath, String binaryPath) {
+        this.sourcePath = sourcePath;
+        this.binaryPath = binaryPath;
+    }
+    
+    public String[] getClassPath() {
+        return classPath;
+    }
+    
+    public String[] getSourcePath() {
+        return sourcePath;
+    }
+    
+    public String getBinaryPath() {
+        return binaryPath;
     }
     
     public void collectInfo(JavaClass jclass) {

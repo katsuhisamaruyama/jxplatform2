@@ -17,8 +17,10 @@ import org.jtool.eclipse.plugin.ResourceChangeListener;
 import org.jtool.eclipse.util.Logger;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.compiler.IProblem;
 import org.eclipse.jdt.core.dom.AST;
@@ -28,11 +30,15 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -132,6 +138,49 @@ public class ProjectManager {
         }
     }
     
+    private void setPaths(JavaProject jproject, IJavaProject project) {
+        jproject.setClassPath(getClassPath(project));
+        jproject.setSourceBinaryPaths(getSourcePath(project), getBinaryPath(project));
+    }
+    
+    private String[] getClassPath(IJavaProject project) {
+        try {
+            List<String> classPathList = new ArrayList<String>();
+            for (IClasspathEntry entry : project.getResolvedClasspath(true)) {
+                if (entry.getEntryKind() != IClasspathEntry.CPE_SOURCE) {
+                    classPathList.add(entry.getPath().makeAbsolute().toOSString());
+                }
+            }
+            return classPathList.toArray(new String[classPathList.size()]);
+        } catch (JavaModelException e) {
+            return new String[0];
+        }
+    }
+    
+    private String[] getSourcePath(IJavaProject project) {
+        try {
+            IWorkspaceRoot workSpaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+            List<String> sourcePathList = new ArrayList<String>();
+            for (IPackageFragmentRoot root : project.getAllPackageFragmentRoots()) {
+                if (root.getKind() == IPackageFragmentRoot.K_SOURCE) {
+                    sourcePathList.add(workSpaceRoot.getFolder(root.getPath()).getLocation().toOSString());
+                }
+            }
+            return sourcePathList.toArray(new String[sourcePathList.size()]);
+        } catch (JavaModelException e) {
+            return new String[0];
+        }
+    }
+    
+    private String getBinaryPath(IJavaProject project) {
+        try {
+            IWorkspaceRoot workSpaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+            return workSpaceRoot.getFolder(project.getOutputLocation()).getLocation().toOSString();
+        } catch (JavaModelException e) {
+            return "";
+        }
+    }
+    
     public void build(IFile file) {
         JavaProject jproject = ProjectStore.getInstance().getProject(file.getProject().getFullPath().toString());
         if (jproject == null || jproject.getFiles().size() == 0) {
@@ -143,6 +192,8 @@ public class ProjectManager {
             Set<ICompilationUnit> compilationUnits = new HashSet<ICompilationUnit>();
             IJavaProject project = JavaCore.create(file.getProject());
             jproject = ProjectStore.getInstance().getProject(project.getPath().toString());
+            setPaths(jproject, project);
+            
             if (project != null) {
                 compilationUnits.add(JavaCore.createCompilationUnitFrom(file));
                 Set<JavaFile> files = collectFilesRelatedTo(jproject, file);
@@ -171,6 +222,8 @@ public class ProjectManager {
         Set<ICompilationUnit> compilationUnits = new HashSet<ICompilationUnit>();
         jproject = ProjectStore.getInstance().getProject(project.getPath().toString());
         ProjectStore.getInstance().setCurrentProject(jproject);
+        setPaths(jproject, project);
+        
         for (IFile file : dirtyFiles) {
             compilationUnits.add(JavaCore.createCompilationUnitFrom(file));
             Set<JavaFile> files = collectFilesRelatedTo(jproject, file);
@@ -193,6 +246,7 @@ public class ProjectManager {
         String path = project.getProject().getFullPath().toString();
         String dir = project.getProject().getLocation().toString();
         JavaProject jproject = new JavaProject(name, path, dir);
+        setPaths(jproject, project);
         
         ProjectStore.getInstance().addProject(jproject);
         ProjectStore.getInstance().setCurrentProject(jproject);

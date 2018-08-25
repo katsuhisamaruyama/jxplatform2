@@ -39,6 +39,10 @@ public class ProjectStore {
         currentProject = jproject;
     }
     
+    public void resetCurrentProject() {
+        currentProject = null;
+    }
+    
     public JavaProject getCurrentProject() {
         return currentProject;
     }
@@ -73,6 +77,10 @@ public class ProjectStore {
     
     public void addProject(JavaProject jproject) {
         projectStore.put(jproject.getPath(), jproject);
+    }
+    
+    public void removeProject(String path) {
+        projectStore.remove(path);
     }
     
     public JavaProject getProject(String path) {
