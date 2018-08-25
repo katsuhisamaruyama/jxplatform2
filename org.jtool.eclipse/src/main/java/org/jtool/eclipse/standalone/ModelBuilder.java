@@ -4,7 +4,7 @@
  *  Department of Computer Science, Ritsumeikan University
  */
 
-package org.jtool.eclipse.javamodel.builder;
+package org.jtool.eclipse.standalone;
 
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaFile;
@@ -34,27 +34,38 @@ import java.io.IOException;
  */
 public class ModelBuilder {
     
-    private JavaProject jproject;
+    private static ModelBuilder instance = new ModelBuilder();
     
-    public ModelBuilder(String name, String target) {
+    private JavaProject currentProject;
+    
+    private ModelBuilder() {
+    }
+    
+    public static ModelBuilder getInstance() {
+        return instance;
+    }
+    
+    public JavaProject getCurrentProject() {
+        return currentProject;
+    }
+    
+    public JavaProject build(String name, String target, String[] classPath) {
         try {
             name = replaceFileSeparator(name);
             target = removeLastFileSeparator(target);
             
             File dir = new File(target);
-            jproject = new JavaProject(name, dir.getCanonicalPath());
-            ProjectStore.getInstance().setCurrentProject(jproject);
+            currentProject = new JavaProject(name, dir.getCanonicalPath());
+            currentProject.setClassPath(classPath);
+            ProjectStore.getInstance().addProject(currentProject);
+            ProjectStore.getInstance().setUnderPlugin(false);
+            
+            run();
+            Logger.getInstance().writeLog();
         } catch (IOException e) {
-            jproject = null;
+            currentProject = null;
         }
-    }
-    
-    public JavaProject getProject() {
-        return jproject;
-    }
-    
-    public void setClassPath(String[] classPath) {
-        jproject.setClassPath(classPath);
+        return currentProject;
     }
     
     private String replaceFileSeparator(String path) {
@@ -68,38 +79,20 @@ public class ModelBuilder {
         return path;
     }
     
-    public JavaProject build(boolean resolveBinding) {
-        if (jproject != null) {
-            run(resolveBinding);
-            Logger.getInstance().writeLog();
-            return jproject;
-        }
-        return null;
-    }
-    
-    public JavaProject rebuild(JavaProject jproject, boolean resolveBinding) {
-        if (jproject != null) {
-            ProjectStore.getInstance().removeProject(jproject.getPath());
-            JavaProject newProject = new JavaProject(jproject.getName(), jproject.getPath(), jproject.getDir());
-            ProjectStore.getInstance().setCurrentProject(newProject);
-            jproject = newProject;
-            
-            run(resolveBinding);
-            Logger.getInstance().writeLog();
-            return jproject;
-        }
-        return null;
+    public JavaProject update() {
+        ProjectStore.getInstance().removeProject(currentProject.getPath());
+        return build(currentProject.getName(), currentProject.getPath(), currentProject.getClassPath());
     }
     
     public void unbuild() {
-        if (jproject != null) {
-            ProjectStore.getInstance().resetCurrentProject();
-            jproject.clear();
+        if (currentProject != null) {
+            ProjectStore.getInstance().removeProject(currentProject.getPath());
+            currentProject.clear();
         }
     }
     
-    private void run(boolean resolveBinding) {
-        List<File> sourceFiles = collectAllJavaFiles(jproject.getPath());
+    private void run() {
+        List<File> sourceFiles = collectAllJavaFiles(currentProject.getPath());
         if (sourceFiles.size() > 0) {
             String[] paths = new String[sourceFiles.size()];
             String[] encodings = new String[sourceFiles.size()];
@@ -117,13 +110,11 @@ public class ModelBuilder {
                     sources.put(path, source);
                     charsets.put(path, charset);
                     count++;
-                } catch (IOException e) { /* rmpty */ }
+                } catch (IOException e) { /* empty */ }
             }
             
             parse(paths, encodings, sources, charsets);
-            if (resolveBinding) {
-                collectInfo();
-            }
+            collectInfo();
         }
     }
     
@@ -135,11 +126,11 @@ public class ModelBuilder {
             private int count = 0;
             
             public void acceptAST(String path, CompilationUnit cu) {
-                JavaFile jfile = new JavaFile(cu, path, sources.get(path), charsets.get(path), jproject);
+                JavaFile jfile = new JavaFile(cu, path, sources.get(path), charsets.get(path), currentProject);
                 JavaASTVisitor visitor = new JavaASTVisitor(jfile);
                 cu.accept(visitor);
                 visitor.terminate();
-                jproject.addFile(jfile);
+                currentProject.addFile(jfile);
                 
                 pm.work(1);
                 count++;
@@ -147,7 +138,7 @@ public class ModelBuilder {
             }
         };
         
-        Logger.getInstance().printMessage("Target = " + jproject.getPath() + " (" + jproject.getName() + ")");
+        Logger.getInstance().printMessage("Target = " + currentProject.getPath() + " (" + currentProject.getName() + ")");
         
         Logger.getInstance().printMessage("** Ready to parse " + size + " files");
         ASTParser parser = getParser();
@@ -156,13 +147,13 @@ public class ModelBuilder {
     }
     
     public void collectInfo() {
-        int size = jproject.getClasses().size();
+        int size = currentProject.getClasses().size();
         Logger.getInstance().printMessage("** Ready to build java models of " + size + " classes");
         ProgressMonitor pm = new ProgressMonitor();
         pm.begin(size);
         int count = 0;
-        for (JavaClass jclass : jproject.getClasses()) {
-            jproject.collectInfo(jclass);
+        for (JavaClass jclass : currentProject.getClasses()) {
+            currentProject.collectInfo(jclass);
             
             pm.work(1);
             count++;
@@ -184,7 +175,7 @@ public class ModelBuilder {
         parser.setResolveBindings(true);
         parser.setStatementsRecovery(true);
         parser.setBindingsRecovery(true);
-        parser.setEnvironment(jproject.getClassPath(), null, null, true);
+        parser.setEnvironment(currentProject.getClassPath(), null, null, true);
         return parser;
     }
     

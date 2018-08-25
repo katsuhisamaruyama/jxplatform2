@@ -7,6 +7,7 @@
 package org.jtool.eclipse.test;
 
 import org.jtool.eclipse.pdg.PDGStore;
+import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.standalone.JavaModelBuilder;
 import org.junit.Test;
 
@@ -23,9 +24,9 @@ public class PDGModelBuilderTest {
     public void testSimple() {
         String target = TEST_PROECT_DIR + "Simple/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        builder.build(false);
+        JavaProject jproject = builder.build();
         PDGStore.getInstance().create(false);
-        PDGStore.getInstance().buildPDGs(builder.getProject().getClasses());
+        PDGStore.getInstance().buildPDGs(jproject.getClasses());
         builder.unbuild();
     }
     
@@ -33,9 +34,9 @@ public class PDGModelBuilderTest {
     public void testJrb() {
         String target = TEST_PROECT_DIR +  "jrb-1.0.2/src/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        builder.build(false);
+        JavaProject jproject = builder.build();
         PDGStore.getInstance().create(false);
-        PDGStore.getInstance().buildPDGs(builder.getProject().getClasses());
+        PDGStore.getInstance().buildPDGs(jproject.getClasses());
         builder.unbuild();
     }
     
@@ -43,9 +44,9 @@ public class PDGModelBuilderTest {
     public void testTetris() {
         String target = TEST_PROECT_DIR + "Tetris/src/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        builder.build(false);
+        JavaProject jproject = builder.build();
         PDGStore.getInstance().create(false);
-        PDGStore.getInstance().buildPDGs(builder.getProject().getClasses());
+        PDGStore.getInstance().buildPDGs(jproject.getClasses());
         builder.unbuild();
     }
     
@@ -53,9 +54,9 @@ public class PDGModelBuilderTest {
     public void testDrawTool() {
         String target = TEST_PROECT_DIR +  "DrawTool/src/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        builder.build(false);
+        JavaProject jproject = builder.build();
         PDGStore.getInstance().create(false);
-        PDGStore.getInstance().buildPDGs(builder.getProject().getClasses());
+        PDGStore.getInstance().buildPDGs(jproject.getClasses());
         builder.unbuild();
     }
     
@@ -63,9 +64,9 @@ public class PDGModelBuilderTest {
     public void testLambda() {
         String target = TEST_PROECT_DIR +  "Lambda/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        builder.build(false);
+        JavaProject jproject = builder.build();
         PDGStore.getInstance().create(false);
-        PDGStore.getInstance().buildPDGs(builder.getProject().getClasses());
+        PDGStore.getInstance().buildPDGs(jproject.getClasses());
         builder.unbuild();
     }
     

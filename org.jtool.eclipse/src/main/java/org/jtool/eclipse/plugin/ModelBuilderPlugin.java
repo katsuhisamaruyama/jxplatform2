@@ -45,9 +45,12 @@ import java.util.HashMap;
  * Manages resources within Eclipse's projects.
  * @author Katsuhisa Maruyama
  */
-public class ProjectManager {
+public class ModelBuilderPlugin {
     
-    private static ProjectManager instance = new ProjectManager();
+    private static ModelBuilderPlugin instance = new ModelBuilderPlugin();
+    
+    private IJavaProject javaProject;
+    private JavaProject currentProject;
     
     private ResourceChangeListener resourceChangeListener = new ResourceChangeListener();
     
@@ -56,7 +59,11 @@ public class ProjectManager {
     
     private JXConsole console = new JXConsole();
     
-    private ProjectManager() {
+    private ModelBuilderPlugin() {
+    }
+    
+    public JavaProject getCurrentProject() {
+        return currentProject;
     }
     
     public void start() {
@@ -67,7 +74,7 @@ public class ProjectManager {
         resourceChangeListener.unregister();
     }
     
-    public static ProjectManager getInstance() {
+    public static ModelBuilderPlugin getInstance() {
         return instance;
     }
     
@@ -182,16 +189,17 @@ public class ProjectManager {
     }
     
     public void build(IFile file) {
+        IJavaProject project = JavaCore.create(file.getProject());
+        ProjectStore.getInstance().setUnderPlugin(true);
         JavaProject jproject = ProjectStore.getInstance().getProject(file.getProject().getFullPath().toString());
         if (jproject == null || jproject.getFiles().size() == 0) {
-            IJavaProject project = JavaCore.create(file.getProject());
             if (project != null) {
                 buildWhole(project);
             }
         } else {
             Set<ICompilationUnit> compilationUnits = new HashSet<ICompilationUnit>();
-            IJavaProject project = JavaCore.create(file.getProject());
-            jproject = ProjectStore.getInstance().getProject(project.getPath().toString());
+            javaProject = project;
+            currentProject = ProjectStore.getInstance().getProject(project.getPath().toString());
             setPaths(jproject, project);
             
             if (project != null) {
@@ -214,14 +222,15 @@ public class ProjectManager {
     }
     
     public JavaProject build(IJavaProject project) {
+        ProjectStore.getInstance().setUnderPlugin(true);
         JavaProject jproject = ProjectStore.getInstance().getProject(project.getPath().toString());
         if (jproject == null || jproject.getFiles().size() == 0) {
             return buildWhole(project);
         }
         
         Set<ICompilationUnit> compilationUnits = new HashSet<ICompilationUnit>();
-        jproject = ProjectStore.getInstance().getProject(project.getPath().toString());
-        ProjectStore.getInstance().setCurrentProject(jproject);
+        javaProject = project;
+        currentProject = ProjectStore.getInstance().getProject(project.getPath().toString());
         setPaths(jproject, project);
         
         for (IFile file : dirtyFiles) {
@@ -241,19 +250,23 @@ public class ProjectManager {
         return jproject;
     }
     
+    public JavaProject update() {
+        ProjectStore.getInstance().removeProject(currentProject.getPath());
+        return buildWhole(javaProject);
+    }
+    
     private JavaProject buildWhole(IJavaProject project) {
         String name = project.getProject().getName();
         String path = project.getProject().getFullPath().toString();
         String dir = project.getProject().getLocation().toString();
-        JavaProject jproject = new JavaProject(name, path, dir);
-        setPaths(jproject, project);
+        javaProject = project;
+        currentProject = new JavaProject(name, path, dir);
+        setPaths(currentProject, project);
+        ProjectStore.getInstance().addProject(currentProject);
         
-        ProjectStore.getInstance().addProject(jproject);
-        ProjectStore.getInstance().setCurrentProject(jproject);
-        
-        Set<ICompilationUnit> compilationUnits = collectCompilationUnits(project, jproject);
-        buildJavaModel(compilationUnits, jproject);
-        return jproject;
+        Set<ICompilationUnit> compilationUnits = collectCompilationUnits(project, currentProject);
+        buildJavaModel(compilationUnits, currentProject);
+        return currentProject;
     }
     
     private Set<ICompilationUnit> collectCompilationUnits(IJavaProject project, JavaProject jproject) {

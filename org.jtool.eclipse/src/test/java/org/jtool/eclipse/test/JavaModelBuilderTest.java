@@ -22,7 +22,7 @@ public class JavaModelBuilderTest {
     public void testSimple() {
         String target = TEST_PROECT_DIR + "Simple/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        builder.build(true);
+        builder.build();
         builder.unbuild();
         
     }
@@ -31,7 +31,7 @@ public class JavaModelBuilderTest {
     public void testJrb() {
         String target = TEST_PROECT_DIR + "jrb-1.0.2/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        builder.build(true);
+        builder.build();
         builder.unbuild();
     }
     
@@ -39,7 +39,7 @@ public class JavaModelBuilderTest {
     public void testTetris() {
         String target = TEST_PROECT_DIR + "Tetris/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        builder.build(true);
+        builder.build();
         builder.unbuild();
     }
     
@@ -47,7 +47,7 @@ public class JavaModelBuilderTest {
     public void testDrawTool() {
         String target = TEST_PROECT_DIR + "DrawTool/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        builder.build(true);
+        builder.build();
         builder.unbuild();
     }
     
@@ -55,7 +55,7 @@ public class JavaModelBuilderTest {
     public void testLambda() {
         String target = TEST_PROECT_DIR + "Lambda/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        builder.build(true);
+        builder.build();
         builder.unbuild();
     }
     
@@ -64,7 +64,7 @@ public class JavaModelBuilderTest {
         String target = TEST_PROECT_DIR + "CS-Sample/";
         String classpath = TEST_PROECT_DIR + "CS-Sample/lib/*";
         JavaModelBuilder builder = new JavaModelBuilder(target, target, classpath);
-        builder.build(true);
+        builder.build();
         builder.unbuild();
     }
     
@@ -73,7 +73,7 @@ public class JavaModelBuilderTest {
         String target = TEST_PROECT_DIR + "findbugs/";
         String classpath = TEST_PROECT_DIR + "findbugs/lib/*";
         JavaModelBuilder builder = new JavaModelBuilder(target, target, classpath);
-        builder.build(true);
+        builder.build();
         builder.unbuild();
     }
     
@@ -82,7 +82,7 @@ public class JavaModelBuilderTest {
         String target = TEST_PROECT_DIR + "apache-ant/";
         String classpath = TEST_PROECT_DIR + "apache-ant/lib/*";
         JavaModelBuilder builder = new JavaModelBuilder(target, target, classpath);
-        builder.build(true);
+        builder.build();
         builder.unbuild();
     }
     
@@ -91,7 +91,7 @@ public class JavaModelBuilderTest {
         String target = TEST_PROECT_DIR + "jdk1.8.0_131/";
         String classpath = TEST_PROECT_DIR + "jdk1.8.0_131/lib/*";
         JavaModelBuilder builder = new JavaModelBuilder(target, target, classpath);
-        builder.build(true);
+        builder.build();
         builder.unbuild();
     }
     

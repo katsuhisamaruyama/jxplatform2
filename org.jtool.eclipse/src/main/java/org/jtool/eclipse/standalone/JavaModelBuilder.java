@@ -7,7 +7,6 @@
 package org.jtool.eclipse.standalone;
 
 import org.jtool.eclipse.javamodel.JavaProject;
-import org.jtool.eclipse.javamodel.builder.ModelBuilder;
 import org.jtool.eclipse.util.Options;
 import org.jtool.eclipse.util.Logger;
 import java.util.List;
@@ -21,25 +20,26 @@ import java.io.IOException;
  */
 public class JavaModelBuilder {
     
-    private ModelBuilder builder;
+    private String projectName;
+    private String projectPath;
+    private String projectClasspath;
+    
     private String logfile = "";
     
     public JavaModelBuilder(String[] args) {
-        String cdir = new File(".").getAbsoluteFile().getParent();
-        Options options = new Options(args);
-        String target = removeLastFileSeparator(options.get("-target", "."));
-        String classpath = options.get("-classpath", ".");
-        String name = options.get("-name", getProjectName(target, cdir));
-        logfile = options.get("-logfile", "");
-        
-        File dir = new File(getFullPath(target, cdir));
-        String path;
         try {
-            path = dir.getCanonicalPath();
-            builder = new ModelBuilder(name, dir.getCanonicalPath());
-            builder.setClassPath(getClassPath(classpath));
+            String cdir = new File(".").getAbsoluteFile().getParent();
+            Options options = new Options(args);
+            String target = removeLastFileSeparator(options.get("-target", "."));
+            
+            projectName = options.get("-name", getProjectName(target, cdir));
+            File dir = new File(getFullPath(target, cdir));
+            projectPath = dir.getCanonicalPath();
+            projectClasspath = options.get("-classpath", ".");
+            
+            logfile = options.get("-logfile", "");
             if (logfile.length() > 0) {
-                Logger.getInstance().setLogFile(path + File.separator + logfile);
+                Logger.getInstance().setLogFile(projectPath + File.separator + logfile);
             }
         } catch (IOException e) {
             System.err.println("Cannot build a Java model due to the invalid options/settings.");
@@ -51,12 +51,16 @@ public class JavaModelBuilder {
     }
     
     public JavaModelBuilder(String name, String target, String classpath) {
-        builder = new ModelBuilder(name, target);
-        builder.setClassPath(getClassPath(classpath));
-    }
-    
-    public JavaProject getProject() {
-        return builder.getProject();
+        try {
+            target = removeLastFileSeparator(target);
+            
+            projectName = replaceFileSeparator(name);
+            File dir = new File(target);
+            projectPath = dir.getCanonicalPath();
+            projectClasspath = classpath;
+        } catch (IOException e) {
+            System.err.println("Cannot build a Java model due to the invalid options/settings.");
+        }
     }
     
     private String getProjectName(String target, String cdir) {
@@ -80,6 +84,14 @@ public class JavaModelBuilder {
     
     private String replaceFileSeparator(String path) {
         return path.replace(File.separatorChar, '.');
+    }
+    
+    public JavaProject build() {
+        return ModelBuilder.getInstance().build(projectName, projectPath, getClassPath(projectClasspath));
+    }
+    
+    public void unbuild() {
+        ModelBuilder.getInstance().unbuild();
     }
     
     private String[] getClassPath(String classpath) {
@@ -134,16 +146,8 @@ public class JavaModelBuilder {
         return array;
     }
     
-    public JavaProject build(boolean resolveBinding) {
-        return builder.build(resolveBinding);
-    }
-    
-    public void unbuild() {
-        builder.unbuild();
-    }
-    
     public static void main(String[] args) {
         JavaModelBuilder builder = new JavaModelBuilder(args);
-        builder.build(true);
+        builder.build();
     }
 }

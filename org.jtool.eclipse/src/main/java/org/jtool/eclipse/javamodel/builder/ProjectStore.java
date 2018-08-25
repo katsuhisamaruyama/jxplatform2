@@ -7,6 +7,9 @@
 package org.jtool.eclipse.javamodel.builder;
 
 import org.jtool.eclipse.javamodel.JavaProject;
+import org.jtool.eclipse.plugin.ModelBuilderPlugin;
+import org.jtool.eclipse.standalone.ModelBuilder;
+
 import java.util.Map;
 import java.util.HashMap;
 
@@ -19,7 +22,8 @@ public class ProjectStore {
     private static ProjectStore instance = new ProjectStore();
     
     private Map<String, JavaProject> projectStore = new HashMap<String, JavaProject>();
-    private JavaProject currentProject;
+    
+    private boolean underPlugin = false;
     
     private ProjectStore() {
     }
@@ -28,23 +32,28 @@ public class ProjectStore {
         return instance;
     }
     
-    public void setCurrentProject(String path) {
-        JavaProject jproject = projectStore.get(path);
-        if (jproject != null) {
-            currentProject = jproject;
-        }
+    public void setUnderPlugin(boolean bool) {
+        underPlugin = bool;
     }
     
-    public void setCurrentProject(JavaProject jproject) {
-        currentProject = jproject;
-    }
-    
-    public void resetCurrentProject() {
-        currentProject = null;
+    public boolean isUnderPlugin(boolean bool) {
+        return underPlugin;
     }
     
     public JavaProject getCurrentProject() {
-        return currentProject;
+        if (underPlugin) {
+            return ModelBuilderPlugin.getInstance().getCurrentProject();
+        } else {
+            return ModelBuilder.getInstance().getCurrentProject();
+        }
+    }
+    
+    public JavaProject updateCurrentProject() {
+        if (underPlugin) {
+            return ModelBuilderPlugin.getInstance().update();
+        } else {
+            return ModelBuilder.getInstance().update();
+        }
     }
     
     public void clear() {

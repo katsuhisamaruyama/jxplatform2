@@ -77,13 +77,13 @@ public class ResourceChangeListener implements IResourceChangeListener {
             if (resource != null && resource.getType() == IResource.FILE && ".java".equals(resource.getFileExtension())) {
                 if (delta.getKind() == IResourceDelta.ADDED) {
                     addedFiles.add((IFile)resource);
-                    ProjectManager.getInstance().addFile((IFile)resource);
+                    ModelBuilderPlugin.getInstance().addFile((IFile)resource);
                 } else if (delta.getKind() == IResourceDelta.REMOVED) {
                     removedFiles.add((IFile)resource);
-                    ProjectManager.getInstance().removeFile((IFile)resource);
+                    ModelBuilderPlugin.getInstance().removeFile((IFile)resource);
                 } else if (delta.getKind() == IResourceDelta.CHANGED) {
                     changedFiles.add((IFile)resource);
-                    ProjectManager.getInstance().changeFile((IFile)resource);
+                    ModelBuilderPlugin.getInstance().changeFile((IFile)resource);
                 }
             }
             return true;
