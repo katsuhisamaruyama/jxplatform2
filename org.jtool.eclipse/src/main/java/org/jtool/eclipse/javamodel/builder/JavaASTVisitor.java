@@ -8,6 +8,7 @@ package org.jtool.eclipse.javamodel.builder;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
+import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
@@ -48,6 +49,12 @@ public class JavaASTVisitor extends ASTVisitor {
     public boolean visit(PackageDeclaration node) {
         jpackage = JavaPackage.create(node, jfile);
         jfile.setPackage(jpackage);
+        return true;
+    }
+    
+    @Override
+    public boolean visit(ImportDeclaration node) {
+        jfile.addImport(node);
         return true;
     }
     

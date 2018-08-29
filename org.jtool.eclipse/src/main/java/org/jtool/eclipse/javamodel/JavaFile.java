@@ -7,8 +7,11 @@
 package org.jtool.eclipse.javamodel;
 
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.ASTNode;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 import java.io.File;
 
 /**
@@ -24,6 +27,8 @@ public class JavaFile {
     
     protected JavaPackage jpackage;
     protected Set<JavaClass> classes = new HashSet<JavaClass>();
+    
+    protected List<ASTNode> imports = new ArrayList<ASTNode>();
     
     protected JavaFile() {
     }
@@ -85,6 +90,14 @@ public class JavaFile {
     
     public Set<JavaClass> getClasses() {
         return classes;
+    }
+    
+    public void addImport(ASTNode node) {
+        imports.add(node);
+    }
+    
+    public List<ASTNode> getImports() {
+        return imports;
     }
     
     @Override
