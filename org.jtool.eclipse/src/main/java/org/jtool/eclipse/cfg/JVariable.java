@@ -44,6 +44,10 @@ public abstract class JVariable {
         astNode = node;
     }
     
+    public ASTNode getASTNode() {
+        return astNode;
+    }
+    
     public String getEnclosingClassName() {
         return enclosingClassName;
     }
