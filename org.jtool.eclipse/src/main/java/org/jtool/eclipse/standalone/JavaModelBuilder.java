@@ -146,6 +146,10 @@ public class JavaModelBuilder {
         return array;
     }
     
+    public void setVisible(boolean visible) {
+        Logger.getInstance().setVisible(visible);
+    }
+    
     public static void main(String[] args) {
         JavaModelBuilder builder = new JavaModelBuilder(args);
         builder.build();

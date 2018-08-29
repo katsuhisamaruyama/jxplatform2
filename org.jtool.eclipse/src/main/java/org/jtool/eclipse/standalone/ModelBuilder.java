@@ -51,9 +51,6 @@ public class ModelBuilder {
     
     public JavaProject build(String name, String target, String[] classPath) {
         try {
-            name = replaceFileSeparator(name);
-            target = removeLastFileSeparator(target);
-            
             File dir = new File(target);
             currentProject = new JavaProject(name, dir.getCanonicalPath());
             currentProject.setClassPath(classPath);
@@ -66,17 +63,6 @@ public class ModelBuilder {
             currentProject = null;
         }
         return currentProject;
-    }
-    
-    private String replaceFileSeparator(String path) {
-        return path.replace(File.separatorChar, '.');
-    }
-    
-    private String removeLastFileSeparator(String path) {
-        if (path.charAt(path.length() - 1) == File.separatorChar) {
-            return path.substring(0, path.length() - 1);
-        }
-        return path;
     }
     
     public JavaProject update() {
@@ -194,10 +180,10 @@ public class ModelBuilder {
         return files;
     }
     
-    private static String read(File file) throws IOException {
+    private String read(File file) throws IOException {
         StringBuilder content = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            char[] buf = new char[10];
+            char[] buf = new char[128];
             int count = 0;
             while ((count = reader.read(buf)) != -1) {
                 String data = String.valueOf(buf, 0, count);
@@ -206,9 +192,5 @@ public class ModelBuilder {
             }
         }
         return  content.toString();
-    }
-    
-    public void setVisible(boolean visible) {
-        Logger.getInstance().setVisible(visible);
     }
 }

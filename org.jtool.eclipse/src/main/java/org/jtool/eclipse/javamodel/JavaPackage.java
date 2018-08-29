@@ -21,6 +21,8 @@ public class JavaPackage extends JavaElement {
     
     protected Set<JavaClass> classes = new HashSet<JavaClass>();
     
+    private static final String DEFAUL_PACKAGE_NAME = "(default)";
+    
     protected JavaPackage() {
     }
     
@@ -41,7 +43,7 @@ public class JavaPackage extends JavaElement {
                 name = binding.getName();
             }
         } else {
-            name = "(default)";
+            name = DEFAUL_PACKAGE_NAME;
         }
         
         JavaPackage jpackage = jfile.getProject().getPackage(name);
@@ -64,6 +66,10 @@ public class JavaPackage extends JavaElement {
     
     public String getName() {
         return name;
+    }
+    
+    public boolean isDefault() {
+        return name.equals(DEFAUL_PACKAGE_NAME);
     }
     
     protected void addClass(JavaClass jclass) {
