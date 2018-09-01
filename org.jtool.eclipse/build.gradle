@@ -66,6 +66,6 @@ shadowJar {
 }
 
 task copyJar(type: Copy) {
-    from '/build/libs'
+    from 'build/libs'
     into 'releases'
 }
