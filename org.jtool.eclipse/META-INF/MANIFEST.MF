@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: jxplatform2
+Bundle-Name: JxPlatform2
 Bundle-SymbolicName: org.jtool.eclipse;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Export-Package: org.jtool.eclipse.batch;uses:="org.jtool.eclipse.javamodel,org.jtool.eclipse.javamodel.builder",
