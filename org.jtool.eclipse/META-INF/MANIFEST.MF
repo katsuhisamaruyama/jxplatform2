@@ -15,8 +15,7 @@ Export-Package: org.jtool.eclipse.batch;uses:="org.jtool.eclipse.javamodel,org.j
  org.jtool.eclipse.javamodel.builder;uses:="org.eclipse.jdt.core.dom,org.jtool.eclipse.javamodel,javassist",
  org.jtool.eclipse.pdg;uses:="org.jtool.eclipse.graph,org.jtool.eclipse.cfg,org.jtool.eclipse.javamodel",
  org.jtool.eclipse.pdg.builder;uses:="org.jtool.eclipse.pdg,org.jtool.eclipse.cfg,org.jtool.eclipse.javamodel",
- org.jtool.eclipse.plugin;
-  uses:="org.osgi.framework,
+ org.jtool.eclipse.plugin;uses:="org.osgi.framework,
    org.eclipse.ui,
    org.eclipse.jdt.core,
    org.eclipse.core.resources,
