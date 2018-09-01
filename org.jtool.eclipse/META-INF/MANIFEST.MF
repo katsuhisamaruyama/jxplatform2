@@ -33,3 +33,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: org.jtool.eclipse
 Bundle-Activator: org.jtool.eclipse.plugin.Activator
 Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: lib/javassist.jar,
+ .

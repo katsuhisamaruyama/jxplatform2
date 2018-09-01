@@ -6,6 +6,8 @@
  
 package org.jtool.eclipse.plugin;
 
+import org.jtool.eclipse.javamodel.JavaProject;
+import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import org.jtool.eclipse.plugin.ModelBuilderPlugin;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -34,10 +36,13 @@ public class BuildAction extends AbstractHandler {
             Object elem = structured.getFirstElement();
             if (elem instanceof IJavaProject) {
                 ModelBuilderPlugin modelBuilder = new ModelBuilderPlugin();
-                modelBuilder.build((IJavaProject)elem);
+                JavaProject jproject = modelBuilder.build((IJavaProject)elem);
+                jproject.registerBytecodeClasses();
+                
             } else if (elem instanceof IProject) {
                 ModelBuilderPlugin modelBuilder = new ModelBuilderPlugin();
-                modelBuilder.build(JavaCore.create((IProject)elem));
+                JavaProject jproject = modelBuilder.build(JavaCore.create((IProject)elem));
+                jproject.registerBytecodeClasses();
             }
         }
         return null;
