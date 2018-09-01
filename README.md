@@ -67,50 +67,62 @@ JDK 1.8
 
 ## Installation
 
-### From a release
+### For the batch-process versions
 
-You can directly download jar files of jxplatform2 on [GitHub](<https://github.com/katsuhisamaruyama/jxplatform2/tree/master/org.jtool.eclipse/releases>). 
+You can directly download jar files for the batch-process versions of jxplatform2 on [GitHub](<https://github.com/katsuhisamaruyama/jxplatform2/tree/master/org.jtool.eclipse/releases>). 
 
-### From the sources
-
-You can build jxplatform2 with the following commands: 
+Alternatively, you can build the batch-process versions of jxplatform2 with the following commands: 
 
     git clone https://github.com/katsuhisamaruyama/jxplatform2/
     cd jxplatform2/org.jtool.eclipse
     ./gradlew build jar shadowJar
 
-Jar files of JxPlatform2 can be found in the 'build/libs' folder.
+Jar files of JxPlatform2 can be found in the 'build/libs' folder. 
+
+### For the Eclipse plug-in version
+
+When using the Eclipse update site, select menu items: "Help" -> "Install New Software..." ->  
+Input `https://katsuhisamaruyama.github.io/jxplatform2/org.jtool.eclipse.site/site.xml` in the text field of "Work with:" 
+
+If you prefer to manually install the plug-in, download the latest release of the jar file in the [plug-in directory]
+(<https://github.com/katsuhisamaruyama/jxplatform2/tree/master/org.jtool.eclipse.site/plugins>)
+and put it in the 'plug-ins' directory under the Eclipse installation. Eclipse needs to be restarted. 
 
 ## Usage
 
-### As a stand-alone application
+### As a batch-process application
 
-`jxplatform-1.0-all.jar` is an executable jar file. For example, when you put Java source code under the `xxx` folder (Java source files are expanded under the folder), the following command builds a Java model for the source code.
+`jxplatform-1.0-all.jar` is an executable jar file itself. For example, when you put Java source code under the `xxx` folder (Java source files are expanded under the folder), the following command builds a Java model for the source code.
 
     java -jar jxplatform-1.0-all.jar -target xxx/ -classpath 'xxx/lib/*' -name name -logfile xxx.log
 
-* `-classpath` specifies class paths where needed libraries are contained 
-* `-name` specifies the name of a project managed in jxplatform2 
-* `-logfile` specifies the name of a file in which the result of analysis is written 
+* `-classpath`: (optional) specifies class paths where needed libraries are contained 
+* `-name`: (optional) specifies the name of a project managed in jxplatform2 
+* `-logfile`: (optional) specifies the name of a file in which the result of analysis is written 
 
-These three options can be eliminated if they are needless. 
-
-If your stand-alone application employs JxPlatform2, you should use `jxplatform-1.0-lib.jar` instead of `jxplatform-1.0-all.jar`. The following API calls build a Java model. 
+If your batch-process application employs JxPlatform2, you should use `jxplatform-1.0-lib.jar` instead of `jxplatform-1.0-all.jar`. The following API calls build a Java model. 
 
     JavaModelBuilder builder = new JavaModelBuilder(name, target, classpath);
-    builder.build(true);
+    builder.setVisible(true);  // Displays log information on console
+    JavaProject jproject = builder.build();
+    ...
+    builder.unbuild();
 
-### As an Eclipse plug-in
+### As a plug-in
 
-You put `jxplatform-1.0-lib.jar` in the 'plug-ins' directory under the Eclipse. Eclipse needs to be restarted. 
+A typical code for building a Java model for the source code within the Eclipse project:
 
-Your code builds a Java model for the source code and return a project containing the generated model with either of the following two API calls:
+    org.eclipse.jdt.core.IJavaProject project;  // It is Ok for org.eclipse.core.resources.IProject
+    ModelBuilderPlugin modelBuilder = new ModelBuilderPlugin();
+    JavaProject jproject = modelBuilder.build(project);
 
-    IJavaProject project;
-    ProjectManager.getInstance().build(project);
-    ProjectManager.getInstance().buildWhole(project);
+The plug-in automatically collects source files that was modified from the previous build.
+Thus, the dirty source files will be analyzed if your code will perform build.
+Use the `buildWhole(project)` method for clean re-build.  
 
 ### Building CFGs and PDGs
+
+UNDER FIXING BUGS -- Thanks for your waiting.
 
 CFGStore and PDGStore classes provides APIs for building CFGs and PDGs from the Java model.
 
