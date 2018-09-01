@@ -6,10 +6,9 @@
 
 package org.jtool.eclipse.javamodel.builder;
 
-import org.jtool.eclipse.batch.ModelBuilder;
 import org.jtool.eclipse.javamodel.JavaProject;
+import org.jtool.eclipse.batch.ModelBuilder;
 import org.jtool.eclipse.plugin.ModelBuilderPlugin;
-
 import java.util.Map;
 import java.util.HashMap;
 

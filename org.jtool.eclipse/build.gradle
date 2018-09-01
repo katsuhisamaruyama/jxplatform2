@@ -50,6 +50,7 @@ repositories {
 
 dependencies {
     compile 'org.eclipse.jdt:org.eclipse.jdt.core:3.13.+'
+    compile files('lib/javassist.jar')
     testCompile 'junit:junit:4.+'
 }
 
@@ -62,4 +63,9 @@ shadowJar {
         attributes('Main-Class' : 'org.jtool.eclipse.standalone.JavaModelBuilder')
         exclude '**/plugin/*'
     }
+}
+
+task copyJar(type: Copy) {
+    from '/build/libs'
+    into 'releases'
 }

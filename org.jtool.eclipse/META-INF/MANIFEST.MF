@@ -3,15 +3,27 @@ Bundle-ManifestVersion: 2
 Bundle-Name: jxplatform2
 Bundle-SymbolicName: org.jtool.eclipse;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Export-Package: org.jtool.eclipse.cfg,
- org.jtool.eclipse.cfg.builder,
+Export-Package: org.jtool.eclipse.batch;uses:="org.jtool.eclipse.javamodel,org.jtool.eclipse.javamodel.builder",
+ org.jtool.eclipse.cfg;
+  uses:="org.jtool.eclipse.graph,
+   org.eclipse.jdt.core.dom,
+   org.jtool.eclipse.pdg,
+   org.jtool.eclipse.javamodel",
+ org.jtool.eclipse.cfg.builder;uses:="org.eclipse.jdt.core.dom,org.jtool.eclipse.cfg,org.jtool.eclipse.javamodel",
  org.jtool.eclipse.graph,
- org.jtool.eclipse.javamodel,
- org.jtool.eclipse.javamodel.builder,
- org.jtool.eclipse.pdg,
- org.jtool.eclipse.pdg.builder,
- org.jtool.eclipse.plugin,
- org.jtool.eclipse.standalone,
+ org.jtool.eclipse.javamodel;uses:="org.eclipse.jdt.core.dom,org.jtool.eclipse.javamodel.builder",
+ org.jtool.eclipse.javamodel.builder;uses:="org.eclipse.jdt.core.dom,org.jtool.eclipse.javamodel,javassist",
+ org.jtool.eclipse.pdg;uses:="org.jtool.eclipse.graph,org.jtool.eclipse.cfg,org.jtool.eclipse.javamodel",
+ org.jtool.eclipse.pdg.builder;uses:="org.jtool.eclipse.pdg,org.jtool.eclipse.cfg,org.jtool.eclipse.javamodel",
+ org.jtool.eclipse.plugin;
+  uses:="org.osgi.framework,
+   org.eclipse.ui,
+   org.eclipse.jdt.core,
+   org.eclipse.core.resources,
+   org.jtool.eclipse.javamodel,
+   org.jtool.eclipse.javamodel.builder,
+   org.eclipse.ui.plugin",
+ org.jtool.eclipse.slice;uses:="org.eclipse.jdt.core.dom,org.jtool.eclipse.pdg,org.jtool.eclipse.cfg",
  org.jtool.eclipse.util
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
