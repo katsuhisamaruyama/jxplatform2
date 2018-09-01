@@ -16,7 +16,6 @@ import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.pdg.builder.PDGBuilder;
-
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +29,6 @@ public class PDGStore {
     private static PDGStore instance = new PDGStore();
     
     protected Map<String, PDG> pdgStore = new HashMap<String, PDG>();
-    private boolean isConservative = true;
     
     private boolean visible = true;
     
@@ -41,15 +39,13 @@ public class PDGStore {
         return instance;
     }
     
-    public PDGStore create(boolean isConservative) {
-        CFGStore.getInstance().create(isConservative);
-        this.isConservative = isConservative;
-        return instance;
-    }
-    
     public void destroy() {
         pdgStore.clear();
         CFGStore.getInstance().destroy();
+    }
+    
+    public PDG getPDG(CFG cfg) {
+        return PDGBuilder.build(cfg);
     }
     
     public PDG getPDG(JavaClass jclass) {
@@ -104,28 +100,19 @@ public class PDGStore {
         cldg.setEntryNode(pdgentry);
         
         for (JavaMethod jm : jclass.getMethods()) {
-            PDG pdg = getPDG(jm.getQualifiedName());
-            if (pdg == null) {
-                pdg = buildPDG(jm);
-                addPDG(pdg);
-            }
+            PDG pdg = buildPDG(jm);
+            addPDG(pdg);
             cldg.add(pdg);
         }
         for (JavaField jf : jclass.getFields()) {
-            PDG pdg = getPDG(jf.getQualifiedName());
-            if (pdg == null) {
-                pdg = buildPDG(jf);
-                addPDG(pdg);
-            }
+            PDG pdg = buildPDG(jf);
+            addPDG(pdg);
             cldg.add(pdg);
         }
         /*
         for (JavaClass jt : jclass.getInnerClasses()) {
-            PDG pdg = getPDG(jt.getQualifiedName());
-            if (pdg == null) {
-                pdg = buildPDG(jt);
-                addPDG(pdg);
-            }
+            PDG pdg = buildPDG(jt);
+            addPDG(pdg);
             cldg.add(pdg);
         }
         */
@@ -135,7 +122,7 @@ public class PDGStore {
     private PDG buildPDG(JavaMethod jmethod) {
         CFG cfg = CFGMethodBuilder.build(jmethod);
         PDG pdg = PDGBuilder.build(cfg);
-        if (isConservative) {
+        if (CFGStore.getInstance().creatingActualNodes()) {
             PDGBuilder.connectActualParameters(pdg);
         }
         return pdg;

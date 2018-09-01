@@ -12,6 +12,7 @@ import org.jtool.eclipse.cfg.builder.CFGMethodBuilder;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
+import org.jtool.eclipse.javamodel.builder.ProjectStore;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ public class CFGStore {
     
     private Map<String, CFG> cfgStore = new HashMap<String, CFG>();
     private boolean creatingActualNodes = false;
+    private boolean analyzingExternalClasses = false;
     
     private boolean visible = true;
     
@@ -38,10 +40,13 @@ public class CFGStore {
         return instance;
     }
     
-    public CFGStore create(boolean creatingActualNodes) {
+    public void setOptions(boolean creatingActualNodes, boolean analyzingExternalClasses) {
         CFGNode.resetId();
         this.creatingActualNodes = creatingActualNodes;
-        return instance;
+        this.analyzingExternalClasses = analyzingExternalClasses;
+        if (analyzingExternalClasses) {
+            ProjectStore.getInstance().getCurrentProject().registerBytecodeClasses();
+        }
     }
     
     public void destroy() {
@@ -51,6 +56,10 @@ public class CFGStore {
     
     public boolean creatingActualNodes() {
         return creatingActualNodes;
+    }
+    
+    public boolean analyzingExternalClasses() {
+        return analyzingExternalClasses;
     }
     
     private void addCFG(CFG cfg) {

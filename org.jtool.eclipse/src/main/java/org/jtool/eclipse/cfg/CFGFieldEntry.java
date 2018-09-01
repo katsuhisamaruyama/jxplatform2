@@ -32,6 +32,12 @@ public class CFGFieldEntry extends CFGEntry {
         return type;
     }
     
+    public JVariable getDefField() {
+        CFGNode[] nodes = toArray(getDstNodes());
+        CFGStatement decl = (CFGStatement)nodes[0];
+        return decl.getFirst();
+    }
+    
     public List<JVariable> getUsedFields() {
         CFGNode[] nodes = toArray(getDstNodes());
         CFGStatement decl = (CFGStatement)nodes[0];

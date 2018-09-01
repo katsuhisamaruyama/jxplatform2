@@ -6,18 +6,19 @@
 
 package org.jtool.eclipse.test;
 
+import org.jtool.eclipse.batch.JavaModelBuilder;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGStore;
 import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
-import org.jtool.eclipse.standalone.JavaModelBuilder;
 import org.junit.Test;
 
 /**
  * Tests a class that builds a CFG.
- * Please the constant value of TEST_PROECT_DIR will be changed according to your environment.
+ * Change the constant value of TEST_PROECT_DIR according to your environment.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class CFGModelBuilderTest {
@@ -47,7 +48,7 @@ public class CFGModelBuilderTest {
         String target = TEST_PROECT_DIR + "Simple/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
-        CFGStore.getInstance().create(false);
+        CFGStore.getInstance().setOptions(false, false);
         CFGStore.getInstance().buildCFGs(jproject.getClasses());
         checkDetails(jproject);
         builder.unbuild();
@@ -58,7 +59,7 @@ public class CFGModelBuilderTest {
         String target = TEST_PROECT_DIR + "jrb-1.0.2/src/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
-        CFGStore.getInstance().create(false);
+        CFGStore.getInstance().setOptions(false, false);
         CFGStore.getInstance().buildCFGs(jproject.getClasses());
         
         builder.unbuild();
@@ -69,7 +70,7 @@ public class CFGModelBuilderTest {
         String target = TEST_PROECT_DIR + "Tetris/src/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
-        CFGStore.getInstance().create(false);
+        CFGStore.getInstance().setOptions(false, false);
         CFGStore.getInstance().buildCFGs(jproject.getClasses());
         CFGStore.getInstance().destroy();
         builder.unbuild();
@@ -80,7 +81,7 @@ public class CFGModelBuilderTest {
         String target = TEST_PROECT_DIR + "DrawTool/src/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
-        CFGStore.getInstance().create(false);
+        CFGStore.getInstance().setOptions(false, false);
         CFGStore.getInstance().buildCFGs(jproject.getClasses());
         builder.unbuild();
     }
@@ -90,7 +91,7 @@ public class CFGModelBuilderTest {
         String target = TEST_PROECT_DIR + "Lambda/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
-        CFGStore.getInstance().create(false);
+        CFGStore.getInstance().setOptions(false, false);
         CFGStore.getInstance().buildCFGs(jproject.getClasses());
         builder.unbuild();
     }

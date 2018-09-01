@@ -105,6 +105,7 @@ public class ExpressionVisitor extends ASTVisitor {
     protected static int paramNumber = 1;
     
     private boolean creatingActuals;
+    private boolean analyzingExternalClasses;
     protected Stack<AnalysisMode> analysisMode = new Stack<AnalysisMode>();
     private enum AnalysisMode {
         DEF, USE,
@@ -117,6 +118,7 @@ public class ExpressionVisitor extends ASTVisitor {
         
         analysisMode.push(AnalysisMode.USE);
         creatingActuals = CFGStore.getInstance().creatingActualNodes();
+        analyzingExternalClasses = CFGStore.getInstance().analyzingExternalClasses();
     }
     
     public CFGNode getEntryNode() {
@@ -320,9 +322,10 @@ public class ExpressionVisitor extends ASTVisitor {
             analysisMode.push(AnalysisMode.USE);
             primary.accept(this);
             analysisMode.pop();
-            analysisMode.push(AnalysisMode.DEF);
-            primary.accept(this);
-            analysisMode.pop();
+            
+            //analysisMode.push(AnalysisMode.DEF);
+            //primary.accept(this);
+            //analysisMode.pop();
             
             int defVarNumAfter = curNode.getDefVariables().size();
             if (defVarNumAfter - defVarNumBefore == 1) {
@@ -548,8 +551,21 @@ public class ExpressionVisitor extends ASTVisitor {
                 curNode.addDefVariable(jvar);
             } else {
                 curNode.addUseVariable(jvar);
+                is(node);
             }
         }
+    }
+    
+    private boolean is(Name node) {
+        ASTNode parent = node.getParent();
+        if (parent instanceof MethodInvocation) {
+            MethodInvocation call = (MethodInvocation)parent;
+            Expression exp = call.getExpression();
+            if (exp instanceof Name) {
+                System.out.println("EXP = " + exp.toString());
+            }
+        }
+        return false;
     }
     
     private IVariableBinding getVariableBinding(Name node) {
