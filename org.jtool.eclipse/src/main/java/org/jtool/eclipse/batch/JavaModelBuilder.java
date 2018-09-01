@@ -25,6 +25,8 @@ public class JavaModelBuilder {
     private String projectPath;
     private String projectClasspath;
     
+    private ModelBuilder modelBuilder;
+    
     private String logfile = "";
     
     public JavaModelBuilder(String[] args) {
@@ -88,11 +90,14 @@ public class JavaModelBuilder {
     }
     
     public JavaProject build() {
-        return ModelBuilder.getInstance().build(projectName, projectPath, getClassPath(projectClasspath));
+        modelBuilder = new ModelBuilder();
+        return modelBuilder.build(projectName, projectPath, getClassPath(projectClasspath));
     }
     
     public void unbuild() {
-        ModelBuilder.getInstance().unbuild();
+        if (modelBuilder != null) {
+            modelBuilder.unbuild();
+        }
     }
     
     private String[] getClassPath(String classpath) {

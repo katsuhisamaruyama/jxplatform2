@@ -24,6 +24,8 @@ public class Activator extends AbstractUIPlugin implements IStartup {
     
     private static Activator plugin;
     
+    private ModelBuilderPlugin modelBuilder;
+    
     public Activator() {
     }
     
@@ -39,12 +41,13 @@ public class Activator extends AbstractUIPlugin implements IStartup {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
-        ModelBuilderPlugin.getInstance().start();
+        modelBuilder = new ModelBuilderPlugin();
+        modelBuilder.start();
     }
     
     @Override
     public void stop(BundleContext context) throws Exception {
-        ModelBuilderPlugin.getInstance().stop();
+        modelBuilder.stop();
         plugin = null;
         super.stop(context);
     }

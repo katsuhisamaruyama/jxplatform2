@@ -10,6 +10,7 @@ import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaFile;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaPackage;
+import org.jtool.eclipse.javamodel.builder.IModelBuilder;
 import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
 import org.jtool.eclipse.javamodel.builder.JavaASTVisitor;
 import org.jtool.eclipse.javamodel.builder.ProjectStore;
@@ -47,9 +48,7 @@ import java.util.HashMap;
  * 
  * @author Katsuhisa Maruyama
  */
-public class ModelBuilderPlugin {
-    
-    private static ModelBuilderPlugin instance = new ModelBuilderPlugin();
+public class ModelBuilderPlugin implements IModelBuilder {
     
     private IJavaProject javaProject;
     private JavaProject currentProject;
@@ -61,7 +60,11 @@ public class ModelBuilderPlugin {
     
     private JXConsole console = new JXConsole();
     
-    private ModelBuilderPlugin() {
+    public ModelBuilderPlugin() {
+    }
+    
+    public boolean isUnderPlugin() {
+        return true;
     }
     
     public JavaProject getCurrentProject() {
@@ -74,10 +77,6 @@ public class ModelBuilderPlugin {
     
     public void stop() {
         resourceChangeListener.unregister();
-    }
-    
-    public static ModelBuilderPlugin getInstance() {
-        return instance;
     }
     
     public void addFileChangeListener(IFileChangeListener listener) {
@@ -192,7 +191,7 @@ public class ModelBuilderPlugin {
     
     public void build(IFile file) {
         IJavaProject project = JavaCore.create(file.getProject());
-        ProjectStore.getInstance().setUnderPlugin(true);
+        ProjectStore.getInstance().setModelBuilder(this);
         JavaProject jproject = ProjectStore.getInstance().getProject(file.getProject().getFullPath().toString());
         if (jproject == null || jproject.getFiles().size() == 0) {
             if (project != null) {
@@ -224,7 +223,7 @@ public class ModelBuilderPlugin {
     }
     
     public JavaProject build(IJavaProject project) {
-        ProjectStore.getInstance().setUnderPlugin(true);
+        ProjectStore.getInstance().setModelBuilder(this);
         JavaProject jproject = ProjectStore.getInstance().getProject(project.getPath().toString());
         if (jproject == null || jproject.getFiles().size() == 0) {
             return buildWhole(project);

@@ -9,6 +9,7 @@ package org.jtool.eclipse.batch;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaFile;
 import org.jtool.eclipse.javamodel.JavaProject;
+import org.jtool.eclipse.javamodel.builder.IModelBuilder;
 import org.jtool.eclipse.javamodel.builder.JavaASTVisitor;
 import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
@@ -34,17 +35,15 @@ import java.io.IOException;
  * 
  * @author Katsuhisa Maruyama
  */
-public class ModelBuilder {
-    
-    private static ModelBuilder instance = new ModelBuilder();
+public class ModelBuilder implements IModelBuilder {
     
     private JavaProject currentProject;
     
-    private ModelBuilder() {
+    public ModelBuilder() {
     }
     
-    public static ModelBuilder getInstance() {
-        return instance;
+    public boolean isUnderPlugin() {
+        return false;
     }
     
     public JavaProject getCurrentProject() {
@@ -57,7 +56,7 @@ public class ModelBuilder {
             currentProject = new JavaProject(name, dir.getCanonicalPath());
             currentProject.setClassPath(classPath);
             ProjectStore.getInstance().addProject(currentProject);
-            ProjectStore.getInstance().setUnderPlugin(false);
+            ProjectStore.getInstance().setModelBuilder(this);
             
             run();
             Logger.getInstance().writeLog();

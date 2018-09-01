@@ -7,8 +7,6 @@
 package org.jtool.eclipse.javamodel.builder;
 
 import org.jtool.eclipse.javamodel.JavaProject;
-import org.jtool.eclipse.batch.ModelBuilder;
-import org.jtool.eclipse.plugin.ModelBuilderPlugin;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -24,7 +22,7 @@ public class ProjectStore {
     
     private Map<String, JavaProject> projectStore = new HashMap<String, JavaProject>();
     
-    private boolean underPlugin = false;
+    private IModelBuilder modelBuilder;
     
     private ProjectStore() {
     }
@@ -33,28 +31,20 @@ public class ProjectStore {
         return instance;
     }
     
-    public void setUnderPlugin(boolean bool) {
-        underPlugin = bool;
+    public void setModelBuilder(IModelBuilder modelBuilder) {
+        this.modelBuilder = modelBuilder;
     }
     
     public boolean isUnderPlugin(boolean bool) {
-        return underPlugin;
+        return modelBuilder.isUnderPlugin();
     }
     
     public JavaProject getCurrentProject() {
-        if (underPlugin) {
-            return ModelBuilderPlugin.getInstance().getCurrentProject();
-        } else {
-            return ModelBuilder.getInstance().getCurrentProject();
-        }
+        return modelBuilder.getCurrentProject();
     }
     
     public JavaProject updateCurrentProject() {
-        if (underPlugin) {
-            return ModelBuilderPlugin.getInstance().update();
-        } else {
-            return ModelBuilder.getInstance().update();
-        }
+        return modelBuilder.update();
     }
     
     public void clear() {
@@ -99,11 +89,7 @@ public class ProjectStore {
     
     public BytecodeClassStore registerBytecodeClasses(JavaProject jproject) {
         BytecodeClassStore bytecodeClassStore = new BytecodeClassStore(jproject);
-        if (underPlugin) {
-            ModelBuilderPlugin.getInstance().resisterBytecodeClasses(bytecodeClassStore);
-        } else {
-            ModelBuilder.getInstance().resisterBytecodeClasses(bytecodeClassStore);
-        }
+        modelBuilder.resisterBytecodeClasses(bytecodeClassStore);
         return bytecodeClassStore;
     }
 }
