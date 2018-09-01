@@ -7,7 +7,6 @@
 package org.jtool.eclipse.plugin;
 
 import org.jtool.eclipse.javamodel.JavaProject;
-import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import org.jtool.eclipse.plugin.ModelBuilderPlugin;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -29,6 +28,7 @@ public class BuildAction extends AbstractHandler {
     public BuildAction() {
     }
     
+    @SuppressWarnings("unused")
     public Object execute(ExecutionEvent event) throws ExecutionException {
         ISelection selection = HandlerUtil.getActiveMenuSelection(event);
         if (selection instanceof IStructuredSelection) {
@@ -37,12 +37,10 @@ public class BuildAction extends AbstractHandler {
             if (elem instanceof IJavaProject) {
                 ModelBuilderPlugin modelBuilder = new ModelBuilderPlugin();
                 JavaProject jproject = modelBuilder.build((IJavaProject)elem);
-                jproject.registerBytecodeClasses();
                 
             } else if (elem instanceof IProject) {
                 ModelBuilderPlugin modelBuilder = new ModelBuilderPlugin();
                 JavaProject jproject = modelBuilder.build(JavaCore.create((IProject)elem));
-                jproject.registerBytecodeClasses();
             }
         }
         return null;
