@@ -19,6 +19,7 @@ import java.util.HashSet;
 
 /**
  * A listener implementation that sends added, removed, and changed files.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class ResourceChangeListener implements IResourceChangeListener {

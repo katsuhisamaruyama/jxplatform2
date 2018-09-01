@@ -30,12 +30,14 @@ import java.util.HashSet;
 
 /**
  * Parses Java source code and stores information on variable access appearing in a method or field.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
+ * @see org.eclipse.jdt.core.dom.Expression
  * 
  * Name:
  *   SimpleName
  *   QualifiedName
  * 
- * @see org.eclipse.jdt.core.dom.Expression
  * @author Katsuhisa Maruyama
  */
 public class FieldAccessCollector extends ASTVisitor {

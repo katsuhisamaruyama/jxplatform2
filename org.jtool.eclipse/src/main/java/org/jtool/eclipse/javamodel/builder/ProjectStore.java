@@ -6,15 +6,17 @@
 
 package org.jtool.eclipse.javamodel.builder;
 
+import org.jtool.eclipse.batch.ModelBuilder;
 import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.plugin.ModelBuilderPlugin;
-import org.jtool.eclipse.standalone.ModelBuilder;
 
 import java.util.Map;
 import java.util.HashMap;
 
 /**
  * An object holds a collection of all projects.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class ProjectStore {
@@ -94,5 +96,15 @@ public class ProjectStore {
     
     public JavaProject getProject(String path) {
         return projectStore.get(path);
+    }
+    
+    public BytecodeClassStore registerBytecodeClasses(JavaProject jproject) {
+        BytecodeClassStore bytecodeClassStore = new BytecodeClassStore(jproject);
+        if (underPlugin) {
+            ModelBuilderPlugin.getInstance().resisterBytecodeClasses(bytecodeClassStore);
+        } else {
+            ModelBuilder.getInstance().resisterBytecodeClasses(bytecodeClassStore);
+        }
+        return bytecodeClassStore;
     }
 }

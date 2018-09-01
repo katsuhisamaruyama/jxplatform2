@@ -13,6 +13,7 @@ import java.util.Calendar;
 
 /**
  * Manages time information.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class TimeInfo {

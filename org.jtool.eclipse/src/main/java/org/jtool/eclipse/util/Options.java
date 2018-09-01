@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 /**
  * Collects command-line options.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class Options {

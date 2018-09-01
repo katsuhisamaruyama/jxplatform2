@@ -24,6 +24,7 @@ import java.util.Comparator;
 
 /**
  * An object representing a class, an interface, an enum, or an enum constant.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class JavaClass extends JavaElement {

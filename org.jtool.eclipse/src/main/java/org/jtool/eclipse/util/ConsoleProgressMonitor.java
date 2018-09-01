@@ -8,15 +8,16 @@ package org.jtool.eclipse.util;
 
 /**
  * A progress monitor.
+ * 
  * @author Katsuhisa Maruyama
  */
-public class ProgressMonitor {
+public class ConsoleProgressMonitor {
     
     private int size;
     private int num;
     private int count;
     
-    public ProgressMonitor() {
+    public ConsoleProgressMonitor() {
     }
     
     public void begin(int size) {

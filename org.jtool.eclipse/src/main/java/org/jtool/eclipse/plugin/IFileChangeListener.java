@@ -11,6 +11,7 @@ import java.util.Set;
 
 /**
  * An interface for handling received added, removed, and changed files.
+ * 
  * @author Katsuhisa Maruyama
  */
 public interface IFileChangeListener {

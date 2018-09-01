@@ -14,6 +14,7 @@ import org.eclipse.ui.console.MessageConsoleStream;
 
 /**
  * Displays a message on the console.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class JXConsole {

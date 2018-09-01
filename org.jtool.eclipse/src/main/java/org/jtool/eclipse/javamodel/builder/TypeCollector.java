@@ -31,6 +31,9 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 
 /**
  * Parses Java source code and stores information on types.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
+ * @see org.eclipse.jdt.core.dom.Type
  * 
  * Type:
  *   AnnotatableType:
@@ -70,7 +73,6 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
  * IntersectionType:
  *   Type & Type { & Type }
  * 
- * @see org.eclipse.jdt.core.dom.Type
  * @author Katsuhisa Maruyama
  */
 public class TypeCollector extends ASTVisitor {

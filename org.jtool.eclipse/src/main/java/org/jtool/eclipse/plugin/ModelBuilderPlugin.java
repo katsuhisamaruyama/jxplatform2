@@ -10,6 +10,7 @@ import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaFile;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaPackage;
+import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
 import org.jtool.eclipse.javamodel.builder.JavaASTVisitor;
 import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import org.jtool.eclipse.plugin.IFileChangeListener;
@@ -43,6 +44,7 @@ import java.util.HashMap;
 
 /**
  * Manages resources within Eclipse's projects.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class ModelBuilderPlugin {
@@ -398,5 +400,40 @@ public class ModelBuilderPlugin {
     private void printError(String mesg) {
         Logger.getInstance().printError(mesg);
         console.println(mesg);
+    }
+    
+    public void resisterBytecodeClasses(BytecodeClassStore bytecodeClassStore) {
+        try {
+            IWorkbenchWindow workbenchWindow = Activator.getDefault().getWorkbenchWindow();
+            workbenchWindow.run(true, true, new IRunnableWithProgress() {
+                
+                @Override
+                public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                    int size = bytecodeClassStore.getBytecodeClassNames().size();
+                    monitor.beginTask("Parsing external classes... ", size);
+                    int count = 1;
+                    for (String className : bytecodeClassStore.getBytecodeClassNames()) {
+                        monitor.subTask(count + "/" + size + " - " + className);
+                        try {
+                            bytecodeClassStore.registerBytecodeClass(className);
+                        } catch (NullPointerException e) {
+                            printError("* Fatal error occurred. Skip the paser of " + className);
+                            e.printStackTrace();
+                        }
+                        if (monitor.isCanceled()) {
+                            monitor.done();
+                            throw new InterruptedException();
+                        }
+                        monitor.worked(1);
+                        count++;
+                    }
+                    monitor.done();
+                }
+            });
+            
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            printError("* InvocationTargetException occurred because " + cause);
+        } catch (InterruptedException e) { /* empty */ }
     }
 }

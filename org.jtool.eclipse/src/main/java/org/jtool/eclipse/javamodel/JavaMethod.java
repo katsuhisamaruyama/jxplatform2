@@ -27,6 +27,7 @@ import java.util.HashSet;
 
 /**
  * An object representing a method, a constructor, or an initializer.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class JavaMethod extends JavaElement {

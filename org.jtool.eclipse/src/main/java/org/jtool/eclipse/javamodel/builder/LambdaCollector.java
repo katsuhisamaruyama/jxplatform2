@@ -22,10 +22,12 @@ import org.eclipse.jdt.core.dom.TypeMethodReference;
 
 /**
  * Parses Java source code and stores information on lambda expressions.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
+ * @see org.eclipse.jdt.core.dom.LambdaExpression
  * 
  * LambdaExpression
  * 
- * @see org.eclipse.jdt.core.dom.LambdaExpression
  * @author Katsuhisa Maruyama
  */
 public class LambdaCollector extends ASTVisitor {

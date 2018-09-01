@@ -6,12 +6,13 @@
 
 package org.jtool.eclipse.test;
 
-import org.jtool.eclipse.standalone.JavaModelBuilder;
+import org.jtool.eclipse.batch.JavaModelBuilder;
 import org.junit.Test;
 
 /**
  * Tests a class that builds a Java Model.
- * Please the constant value of TEST_PROECT_DIR will be changed according to your environment.
+ * Change the constant value of TEST_PROECT_DIR according to your environment.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class JavaModelBuilderTest {

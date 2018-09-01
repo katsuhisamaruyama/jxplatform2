@@ -18,12 +18,14 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 
 /**
  * A root object for a Java program element.
+ * 
  * @author Katsuhisa Maruyama
  */
 public abstract class JavaElement {
     
     protected ASTNode astNode;
     protected JavaFile jfile;
+    
     protected CodeRange codeRange;
     
     public static final String QualifiedNameSeparator = "#";
@@ -34,7 +36,7 @@ public abstract class JavaElement {
     public JavaFile getFile() {
         return jfile;
     }
-    	
+    
     public ASTNode getASTNode() {
         return astNode;
     }
@@ -125,6 +127,7 @@ public abstract class JavaElement {
         }
         return null;
     }
+    
     
     public static JavaMethod findDeclaringMethod(IMethodBinding mbinding) {
         if (mbinding != null) { 

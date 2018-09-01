@@ -13,6 +13,7 @@ import java.util.HashSet;
 
 /**
  * An object representing a package.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class JavaPackage extends JavaElement {

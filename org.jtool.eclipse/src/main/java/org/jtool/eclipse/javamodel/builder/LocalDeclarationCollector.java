@@ -28,12 +28,14 @@ import java.util.HashSet;
 
 /**
  * Parses Java source code and stores information on on local variable declarations.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
+ * @see org.eclipse.jdt.core.dom.VariableDeclaration
  * 
  * VariableDeclaration:
  *   SingleVariableDeclaration
  *   VariableDeclarationFragment
  * 
- * @see org.eclipse.jdt.core.dom.VariableDeclaration
  * @author Katsuhisa Maruyama
  */
 public class LocalDeclarationCollector extends ASTVisitor {

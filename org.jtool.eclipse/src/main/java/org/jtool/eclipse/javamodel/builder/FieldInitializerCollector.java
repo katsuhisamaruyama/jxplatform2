@@ -27,10 +27,12 @@ import java.util.HashSet;
 
 /**
  * Parses Java source code and stores information on field initializers appearing in a field.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
+ * @see org.eclipse.jdt.core.dom.Expression
  * 
  * VariableDeclarationFragment
  * 
- * @see org.eclipse.jdt.core.dom.Expression
  * @author Katsuhisa Maruyama
  */
 public class FieldInitializerCollector extends ASTVisitor {

@@ -4,16 +4,17 @@
  *  Department of Computer Science, Ritsumeikan University
  */
 
-package org.jtool.eclipse.standalone;
+package org.jtool.eclipse.batch;
 
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaFile;
 import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.builder.JavaASTVisitor;
 import org.jtool.eclipse.javamodel.builder.ProjectStore;
+import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
 import org.jtool.eclipse.util.DetectCharset;
 import org.jtool.eclipse.util.Logger;
-import org.jtool.eclipse.util.ProgressMonitor;
+import org.jtool.eclipse.util.ConsoleProgressMonitor;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -30,6 +31,7 @@ import java.io.IOException;
 
 /**
  * Builds a Java Model.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class ModelBuilder {
@@ -106,7 +108,7 @@ public class ModelBuilder {
     
     private void parse(String[] paths, String[] encodings, Map<String, String> sources, Map<String, String> charsets) {
         final int size = paths.length;
-        ProgressMonitor pm = new ProgressMonitor();
+        ConsoleProgressMonitor pm = new ConsoleProgressMonitor();
         pm.begin(size);
         FileASTRequestor requestor = new FileASTRequestor() {
             private int count = 0;
@@ -135,7 +137,7 @@ public class ModelBuilder {
     public void collectInfo() {
         int size = currentProject.getClasses().size();
         Logger.getInstance().printMessage("** Ready to build java models of " + size + " classes");
-        ProgressMonitor pm = new ProgressMonitor();
+        ConsoleProgressMonitor pm = new ConsoleProgressMonitor();
         pm.begin(size);
         int count = 0;
         for (JavaClass jclass : currentProject.getClasses()) {
@@ -192,5 +194,21 @@ public class ModelBuilder {
             }
         }
         return  content.toString();
+    }
+    
+    public void resisterBytecodeClasses(BytecodeClassStore bytecodeClassStore) {
+        int size = bytecodeClassStore.getBytecodeClassNames().size();
+        Logger.getInstance().printMessage("** Ready to build java models of " + size + " bytecode-classes outside the project");
+        ConsoleProgressMonitor pm = new ConsoleProgressMonitor();
+        pm.begin(size);
+        int count = 0;
+        for (String className : bytecodeClassStore.getBytecodeClassNames()) {
+            bytecodeClassStore.registerBytecodeClass(className);
+            
+            pm.work(1);
+            count++;
+            Logger.getInstance().printLog("-Parse " + className + " (" + count + "/" + size + ")");
+        }
+        pm.done();
     }
 }

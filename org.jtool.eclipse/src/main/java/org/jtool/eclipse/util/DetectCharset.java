@@ -14,6 +14,7 @@ import java.io.IOException;
 
 /**
  * Detects the charset name of a Japanese text.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class DetectCharset {

@@ -13,10 +13,12 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 
 /**
  * An object representing a local variable or a parameter.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class JavaLocal extends JavaVariable {
     
+    protected IVariableBinding binding;
     protected long variableId;
     
     protected JavaLocal() {
@@ -30,7 +32,7 @@ public class JavaLocal extends JavaVariable {
         super(node, jmethod.getFile());
         
         if (vbinding != null) {
-            vbinding = vbinding.getVariableDeclaration();
+            binding = vbinding.getVariableDeclaration();
             name = vbinding.getName();
             fqn = name;
             type = vbinding.getType().getQualifiedName();
@@ -80,6 +82,10 @@ public class JavaLocal extends JavaVariable {
         
         declaringClass = jmethod.getDeclaringClass();
         declaringMethod = jmethod;
+    }
+    
+    public IVariableBinding getVariableBinding() {
+        return binding;
     }
     
     protected long getVariableId() {

@@ -16,6 +16,7 @@ import java.io.File;
 
 /**
  * An object representing a Java source file.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class JavaFile {

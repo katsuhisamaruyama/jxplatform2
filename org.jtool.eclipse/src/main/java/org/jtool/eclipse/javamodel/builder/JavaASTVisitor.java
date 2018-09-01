@@ -27,6 +27,8 @@ import java.util.Stack;
 
 /**
  * Visits Java source code and stores its information.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class JavaASTVisitor extends ASTVisitor {

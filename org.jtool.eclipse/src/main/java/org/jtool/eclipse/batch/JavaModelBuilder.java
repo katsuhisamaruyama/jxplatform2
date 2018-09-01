@@ -4,7 +4,7 @@
  *  Department of Computer Science, Ritsumeikan University
  */
 
-package org.jtool.eclipse.standalone;
+package org.jtool.eclipse.batch;
 
 import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.util.Options;
@@ -16,6 +16,7 @@ import java.io.IOException;
 
 /**
  * Builds a Java Model for stand-alone use.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class JavaModelBuilder {
@@ -99,7 +100,7 @@ public class JavaModelBuilder {
         try {
             String cdir = new File(".").getAbsoluteFile().getParent();
             if (classpath != null && classpath.length() != 0) {
-                String[] paths = classpath.split(":");
+                String[] paths = classpath.split(File.pathSeparator);
                 if (paths != null) {
                     for (int i = 0; i < paths.length; i++) {
                         String path = getFullPath(paths[i], cdir); 
@@ -125,7 +126,7 @@ public class JavaModelBuilder {
         } catch (IOException e) {
             return new String[0];
         }
-        return toArray(classpaths);
+        return classpaths.toArray(new String[classpaths.size()]);
     }
     
     private String getFullPath(String path, String cdir) {
@@ -134,16 +135,6 @@ public class JavaModelBuilder {
         } else {
             return cdir + File.separatorChar + path;
         }
-    }
-    
-    private String[] toArray(List<String> list) {
-        String[] array = new String[list.size()];
-        int index = 0;
-        for (String elem : list) {
-            array[index] = elem;
-            index++;
-        }
-        return array;
     }
     
     public void setVisible(boolean visible) {

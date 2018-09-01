@@ -33,6 +33,9 @@ import java.util.ArrayList;
 
 /**
  * Visits a Java program and stores information on statements appearing in a method.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
+ * @see org.eclipse.jdt.core.dom.Statement
  * 
  * AssertStatement
  * Block
@@ -57,7 +60,6 @@ import java.util.ArrayList;
  * VariableDeclarationStatement
  * WhileStatement
  * 
- * @see org.eclipse.jdt.core.dom.Statement
  * @author Katsuhisa Maruyama
  */
 public class StatementCollector extends ASTVisitor {

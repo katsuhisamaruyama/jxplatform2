@@ -12,6 +12,7 @@ import org.eclipse.jdt.core.dom.Modifier;
 
 /**
  * An object representing a field, an enum-constant, or a local variable.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class JavaVariable extends JavaElement {

@@ -31,6 +31,9 @@ import java.util.HashSet;
 
 /**
  * Parses Java source code and stores information on method invocation appearing in a method or field.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
+ * @see org.eclipse.jdt.core.dom.Expression
  * 
  * MethodInvocation
  * SuperMethodInvocation
@@ -38,7 +41,6 @@ import java.util.HashSet;
  * SuperConstructorInvocation
  * ClassInstanceCreation
  * 
- * @see org.eclipse.jdt.core.dom.Expression
  * @author Katsuhisa Maruyama
  */
 public class MethodCallCollector extends ASTVisitor {

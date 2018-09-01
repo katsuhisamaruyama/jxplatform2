@@ -10,7 +10,8 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
 /**
- * Stores information on the range of code.
+ * Stores information on the range of a code fragment.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class CodeRange {
@@ -39,22 +40,6 @@ public class CodeRange {
             extendedUpperLineNumber = cu.getLineNumber(extendedStartPosition);
             extendedBottomLineNumber = cu.getLineNumber(extendedEndPosition);
         }
-    }
-    
-    public void setCodeRange(int start, int end, int upper, int bottom, int exstart, int exend, int exupper, int exbottom) {
-        startPosition = start;
-        endPosition = end;
-        upperLineNumber = upper;
-        bottomLineNumber = bottom;
-        
-        extendedStartPosition = exstart;
-        extendedEndPosition = exend;
-        extendedUpperLineNumber = exupper;
-        extendedBottomLineNumber = exbottom;
-    }
-    
-    public void setCodeRange(int start, int end, int upper, int bottom) {
-        setCodeRange(start, end, upper, bottom, start, end, upper, bottom);
     }
     
     public int getStartPosition() {

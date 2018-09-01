@@ -19,6 +19,7 @@ import java.util.HashSet;
 
 /**
  * An object representing a field.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class JavaField extends JavaVariable {

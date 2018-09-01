@@ -15,6 +15,7 @@ import java.io.IOException;
 
 /**
  * Records logs.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class Logger {

@@ -6,6 +6,9 @@
 
 package org.jtool.eclipse.javamodel;
 
+import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
+import org.jtool.eclipse.javamodel.builder.ProjectStore;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -16,6 +19,7 @@ import java.util.Comparator;
 
 /**
  * An object representing a collection of Java source files, packages, and classes to be analyzed.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class JavaProject {
@@ -34,6 +38,8 @@ public class JavaProject {
     private String[] sourcePath;
     private String binaryPath;
     
+    private BytecodeClassStore bytecodeClassStore = null;
+    
     public JavaProject(String name, String path) {
         this(name, path, path);
     }
@@ -42,6 +48,10 @@ public class JavaProject {
         this.name = name;
         this.path = path;
         this.dir = dir;
+    }
+    
+    public static JavaProject findProject(String path) {
+        return ProjectStore.getInstance().getProject(path);
     }
     
     public void clear() {
@@ -67,6 +77,12 @@ public class JavaProject {
             jclass.dispose();
         }
         externalClasseStore.clear();
+        
+        classPath = null;
+        sourcePath = null;
+        binaryPath = null;
+        
+        bytecodeClassStore = null;
     }
     
     public void dispose() {
@@ -195,6 +211,17 @@ public class JavaProject {
     
     public void collectInfo(JavaClass jclass) {
         jclass.collectInfo();
+    }
+    
+    public void registerBytecodeClasses() {
+        if (bytecodeClassStore == null) {
+            bytecodeClassStore = ProjectStore.getInstance().registerBytecodeClasses(this);
+            bytecodeClassStore.collectBytecodeClassInfo();
+        }
+    }
+    
+    public BytecodeClassStore getBytecodeClassStore() {
+        return bytecodeClassStore;
     }
     
     @Override
