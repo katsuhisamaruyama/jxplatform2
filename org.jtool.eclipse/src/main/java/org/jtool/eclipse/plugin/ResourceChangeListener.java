@@ -26,7 +26,10 @@ public class ResourceChangeListener implements IResourceChangeListener {
     
     private Set<IFileChangeListener> fileChangeListeners = new HashSet<IFileChangeListener>();
     
-    ResourceChangeListener() {
+    private ModelBuilderPlugin modelBuilder;
+    
+    ResourceChangeListener(ModelBuilderPlugin modelBuilder) {
+        this.modelBuilder = modelBuilder;
     }
     
     void register() {
@@ -78,13 +81,13 @@ public class ResourceChangeListener implements IResourceChangeListener {
             if (resource != null && resource.getType() == IResource.FILE && ".java".equals(resource.getFileExtension())) {
                 if (delta.getKind() == IResourceDelta.ADDED) {
                     addedFiles.add((IFile)resource);
-                    ModelBuilderPlugin.getInstance().addFile((IFile)resource);
+                    modelBuilder.addFile((IFile)resource);
                 } else if (delta.getKind() == IResourceDelta.REMOVED) {
                     removedFiles.add((IFile)resource);
-                    ModelBuilderPlugin.getInstance().removeFile((IFile)resource);
+                    modelBuilder.removeFile((IFile)resource);
                 } else if (delta.getKind() == IResourceDelta.CHANGED) {
                     changedFiles.add((IFile)resource);
-                    ModelBuilderPlugin.getInstance().changeFile((IFile)resource);
+                    modelBuilder.changeFile((IFile)resource);
                 }
             }
             return true;

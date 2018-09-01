@@ -53,7 +53,7 @@ public class ModelBuilderPlugin implements IModelBuilder {
     private IJavaProject javaProject;
     private JavaProject currentProject;
     
-    private ResourceChangeListener resourceChangeListener = new ResourceChangeListener();
+    private ResourceChangeListener resourceChangeListener;
     
     private Map<String, ICompilationUnit> compilationUnitMap = new HashMap<String, ICompilationUnit>();
     private Set<IFile> dirtyFiles = new HashSet<IFile>();
@@ -61,6 +61,7 @@ public class ModelBuilderPlugin implements IModelBuilder {
     private JXConsole console = new JXConsole();
     
     public ModelBuilderPlugin() {
+        resourceChangeListener = new ResourceChangeListener(this);
     }
     
     public boolean isUnderPlugin() {
