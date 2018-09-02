@@ -10,7 +10,7 @@ import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.ControlFlow;
-import org.jtool.eclipse.cfg.JVariable;
+import org.jtool.eclipse.cfg.JAccess;
 import org.jtool.eclipse.graph.GraphEdge;
 import org.jtool.eclipse.pdg.CD;
 import org.jtool.eclipse.pdg.DD;
@@ -44,12 +44,12 @@ public class DDFinder {
     }
     
     private static void findDDs(PDG pdg, CFG cfg, CFGStatement anchor) {
-        for (JVariable jvar : anchor.getDefVariables()) {
+        for (JAccess jvar : anchor.getDefVariables()) {
             findDDs(pdg, cfg, anchor, jvar);
         }
     }
     
-    private static void findDDs(PDG pdg, CFG cfg, CFGStatement anchor, JVariable jvar) {
+    private static void findDDs(PDG pdg, CFG cfg, CFGStatement anchor, JAccess jvar) {
         for (ControlFlow flow : anchor.getOutgoingFlows()) {
             if (!flow.isFallThrough()) {
                 Set<CFGNode> track = new HashSet<CFGNode>();
@@ -59,7 +59,7 @@ public class DDFinder {
         }
     }
     
-    private static void findDD(PDG pdg, CFG cfg, CFGNode anchor, CFGNode node, JVariable jvar, Set<CFGNode> track) {
+    private static void findDD(PDG pdg, CFG cfg, CFGNode anchor, CFGNode node, JAccess jvar, Set<CFGNode> track) {
         track.add(node);
         if (node.hasUseVariable()) {
             CFGStatement candidate = (CFGStatement)node;

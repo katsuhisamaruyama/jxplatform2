@@ -7,11 +7,13 @@
 package org.jtool.eclipse.cfg;
 
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.jtool.eclipse.cfg.builder.JInfoStore;
 import java.util.Set;
 import java.util.HashSet;
 
 /**
  * The entry node of a CFG for a class or an interface.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class CFGClassEntry extends CFGEntry {
@@ -20,11 +22,18 @@ public class CFGClassEntry extends CFGEntry {
     private Set<CFG> fields = new HashSet<CFG>();
     private Set<CFG> types = new HashSet<CFG>();
     
+    private JClass jclass;
+    
     protected CFGClassEntry() {
     }
     
     public CFGClassEntry(ASTNode node, CFGNode.Kind kind, String name, String fqn) {
-        super(node, kind, name, fqn);
+        super(node, kind, name, fqn, fqn);
+        jclass = JInfoStore.getInstance().getJClass(fqn);
+    }
+    
+    public JClass getJClass() {
+        return jclass;
     }
     
     public void addMethod(CFG cfg) {

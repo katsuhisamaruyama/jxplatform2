@@ -15,7 +15,7 @@ import org.jtool.eclipse.cfg.CFGStore;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JApparentAccess;
 import org.jtool.eclipse.cfg.JLocalAccess;
-import org.jtool.eclipse.cfg.JVariable;
+import org.jtool.eclipse.cfg.JAccess;
 import org.jtool.eclipse.graph.GraphEdge;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -34,6 +34,8 @@ import java.util.HashSet;
 
 /**
  * Builds a CFG that corresponds to a method.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class CFGMethodBuilder {
@@ -64,7 +66,7 @@ public class CFGMethodBuilder {
     }
     
     public static CFG build(Initializer node) {
-        ITypeBinding tbinding = JVariable.findEnclosingClass(node).getTypeDeclaration();
+        ITypeBinding tbinding = JAccess.findEnclosingClass(node).getTypeDeclaration();
         String name = JavaMethod.InitializerName;
         String fqn = tbinding.getTypeDeclaration().getQualifiedName() + QualifiedNameSeparator + name;
         return build(node, null, null, name, name, fqn);
@@ -165,10 +167,10 @@ public class CFGMethodBuilder {
             entry.addFormalIn(formalInNode);
             cfg.add(formalInNode);
             
-            JVariable jvout = new JLocalAccess(param, param.resolveBinding());
+            JAccess jvout = new JLocalAccess(param, param.resolveBinding());
             formalInNode.setDefVariable(jvout);
             
-            JVariable jvin = new JApparentAccess(param, "$" + String.valueOf(ExpressionVisitor.paramNumber), jvout.getType(), jvout.isPrimitiveType());
+            JAccess jvin = new JApparentAccess(param, "$" + String.valueOf(ExpressionVisitor.paramNumber), jvout.getType(), jvout.isPrimitiveType());
             formalInNode.setUseVariable(jvin);
             ExpressionVisitor.paramNumber++;
             
@@ -192,11 +194,11 @@ public class CFGMethodBuilder {
         entry.addFormalOut(formalOutNode);
         cfg.add(formalOutNode);
         
-        JVariable jvout = new JApparentAccess(node, "$" + String.valueOf(ExpressionVisitor.paramNumber), entry.getReturnType(), entry.isPrimitiveType());
+        JAccess jvout = new JApparentAccess(node, "$" + String.valueOf(ExpressionVisitor.paramNumber), entry.getReturnType(), entry.isPrimitiveType());
         formalOutNode.addDefVariable(jvout);
         ExpressionVisitor.paramNumber++;
         
-        JVariable jvin = new JApparentAccess(node, "$_", entry.getReturnType(), entry.isPrimitiveType());
+        JAccess jvin = new JApparentAccess(node, "$_", entry.getReturnType(), entry.isPrimitiveType());
         formalOutNode.addUseVariable(jvin);
         
         return formalOutNode;

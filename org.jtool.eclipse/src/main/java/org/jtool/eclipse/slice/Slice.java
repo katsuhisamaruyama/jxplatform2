@@ -9,7 +9,7 @@ package org.jtool.eclipse.slice;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGStore;
-import org.jtool.eclipse.cfg.JVariable;
+import org.jtool.eclipse.cfg.JAccess;
 import org.jtool.eclipse.pdg.DD;
 import org.jtool.eclipse.pdg.DependenceEdge;
 import org.jtool.eclipse.pdg.PDG;
@@ -29,28 +29,28 @@ public class Slice extends PDG {
     
     private PDG pdg;
     private PDGStatement criterionNode;
-    private List<JVariable> criterionVariables;
+    private List<JAccess> criterionVariables;
     
-    public Slice(PDG pdg, PDGStatement node, JVariable jv) {
+    public Slice(PDG pdg, PDGStatement node, JAccess jv) {
         this.pdg = pdg;
         criterionNode = node;
-        criterionVariables = new ArrayList<JVariable>();
+        criterionVariables = new ArrayList<JAccess>();
         criterionVariables.add(jv);
         
         extract(node, jv);
     }
     
-    public Slice(PDG pdg, PDGStatement node, List<JVariable> jvs) {
+    public Slice(PDG pdg, PDGStatement node, List<JAccess> jvs) {
         this.pdg = pdg;
         criterionNode = node;
         criterionVariables = jvs;
         
-        for (JVariable jv : jvs) {
+        for (JAccess jv : jvs) {
             extract(node, jv);
         }
     }
     
-    private void extract(PDGStatement node, JVariable jv) {
+    private void extract(PDGStatement node, JAccess jv) {
         if (jv.isFieldAccess()) {
             traverseOnCFG(node, jv);
         } else {
@@ -70,11 +70,11 @@ public class Slice extends PDG {
         return criterionNode;
     }
     
-    public List<JVariable> getCriterionVariables() {
+    public List<JAccess> getCriterionVariables() {
         return criterionVariables;
     }
     
-    private void traverseOnCFG(PDGStatement node, JVariable jv) {
+    private void traverseOnCFG(PDGStatement node, JAccess jv) {
         String fqn = jv.getEnclosingMethodName();
         CFG cfg = CFGStore.getInstance().getCFG(fqn);
         Set<CFGNode> cfgNodes = cfg.getBackwardReachableNodes(node.getCFGNode(), cfg.getStartNode());
@@ -90,7 +90,7 @@ public class Slice extends PDG {
         }
     }
     
-    private void traverseOnPDG(PDGStatement node, JVariable jv) {
+    private void traverseOnPDG(PDGStatement node, JAccess jv) {
         if (node.definesVariable(jv)) {
             traverseBackward(node);
         } else if (node.usesVariable(jv)) {
@@ -101,7 +101,7 @@ public class Slice extends PDG {
         }
     }
     
-    private Set<PDGStatement> findDefNode(PDGStatement anchor, JVariable jvar) {
+    private Set<PDGStatement> findDefNode(PDGStatement anchor, JAccess jvar) {
         Set<PDGStatement> defs = new HashSet<PDGStatement>();
         
         for (DD edge : anchor.getIncomingDDEdges()) {
@@ -136,9 +136,9 @@ public class Slice extends PDG {
         return buf.toString();
     }
     
-    private String getVariableNames(List<JVariable> jvs) {
+    private String getVariableNames(List<JAccess> jvs) {
         StringBuilder buf = new StringBuilder();
-        for (JVariable jv : jvs) {
+        for (JAccess jv : jvs) {
             buf.append(" " + jv.getName());
         }
         return buf.toString();

@@ -48,9 +48,12 @@ public class CFGModelBuilderTest {
         String target = TEST_PROECT_DIR + "Simple/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
-        CFGStore.getInstance().setOptions(false, false);
+        CFGStore.getInstance().setAnalysisLevel(jproject, false);
+        CFGStore.getInstance().setCreatingActualNodes(false);
+        
         CFGStore.getInstance().buildCFGs(jproject.getClasses());
         checkDetails(jproject);
+        CFGStore.getInstance().destroy();
         builder.unbuild();
     }
     
@@ -59,9 +62,11 @@ public class CFGModelBuilderTest {
         String target = TEST_PROECT_DIR + "jrb-1.0.2/src/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
-        CFGStore.getInstance().setOptions(false, false);
-        CFGStore.getInstance().buildCFGs(jproject.getClasses());
+        CFGStore.getInstance().setAnalysisLevel(jproject, false);
+        CFGStore.getInstance().setCreatingActualNodes(false);
         
+        CFGStore.getInstance().buildCFGs(jproject.getClasses());
+        CFGStore.getInstance().destroy();
         builder.unbuild();
     }
     
@@ -70,7 +75,9 @@ public class CFGModelBuilderTest {
         String target = TEST_PROECT_DIR + "Tetris/src/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
-        CFGStore.getInstance().setOptions(false, false);
+        CFGStore.getInstance().setAnalysisLevel(jproject, false);
+        CFGStore.getInstance().setCreatingActualNodes(false);
+        
         CFGStore.getInstance().buildCFGs(jproject.getClasses());
         CFGStore.getInstance().destroy();
         builder.unbuild();
@@ -81,8 +88,11 @@ public class CFGModelBuilderTest {
         String target = TEST_PROECT_DIR + "DrawTool/src/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
-        CFGStore.getInstance().setOptions(false, false);
+        CFGStore.getInstance().setAnalysisLevel(jproject, false);
+        CFGStore.getInstance().setCreatingActualNodes(false);
+        
         CFGStore.getInstance().buildCFGs(jproject.getClasses());
+        CFGStore.getInstance().destroy();
         builder.unbuild();
     }
     
@@ -91,7 +101,7 @@ public class CFGModelBuilderTest {
         String target = TEST_PROECT_DIR + "Lambda/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
-        CFGStore.getInstance().setOptions(false, false);
+        CFGStore.getInstance().setAnalysisLevel(jproject, false);
         CFGStore.getInstance().buildCFGs(jproject.getClasses());
         builder.unbuild();
     }

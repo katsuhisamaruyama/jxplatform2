@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 
 /**
  * A merge node of a CFG.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class CFGMerge extends CFGNode {

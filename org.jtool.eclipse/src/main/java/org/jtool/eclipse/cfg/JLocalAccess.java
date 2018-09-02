@@ -11,9 +11,10 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 
 /**
  * An object representing an expression for an access to a field, an enum-constant, or a local variable.
+ * 
  * @author Katsuhisa Maruyama
  */
-public class JLocalAccess extends JVariable {
+public class JLocalAccess extends JAccess {
     
     private boolean isParameter;
     

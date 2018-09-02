@@ -25,6 +25,8 @@ import java.util.List;
 
 /**
  * Builds a CFG that corresponds to a field.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class CFGClassBuilder {
@@ -59,7 +61,7 @@ public class CFGClassBuilder {
         }
         */
         return ccfg;
-}
+    }
     
     public static CCFG build(TypeDeclaration node) {
         return build(node, node.resolveBinding().getTypeDeclaration(), node.getMethods(), node.getFields(), node.getTypes());

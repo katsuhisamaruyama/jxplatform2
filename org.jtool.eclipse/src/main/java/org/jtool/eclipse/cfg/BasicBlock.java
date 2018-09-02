@@ -11,6 +11,7 @@ import java.util.HashSet;
 
 /**
  * An object storing information about a basic block of a CFG.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class BasicBlock {

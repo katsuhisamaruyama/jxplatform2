@@ -6,20 +6,21 @@
 
 package org.jtool.eclipse.cfg;
 
+import org.jtool.eclipse.cfg.builder.JInfoStore;
 import org.jtool.eclipse.cfg.builder.CFGClassBuilder;
 import org.jtool.eclipse.cfg.builder.CFGFieldBuilder;
 import org.jtool.eclipse.cfg.builder.CFGMethodBuilder;
+import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
-import org.jtool.eclipse.javamodel.builder.ProjectStore;
-
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 
 /**
  * An object representing a virtual project.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class CFGStore {
@@ -27,8 +28,10 @@ public class CFGStore {
     private static CFGStore instance = new CFGStore();
     
     private Map<String, CFG> cfgStore = new HashMap<String, CFG>();
+    
+    private int analysisLevel = 0;
+    
     private boolean creatingActualNodes = false;
-    private boolean analyzingExternalClasses = false;
     
     private boolean visible = true;
     
@@ -36,17 +39,30 @@ public class CFGStore {
         CFGNode.resetId();
     }
     
+    public void resetId() {
+        CFGNode.resetId();
+    }
+    
     public static CFGStore getInstance() {
         return instance;
     }
     
-    public void setOptions(boolean creatingActualNodes, boolean analyzingExternalClasses) {
-        CFGNode.resetId();
-        this.creatingActualNodes = creatingActualNodes;
-        this.analyzingExternalClasses = analyzingExternalClasses;
-        if (analyzingExternalClasses) {
-            ProjectStore.getInstance().getCurrentProject().registerBytecodeClasses();
+    public void setAnalysisLevel(JavaProject jproject, boolean analyzingBytecode) {
+        if (jproject != null) {
+            analysisLevel = 1;
+            JInfoStore.getInstance().build(jproject, analyzingBytecode);
+            if (analyzingBytecode) {
+                analysisLevel = 2;
+            }
         }
+    }
+    
+    public int getAnalsisLevel() {
+        return analysisLevel;
+    }
+    
+    public void setCreatingActualNodes(boolean creatingActualNodes) {
+        this.creatingActualNodes = creatingActualNodes;
     }
     
     public void destroy() {
@@ -56,10 +72,6 @@ public class CFGStore {
     
     public boolean creatingActualNodes() {
         return creatingActualNodes;
-    }
-    
-    public boolean analyzingExternalClasses() {
-        return analyzingExternalClasses;
     }
     
     private void addCFG(CFG cfg) {

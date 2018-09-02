@@ -12,12 +12,13 @@ import java.util.ArrayList;
 
 /**
  * A statement node of a CFG.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class CFGStatement extends CFGNode {
     
-    private List<JVariable> defs = new ArrayList<JVariable>();
-    private List<JVariable> uses = new ArrayList<JVariable>();
+    private List<JAccess> defs = new ArrayList<JAccess>();
+    private List<JAccess> uses = new ArrayList<JAccess>();
     
     protected CFGStatement() {
     }
@@ -26,37 +27,37 @@ public class CFGStatement extends CFGNode {
         super(node, kind);
     }
     
-    public boolean addDefVariable(JVariable jvar) {
+    public boolean addDefVariable(JAccess jvar) {
         if (jvar!= null && !defineVariable(jvar)) {
             return defs.add(jvar);
         }
         return false;
     }
     
-    public boolean addUseVariable(JVariable jvar) {
+    public boolean addUseVariable(JAccess jvar) {
         if (jvar != null && !useVariable(jvar)) {
             return uses.add(jvar);
         }
         return false;
     }
     
-    public void addDefVariables(List<JVariable> jvars) {
-        for (JVariable jvar : jvars) {
+    public void addDefVariables(List<JAccess> jvars) {
+        for (JAccess jvar : jvars) {
             addDefVariable(jvar);
         }
     }
     
-    public void addUseVariables(List<JVariable> jvars) {
-        for (JVariable jvar : jvars) {
+    public void addUseVariables(List<JAccess> jvars) {
+        for (JAccess jvar : jvars) {
             addUseVariable(jvar);
         }
     }
     
-    public boolean removeDefVariable(JVariable jvar) {
+    public boolean removeDefVariable(JAccess jvar) {
         return defs.remove(jvar);
     }
     
-    public boolean removeUseVariable(JVariable jvar) {
+    public boolean removeUseVariable(JAccess jvar) {
         return uses.remove(jvar);
     }
     
@@ -68,34 +69,34 @@ public class CFGStatement extends CFGNode {
         uses.clear();
     }
     
-    public void setDefVariables(List<JVariable> jvars) {
+    public void setDefVariables(List<JAccess> jvars) {
         defs = jvars;
     }
     
-    public void setUseVariables(List<JVariable> jvars) {
+    public void setUseVariables(List<JAccess> jvars) {
         uses = jvars;
     }
     
-    public void setDefVariable(JVariable jvar) {
+    public void setDefVariable(JAccess jvar) {
         clearDefVariables();
         addDefVariable(jvar);
     }
     
-    public void setUseVariable(JVariable jvar) {
+    public void setUseVariable(JAccess jvar) {
         clearUseVariables();
         addUseVariable(jvar);
     }
     
-    public List<JVariable> getDefVariables() {
+    public List<JAccess> getDefVariables() {
         return defs;
     }
     
-    public List<JVariable> getUseVariables() {
+    public List<JAccess> getUseVariables() {
         return uses;
     }
     
-    public boolean defineVariable(JVariable jvar) {
-        for (JVariable jv : defs) {
+    public boolean defineVariable(JAccess jvar) {
+        for (JAccess jv : defs) {
             if (jv.equals(jvar)) {
                 return true;
             }
@@ -103,8 +104,8 @@ public class CFGStatement extends CFGNode {
         return false;
     }
     
-    public boolean useVariable(JVariable jvar) {
-        for (JVariable jv : uses) {
+    public boolean useVariable(JAccess jvar) {
+        for (JAccess jv : uses) {
             if (jv.equals(jvar)) {
                 return true;
             }
@@ -122,8 +123,8 @@ public class CFGStatement extends CFGNode {
         return uses.size() != 0;
     }
     
-    public JVariable getDefVariable(String name) {
-        for (JVariable jv : defs) {
+    public JAccess getDefVariable(String name) {
+        for (JAccess jv : defs) {
             if (jv.getName().equals(name)) {
                 return jv;
             }
@@ -131,8 +132,8 @@ public class CFGStatement extends CFGNode {
         return null;
     }
     
-    public JVariable getUseVariable(String name) {
-        for (JVariable jv : uses) {
+    public JAccess getUseVariable(String name) {
+        for (JAccess jv : uses) {
             if (jv.getName().equals(name)) {
                 return jv;
             }
@@ -140,7 +141,7 @@ public class CFGStatement extends CFGNode {
         return null;
     }
     
-    public JVariable getFirst() {
+    public JAccess getFirst() {
         return getDefVariables().get(0);
     }
     
@@ -166,9 +167,9 @@ public class CFGStatement extends CFGNode {
         return buf.toString();
     }
     
-    protected String toString(List<JVariable> jvars) {
+    protected String toString(List<JAccess> jvars) {
         StringBuffer buf = new StringBuffer();
-        for (JVariable jvar : jvars) {
+        for (JAccess jvar : jvars) {
             if (jvar.isFieldAccess()) {
                 buf.append(jvar.getQualifiedName());
             } else {

@@ -213,11 +213,12 @@ public class JavaProject {
         jclass.collectInfo();
     }
     
-    public void registerBytecodeClasses() {
+    public BytecodeClassStore registerBytecodeClasses() {
         if (bytecodeClassStore == null) {
             bytecodeClassStore = ProjectStore.getInstance().registerBytecodeClasses(this);
             bytecodeClassStore.collectBytecodeClassInfo();
         }
+        return bytecodeClassStore;
     }
     
     public BytecodeClassStore getBytecodeClassStore() {

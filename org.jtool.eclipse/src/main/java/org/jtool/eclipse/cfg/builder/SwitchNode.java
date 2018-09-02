@@ -14,6 +14,8 @@ import org.eclipse.jdt.core.dom.ASTNode;
 
 /**
  * A node for a <code>switch</code> statement of a CFG.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
  * @author Katsuhisa Maruyama
  */
 class SwitchNode extends CFGStatement {

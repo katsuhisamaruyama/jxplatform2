@@ -15,9 +15,10 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 
 /**
  * An object representing an expression for an access to a field, an enum-constant, or a local variable.
+ * 
  * @author Katsuhisa Maruyama
  */
-public class JFieldAccess extends JVariable {
+public class JFieldAccess extends JAccess {
     
     private boolean isField;
     private boolean isEnumConstant;

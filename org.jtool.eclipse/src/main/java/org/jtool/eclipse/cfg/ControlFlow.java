@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  * An edge of CFGs, which represents a control flow between CFG nodes.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class ControlFlow extends GraphEdge {

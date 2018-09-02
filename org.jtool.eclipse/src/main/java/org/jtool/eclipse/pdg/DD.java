@@ -6,7 +6,7 @@
 
 package org.jtool.eclipse.pdg;
 
-import org.jtool.eclipse.cfg.JVariable;
+import org.jtool.eclipse.cfg.JAccess;
 import org.jtool.eclipse.graph.GraphElement;
 
 /**
@@ -15,7 +15,7 @@ import org.jtool.eclipse.graph.GraphElement;
  */
 public class DD extends DependenceEdge {
     
-    protected JVariable jvar;
+    protected JAccess jvar;
     private PDGNode loopCarriedNode = null;
     
     protected DD() {
@@ -26,16 +26,16 @@ public class DD extends DependenceEdge {
         super(src, dst);
     }
     
-    public DD(PDGNode src, PDGNode dst, JVariable jvar) {
+    public DD(PDGNode src, PDGNode dst, JAccess jvar) {
         super(src, dst);
         this.jvar = jvar;
     }
     
-    public void setVariable(JVariable jvar) {
+    public void setVariable(JAccess jvar) {
         this.jvar = jvar;
     }
     
-    public JVariable getVariable() {
+    public JAccess getVariable() {
         return jvar;
     }
     

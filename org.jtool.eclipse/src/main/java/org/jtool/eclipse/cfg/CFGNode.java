@@ -21,6 +21,7 @@ import java.util.List;
 
 /**
  * A node of a CFG.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class CFGNode extends GraphNode {

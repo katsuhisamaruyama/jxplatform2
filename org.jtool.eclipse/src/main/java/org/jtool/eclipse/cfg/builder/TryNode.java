@@ -14,6 +14,8 @@ import java.util.ArrayList;
 
 /**
  * A node for a <code>try</code> statement of a CFG.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
  * @author Katsuhisa Maruyama
  */
 class TryNode extends CFGStatement {

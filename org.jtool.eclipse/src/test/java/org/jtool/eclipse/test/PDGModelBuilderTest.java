@@ -27,8 +27,11 @@ public class PDGModelBuilderTest {
         String target = TEST_PROECT_DIR + "Simple/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
-        CFGStore.getInstance().setOptions(false, false);
+        CFGStore.getInstance().setAnalysisLevel(jproject, false);
+        CFGStore.getInstance().setCreatingActualNodes(false);
+        
         PDGStore.getInstance().buildPDGs(jproject.getClasses());
+        PDGStore.getInstance().destroy();
         builder.unbuild();
     }
     
@@ -37,8 +40,11 @@ public class PDGModelBuilderTest {
         String target = TEST_PROECT_DIR +  "jrb-1.0.2/src/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
-        CFGStore.getInstance().setOptions(false, false);
+        CFGStore.getInstance().setAnalysisLevel(jproject, false);
+        CFGStore.getInstance().setCreatingActualNodes(false);
+        
         PDGStore.getInstance().buildPDGs(jproject.getClasses());
+        PDGStore.getInstance().destroy();
         builder.unbuild();
     }
     
@@ -47,8 +53,11 @@ public class PDGModelBuilderTest {
         String target = TEST_PROECT_DIR + "Tetris/src/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
-        CFGStore.getInstance().setOptions(false, false);
+        CFGStore.getInstance().setAnalysisLevel(jproject, false);
+        CFGStore.getInstance().setCreatingActualNodes(false);
+        
         PDGStore.getInstance().buildPDGs(jproject.getClasses());
+        PDGStore.getInstance().destroy();
         builder.unbuild();
     }
     
@@ -57,8 +66,11 @@ public class PDGModelBuilderTest {
         String target = TEST_PROECT_DIR +  "DrawTool/src/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
-        CFGStore.getInstance().setOptions(false, false);
+        CFGStore.getInstance().setAnalysisLevel(jproject, false);
+        CFGStore.getInstance().setCreatingActualNodes(false);
+        
         PDGStore.getInstance().buildPDGs(jproject.getClasses());
+        PDGStore.getInstance().destroy();
         builder.unbuild();
     }
     
@@ -67,8 +79,11 @@ public class PDGModelBuilderTest {
         String target = TEST_PROECT_DIR +  "Lambda/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
-        CFGStore.getInstance().setOptions(false, false);
+        CFGStore.getInstance().setAnalysisLevel(jproject, false);
+        CFGStore.getInstance().setCreatingActualNodes(false);
+        
         PDGStore.getInstance().buildPDGs(jproject.getClasses());
+        PDGStore.getInstance().destroy();
         builder.unbuild();
     }
     

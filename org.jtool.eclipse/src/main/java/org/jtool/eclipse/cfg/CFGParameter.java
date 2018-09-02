@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 
 /**
  * A node for a parameter of a method declaration.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class CFGParameter extends CFGStatement {
@@ -42,11 +43,11 @@ public class CFGParameter extends CFGStatement {
         return parent;
     }
     
-    public JVariable getDefVariable() {
+    public JAccess getDefVariable() {
         return getDefVariables().get(0);
     }
     
-    public JVariable getUseVariable() {
+    public JAccess getUseVariable() {
         return getUseVariables().get(0);
     }
 }

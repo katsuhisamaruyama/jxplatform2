@@ -376,7 +376,7 @@ public class JavaMethod extends JavaElement {
     }
     
     public boolean hasSameSigantureAndModifier(JavaMethod jm) {
-        return getSignature().compareTo(jm.getSignature()) == 0 && getModifiers() == jm.getModifiers();
+        return !isPrivate() && getSignature().equals(jm.getSignature());
     }
     
     public boolean isInProject() {

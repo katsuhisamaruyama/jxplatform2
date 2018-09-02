@@ -16,7 +16,7 @@ import org.jtool.eclipse.cfg.CFGMethodCall;
 import org.jtool.eclipse.cfg.CFGMethodEntry;
 import org.jtool.eclipse.cfg.CFGParameter;
 import org.jtool.eclipse.cfg.JFieldAccess;
-import org.jtool.eclipse.cfg.JVariable;
+import org.jtool.eclipse.cfg.JAccess;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
@@ -137,7 +137,7 @@ public class SDGBuilder {
         for (int ordinal = 0; ordinal < caller.getActualIns().size(); ordinal++) {
             CFGParameter actualIn = caller.getActualIn(ordinal);
             CFGParameter formalIn = callee.getFormalIn(Math.min(ordinal, callee.getFormalIns().size() - 1));
-            JVariable jvar = formalIn.getUseVariables().get(0);
+            JAccess jvar = formalIn.getUseVariables().get(0);
             ParameterEdge edge = new ParameterEdge(actualIn.getPDGNode(), formalIn.getPDGNode(), jvar);
             edge.setParameterIn();
             sdg.add(edge);
@@ -147,7 +147,7 @@ public class SDGBuilder {
             CFGParameter actualOut = caller.getActualOuts().get(0);
             CFGParameter formalOut = callee.getFormalOuts().get(0);
             
-            JVariable jvar = formalOut.getDefVariables().get(0);
+            JAccess jvar = formalOut.getDefVariables().get(0);
             ParameterEdge edge = new ParameterEdge(formalOut.getPDGNode(), actualOut.getPDGNode(), jvar);
             edge.setParameterOut();
             sdg.add(edge);
@@ -159,12 +159,12 @@ public class SDGBuilder {
         for (PDGNode pdgnode : pdg.getNodes()) {
             if (pdgnode.isStatement()) {
                 PDGStatement stnode = (PDGStatement)pdgnode;
-                for (JVariable jvar : stnode.getDefVariables()) {
+                for (JAccess jvar : stnode.getDefVariables()) {
                     if (jvar.isFieldAccess()) {
                         fieldaccesses.add((JFieldAccess)jvar);
                     }
                 }
-                for (JVariable jvar : stnode.getUseVariables()) {
+                for (JAccess jvar : stnode.getUseVariables()) {
                     if (jvar.isFieldAccess()) {
                         fieldaccesses.add((JFieldAccess)jvar);
                     }

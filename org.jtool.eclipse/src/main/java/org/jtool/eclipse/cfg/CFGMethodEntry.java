@@ -7,27 +7,35 @@
 package org.jtool.eclipse.cfg;
 
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.jtool.eclipse.cfg.builder.JInfoStore;
+
 import java.util.List;
 import java.util.ArrayList;
 
 /**
  * The entry node of a CFG for a method or a constructor.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class CFGMethodEntry extends CFGEntry {
     
     private String returnType;
     private boolean isPrimitiveType;
-    private String simpleName;
     private List<CFGParameter> formalIns = new ArrayList<CFGParameter>();
     private List<CFGParameter> formalOuts = new ArrayList<CFGParameter>();
+    
+    private JMethod jmethod;
     
     protected CFGMethodEntry() {
     }
     
-    public CFGMethodEntry(ASTNode node, CFGNode.Kind kind, String simpleName, String name, String fqn) {
-        super(node, kind, name, fqn);
-        this.simpleName = simpleName;
+    public CFGMethodEntry(ASTNode node, CFGNode.Kind kind, String name, String signature, String fqn) {
+        super(node, kind, name, signature, fqn);
+        jmethod = JInfoStore.getInstance().getJMethod(fqn, name);
+    }
+    
+    public JMethod getJMethod() {
+        return jmethod;
     }
     
     public void setReturnType(String type) {
@@ -44,10 +52,6 @@ public class CFGMethodEntry extends CFGEntry {
     
     public boolean isPrimitiveType() {
         return isPrimitiveType;
-    }
-    
-    public String getSimpleName() {
-        return simpleName;
     }
     
     public boolean isVoidType() {

@@ -13,6 +13,8 @@ import org.jtool.eclipse.cfg.ControlFlow;
 
 /**
  * Calculates and stores basic blocks of a CFG.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class BasicBlockBuilder {

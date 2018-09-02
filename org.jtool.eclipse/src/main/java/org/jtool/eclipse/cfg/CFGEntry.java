@@ -10,20 +10,23 @@ import org.eclipse.jdt.core.dom.ASTNode;
 
 /**
  * The entry node of a CFG.
+ * 
  * @author Katsuhisa Maruyama
  */
 public abstract class CFGEntry extends CFGNode {
     
     private String name;
+    private String signature;
     private String fqn;
     private CFG cfg = null;
     
     protected CFGEntry() {
     }
     
-    protected CFGEntry(ASTNode node, CFGNode.Kind kind, String name, String fqn) {
+    protected CFGEntry(ASTNode node, CFGNode.Kind kind, String name, String signature, String fqn) {
         super(node, kind);
         this.name = name;
+        this.signature = signature;
         this.fqn = fqn;
     }
     
@@ -37,6 +40,10 @@ public abstract class CFGEntry extends CFGNode {
     
     public String getName() {
         return name;
+    }
+    
+    public String getSignature() {
+        return signature;
     }
     
     public String getQualifiedName() {

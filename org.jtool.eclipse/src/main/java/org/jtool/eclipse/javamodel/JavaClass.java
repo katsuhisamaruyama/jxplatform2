@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 /**
- * An object representing a class, an interface, an enum, or an enum constant.
+ * An object representing a class, an interface, an enum, or a lambda expression.
  * 
  * @author Katsuhisa Maruyama
  */

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 /**
  * An object storing information about a control flow graph (CFG).
+ * 
  * @author Katsuhisa Maruyama
  */
 public class CFG extends Graph<CFGNode, ControlFlow> {

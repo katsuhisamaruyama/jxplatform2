@@ -10,7 +10,7 @@ import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGEntry;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGStatement;
-import org.jtool.eclipse.cfg.JVariable;
+import org.jtool.eclipse.cfg.JAccess;
 import org.jtool.eclipse.graph.GraphNode;
 import org.jtool.eclipse.pdg.PDG;
 import org.jtool.eclipse.pdg.PDGClassEntry;
@@ -75,7 +75,7 @@ public class PDGBuilder {
                         PDGNode pdgnode = (PDGNode)node;
                         if (pdgnode.getCFGNode().isActualIn()) {
                             PDGStatement ain = (PDGStatement)pdgnode;
-                            JVariable jvar = ain.getDefVariables().get(0);
+                            JAccess jvar = ain.getDefVariables().get(0);
                             ParameterEdge edge = new ParameterEdge(ain, aout, jvar);
                             edge.setSummary();
                             pdg.add(edge);

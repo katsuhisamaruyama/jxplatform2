@@ -46,10 +46,18 @@ public class BytecodeClassStore {
     }
     
     public Set<String> getBytecodeClassNames() {
-        return classNames;
+         return classNames;
     }
     
-    public CtClass getExternalClass(String fqn) {
+    public Set<CtClass> getCtClasses() {
+        Set<CtClass> classes = new HashSet<CtClass>();
+        for (BytecodeClassInfo classInfo : classStore.values()) {
+            classes.add(classInfo.getCtClass());
+        }
+        return classes;
+    }
+    
+    public CtClass getCtClass(String fqn) {
         BytecodeClassInfo classInfo = classStore.get(fqn);
         if (classInfo != null) {
             return classInfo.getCtClass();
@@ -58,19 +66,19 @@ public class BytecodeClassStore {
         }
     }
     
-    public Set<CtClass> getParents(String fqn) {
+    public Set<CtClass> getAncestors(String fqn) {
         BytecodeClassInfo classInfo = classStore.get(fqn);
         if (classInfo != null) {
-            return classInfo.getParents();
+            return classInfo.getAncestors();
         } else {
             return null;
         }
     }
     
-    public Set<CtClass> getChildren(String fqn) {
+    public Set<CtClass> getDescendants(String fqn) {
         BytecodeClassInfo classInfo = classStore.get(fqn);
         if (classInfo != null) {
-            return classInfo.getChildren();
+            return classInfo.getDescendants();
         } else {
             return null;
         }
@@ -117,7 +125,6 @@ public class BytecodeClassStore {
         ClassPool classpool = ClassPool.getDefault();
         for (String path : classPath) {
             classpool.insertClassPath(path);
-            // System.out.println("CLASSPATH = " + path);
         }
         return classpool;
     }
@@ -171,7 +178,7 @@ public class BytecodeClassStore {
     public void registerBytecodeClass(String className) {
         try {
             CtClass ctClass = classPool.get(className);
-            if (ctClass.isInterface() || ctClass.getModifiers() == Modifier.PUBLIC) {
+            if (ctClass.isInterface() || ctClass.getModifiers() != Modifier.PRIVATE) {
                 BytecodeClassInfo classInfo = new BytecodeClassInfo(ctClass);
                 classStore.put(className, classInfo);
             }
@@ -180,20 +187,28 @@ public class BytecodeClassStore {
     
     public void collectBytecodeClassInfo() {
         for (BytecodeClassInfo classInfo : classStore.values()) {
-            for (CtClass parent : classInfo.getParents()) {
+            for (BytecodeClassInfo parent : classInfo.getParents()) {
                 BytecodeClassInfo parentInfo = classStore.get(parent.getName());
                 if (parentInfo != null) {
-                    parentInfo.addChild(classInfo.getCtClass());
+                    parentInfo.addChild(classInfo);
                 }
             }
+        }
+        
+        for (BytecodeClassInfo classInfo : classStore.values()) {
+            classInfo.setAncestors(classInfo);
+            classInfo.setDescendants(classInfo);
         }
     }
     
     private class BytecodeClassInfo {
         
         private CtClass ctClass;
-        private Set<CtClass> parents = new HashSet<CtClass>();
-        private Set<CtClass> children = new HashSet<CtClass>();
+        private Set<BytecodeClassInfo> parents = new HashSet<BytecodeClassInfo>();
+        private Set<BytecodeClassInfo> childrens = new HashSet<BytecodeClassInfo>();
+        
+        private Set<CtClass> ancestors = new HashSet<CtClass>();
+        private Set<CtClass> descendants = new HashSet<CtClass>();
         
         BytecodeClassInfo(CtClass ctClass) {
             this.ctClass = ctClass;
@@ -201,28 +216,54 @@ public class BytecodeClassStore {
             try {
                 CtClass superClass = ctClass.getSuperclass();
                 if (superClass != null) {
-                    parents.add(superClass);
+                    parents.add(new BytecodeClassInfo(superClass));
                 }
                 for (CtClass c : ctClass.getInterfaces()) {
-                    parents.add(c);
+                    parents.add(new BytecodeClassInfo(c));
                 }
             } catch (NotFoundException e) { /* empty */ }
+        }
+        
+        String getName() {
+            return ctClass.getName();
         }
         
         CtClass getCtClass() {
             return ctClass;
         }
         
-        Set<CtClass> getParents() {
+        Set<BytecodeClassInfo> getParents() {
             return parents;
         }
         
-        Set<CtClass> getChildren() {
-            return children;
+        Set<BytecodeClassInfo> getChildren() {
+            return childrens;
         }
         
-        void addChild(CtClass child) {
-            children.add(child);
+        void addChild(BytecodeClassInfo child) {
+            childrens.add(child);
+        }
+        
+        Set<CtClass> getAncestors() {
+            return ancestors;
+        }
+        
+        void setAncestors(BytecodeClassInfo classInfo) {
+            for (BytecodeClassInfo parent : classInfo.getParents()) {
+                ancestors.add(parent.getCtClass());
+                setAncestors(parent);
+            }
+        }
+        
+        Set<CtClass> getDescendants() {
+            return descendants;
+        }
+        
+        void setDescendants(BytecodeClassInfo classInfo) {
+            for (BytecodeClassInfo child : classInfo.getChildren()) {
+                ancestors.add(child.getCtClass());
+                setDescendants(child);
+            }
         }
     }
 }

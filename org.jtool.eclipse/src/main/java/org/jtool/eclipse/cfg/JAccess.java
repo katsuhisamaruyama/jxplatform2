@@ -19,9 +19,10 @@ import org.jtool.eclipse.javamodel.JavaMethod;
 
 /**
  * An object representing an expression for an access to a method, a field, or a local variable.
+ * 
  * @author Katsuhisa Maruyama
  */
-public abstract class JVariable {
+public abstract class JAccess {
     
     protected ASTNode astNode;
     protected String enclosingClassName;
@@ -37,10 +38,10 @@ public abstract class JVariable {
     protected int modifiers;
     protected boolean inProject;
     
-    protected JVariable() {
+    protected JAccess() {
     }
     
-    public JVariable(ASTNode node) {
+    public JAccess(ASTNode node) {
         astNode = node;
     }
     
@@ -110,13 +111,13 @@ public abstract class JVariable {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof JVariable)) {
+        if (obj == null || !(obj instanceof JAccess)) {
             return false;
         }
-        return equals((JVariable)obj);
+        return equals((JAccess)obj);
     }
     
-    public boolean equals(JVariable jvar) {
+    public boolean equals(JAccess jvar) {
         return this == jvar || fqn.equals(jvar.fqn);
     }
     

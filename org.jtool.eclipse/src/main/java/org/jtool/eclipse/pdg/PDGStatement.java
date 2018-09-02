@@ -7,7 +7,7 @@
 package org.jtool.eclipse.pdg;
 
 import org.jtool.eclipse.cfg.CFGStatement;
-import org.jtool.eclipse.cfg.JVariable;
+import org.jtool.eclipse.cfg.JAccess;
 import java.util.List;
 
 /**
@@ -28,19 +28,19 @@ public class PDGStatement extends PDGNode {
         return (CFGStatement)getCFGNode();
     }
     
-    public List<JVariable> getDefVariables() {
+    public List<JAccess> getDefVariables() {
         return getCFGStatement().getDefVariables();
     }
     
-    public List<JVariable> getUseVariables() {
+    public List<JAccess> getUseVariables() {
         return getCFGStatement().getUseVariables();
     }
     
-    public boolean definesVariable(JVariable jvar) {
+    public boolean definesVariable(JAccess jvar) {
         return getCFGStatement().getDefVariables().contains(jvar);
     }
     
-    public boolean usesVariable(JVariable jvar) {
+    public boolean usesVariable(JAccess jvar) {
         return getCFGStatement().getUseVariables().contains(jvar);
     }
     

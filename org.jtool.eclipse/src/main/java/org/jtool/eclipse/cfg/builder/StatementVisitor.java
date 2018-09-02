@@ -15,7 +15,7 @@ import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JApparentAccess;
 import org.jtool.eclipse.cfg.JLocalAccess;
-import org.jtool.eclipse.cfg.JVariable;
+import org.jtool.eclipse.cfg.JAccess;
 import org.jtool.eclipse.graph.GraphEdge;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -54,6 +54,9 @@ import java.util.Stack;
 
 /**
  * Visits AST nodes within a statement.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
+ * @see org.eclipse.jdt.core.dom.Statement
  * 
  * Statement:
  * 
@@ -79,6 +82,8 @@ import java.util.Stack;
  *   SynchronizedStatement
  *   ThrowStatement
  *   TryStatement
+ *   
+ *   @author Katsuhisa Maruyama
  */
 public class StatementVisitor extends ASTVisitor {
     
@@ -572,7 +577,7 @@ public class StatementVisitor extends ASTVisitor {
             CFGMethodEntry methodNode = (CFGMethodEntry)cfg.getStartNode();
             String type = methodNode.getReturnType();
             boolean primitive = methodNode.isPrimitiveType();
-            JVariable jvar = new JApparentAccess(methodNode.getASTNode(), "$_", type, primitive);
+            JAccess jvar = new JApparentAccess(methodNode.getASTNode(), "$_", type, primitive);
             returnNode.addDefVariable(jvar);
             curNode = exprVisitor.getExitNode();
         }
@@ -696,9 +701,9 @@ public class StatementVisitor extends ASTVisitor {
         reconnect(paramNode);
         
         IVariableBinding vbinding = node.getException().resolveBinding();
-        JVariable jvar = new JLocalAccess(node.getException(), vbinding);
+        JAccess jvar = new JLocalAccess(node.getException(), vbinding);
         paramNode.addDefVariable(jvar);
-        JVariable jvin = new JApparentAccess(node.getException(), "$" + vbinding.getName(), vbinding);
+        JAccess jvin = new JApparentAccess(node.getException(), "$" + vbinding.getName(), vbinding);
         paramNode.addUseVariable(jvin);
         
         ControlFlow trueEdge = createFlow(paramNode, nextNode);

@@ -13,9 +13,10 @@ import org.eclipse.jdt.core.dom.Modifier;
 
 /**
  * An object representing an expression for an access to a field, an enum-constant, or a local variable.
+ * 
  * @author Katsuhisa Maruyama
  */
-public class JApparentAccess extends JVariable {
+public class JApparentAccess extends JAccess {
     
     public JApparentAccess(ASTNode node, String name, IVariableBinding vbinding) {
         super(node);

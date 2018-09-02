@@ -18,9 +18,10 @@ import java.util.ArrayList;
 
 /**
  * An object representing a call to a method or a constructor.
+ * 
  * @author Katsuhisa Maruyama
  */
-public class JMethodCall extends JVariable {
+public class JMethodCall extends JAccess {
     
     private boolean isMethod;
     private boolean isConstructor;
@@ -30,7 +31,7 @@ public class JMethodCall extends JVariable {
     private List<String> argumentTypes = new ArrayList<String>();
     private List<Boolean> argumentPrimitiveTypes = new ArrayList<Boolean>();
     
-    private JVariable primary = null;
+    private JAccess primary = null;
     
     public JMethodCall(ASTNode node, IMethodBinding mbinding, List<Expression> args) {
         super(node);
@@ -116,11 +117,11 @@ public class JMethodCall extends JVariable {
         return primary != null;
     }
     
-    public void setPrimary(JVariable jvar) {
+    public void setPrimary(JAccess jvar) {
         primary = jvar;
     }
     
-    public JVariable getPrimary() {
+    public JAccess getPrimary() {
         return primary;
     }
     

@@ -7,7 +7,7 @@
 package org.jtool.eclipse.pdg.builder;
 
 import org.jtool.eclipse.cfg.CFGNode;
-import org.jtool.eclipse.cfg.JVariable;
+import org.jtool.eclipse.cfg.JAccess;
 import org.jtool.eclipse.pdg.DD;
 import org.jtool.eclipse.pdg.PDG;
 import org.jtool.eclipse.pdg.PDGNode;
@@ -34,7 +34,7 @@ public class SummaryFinder {
             
             for (PDGStatement ain : ains) {
                 if (nodes.contains(ain)) {
-                    JVariable jvar = ain.getDefVariables().get(0);
+                    JAccess jvar = ain.getDefVariables().get(0);
                     ParameterEdge edge = new ParameterEdge(ain, aout, jvar);
                     edge.setSummary();
                     pdg.add(edge);

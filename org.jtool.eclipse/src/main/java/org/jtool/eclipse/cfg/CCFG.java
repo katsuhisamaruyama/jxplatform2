@@ -8,6 +8,7 @@ package org.jtool.eclipse.cfg;
 
 /**
  * An object storing information about a class control flow graph (CCFG).
+ * 
  * @author Katsuhisa Maruyama
  */
 public class CCFG extends CFG {

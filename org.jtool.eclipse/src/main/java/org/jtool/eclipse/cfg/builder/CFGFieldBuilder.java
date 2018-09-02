@@ -13,7 +13,7 @@ import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JFieldAccess;
-import org.jtool.eclipse.cfg.JVariable;
+import org.jtool.eclipse.cfg.JAccess;
 import org.jtool.eclipse.javamodel.JavaField;
 
 import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
@@ -28,6 +28,8 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 
 /**
  * Builds a CFG that corresponds to a field.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class CFGFieldBuilder {
@@ -78,7 +80,7 @@ public class CFGFieldBuilder {
         cfg.add(entry);
         
         CFGStatement declNode = new CFGStatement(node, CFGNode.Kind.fieldDeclaration);
-        JVariable jvar = new JFieldAccess(node, vbinding);
+        JAccess jvar = new JFieldAccess(node, vbinding);
         declNode.addDefVariable(jvar);
         declNode.addUseVariable(jvar);
         cfg.add(declNode);

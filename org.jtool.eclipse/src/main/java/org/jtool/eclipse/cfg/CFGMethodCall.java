@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 /**
  * A node that represents a method call node within a CFG.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class CFGMethodCall extends CFGStatement {
@@ -38,7 +39,7 @@ public class CFGMethodCall extends CFGStatement {
         return jmethodCall.hasPrimary();
     }
     
-    public JVariable getPrimary() {
+    public JAccess getPrimary() {
         return jmethodCall.getPrimary();
     }
     

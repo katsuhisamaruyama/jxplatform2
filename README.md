@@ -67,7 +67,7 @@ JDK 1.8
 
 ## Installation
 
-### For the batch-process versions
+### For batch-process versions
 
 You can directly download jar files for the batch-process versions of jxplatform2 on [GitHub](<https://github.com/katsuhisamaruyama/jxplatform2/tree/master/org.jtool.eclipse/releases>). 
 
@@ -79,7 +79,7 @@ Alternatively, you can build the batch-process versions of jxplatform2 with the 
 
 Jar files of JxPlatform2 can be found in the 'build/libs' folder. 
 
-### For the Eclipse plug-in version
+### For an Eclipse plug-in version
 
 When using the Eclipse update site, select menu items: "Help" -> "Install New Software..." ->  
 Input `https://katsuhisamaruyama.github.io/jxplatform2/org.jtool.eclipse.site/site.xml` in the text field of "Work with:" 
@@ -108,11 +108,11 @@ If your batch-process application employs JxPlatform2, you should use `jxplatfor
     ...
     builder.unbuild();
 
-### As a plug-in
+### As an Eclipse plug-in
 
-A typical code for building a Java model for the source code within the Eclipse project:
+Following is the typical code for building a Java model for the source code within the Eclipse project:
 
-    org.eclipse.jdt.core.IJavaProject project;  // It is Ok for org.eclipse.core.resources.IProject
+    org.eclipse.jdt.core.IJavaProject project;  // It is Ok in using org.eclipse.core.resources.IProject
     ModelBuilderPlugin modelBuilder = new ModelBuilderPlugin();
     JavaProject jproject = modelBuilder.build(project);
 
