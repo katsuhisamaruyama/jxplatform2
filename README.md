@@ -71,7 +71,7 @@ JDK 1.8
 
 You can directly download jar files for the batch-process versions of jxplatform2 on [GitHub](<https://github.com/katsuhisamaruyama/jxplatform2/tree/master/org.jtool.eclipse/releases>). 
 
-Alternatively, you can build the batch-process versions of jxplatform2 with the following commands: 
+Alternatively, you can build the batch-process versions of JxPlatform2 with the following commands: 
 
     git clone https://github.com/katsuhisamaruyama/jxplatform2/
     cd jxplatform2/org.jtool.eclipse
