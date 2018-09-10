@@ -78,6 +78,10 @@ public abstract class JavaElement {
     }
     
     protected static String retrieveQualifiedName(ITypeBinding tbinding) {
+        if (tbinding.isTypeVariable()) {
+            return "java.lang.Object";
+        }
+        
         String qname = tbinding.getQualifiedName();
         if (qname.length() != 0) {
             return qname;

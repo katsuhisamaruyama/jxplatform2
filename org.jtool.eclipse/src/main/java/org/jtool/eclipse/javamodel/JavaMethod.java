@@ -197,7 +197,11 @@ public class JavaMethod extends JavaElement {
         ITypeBinding[] bindings = mbinding.getParameterTypes();
         for (int i = 0; i < bindings.length; i++) {
             buf.append(" ");
-            buf.append(bindings[i].getQualifiedName());
+            if (bindings[i].isTypeVariable()) {
+                buf.append("java.lang.Object");
+            } else {
+                buf.append(bindings[i].getQualifiedName());
+            }
         }
         return buf.toString() + " ";
     }
