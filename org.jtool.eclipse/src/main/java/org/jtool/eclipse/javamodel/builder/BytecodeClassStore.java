@@ -97,16 +97,36 @@ public class BytecodeClassStore {
         String cdir = new File(".").getAbsoluteFile().getParent();
         String pdir = jproject.getDir();
         String[] projectClassPath = jproject.getClassPath();
-        String[] systemClassPath = System.getProperty("java.class.path").split(File.pathSeparator, 0);
+        
         List<String> classpaths = new ArrayList<String>();
         for (int i = 0; i < projectClassPath.length; i++) {
             if (!projectClassPath[i].startsWith(cdir) && !projectClassPath[i].startsWith(pdir)) {
-                classpaths.add(projectClassPath[i]);
+                File file = new File(projectClassPath[i]);
+                if (file.exists()) {
+                    classpaths.add(projectClassPath[i]);
+                }
             }
         }
-        for (int i = 0; i < systemClassPath.length; i++) {
-            if (!systemClassPath[i].startsWith(cdir) && !systemClassPath[i].startsWith(pdir)) {
-                classpaths.add(systemClassPath[i]);
+        
+        String[] bootClassPath = System.getProperty("sun.boot.class.path").split(File.pathSeparator, 0);
+        for (int i = 0; i < bootClassPath.length; i++) {
+            File file = new File(bootClassPath[i]);
+            if (file.exists()) {
+                classpaths.add(bootClassPath[i]);
+            }
+        }
+        String[] extDirs = System.getProperty("java.ext.dirs").split(File.pathSeparator, 0);
+        for (int i = 0; i < extDirs.length; i++) {
+            File file = new File(extDirs[i]);
+            if (file.exists()) { 
+                classpaths.add(extDirs[i]);
+            }
+        }
+        String[] endorsedDirs = System.getProperty("java.endorsed.dirs").split(File.pathSeparator, 0);
+        for (int i = 0; i < endorsedDirs.length; i++) {
+            File file = new File(endorsedDirs[i]);
+            if (file.exists()) {
+                classpaths.add(endorsedDirs[i]);
             }
         }
         
@@ -114,7 +134,6 @@ public class BytecodeClassStore {
         try {
             classPool = getClassPool(classPath);
             return classPath;
-        
         } catch (NotFoundException e) {
             return new String[0];
         }
