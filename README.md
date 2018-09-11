@@ -4,7 +4,7 @@ JxPlatform2 is a module that provides three types of easy-to-use models of Java 
 
 ### Source Code Model 
 
-JxPlatform2 builds a Java model consisting of the following elements: 
+JxPlatform2 builds a Java source code model consisting of the following elements: 
 
 * JavaProject - Stores a collection of Java source files, packages, and classes 
 * JavaFile - Provides information on a Java source file 
@@ -18,7 +18,7 @@ JxPlatform2 builds a Java model consisting of the following elements:
 
 JxPlatform2 creates a CFG for each method existing in Java source code. 
 
-* CFGStore - Stores a collection of CFGs created from Java source code 
+* CFGStore - Provides APIs to create CFGs from Java source code and stores them 
 * CFG - Provides information about a CFG 
 * CCFG- Provides information about a class control flow graph (CCFG) 
 * BasicBlock - Provides information about a basic block of a CFG 
@@ -31,8 +31,23 @@ Each CFG consists of nodes and edges between two nodes.
 * CFGFieldEntry - Represents an entry node of a CFG for a field declaration, or an enum-constant 
 * CFGExit - Represents an exit node of a CFG 
 * CFGStatement - Represents a statement node of a CFG 
+* CFGParameter - Represents a parameter node of a CFG 
 * CFGMerge - Represents a merge node of a CFG 
 * ControlFlow - Represents control flow between CFG nodes 
+
+Each CFGStatement node holds a define-set and a use-set of references to fields, local variables, and method calls. The define-set contains fields and local variables defined in an expression corresponding to the node. The use-set contains fields and local variables used in the expression and method calls performed.
+
+* JReference - Represents a reference to a field, or a local variable, or a method 
+* JFieldReference - Represents a reference to an accessed field 
+* JLocalReference - Represents a reference to an accessed local variable 
+* JMethodReference - Represents reference to a called method or a called constructor 
+* JVirtualReference - represents a reference to a virtual variable (that stores a return value or an argument value) 
+
+Besides, the following three elements can be retrieved when given information on a project.
+
+* JClass - Provides concise information on a class 
+* JMethod - Provides concise information on a method 
+* JField - Provides concise information on a field
 
 ### PDG (Program Dependence Graph) 
 
@@ -116,6 +131,9 @@ If your batch-process application employs JxPlatform2 as a library, you should u
 
 The code building a Java model is describe below. 
 
+    import org.jtool.eclipse.batch.JavaModelBuilder;
+    import org.jtool.eclipse.javamodel.JavaProject;
+    
     JavaModelBuilder builder = new JavaModelBuilder(name, target, classpath);
     builder.setVisible(true);  // Displays log information on console
     JavaProject jproject = builder.build();
@@ -124,9 +142,13 @@ The code building a Java model is describe below.
 
 ### As an Eclipse plug-in
 
-The following is the typical code for building a Java model for the source code within the Eclipse project:
+The following is the typical code for building a Java model for the source code within the Eclipse project.
 
-    org.eclipse.jdt.core.IJavaProject project;  // Possible to use org.eclipse.core.resources.IProject
+    import org.eclipse.jdt.core.IJavaProject;
+    import org.jtool.eclipse.plugin.ModelBuilderPlugin;
+    import org.jtool.eclipse.javamodel.JavaProject;
+    
+    IJavaProject project;  // Possible to use org.eclipse.core.resources.IProject
     ModelBuilderPlugin modelBuilder = new ModelBuilderPlugin();
     JavaProject jproject = modelBuilder.build(project);
 
@@ -134,7 +156,47 @@ The plug-in automatically collects source files that was modified after the prev
 Thus, the dirty source files will be analyzed if your code will perform build.
 Use the `buildWhole(project)` method for clean re-build.  
 
-### Building CFGs and PDGs
+### Building CFGs
+
+The following code builds CFGs for all classes within a project.
+
+    import org.jtool.eclipse.batch.JavaModelBuilder;
+    import org.jtool.eclipse.cfg.CCFG;
+    import org.jtool.eclipse.cfg.CFGStore;
+    import org.jtool.eclipse.javamodel.JavaProject;
+    import org.jtool.eclipse.javamodel.JavaClass;
+    
+    JavaModelBuilder builder = new JavaModelBuilder(target, target);
+    JavaProject jproject = builder.build();
+    CFGStore.getInstance().setAnalysisLevel(jproject, false);
+    CFGStore.getInstance().setCreatingActualNodes(false);  // false if actual nodes need to be created
+    CFGStore.getInstance().setVisible(true);
+    for (JavaClass jclass : jproject.getClasses()) {
+       CCFG ccfg = CFGStore.getInstance().getCFG(jclass);
+    }
+    ...
+    CFGStore.getInstance().destroy();
+    builder.unbuild();
+
+To build a normal CFG, only the source code within the project is analyzed. If high-precision of dependency analysis is needed, the bytecode of library classes can be additionally analyzed using the following code:
+
+    CFGStore.getInstance().setAnalysisLevel(jproject, true);
+
+A CFG can be created from an object of JavaMethod or JavaField as described below.
+
+    import org.jtool.eclipse.cfg.CFG;
+    import org.jtool.eclipse.javamodel.JavaMethod;
+    
+    CFG cfg = CFGStore.getInstance().getCFG(jmethod);
+
+    import org.jtool.eclipse.cfg.CFG;
+    import org.jtool.eclipse.javamodel.JavaField;
+    
+    CFG cfg = CFGStore.getInstance().getCFG(jfield)
+
+To create CFGs from an AST instead of a Java source code model, you can use several APIs provided by CFGClassBuilder, CFGMethodBuilder, and CFGFieldBuilder. In this case, you do not have to specify a project related to the AST, but the bytecode analysis is never performed.
+
+### Building PDGs
 
 UNDER FIXING BUGS -- Thanks for your waiting.
 

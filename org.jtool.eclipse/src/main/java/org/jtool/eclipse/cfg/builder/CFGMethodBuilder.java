@@ -33,7 +33,6 @@ import java.util.HashSet;
 
 /**
  * Builds a CFG that corresponds to a method.
- * All methods of this class are not intended to be directly called by clients.
  * 
  * @author Katsuhisa Maruyama
  */

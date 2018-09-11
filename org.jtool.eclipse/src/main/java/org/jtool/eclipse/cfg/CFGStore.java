@@ -88,15 +88,15 @@ public class CFGStore {
         return cfgStore.size();
     }
     
-    public CFG getCFG(JavaClass jclass) {
+    public CCFG getCFG(JavaClass jclass) {
         CFG ccfg = getCFG(jclass.getQualifiedName());
-        if (ccfg == null) {
+        if (ccfg == null || !(ccfg instanceof CCFG)) {
             if (visible) {
                 System.out.print(" - " + jclass.getQualifiedName() + " - CFG");
             }
             ccfg = build(jclass);
         }
-        return ccfg;
+        return (CCFG)ccfg;
     }
     
     private CCFG build(JavaClass jclass) {
