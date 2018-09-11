@@ -602,6 +602,9 @@ public class JavaMethod extends JavaElement {
         if (overriddenMethods == null) {
             findOverriddenMethods();
         }
+        if (overriddenMethods == null) {
+            overriddenMethods = new HashSet<JavaMethod>();
+        }
         return overriddenMethods;
     }
     
@@ -609,6 +612,9 @@ public class JavaMethod extends JavaElement {
         collectInfo();
         if (overridingMethods == null) {
             findOverriddenMethods();
+        }
+        if (overridingMethods == null) {
+            overridingMethods = new HashSet<JavaMethod>();
         }
         return overridingMethods;
     }
