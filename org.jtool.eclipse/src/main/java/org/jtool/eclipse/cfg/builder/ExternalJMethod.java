@@ -132,9 +132,14 @@ public class ExternalJMethod extends JMethod {
                 
                 @Override
                 public void edit(MethodCall cm) throws CannotCompileException {
-                    JClass clazz = JInfoStore.getInstance().getJClass(cm.getClassName());
-                    JMethod method = clazz.getMethod(cm.getSignature());
-                    methods.add(method);
+                    try {
+                        JClass clazz = JInfoStore.getInstance().getJClass(cm.getClassName());
+                        JMethod method = clazz.getMethod(cm.getSignature());
+                        methods.add(method);
+                    } catch (ClassCastException e) {
+                        // javassit's bug related to invocation for Lambda interface methods
+                        // javassist.bytecode.InterfaceMethodrefInfo cannot be cast to javassist.bytecode.MethodrefInfo
+                    }
                 }
                 
                 @Override
