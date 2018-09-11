@@ -6,13 +6,19 @@
 
 package org.jtool.eclipse.cfg.builder;
 
+import org.jtool.eclipse.cfg.CFGStore;
+import org.jtool.eclipse.cfg.JReference;
+import org.jtool.eclipse.cfg.CFG;
+import org.jtool.eclipse.cfg.CFGNode;
+import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.JClass;
 import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.cfg.JField;
-import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.javamodel.JavaField;
+import org.jtool.eclipse.javamodel.JavaMethod;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * An object that represents a method inside the project.
@@ -20,11 +26,11 @@ import java.util.ArrayList;
  * 
  * @author Katsuhisa Maruyama
  */
-public class JInternalMethod extends JMethod {
+public class InternalJMethod extends JMethod {
     
     protected JavaMethod jmethod;
     
-    public JInternalMethod(JClass clazz, JavaMethod jmethod) {
+    public InternalJMethod(JClass clazz, JavaMethod jmethod) {
         this.jmethod = jmethod;
         declaringClass = clazz;
     }
@@ -102,14 +108,8 @@ public class JInternalMethod extends JMethod {
         return true;
     }
     
-    void collectInfo() {
-        accessedMethods = findAccessedMethods();
-        accessedFields = findAccessedFields();
-        overrindingMethods = findOverridingMethods();
-        overriddenMethods = findOverriddenMethods();
-    }
-    
-    private JMethod[] findAccessedMethods() {
+    @Override
+    protected JMethod[] findAccessedMethods() {
         List<JMethod> methods = new ArrayList<JMethod>();
         for (JavaMethod jm : jmethod.getCalledMethods()) {
             JClass clazz = JInfoStore.getInstance().getJClass(jm.getDeclaringClass().getQualifiedName());
@@ -121,7 +121,8 @@ public class JInternalMethod extends JMethod {
         return methods.toArray(new JMethod[methods.size()]);
     }
     
-    private JField[] findAccessedFields() {
+    @Override
+    protected JField[] findAccessedFields() {
         List<JField> fields = new ArrayList<JField>();
         for (JavaField jf : jmethod.getAccessedFields()) {
             JClass clazz = JInfoStore.getInstance().getJClass(jf.getDeclaringClass().getQualifiedName());
@@ -133,7 +134,8 @@ public class JInternalMethod extends JMethod {
         return fields.toArray(new JField[fields.size()]);
     }
     
-    private JMethod[] findOverridingMethods() {
+    @Override
+    protected JMethod[] findOverridingMethods() {
         List<JMethod> methods = new ArrayList<JMethod>();
         for (JavaMethod jm : jmethod.getOverridingMethods()) {
             JClass clazz = JInfoStore.getInstance().getJClass(jm.getDeclaringClass().getQualifiedName());
@@ -145,7 +147,8 @@ public class JInternalMethod extends JMethod {
         return methods.toArray(new JMethod[methods.size()]);
     }
     
-    private JMethod[] findOverriddenMethods() {
+    @Override
+    protected JMethod[] findOverriddenMethods() {
         List<JMethod> methods = new ArrayList<JMethod>();
         for (JavaMethod jm : jmethod.getOverriddenMethods()) {
             JClass clazz = JInfoStore.getInstance().getJClass(jm.getDeclaringClass().getQualifiedName());
@@ -155,5 +158,21 @@ public class JInternalMethod extends JMethod {
             }
         }
         return methods.toArray(new JMethod[methods.size()]);
+    }
+    
+    @Override
+    protected void checkSideEffectsOnFields(Set<JMethod> visitedMethods) {
+        CFG cfg = CFGStore.getInstance().getCFG(jmethod, visitedMethods);
+        for (CFGNode node : cfg.getNodes()) {
+            if (node instanceof CFGStatement) {
+                CFGStatement stNode = (CFGStatement)node;
+                for (JReference jv : stNode.getDefVariables()) {
+                    if (jv.isFieldAccess()) {
+                        sideEffects = SideEffectStatus.YES;
+                        return;
+                    }
+                }
+            }
+        }
     }
 }

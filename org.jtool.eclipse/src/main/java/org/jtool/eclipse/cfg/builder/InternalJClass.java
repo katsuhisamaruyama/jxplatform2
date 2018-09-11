@@ -19,45 +19,28 @@ import java.util.ArrayList;
  * 
  * @author Katsuhisa Maruyama
  */
-public class JInternalClass extends JClass {
+public class InternalJClass extends JClass {
     
     protected JavaClass jclass;
     
-    public JInternalClass(JavaClass jclass) {
+    public InternalJClass(JavaClass jclass) {
         this(null, jclass);
     }
     
-    public JInternalClass(JClass clazz, JavaClass jclass) {
+    public InternalJClass(JClass clazz, JavaClass jclass) {
         this.jclass = jclass;
-        declaringClass = clazz;
-        if (clazz != null) {
-            if (jclass.getDeclaringMethod() != null) {
-                declaringMethod = declaringClass.getMethod(jclass.getDeclaringMethod().getSignature());
-            } else {
-                declaringMethod = null;
-            }
-        } else {
-            declaringMethod = null;
-        }
         
         int num = 0;
-        fields = new JInternalField[jclass.getFields().size()];
+        fields = new InternalJField[jclass.getFields().size()];
         for (JavaField jf : jclass.getFields()) {
-            fields[num] = new JInternalField(this, jf);
+            fields[num] = new InternalJField(this, jf);
             num++;
         }
         
         num = 0;
-        methods = new JInternalMethod[jclass.getMethods().size()];
+        methods = new InternalJMethod[jclass.getMethods().size()];
         for (JavaMethod jm: jclass.getMethods()) {
-            methods[num] = new JInternalMethod(this, jm);
-            num++;
-        }
-        
-        num = 0;
-        innerClasses = new JInternalClass[jclass.getInnerClasses().size()];
-        for (JavaClass jc: jclass.getInnerClasses()) {
-            innerClasses[num] = new JInternalClass(this, jc);
+            methods[num] = new InternalJMethod(this, jm);
             num++;
         }
     }
@@ -116,12 +99,8 @@ public class JInternalClass extends JClass {
         return true;
     }
     
-    void collectInfo() {
-        ancestors = findAncestors();
-        descendants = findDescendants();
-    }
-    
-    private JClass[] findAncestors() {
+    @Override
+    protected JClass[] findAncestors() {
         List<JClass> classes = new ArrayList<JClass>();
         for (JavaClass jc : jclass.getAncestors()) {
             JClass clazz = JInfoStore.getInstance().getJClass(jc.getQualifiedName());
@@ -132,11 +111,20 @@ public class JInternalClass extends JClass {
         return classes.toArray(new JClass[classes.size()]);
     }
     
-    private JClass[] findDescendants() {
+    @Override
+    protected JClass[] findDescendants() {
+        System.out.println("TARGET = " + this.getQualifiedName());
+        
         List<JClass> classes = new ArrayList<JClass>();
         for (JavaClass jc : jclass.getDescendants()) {
+            
+            System.out.println("DESC = " + jc.getQualifiedName()+ " of " + this.getQualifiedName());
+            
             JClass clazz = JInfoStore.getInstance().getJClass(jc.getQualifiedName());
             if (clazz != null) {
+                
+                System.out.println("DESC = " + clazz.getQualifiedName()+ " of " + this.getQualifiedName());
+                
                 classes.add(clazz);
             }
         }

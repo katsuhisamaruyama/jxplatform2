@@ -17,7 +17,7 @@ import java.util.ArrayList;
  */
 public class CFGMethodCall extends CFGStatement {
     
-    private JMethodCall jmethodCall;
+    private JMethodReference jmethodCall;
     
     private List<CFGParameter> actualIns = new ArrayList<CFGParameter>();
     private List<CFGParameter> actualOuts = new ArrayList<CFGParameter>();
@@ -26,12 +26,12 @@ public class CFGMethodCall extends CFGStatement {
         super();
     }
     
-    public CFGMethodCall(ASTNode node, JMethodCall jcall, CFGNode.Kind kind) {
+    public CFGMethodCall(ASTNode node, JMethodReference jcall, CFGNode.Kind kind) {
         super(node, kind);
         jmethodCall = jcall;
     }
     
-    public JMethodCall getMethodCall() {
+    public JMethodReference getMethodCall() {
         return jmethodCall;
     }
     
@@ -39,7 +39,7 @@ public class CFGMethodCall extends CFGStatement {
         return jmethodCall.hasPrimary();
     }
     
-    public JAccess getPrimary() {
+    public JReference getPrimary() {
         return jmethodCall.getPrimary();
     }
     

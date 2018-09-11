@@ -18,11 +18,11 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.jtool.eclipse.javamodel.JavaMethod;
 
 /**
- * An object representing an expression for an access to a method, a field, or a local variable.
+ * An abstract class that represents a reference to a field,  a local variable, or a method.
  * 
  * @author Katsuhisa Maruyama
  */
-public abstract class JAccess {
+public abstract class JReference {
     
     protected ASTNode astNode;
     protected String enclosingClassName;
@@ -38,10 +38,10 @@ public abstract class JAccess {
     protected int modifiers;
     protected boolean inProject;
     
-    protected JAccess() {
+    protected JReference() {
     }
     
-    public JAccess(ASTNode node) {
+    public JReference(ASTNode node) {
         astNode = node;
     }
     
@@ -105,19 +105,23 @@ public abstract class JAccess {
         return false;
     }
     
+    public boolean isApparentAccess() {
+        return false;
+    }
+    
     public boolean isMethodCall() {
         return false;
     }
     
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof JAccess)) {
+        if (obj == null || !(obj instanceof JReference)) {
             return false;
         }
-        return equals((JAccess)obj);
+        return equals((JReference)obj);
     }
     
-    public boolean equals(JAccess jvar) {
+    public boolean equals(JReference jvar) {
         return this == jvar || fqn.equals(jvar.fqn);
     }
     

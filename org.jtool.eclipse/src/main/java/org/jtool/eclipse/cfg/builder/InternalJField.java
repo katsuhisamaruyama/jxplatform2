@@ -7,12 +7,8 @@
 package org.jtool.eclipse.cfg.builder;
 
 import org.jtool.eclipse.cfg.JClass;
-import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.cfg.JField;
-import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.javamodel.JavaField;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * An object that represents a field inside the project.
@@ -20,11 +16,11 @@ import java.util.ArrayList;
  * 
  * @author Katsuhisa Maruyama
  */
-public class JInternalField extends JField {
+public class InternalJField extends JField {
     
     protected JavaField jfield;
     
-    public JInternalField(JClass clazz, JavaField jfield) {
+    public InternalJField(JClass clazz, JavaField jfield) {
         this.jfield = jfield;
         declaringClass = clazz;
     }
@@ -76,34 +72,5 @@ public class JInternalField extends JField {
     @Override
     public boolean isInProject() {
         return true;
-    }
-    
-    void collectInfo() {
-        accessedMethods = findAccessedMethods();
-        accessedFields = findAccessedFields();
-    }
-    
-    private JMethod[] findAccessedMethods() {
-        List<JMethod> methods = new ArrayList<JMethod>();
-        for (JavaMethod jm : jfield.getCalledMethods()) {
-            JClass clazz = JInfoStore.getInstance().getJClass(jm.getDeclaringClass().getQualifiedName());
-            JMethod method = clazz.getMethod(jm.getSignature());
-            if (method != null) {
-                methods.add(method);
-            }
-        }
-        return methods.toArray(new JMethod[methods.size()]);
-    }
-    
-    private JField[] findAccessedFields() {
-        List<JField> fields = new ArrayList<JField>();
-        for (JavaField jf : jfield.getAccessedFields()) {
-            JClass clazz = JInfoStore.getInstance().getJClass(jf.getDeclaringClass().getQualifiedName());
-            JField field = clazz.getField(jf.getName());
-            if (field != null) {
-                fields.add(field);
-            }
-        }
-        return fields.toArray(new JField[fields.size()]);
     }
 }

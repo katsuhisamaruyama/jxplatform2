@@ -7,7 +7,6 @@
 package org.jtool.eclipse.cfg.builder;
 
 import org.jtool.eclipse.cfg.JClass;
-import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.cfg.JField;
 import org.jtool.eclipse.javamodel.JavaElement;
 import javassist.CtField;
@@ -20,11 +19,11 @@ import javassist.NotFoundException;
  * 
  * @author Katsuhisa Maruyama
  */
-public class JExternalField extends JField {
+public class ExternalJField extends JField {
     
     protected CtField cfield;
     
-    public JExternalField(JClass clazz, CtField cfield) {
+    public ExternalJField(JClass clazz, CtField cfield) {
         this.cfield = cfield;
         declaringClass = clazz;
     }
@@ -84,10 +83,5 @@ public class JExternalField extends JField {
     @Override
     public boolean isInProject() {
         return false;
-    }
-    
-    void collectInfo() {
-        accessedMethods = new JMethod[0];
-        accessedFields = new JField[0];
     }
 }

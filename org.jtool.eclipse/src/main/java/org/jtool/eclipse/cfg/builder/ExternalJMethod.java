@@ -10,32 +10,35 @@ import org.jtool.eclipse.cfg.JClass;
 import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.cfg.JField;
 import org.jtool.eclipse.javamodel.JavaElement;
-import javassist.CtConstructor;
+import javassist.CtClass;
+import javassist.CtMethod;
 import javassist.Modifier;
+import javassist.NotFoundException;
 import javassist.CannotCompileException;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
 import javassist.expr.ConstructorCall;
 import javassist.expr.FieldAccess;
 import java.util.List;
+import java.util.Set;
 import java.util.ArrayList;
 
 /**
- * An object that represents a constructor outside the project.
+ * An object that represents a method outside the project.
  * All methods of this class are not intended to be directly called by clients.
  * 
  * @author Katsuhisa Maruyama
  */
-public class JExternalConstructor extends JMethod {
+public class ExternalJMethod extends JMethod {
     
-    protected CtConstructor cmethod;
+    protected CtMethod cmethod;
     
-    public JExternalConstructor(JClass clazz, CtConstructor cmethod) {
+    public ExternalJMethod(JClass clazz, CtMethod cmethod) {
         this.cmethod = cmethod;
         declaringClass = clazz;
     }
     
-    public CtConstructor getCtConstructor() {
+    public CtMethod getCtMethod() {
         return cmethod;
     }
     
@@ -46,42 +49,54 @@ public class JExternalConstructor extends JMethod {
     
     @Override
     public String getQualifiedName() {
-        return declaringClass.getQualifiedName() + JavaElement.QualifiedNameSeparator + cmethod.getSignature();
+        return declaringClass.getQualifiedName() + JavaElement.QualifiedNameSeparator + getSignature();
     }
     
     @Override
     public String getSignature() {
-        return cmethod.getSignature();
+        return cmethod.getName() + MethodSignature.methodSignatureToString(cmethod.getSignature());
     }
     
     @Override
     public String getReturnType() {
-        return declaringClass.getQualifiedName();
+        try {
+            return cmethod.getReturnType().getName();
+        } catch (NotFoundException e) {
+            return "";
+        }
     }
     
     @Override
     public boolean isPrimitiveReturnType() {
-        return false;
+        try {
+            return cmethod.getReturnType().isPrimitive();
+        } catch (NotFoundException e) {
+            return false;
+        }
     }
     
     @Override
     public boolean isVoid() {
-        return false;
+        try {
+            return cmethod.getReturnType().equals(CtClass.voidType);
+        } catch (NotFoundException e) {
+            return false;
+        }
     }
     
     @Override
     public boolean isMethod() {
-        return false;
+        return true;
     }
     
     @Override
     public boolean isConstructor() {
-        return !cmethod.isClassInitializer();
+        return false;
     }
     
     @Override
     public boolean isInitializer() {
-        return cmethod.isClassInitializer();
+        return false;
     }
     
     @Override
@@ -109,14 +124,8 @@ public class JExternalConstructor extends JMethod {
         return false;
     }
     
-    void collectInfo() {
-        accessedMethods = findAccessedMethods();
-        accessedFields = findAccessedFields();
-        overrindingMethods = new JMethod[0];
-        overriddenMethods = new JMethod[0];
-    }
-    
-    private JMethod[] findAccessedMethods() {
+    @Override
+    protected JMethod[] findAccessedMethods() {
         List<JMethod> methods = new ArrayList<JMethod>();
         try {
             cmethod.instrument(new ExprEditor() {
@@ -139,11 +148,13 @@ public class JExternalConstructor extends JMethod {
         return methods.toArray(new JMethod[methods.size()]);
     }
     
-    private JField[] findAccessedFields() {
+    @Override
+    protected JField[] findAccessedFields() {
         List<JField> fields = new ArrayList<JField>();
         try {
             cmethod.instrument(new ExprEditor() {
                 
+                @Override
                 public void edit(FieldAccess cf) throws CannotCompileException {
                     JClass clazz = JInfoStore.getInstance().getJClass(cf.getClassName());
                     JField field = clazz.getField(cf.getFieldName());
@@ -152,5 +163,51 @@ public class JExternalConstructor extends JMethod {
             });
         } catch (CannotCompileException e) { /* empty */ }
         return fields.toArray(new JField[fields.size()]);
+    }
+    
+    @Override
+    protected JMethod[] findOverridingMethods() {
+        List<JMethod> methods = new ArrayList<JMethod>();
+        for (JClass clazz : declaringClass.getDescendants()) {
+            for (JMethod method : clazz.getMethods()) {
+                if (!isPrivate() && getSignature().equals(method.getSignature())) {
+                    methods.add(method);
+                }
+            }
+        }
+        return methods.toArray(new JMethod[methods.size()]);
+    }
+    
+    @Override
+    protected JMethod[] findOverriddenMethods() {
+        List<JMethod> methods = new ArrayList<JMethod>();
+        for (JClass clazz : declaringClass.getAncestors()) {
+            for (JMethod method : clazz.getMethods()) {
+                if (!isPrivate() && getSignature().equals(method.getSignature())) {
+                    methods.add(method);
+                }
+            }
+        }
+        return methods.toArray(new JMethod[methods.size()]);
+    }
+    
+    @Override
+    protected void checkSideEffectsOnFields(Set<JMethod> visitedMethods) {
+        try {
+            cmethod.instrument(new ExprEditor() {
+                
+                @Override
+                public void edit(FieldAccess cf) throws CannotCompileException {
+                    if (cf.isWriter()) {
+                        sideEffects = SideEffectStatus.YES;
+                        return;
+                    }
+                }
+            });
+        } catch (CannotCompileException e) {
+            if (sideEffects == SideEffectStatus.UNKNOWM) {
+                sideEffects = SideEffectStatus.MAYBE;
+            }
+        }
     }
 }

@@ -6,8 +6,10 @@
 
 package org.jtool.eclipse.cfg;
 
+import java.util.Set;
+
 /**
- * An abstract class that represents a method or a constructor.
+ * An abstract class that provides concise information on a method.
  * 
  * @author Katsuhisa Maruyama
  */
@@ -15,32 +17,22 @@ public abstract class JMethod {
     
     protected JClass declaringClass;
     
-    protected JMethod[] accessedMethods;
-    protected JField[] accessedFields;
-    protected JMethod[] overrindingMethods;
-    protected JMethod[] overriddenMethods;
+    protected JMethod[] accessedMethods = null;
+    protected JField[] accessedFields = null;
+    protected JMethod[] overrindingMethods = null;
+    protected JMethod[] overriddenMethods = null;
+    
+    protected enum SideEffectStatus {
+        YES, NO, MAYBE, UNKNOWM;
+    }
+    protected SideEffectStatus sideEffects = SideEffectStatus.UNKNOWM;
+    protected static final int SideEffectCheckCount = 5;
     
     protected JMethod() {
     }
     
     public JClass getDeclaringClass() {
         return declaringClass;
-    }
-    
-    public JMethod[] getAccessedMethod() {
-        return accessedMethods;
-    }
-    
-    public JField[] getAccessedFields() {
-        return accessedFields;
-    }
-    
-    public JMethod[] getOverrindingMethods() {
-        return overrindingMethods;
-    }
-    
-    public JMethod[] getOverriddenMethods() {
-        return overriddenMethods;
     }
     
     public abstract String getName();
@@ -70,6 +62,77 @@ public abstract class JMethod {
     public abstract boolean isDefault();
     
     public abstract boolean isInProject();
+    
+    public JMethod[] getAccessedMethods() {
+        if (accessedMethods == null) {
+            accessedMethods = findAccessedMethods();
+        }
+        return accessedMethods;
+    }
+    
+    public JField[] getAccessedFields() {
+        if (accessedFields == null) {
+            accessedFields = findAccessedFields();
+        }
+        return accessedFields;
+    }
+    
+    
+    public JMethod[] getOverridingMethods() {
+        if (overrindingMethods == null) {
+            overrindingMethods = findOverridingMethods();
+        }
+        return overrindingMethods;
+    }
+    
+    public JMethod[] getOverriddenMethods() {
+        if (overriddenMethods == null) {
+            overriddenMethods = findOverriddenMethods();
+        }
+        return overriddenMethods;
+    }
+    
+    protected abstract JMethod[] findAccessedMethods();
+    
+    protected abstract JField[] findAccessedFields();
+    
+    protected abstract JMethod[] findOverridingMethods();
+    
+    protected abstract JMethod[] findOverriddenMethods();
+    
+    public boolean hasSideEffects(Set<JMethod> visitedMethods) {
+        return hasSideEffects(SideEffectCheckCount, visitedMethods);
+    }
+    
+    protected boolean hasSideEffects(int count, Set<JMethod> visitedMethods) {
+        if (count == 0) {
+            sideEffects = SideEffectStatus.MAYBE;
+        }
+        if (sideEffects == SideEffectStatus.UNKNOWM) {
+            checkSideEffectsOnFields(visitedMethods);
+            checkSideEffectsOnMethods(count, visitedMethods);
+        }
+        return sideEffects == SideEffectStatus.YES || sideEffects == SideEffectStatus.MAYBE;
+    }
+    
+    protected void checkSideEffectsOnFields(Set<JMethod> visitedMethods) {
+    }
+    
+    protected void checkSideEffectsOnMethods(int count, Set<JMethod> visitedMethods) {
+        for (JMethod method : getOverridingMethods()) {
+            if (method != null && !visitedMethods.contains(method) && method.hasSideEffects(count, visitedMethods)) {
+                sideEffects = SideEffectStatus.YES;
+                return;
+            }
+        }
+        
+        for (JMethod method : getAccessedMethods()) {
+            if (method != null && !visitedMethods.contains(method) && method.hasSideEffects(count - 1, visitedMethods)) {
+                sideEffects = SideEffectStatus.YES;
+                return;
+            }
+        }
+    }
     
     public boolean equals(JMethod method) {
         if (method == null) {

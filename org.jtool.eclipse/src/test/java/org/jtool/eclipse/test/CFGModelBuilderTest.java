@@ -62,7 +62,7 @@ public class CFGModelBuilderTest {
         String target = TEST_PROECT_DIR + "jrb-1.0.2/src/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
-        CFGStore.getInstance().setAnalysisLevel(jproject, false);
+        CFGStore.getInstance().setAnalysisLevel(jproject, true);
         CFGStore.getInstance().setCreatingActualNodes(false);
         
         CFGStore.getInstance().buildCFGs(jproject.getClasses());
@@ -108,10 +108,10 @@ public class CFGModelBuilderTest {
     
     public static void main(String[] args) {
         CFGModelBuilderTest tester = new CFGModelBuilderTest();
-        tester.testSimple();
+        //tester.testSimple();
         tester.testJrb();
-        tester.testTetris();
-        tester.testDrawTool();
-        tester.testLambda();
+        //tester.testTetris();
+        //tester.testDrawTool();
+        //tester.testLambda();
     }
 }

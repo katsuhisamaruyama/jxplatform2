@@ -12,13 +12,13 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Modifier;
 
 /**
- * An object representing an expression for an access to a field, an enum-constant, or a local variable.
+ * An class that represents a reference to a virtual variable.
  * 
  * @author Katsuhisa Maruyama
  */
-public class JApparentAccess extends JAccess {
+public class JVirtualReference extends JReference {
     
-    public JApparentAccess(ASTNode node, String name, IVariableBinding vbinding) {
+    public JVirtualReference(ASTNode node, String name, IVariableBinding vbinding) {
         super(node);
         
         setProperties(node);
@@ -29,7 +29,7 @@ public class JApparentAccess extends JAccess {
         modifiers = binding.getModifiers();
     }
     
-    public JApparentAccess(ASTNode node, String name, ITypeBinding tbinding) {
+    public JVirtualReference(ASTNode node, String name, ITypeBinding tbinding) {
         super(node);
         
         this.name = name;
@@ -41,7 +41,7 @@ public class JApparentAccess extends JAccess {
         setProperties(node);
     }
     
-    public JApparentAccess(ASTNode node, String name, String type, boolean primitive) {
+    public JVirtualReference(ASTNode node, String name, String type, boolean primitive) {
         super(node);
         
         this.name = name;
@@ -51,7 +51,7 @@ public class JApparentAccess extends JAccess {
         setProperties(node);
     }
     
-    public JApparentAccess(ASTNode node, String name, boolean primitive) {
+    public JVirtualReference(ASTNode node, String name, boolean primitive) {
         super(node);
         
         ITypeBinding binding = findEnclosingClass(node).getTypeDeclaration();
@@ -75,7 +75,7 @@ public class JApparentAccess extends JAccess {
     }
     
     @Override
-    public boolean isLocalAccess() {
+    public boolean isApparentAccess() {
         return true;
     }
     

@@ -16,6 +16,8 @@ import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -48,16 +50,16 @@ public class CFGStore {
     }
     
     public void setAnalysisLevel(JavaProject jproject, boolean analyzingBytecode) {
+        JInfoStore.getInstance().build(jproject, analyzingBytecode);
         if (jproject != null) {
             analysisLevel = 1;
-            JInfoStore.getInstance().build(jproject, analyzingBytecode);
             if (analyzingBytecode) {
                 analysisLevel = 2;
             }
         }
     }
     
-    public int getAnalsisLevel() {
+    public int getAnalysisLevel() {
         return analysisLevel;
     }
     
@@ -97,28 +99,6 @@ public class CFGStore {
         return ccfg;
     }
     
-    public CFG getCFG(JavaMethod jmethod) {
-        CFG cfg = getCFG(jmethod.getQualifiedName());
-        if (cfg == null) {
-            if (visible) {
-                System.out.print(" - " + jmethod.getQualifiedName() + " - CFG");
-            }
-            cfg = build(jmethod);
-        }
-        return cfg;
-    }
-    
-    public CFG getCFG(JavaField jfield) {
-        CFG cfg = getCFG(jfield.getQualifiedName());
-        if (cfg == null) {
-            if (visible) {
-                System.out.print(" - " + jfield.getQualifiedName() + " - CFG");
-            }
-            cfg = build(jfield);
-        }
-        return cfg;
-    }
-    
     private CCFG build(JavaClass jclass) {
         CCFG ccfg = CFGClassBuilder.build(jclass);
         CFGStore.getInstance().addCFG(ccfg);
@@ -129,24 +109,40 @@ public class CFGStore {
         for (CFG cfg : ccfg.getStartNode().getFields()) {
             addCFG(cfg);
         }
-        /*
-        for (CFG cfg : ccfg.getStartNode().getTypes()) {
-            addCFG(cfg);
-        }
-        */
         return ccfg;
     }
     
-    private CFG build(JavaMethod jmethod) {
-        CFG cfg = CFGMethodBuilder.build(jmethod);
-        addCFG(cfg);
+    public CFG getCFG(JavaMethod jmethod) {
+        return getCFG(jmethod, new HashSet<JMethod>());
+    }
+    
+    public CFG getCFG(JavaMethod jmethod, Set<JMethod> visitedMethods) {
+        CFG cfg = getCFG(jmethod.getQualifiedName());
+        if (cfg == null) {
+            if (visible) {
+                System.out.print(" - " + jmethod.getQualifiedName() + " - CFG");
+            }
+            
+            cfg = CFGMethodBuilder.build(jmethod, visitedMethods);
+            addCFG(cfg);
+        }
         return cfg;
     }
     
-    private CFG build(JavaField jfield) {
-        
-        CFG cfg = CFGFieldBuilder.build(jfield);
-        addCFG(cfg);
+    public CFG getCFG(JavaField jfield) {
+        return getCFG(jfield, new HashSet<JMethod>());
+    }
+    
+    public CFG getCFG(JavaField jfield, Set<JMethod> visitedMethods) {
+        CFG cfg = getCFG(jfield.getQualifiedName());
+        if (cfg == null) {
+            if (visible) {
+                System.out.print(" - " + jfield.getQualifiedName() + " - CFG");
+            }
+            
+            cfg = CFGFieldBuilder.build(jfield, visitedMethods);
+            addCFG(cfg);
+        }
         return cfg;
     }
     

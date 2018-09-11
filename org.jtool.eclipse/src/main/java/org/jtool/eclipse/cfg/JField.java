@@ -7,7 +7,7 @@
 package org.jtool.eclipse.cfg;
 
 /**
- * An abstract class that represents a field.
+ * An abstract class that provides concise information on a field.
  * 
  * @author Katsuhisa Maruyama
  */
@@ -15,22 +15,11 @@ public abstract class JField {
     
     protected JClass declaringClass;
     
-    protected JMethod[] accessedMethods;
-    protected JField[] accessedFields;
-    
     protected JField() {
     }
     
     public JClass getDeclaringClass() {
         return declaringClass;
-    }
-    
-    public JMethod[] getAccessedMethod() {
-        return accessedMethods;
-    }
-    
-    public JField[] getAccessedFields() {
-        return accessedFields;
     }
     
     public abstract String getName();

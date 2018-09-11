@@ -25,9 +25,9 @@ public class CFGFieldEntry extends CFGEntry {
     protected CFGFieldEntry() {
     }
     
-    public CFGFieldEntry(ASTNode node, CFGNode.Kind kind, String name, String fqn) {
+    public CFGFieldEntry(ASTNode node, CFGNode.Kind kind, String name, String fqn, String className) {
         super(node, kind, name, name, fqn);
-        jfield = JInfoStore.getInstance().getJField(fqn, name);
+        jfield = JInfoStore.getInstance().getJField(className, name);
     }
     
     public JField getJField() {
@@ -42,13 +42,13 @@ public class CFGFieldEntry extends CFGEntry {
         return type;
     }
     
-    public JAccess getDefField() {
+    public JReference getDefField() {
         CFGNode[] nodes = toArray(getDstNodes());
         CFGStatement decl = (CFGStatement)nodes[0];
         return decl.getFirst();
     }
     
-    public List<JAccess> getUsedFields() {
+    public List<JReference> getUsedFields() {
         CFGNode[] nodes = toArray(getDstNodes());
         CFGStatement decl = (CFGStatement)nodes[0];
         return decl.getUseVariables();

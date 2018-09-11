@@ -26,8 +26,8 @@ public class JInfoStore {
     
     private static JInfoStore instance = new JInfoStore();
     
-    private Map<String, JInternalClass> internalClassStore = new HashMap<String, JInternalClass>();
-    private Map<String, JExternalClass> externalClassStore = new HashMap<String, JExternalClass>();
+    private Map<String, InternalJClass> internalClassStore = new HashMap<String, InternalJClass>();
+    private Map<String, ExternalJClass> externalClassStore = new HashMap<String, ExternalJClass>();
     
     private JavaProject jproject;
     private BytecodeClassStore bytecodeClassStore;
@@ -39,9 +39,13 @@ public class JInfoStore {
         return instance;
     }
     
+    public JavaProject getProject() {
+        return jproject;
+    }
+    
     public void build(JavaProject jproject, boolean bytecodeAnalysized) {
         this.jproject = jproject;
-        if (bytecodeAnalysized) {
+        if (jproject != null && bytecodeAnalysized) {
             bytecodeClassStore = jproject.registerBytecodeClasses();
         } else {
             bytecodeClassStore = null;
@@ -57,71 +61,89 @@ public class JInfoStore {
         externalClassStore.clear();
     }
     
-    private JClass registerClassFromJavaClass(String fqn) {
+    private JClass registerInternalClass(String fqn) {
         if (jproject != null) {
             JavaClass jclass = jproject.getClass(fqn);
             if (jclass != null) {
-                JInternalClass clazz = new JInternalClass(jclass);
-                if (clazz != null) {
-                    internalClassStore.put(clazz.getQualifiedName(), clazz);
-                }
+                InternalJClass clazz = new InternalJClass(jclass);
+                internalClassStore.put(clazz.getQualifiedName(), clazz);
                 return clazz;
             }
         }
         return null;
     }
     
-    private JClass registerClassFromCtClass(String fqn) {
+    private JClass registerExternalClass(String fqn) {
         if (bytecodeClassStore != null) {
             CtClass cclass = bytecodeClassStore.getCtClass(fqn);
             if (cclass != null) {
-                JExternalClass clazz = new JExternalClass(cclass);
-                if (clazz != null) {
-                    externalClassStore.put(clazz.getQualifiedName(), clazz);
-                }
+                ExternalJClass clazz = new ExternalJClass(cclass, jproject);
+                externalClassStore.put(clazz.getQualifiedName(), clazz);
                 return clazz;
             }
         }
         return null;
     }
     
-    private JClass registerJClassFromStore(String fqn) {
-        JClass jclass = registerClassFromJavaClass(fqn);
-        if (jclass == null) {
-            jclass = registerClassFromCtClass(fqn);
-        }
-        return jclass;
-    }
-    
-    private JClass getJClassFromStore(String fqn) {
-        JClass jclass = internalClassStore.get(fqn);
-        if (jclass == null) {
-            jclass = externalClassStore.get(fqn);
-        }
-        return jclass;
-    }
-    
-    public JClass getJClass(String fqn) {
-        JClass clazz = getJClassFromStore(fqn);
+    private JClass registerClass(String fqn) {
+        JClass clazz = registerInternalClass(fqn);
         if (clazz == null) {
-            clazz = registerJClassFromStore(fqn);
+            clazz = registerExternalClass(fqn);
         }
         return clazz;
     }
     
-    public JMethod getJMethod(String classFqn, String methodSig) {
-        JClass jclass = getJClass(classFqn);
-        if (jclass != null) {
-            return jclass.getMethod(methodSig);
+    private JClass findClass(String fqn) {
+        JClass clazz = internalClassStore.get(fqn);
+        if (clazz == null) {
+            clazz = externalClassStore.get(fqn);
         }
-        return null;
+        return clazz;
+    }
+    
+    public JClass getJClass(String fqn) {
+        if (jproject != null) {
+            JClass clazz = findClass(fqn);
+            if (clazz != null) {
+                return clazz;
+            }
+        } else {
+            return UnregisteredJClass.getInstance();
+        }
+        if (bytecodeClassStore != null) {
+            JClass clazz = registerClass(fqn);
+            if (clazz != null) {
+                return clazz;
+            }
+        } else {
+            return UnregisteredJClass.getInstance();
+        }
+        return UnregisteredJClass.getInstance();
+    }
+    
+    public JMethod getJMethod(String classFqn, String methodSig) {
+        JClass clazz = getJClass(classFqn);
+        JMethod method = clazz.getMethod(methodSig);
+        if (method != null) {
+            if (method.isInProject()) {
+                return (InternalJMethod)method;
+            } else {
+                if (method.isConstructor()) {
+                    return (ExternalJConstructor)method;
+                } else {
+                    return (ExternalJMethod)method;
+                }
+            }
+        }
+        return UnregisteredJMethod.getInstance();
     }
     
     public JField getJField(String classFqn, String fieldName) {
-        JClass jclass = getJClass(classFqn);
-        if (jclass != null) {
-            return jclass.getField(fieldName);
+        JClass clazz = getJClass(classFqn);
+        JField field = clazz.getField(fieldName);
+        if (field != null) {
+            return field;
         }
-        return null;
+        return UnregisteredJField.getInstance();
     }
 }

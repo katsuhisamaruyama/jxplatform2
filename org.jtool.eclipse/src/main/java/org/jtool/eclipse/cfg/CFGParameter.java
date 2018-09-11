@@ -43,11 +43,11 @@ public class CFGParameter extends CFGStatement {
         return parent;
     }
     
-    public JAccess getDefVariable() {
+    public JReference getDefVariable() {
         return getDefVariables().get(0);
     }
     
-    public JAccess getUseVariable() {
+    public JReference getUseVariable() {
         return getUseVariables().get(0);
     }
 }

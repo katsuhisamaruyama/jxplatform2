@@ -10,15 +10,15 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 
 /**
- * An object representing an expression for an access to a field, an enum-constant, or a local variable.
+ * An class that represents a reference to an accessed local variable.
  * 
  * @author Katsuhisa Maruyama
  */
-public class JLocalAccess extends JAccess {
+public class JLocalReference extends JReference {
     
     private boolean isParameter;
     
-    public JLocalAccess(ASTNode node, IVariableBinding vbinding) {
+    public JLocalReference(ASTNode node, IVariableBinding vbinding) {
         super(node);
         
         IVariableBinding binding = vbinding.getVariableDeclaration();

@@ -10,34 +10,33 @@ import org.jtool.eclipse.cfg.JClass;
 import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.cfg.JField;
 import org.jtool.eclipse.javamodel.JavaElement;
-import javassist.CtClass;
-import javassist.CtMethod;
+import javassist.CtConstructor;
 import javassist.Modifier;
-import javassist.NotFoundException;
 import javassist.CannotCompileException;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
 import javassist.expr.ConstructorCall;
 import javassist.expr.FieldAccess;
 import java.util.List;
+import java.util.Set;
 import java.util.ArrayList;
 
 /**
- * An object that represents a method outside the project.
+ * An object that represents a constructor outside the project.
  * All methods of this class are not intended to be directly called by clients.
  * 
  * @author Katsuhisa Maruyama
  */
-public class JExternalMethod extends JMethod {
+public class ExternalJConstructor extends JMethod {
     
-    protected CtMethod cmethod;
+    protected CtConstructor cmethod;
     
-    public JExternalMethod(JClass clazz, CtMethod cmethod) {
+    public ExternalJConstructor(JClass clazz, CtConstructor cmethod) {
         this.cmethod = cmethod;
         declaringClass = clazz;
     }
     
-    public CtMethod getCtMethod() {
+    public CtConstructor getCtConstructor() {
         return cmethod;
     }
     
@@ -48,54 +47,42 @@ public class JExternalMethod extends JMethod {
     
     @Override
     public String getQualifiedName() {
-        return declaringClass.getQualifiedName() + JavaElement.QualifiedNameSeparator + cmethod.getSignature();
+        return declaringClass.getQualifiedName() + JavaElement.QualifiedNameSeparator + getSignature();
     }
     
     @Override
     public String getSignature() {
-        return cmethod.getSignature();
+        return cmethod.getName() + MethodSignature.methodSignatureToString(cmethod.getSignature());
     }
     
     @Override
     public String getReturnType() {
-        try {
-            return cmethod.getReturnType().getName();
-        } catch (NotFoundException e) {
-            return "";
-        }
+        return declaringClass.getQualifiedName();
     }
     
     @Override
     public boolean isPrimitiveReturnType() {
-        try {
-            return cmethod.getReturnType().isPrimitive();
-        } catch (NotFoundException e) {
-            return false;
-        }
+        return false;
     }
     
     @Override
     public boolean isVoid() {
-        try {
-            return cmethod.getReturnType().equals(CtClass.voidType);
-        } catch (NotFoundException e) {
-            return false;
-        }
+        return false;
     }
     
     @Override
     public boolean isMethod() {
-        return true;
+        return false;
     }
     
     @Override
     public boolean isConstructor() {
-        return false;
+        return !cmethod.isClassInitializer();
     }
     
     @Override
     public boolean isInitializer() {
-        return false;
+        return cmethod.isClassInitializer();
     }
     
     @Override
@@ -123,14 +110,8 @@ public class JExternalMethod extends JMethod {
         return false;
     }
     
-    void collectInfo() {
-        accessedMethods = findAccessedMethods();
-        accessedFields = findAccessedFields();
-        overrindingMethods = findOverridingMethods();
-        overriddenMethods = findOverriddenMethods();
-    }
-    
-    private JMethod[] findAccessedMethods() {
+    @Override
+    protected JMethod[] findAccessedMethods() {
         List<JMethod> methods = new ArrayList<JMethod>();
         try {
             cmethod.instrument(new ExprEditor() {
@@ -153,7 +134,8 @@ public class JExternalMethod extends JMethod {
         return methods.toArray(new JMethod[methods.size()]);
     }
     
-    private JField[] findAccessedFields() {
+    @Override
+    protected JField[] findAccessedFields() {
         List<JField> fields = new ArrayList<JField>();
         try {
             cmethod.instrument(new ExprEditor() {
@@ -168,27 +150,18 @@ public class JExternalMethod extends JMethod {
         return fields.toArray(new JField[fields.size()]);
     }
     
-    private JMethod[] findOverridingMethods() {
-        List<JMethod> methods = new ArrayList<JMethod>();
-        for (JClass clazz : declaringClass.getDescendants()) {
-            for (JMethod method : clazz.getMethods()) {
-                if (!isPrivate() && getSignature().equals(method.getSignature())) {
-                    methods.add(method);
-                }
-            }
-        }
-        return methods.toArray(new JMethod[methods.size()]);
+    @Override
+    protected JMethod[] findOverridingMethods() {
+        return new JMethod[0];
     }
     
-    private JMethod[] findOverriddenMethods() {
-        List<JMethod> methods = new ArrayList<JMethod>();
-        for (JClass clazz : declaringClass.getAncestors()) {
-            for (JMethod method : clazz.getMethods()) {
-                if (!isPrivate() && getSignature().equals(method.getSignature())) {
-                    methods.add(method);
-                }
-            }
-        }
-        return methods.toArray(new JMethod[methods.size()]);
+    @Override
+    protected JMethod[] findOverriddenMethods() {
+        return new JMethod[0];
+    }
+    
+    @Override
+    public boolean hasSideEffects(Set<JMethod> visitedMethods) {
+        return true;
     }
 }

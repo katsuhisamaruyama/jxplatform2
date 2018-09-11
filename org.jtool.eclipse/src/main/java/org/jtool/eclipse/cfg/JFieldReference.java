@@ -14,16 +14,16 @@ import org.jtool.eclipse.javamodel.JavaClass;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
 /**
- * An object representing an expression for an access to a field, an enum-constant, or a local variable.
+ * An class that represents a reference to an accessed field.
  * 
  * @author Katsuhisa Maruyama
  */
-public class JFieldAccess extends JAccess {
+public class JFieldReference extends JReference {
     
     private boolean isField;
     private boolean isEnumConstant;
     
-    public JFieldAccess(ASTNode node, IVariableBinding vbinding) {
+    public JFieldReference(ASTNode node, IVariableBinding vbinding) {
         super(node);
         
         IVariableBinding binding = vbinding.getVariableDeclaration();

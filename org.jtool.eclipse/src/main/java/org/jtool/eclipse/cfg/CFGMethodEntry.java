@@ -29,9 +29,9 @@ public class CFGMethodEntry extends CFGEntry {
     protected CFGMethodEntry() {
     }
     
-    public CFGMethodEntry(ASTNode node, CFGNode.Kind kind, String name, String signature, String fqn) {
+    public CFGMethodEntry(ASTNode node, CFGNode.Kind kind, String name, String signature, String fqn, String className) {
         super(node, kind, name, signature, fqn);
-        jmethod = JInfoStore.getInstance().getJMethod(fqn, name);
+        jmethod = JInfoStore.getInstance().getJMethod(className, signature);
     }
     
     public JMethod getJMethod() {

@@ -7,31 +7,19 @@
 package org.jtool.eclipse.cfg;
 
 /**
- * An interface that represents a class.
+ * An abstract class that provides concise information on a class.
  * 
  * @author Katsuhisa Maruyama
  */
 public abstract class JClass {
     
-    protected JClass declaringClass;
-    protected JMethod declaringMethod;
-    
     protected JField[] fields;
     protected JMethod[] methods;
-    protected JClass[] innerClasses;
     
-    protected JClass[] ancestors;
-    protected JClass[] descendants;
+    protected JClass[] ancestors = null;
+    protected JClass[] descendants = null;
     
     protected JClass() {
-    }
-    
-    public JClass getDeclaringClass() {
-        return declaringClass;
-    }
-    
-    public JMethod getDeclaringMethod() {
-        return declaringMethod;
     }
     
     public JField[] getFields() {
@@ -60,18 +48,6 @@ public abstract class JClass {
         return null;
     }
     
-    public JClass[] getInnerClasses() {
-        return innerClasses;
-    }
-    
-    public JClass[] getAncestors() {
-        return ancestors;
-    }
-    
-    public JClass[] getDescendants() {
-        return descendants;
-    }
-    
     public abstract String getName();
     
     public abstract String getQualifiedName();
@@ -91,6 +67,24 @@ public abstract class JClass {
     public abstract boolean isDefault();
     
     public abstract boolean isInProject();
+    
+    public JClass[] getAncestors() {
+        if (ancestors == null) {
+            ancestors = findAncestors();
+        }
+        return ancestors;
+    }
+    
+    public JClass[] getDescendants() {
+        if (descendants == null) {
+            descendants = findDescendants();
+        }
+        return descendants;
+    }
+    
+    protected abstract JClass[] findAncestors();
+    
+    protected abstract JClass[] findDescendants();
     
     public boolean equals(JClass clazz) {
         if (clazz == null) {

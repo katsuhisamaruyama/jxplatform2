@@ -13,11 +13,13 @@ import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGParameter;
 import org.jtool.eclipse.cfg.CFGStore;
 import org.jtool.eclipse.cfg.ControlFlow;
-import org.jtool.eclipse.cfg.JApparentAccess;
-import org.jtool.eclipse.cfg.JLocalAccess;
-import org.jtool.eclipse.cfg.JAccess;
+import org.jtool.eclipse.cfg.JVirtualReference;
+import org.jtool.eclipse.cfg.JLocalReference;
+import org.jtool.eclipse.cfg.JReference;
+import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.graph.GraphEdge;
 import org.jtool.eclipse.javamodel.JavaMethod;
+import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
@@ -27,9 +29,6 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import java.util.List;
 import java.util.Set;
-
-import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
-
 import java.util.HashSet;
 
 /**
@@ -40,8 +39,12 @@ import java.util.HashSet;
  */
 public class CFGMethodBuilder {
     
-    @SuppressWarnings("unchecked")
     public static CFG build(JavaMethod jmethod) {
+        return build(jmethod, new HashSet<JMethod>());
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static CFG build(JavaMethod jmethod, Set<JMethod> visitedMethods) {
         List<VariableDeclaration> params = null;
         if (!jmethod.isInitializer()) {
             if (jmethod.isLambda()) {
@@ -52,7 +55,13 @@ public class CFGMethodBuilder {
                 params = node.parameters();
             }
         }
-        return build(jmethod.getASTNode(), jmethod.getMethodBinding(), params, jmethod.getName(), jmethod.getSignature(), jmethod.getQualifiedName());
+        
+        IMethodBinding mbinding = jmethod.getMethodBinding();
+        String name = jmethod.getName();
+        String sig = jmethod.getSignature();
+        String fqn = jmethod.getQualifiedName();
+        String className = jmethod.getDeclaringClass().getQualifiedName();
+        return build(jmethod.getASTNode(), mbinding, params, name, sig, fqn, className, visitedMethods);
     }
     
     @SuppressWarnings("unchecked")
@@ -61,15 +70,17 @@ public class CFGMethodBuilder {
         IMethodBinding mbinding = node.resolveBinding().getMethodDeclaration();
         String name = mbinding.getName();
         String sig = JavaMethod.getSignature(mbinding);
-        String fqn = tbinding.getTypeDeclaration().getQualifiedName() + QualifiedNameSeparator + sig;
-        return build(node, mbinding, node.parameters(), name, sig, fqn);
+        String className = tbinding.getTypeDeclaration().getQualifiedName();
+        String fqn = className + QualifiedNameSeparator + sig;
+        return build(node, mbinding, node.parameters(), name, sig, fqn, className, new HashSet<JMethod>());
     }
     
     public static CFG build(Initializer node) {
-        ITypeBinding tbinding = JAccess.findEnclosingClass(node).getTypeDeclaration();
+        ITypeBinding tbinding = JReference.findEnclosingClass(node).getTypeDeclaration();
         String name = JavaMethod.InitializerName;
-        String fqn = tbinding.getTypeDeclaration().getQualifiedName() + QualifiedNameSeparator + name;
-        return build(node, null, null, name, name, fqn);
+        String className = tbinding.getTypeDeclaration().getQualifiedName();
+        String fqn = className + QualifiedNameSeparator + name;
+        return build(node, null, null, name, name, fqn, className, new HashSet<JMethod>());
     }
     
     @SuppressWarnings("unchecked")
@@ -78,26 +89,28 @@ public class CFGMethodBuilder {
         IMethodBinding mbinding = tbinding.getFunctionalInterfaceMethod().getMethodDeclaration();
         String name = mbinding.getName();
         String sig = JavaMethod.getSignature(mbinding);
-        String fqn = tbinding.getTypeDeclaration().getQualifiedName() + "$" + String.valueOf(CFGStore.getInstance().size()) + QualifiedNameSeparator + sig;
-        return build(node, mbinding, node.parameters(), name, sig, fqn);
+        String className = tbinding.getTypeDeclaration().getQualifiedName() + "$" + String.valueOf(CFGStore.getInstance().size());
+        String fqn = className + QualifiedNameSeparator + sig;
+        return build(node, mbinding, node.parameters(), name, sig, fqn, className, new HashSet<JMethod>());
     }
     
-    private static CFG build(ASTNode node, IMethodBinding mbinding, List<VariableDeclaration> params, String name, String sig, String fqn) {
+    private static CFG build(ASTNode node, IMethodBinding mbinding,
+            List<VariableDeclaration> params, String name, String sig, String fqn, String className, Set<JMethod> visitedMethods) {
         CFG cfg = new CFG();
         ExpressionVisitor.paramNumber = 1;
         
         CFGMethodEntry entry;
         if (mbinding == null) {
-            entry = new CFGMethodEntry(node, CFGNode.Kind.initializerEntry, name, sig, fqn);
+            entry = new CFGMethodEntry(node, CFGNode.Kind.initializerEntry, name, sig, fqn, className);
             entry.setReturnType("void");
             entry.setPrimitiveType(false);
         } else {
             if (mbinding.isConstructor()) {
-                entry = new CFGMethodEntry(node, CFGNode.Kind.constructorEntry, name, sig, fqn);
+                entry = new CFGMethodEntry(node, CFGNode.Kind.constructorEntry, name, sig, fqn, className);
                 entry.setReturnType(mbinding.getReturnType().getTypeDeclaration().getQualifiedName());
                 entry.setPrimitiveType(mbinding.getReturnType().isPrimitive());
             } else {
-                entry = new CFGMethodEntry(node, CFGNode.Kind.methodEntry, name, sig, fqn);
+                entry = new CFGMethodEntry(node, CFGNode.Kind.methodEntry, name, sig, fqn, className);
                 entry.setReturnType(mbinding.getReturnType().getTypeDeclaration().getQualifiedName());
                 entry.setPrimitiveType(mbinding.getReturnType().isPrimitive());
             }
@@ -116,7 +129,7 @@ public class CFGMethodBuilder {
         entryEdge.setTrue();
         cfg.add(entryEdge);
         
-        StatementVisitor visitor = new StatementVisitor(cfg, formalInNode, nextNode);
+        StatementVisitor visitor = new StatementVisitor(cfg, formalInNode, nextNode, visitedMethods);
         node.accept(visitor);
         nextNode = visitor.getNextCFGNode();
         
@@ -167,10 +180,10 @@ public class CFGMethodBuilder {
             entry.addFormalIn(formalInNode);
             cfg.add(formalInNode);
             
-            JAccess jvout = new JLocalAccess(param, param.resolveBinding());
+            JReference jvout = new JLocalReference(param, param.resolveBinding());
             formalInNode.setDefVariable(jvout);
             
-            JAccess jvin = new JApparentAccess(param, "$" + String.valueOf(ExpressionVisitor.paramNumber), jvout.getType(), jvout.isPrimitiveType());
+            JReference jvin = new JVirtualReference(param, "$" + String.valueOf(ExpressionVisitor.paramNumber), jvout.getType(), jvout.isPrimitiveType());
             formalInNode.setUseVariable(jvin);
             ExpressionVisitor.paramNumber++;
             
@@ -194,11 +207,11 @@ public class CFGMethodBuilder {
         entry.addFormalOut(formalOutNode);
         cfg.add(formalOutNode);
         
-        JAccess jvout = new JApparentAccess(node, "$" + String.valueOf(ExpressionVisitor.paramNumber), entry.getReturnType(), entry.isPrimitiveType());
+        JReference jvout = new JVirtualReference(node, "$" + String.valueOf(ExpressionVisitor.paramNumber), entry.getReturnType(), entry.isPrimitiveType());
         formalOutNode.addDefVariable(jvout);
         ExpressionVisitor.paramNumber++;
         
-        JAccess jvin = new JApparentAccess(node, "$_", entry.getReturnType(), entry.isPrimitiveType());
+        JReference jvin = new JVirtualReference(node, "$_", entry.getReturnType(), entry.isPrimitiveType());
         formalOutNode.addUseVariable(jvin);
         
         return formalOutNode;

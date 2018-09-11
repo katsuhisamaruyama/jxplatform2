@@ -17,11 +17,11 @@ import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
 import java.util.ArrayList;
 
 /**
- * An object representing a call to a method or a constructor.
+ * An class that represents reference to a called method or a called constructor.
  * 
  * @author Katsuhisa Maruyama
  */
-public class JMethodCall extends JAccess {
+public class JMethodReference extends JReference {
     
     private boolean isMethod;
     private boolean isConstructor;
@@ -31,9 +31,9 @@ public class JMethodCall extends JAccess {
     private List<String> argumentTypes = new ArrayList<String>();
     private List<Boolean> argumentPrimitiveTypes = new ArrayList<Boolean>();
     
-    private JAccess primary = null;
+    private JReference primary = null;
     
-    public JMethodCall(ASTNode node, IMethodBinding mbinding, List<Expression> args) {
+    public JMethodReference(ASTNode node, IMethodBinding mbinding, List<Expression> args) {
         super(node);
         
         IMethodBinding binding = mbinding.getMethodDeclaration();
@@ -117,11 +117,11 @@ public class JMethodCall extends JAccess {
         return primary != null;
     }
     
-    public void setPrimary(JAccess jvar) {
+    public void setPrimary(JReference jvar) {
         primary = jvar;
     }
     
-    public JAccess getPrimary() {
+    public JReference getPrimary() {
         return primary;
     }
     
@@ -139,8 +139,8 @@ public class JMethodCall extends JAccess {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof JMethodCall) {
-            JMethodCall jcall = (JMethodCall)obj;
+        if (obj instanceof JMethodReference) {
+            JMethodReference jcall = (JMethodReference)obj;
             return equals(jcall);
         }
         return false;

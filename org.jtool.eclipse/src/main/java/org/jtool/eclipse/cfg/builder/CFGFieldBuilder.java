@@ -6,25 +6,25 @@
 
 package org.jtool.eclipse.cfg.builder;
 
+import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGExit;
 import org.jtool.eclipse.cfg.CFGFieldEntry;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.ControlFlow;
-import org.jtool.eclipse.cfg.JFieldAccess;
-import org.jtool.eclipse.cfg.JAccess;
+import org.jtool.eclipse.cfg.JFieldReference;
+import org.jtool.eclipse.cfg.JReference;
+import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.javamodel.JavaField;
-
-import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
-
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
-import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Builds a CFG that corresponds to a field.
@@ -35,52 +35,57 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 public class CFGFieldBuilder {
     
     public static CFG build(JavaField jfield) {
-        return build(jfield.getASTNode(), jfield.getVariableBinding(), jfield.getName(), jfield.getQualifiedName());
+        return build(jfield, new HashSet<JMethod>());
+    }
+    
+    public static CFG build(JavaField jfield, Set<JMethod> visitedMethods) {
+        String name = jfield.getName();
+        String fqn = jfield.getQualifiedName();
+        String className = jfield.getDeclaringClass().getQualifiedName();
+        return build(jfield.getASTNode(), jfield.getVariableBinding(), name, fqn, className, visitedMethods);
     }
     
     public static CFG build(VariableDeclaration node) {
-        IVariableBinding vbinding = node.resolveBinding();
-        String fqn = getQualifiedName(vbinding.getDeclaringClass(), vbinding);
+        IVariableBinding vbinding = node.resolveBinding().getVariableDeclaration();
         String name = vbinding.getName();
-        return build(node, vbinding, name, fqn);
+        String className = vbinding.getDeclaringClass().getTypeDeclaration().getQualifiedName();
+        String fqn = className + QualifiedNameSeparator + name;
+        return build(node, vbinding, name, fqn, className, new HashSet<JMethod>());
     }
     
     public static CFG build(VariableDeclarationFragment node) {
-        IVariableBinding vbinding = node.resolveBinding();
-        String fqn = getQualifiedName(vbinding.getDeclaringClass(), vbinding);
+        IVariableBinding vbinding = node.resolveBinding().getVariableDeclaration();
         String name = vbinding.getName();
-        return build(node, vbinding, name, fqn);
+        String className = vbinding.getDeclaringClass().getTypeDeclaration().getQualifiedName();
+        String fqn = className + QualifiedNameSeparator + name;
+        return build(node, vbinding, name, fqn, className, new HashSet<JMethod>());
     }
     
     public static CFG build(EnumConstantDeclaration node) {
-        IVariableBinding vbinding = node.resolveVariable();
-        String fqn = getQualifiedName(vbinding.getDeclaringClass(), vbinding);
+        IVariableBinding vbinding = node.resolveVariable().getVariableDeclaration();
         String name = vbinding.getName();
-        return build(node, vbinding, name, fqn);
+        String className = vbinding.getDeclaringClass().getTypeDeclaration().getQualifiedName();
+        String fqn = className + QualifiedNameSeparator + name;
+        return build(node, vbinding, name, fqn, className, new HashSet<JMethod>());
     }
     
-    private static String getQualifiedName(ITypeBinding tbinding, IVariableBinding vbinding) {
-        tbinding = tbinding.getTypeDeclaration();
-        vbinding = vbinding.getVariableDeclaration();
-        return tbinding.getQualifiedName() + QualifiedNameSeparator + vbinding.getName();
-    }
-    
-    private static CFG build(ASTNode node, IVariableBinding vbinding, String name, String fqn) {
+    private static CFG build(ASTNode node, IVariableBinding vbinding,
+            String name, String fqn, String className, Set<JMethod> visitedMethods) {
         CFG cfg = new CFG();
         ExpressionVisitor.paramNumber = 1;
         
         CFGFieldEntry entry;
         if (vbinding.isEnumConstant()) {
-            entry = new CFGFieldEntry(node, CFGNode.Kind.enumConstantEntry, name, fqn);
+            entry = new CFGFieldEntry(node, CFGNode.Kind.enumConstantEntry, name, fqn, className);
         } else {
-            entry = new CFGFieldEntry(node, CFGNode.Kind.fieldEntry, name, fqn);
+            entry = new CFGFieldEntry(node, CFGNode.Kind.fieldEntry, name, fqn, className);
         }
         entry.setType(vbinding.getType().getTypeDeclaration().getQualifiedName());
         cfg.setStartNode(entry);
         cfg.add(entry);
         
         CFGStatement declNode = new CFGStatement(node, CFGNode.Kind.fieldDeclaration);
-        JAccess jvar = new JFieldAccess(node, vbinding);
+        JReference jvar = new JFieldReference(node, vbinding);
         declNode.addDefVariable(jvar);
         declNode.addUseVariable(jvar);
         cfg.add(declNode);
@@ -93,7 +98,7 @@ public class CFGFieldBuilder {
         if (vbinding.isEnumConstant()) {
             EnumConstantDeclaration decl = (EnumConstantDeclaration)node;
             if (decl.resolveConstructorBinding() != null) {
-                ExpressionVisitor visitor = new ExpressionVisitor(cfg, declNode);
+                ExpressionVisitor visitor = new ExpressionVisitor(cfg, declNode, visitedMethods);
                 decl.accept(visitor);
                 curNode = visitor.getExitNode();
             }
@@ -101,7 +106,7 @@ public class CFGFieldBuilder {
             VariableDeclarationFragment decl = (VariableDeclarationFragment)node;
             Expression initializer = decl.getInitializer();
             if (initializer != null) {
-                ExpressionVisitor visitor = new ExpressionVisitor(cfg, declNode);
+                ExpressionVisitor visitor = new ExpressionVisitor(cfg, declNode, visitedMethods);
                 initializer.accept(visitor);
                 curNode = visitor.getExitNode();
             }

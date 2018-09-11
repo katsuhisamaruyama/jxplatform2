@@ -13,11 +13,12 @@ import org.jtool.eclipse.cfg.CFGParameter;
 import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.CFGStore;
 import org.jtool.eclipse.cfg.ControlFlow;
-import org.jtool.eclipse.cfg.JApparentAccess;
-import org.jtool.eclipse.cfg.JFieldAccess;
-import org.jtool.eclipse.cfg.JLocalAccess;
-import org.jtool.eclipse.cfg.JMethodCall;
-import org.jtool.eclipse.cfg.JAccess;
+import org.jtool.eclipse.cfg.JVirtualReference;
+import org.jtool.eclipse.cfg.JFieldReference;
+import org.jtool.eclipse.cfg.JLocalReference;
+import org.jtool.eclipse.cfg.JMethodReference;
+import org.jtool.eclipse.cfg.JReference;
+import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.graph.GraphEdge;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -107,21 +108,24 @@ public class ExpressionVisitor extends ASTVisitor {
     protected static int paramNumber = 1;
     
     private boolean creatingActuals;
-    private int analsisLevel;
+    private int analysisLevel;
     
-    protected Stack<AnalysisMode> analysisMode = new Stack<AnalysisMode>();
+    private Stack<AnalysisMode> analysisMode = new Stack<AnalysisMode>();
     private enum AnalysisMode {
         DEF, USE,
     }
     
-    protected ExpressionVisitor(CFG cfg, CFGStatement node) {
+    private Set<JMethod> visitedMethods;
+    
+    protected ExpressionVisitor(CFG cfg, CFGStatement node, Set<JMethod> visitedMethods) {
         this.cfg = cfg;
         curNode = node;
         entryNode = node;
         
         analysisMode.push(AnalysisMode.USE);
         creatingActuals = CFGStore.getInstance().creatingActualNodes();
-        analsisLevel = CFGStore.getInstance().getAnalsisLevel();
+        analysisLevel = CFGStore.getInstance().getAnalysisLevel();
+        this.visitedMethods = visitedMethods;
     }
     
     public CFGNode getEntryNode() {
@@ -254,11 +258,11 @@ public class ExpressionVisitor extends ASTVisitor {
     @Override
     public boolean visit(ThisExpression node) {
         Name name = node.getQualifier();
-        JAccess jvar;
+        JReference jvar;
         if (name != null) {
-            jvar = new JApparentAccess(node, "$this", name.resolveTypeBinding());
+            jvar = new JVirtualReference(node, "$this", name.resolveTypeBinding());
         } else {
-            jvar = new JApparentAccess(node, "$this", false);
+            jvar = new JVirtualReference(node, "$this", false);
         }
         curNode.addUseVariable(jvar);
         return false;
@@ -314,7 +318,7 @@ public class ExpressionVisitor extends ASTVisitor {
             return false;
         }
         
-        JMethodCall jcall = new JMethodCall(node, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.methodCall);
         setActualNodes(callNode, node, node.arguments());
         
@@ -326,9 +330,19 @@ public class ExpressionVisitor extends ASTVisitor {
             primary.accept(this);
             analysisMode.pop();
             
-            //analysisMode.push(AnalysisMode.DEF);
-            //primary.accept(this);
-            //analysisMode.pop();
+            if (analysisLevel > 0) {
+                JMethod method = JInfoStore.getInstance().getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
+                if (method != null && !visitedMethods.contains(method)) {
+                    for (JReference jvar : curNode.getUseVariables()) {
+                        if ((jvar.isLocalAccess() || jvar.isFieldAccess()) && jvar.getName().equals(primary.toString())) {
+                            visitedMethods.add(method);
+                            if (method.hasSideEffects(visitedMethods)) {
+                                curNode.addDefVariable(jvar);
+                            }
+                        }
+                    }
+                }
+            }
             
             int defVarNumAfter = curNode.getDefVariables().size();
             if (defVarNumAfter - defVarNumBefore == 1) {
@@ -346,7 +360,7 @@ public class ExpressionVisitor extends ASTVisitor {
             return false;
         }
         
-        JMethodCall jcall = new JMethodCall(node, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.methodCall);
         setActualNodes(callNode, node, node.arguments());
         return false;
@@ -360,7 +374,7 @@ public class ExpressionVisitor extends ASTVisitor {
             return false;
         }
         
-        JMethodCall jcall = new JMethodCall(node, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.instanceCreation);
         setActualNodes(callNode, node, node.arguments());
         
@@ -381,7 +395,7 @@ public class ExpressionVisitor extends ASTVisitor {
             return false;
         }
         
-        JMethodCall jcall = new JMethodCall(node, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
         setActualNodes(callNode, node, node.arguments());
         return false;
@@ -395,7 +409,7 @@ public class ExpressionVisitor extends ASTVisitor {
             return false;
         }
         
-        JMethodCall jcall = new JMethodCall(node, binding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, binding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
         setActualNodes(callNode, node, node.arguments());
         return false;
@@ -409,7 +423,7 @@ public class ExpressionVisitor extends ASTVisitor {
             return false;
         }
         
-        JMethodCall jcall = new JMethodCall(node, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
         setActualNodes(callNode, node, node.arguments());
         return false;
@@ -447,7 +461,7 @@ public class ExpressionVisitor extends ASTVisitor {
         
         String type = callNode.getMethodCall().getArgumentType(ordinal);
         boolean primitive = callNode.getMethodCall().getArgumentPrimitiveType(ordinal);
-        JAccess actualIn = new JApparentAccess(node, "$" + String.valueOf(paramNumber), type, primitive);
+        JReference actualIn = new JVirtualReference(node, "$" + String.valueOf(paramNumber), type, primitive);
         actualInNode.addDefVariable(actualIn);
         paramNumber++;
         
@@ -465,7 +479,7 @@ public class ExpressionVisitor extends ASTVisitor {
         for (int ordinal = 0; ordinal < arguments.size(); ordinal++) {
             CFGParameter actualIn = callNode.getActualIn(ordinal);
             if (actualIn.getUseVariables().size() == 1) {
-                JAccess jacc = actualIn.getDefVariable();
+                JReference jacc = actualIn.getDefVariable();
                 if (!jacc.isPrimitiveType()) {
                     createActualOut(callNode, actualIn);
                 }
@@ -494,8 +508,8 @@ public class ExpressionVisitor extends ASTVisitor {
         
         String type = callNode.getReturnType();
         boolean primitive = callNode.isPrimitiveType();
-        JAccess actualIn = new JApparentAccess(callNode.getASTNode(), "$" + String.valueOf(paramNumber), type, primitive);
-        JAccess actualOut = new JApparentAccess(callNode.getASTNode(), "$" + String.valueOf(paramNumber), type, primitive);
+        JReference actualIn = new JVirtualReference(callNode.getASTNode(), "$" + String.valueOf(paramNumber), type, primitive);
+        JReference actualOut = new JVirtualReference(callNode.getASTNode(), "$" + String.valueOf(paramNumber), type, primitive);
         returnNode.addDefVariable(actualIn);
         returnNode.addUseVariable(actualOut);
         paramNumber++;
@@ -511,8 +525,8 @@ public class ExpressionVisitor extends ASTVisitor {
             arguments.get(ordinal).accept(this);
             analysisMode.pop();
             
-            List<JAccess> uses = new ArrayList<JAccess>(curNode.getUseVariables());
-            for (JAccess jvar : uses) {
+            List<JReference> uses = new ArrayList<JReference>(curNode.getUseVariables());
+            for (JReference jvar : uses) {
                 callNode.addUseVariable(jvar);
                 curNode.removeUseVariable(jvar);
             }
@@ -523,7 +537,7 @@ public class ExpressionVisitor extends ASTVisitor {
         String type = callNode.getReturnType();
         boolean primitive = callNode.isPrimitiveType();
         String name = "$" + String.valueOf(paramNumber);
-        JAccess jvar = new JApparentAccess(callNode.getASTNode(), name, type, primitive);
+        JReference jvar = new JVirtualReference(callNode.getASTNode(), name, type, primitive);
         
         callNode.addDefVariable(jvar);
         paramNumber++;
@@ -544,31 +558,18 @@ public class ExpressionVisitor extends ASTVisitor {
     private void registVariable(Name node) {
         IVariableBinding vbinding = getVariableBinding(node);
         if (vbinding != null) {
-            JAccess jvar;
+            JReference jvar;
             if (vbinding.isField()) {
-                jvar = new JFieldAccess(node, vbinding);
+                jvar = new JFieldReference(node, vbinding);
             } else {
-                jvar = new JLocalAccess(node, vbinding);
+                jvar = new JLocalReference(node, vbinding);
             }
             if (analysisMode.peek() == AnalysisMode.DEF) {
                 curNode.addDefVariable(jvar);
             } else {
                 curNode.addUseVariable(jvar);
-                is(node);
             }
         }
-    }
-    
-    private boolean is(Name node) {
-        ASTNode parent = node.getParent();
-        if (parent instanceof MethodInvocation) {
-            MethodInvocation call = (MethodInvocation)parent;
-            Expression exp = call.getExpression();
-            if (exp instanceof Name) {
-                System.out.println("EXP = " + exp.toString());
-            }
-        }
-        return false;
     }
     
     private IVariableBinding getVariableBinding(Name node) {

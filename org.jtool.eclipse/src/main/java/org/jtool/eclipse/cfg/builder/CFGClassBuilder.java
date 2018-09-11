@@ -35,12 +35,14 @@ public class CFGClassBuilder {
         CCFG ccfg = new CCFG();
         
         CFGClassEntry entry;
+        String name = jclass.getName();
+        String fqn = jclass.getQualifiedName();
         if (jclass.isEnum()) {
-            entry = new CFGClassEntry(jclass.getASTNode(), CFGNode.Kind.enumEntry, jclass.getName(), jclass.getQualifiedName());
+            entry = new CFGClassEntry(jclass.getASTNode(), CFGNode.Kind.enumEntry, name, fqn);
         } else if (jclass.isInterface()) {
-            entry = new CFGClassEntry(jclass.getASTNode(), CFGNode.Kind.interfaceEntry, jclass.getName(), jclass.getQualifiedName());
+            entry = new CFGClassEntry(jclass.getASTNode(), CFGNode.Kind.interfaceEntry, name, fqn);
         } else {
-            entry = new CFGClassEntry(jclass.getASTNode(), CFGNode.Kind.classEntry, jclass.getName(), jclass.getQualifiedName());
+            entry = new CFGClassEntry(jclass.getASTNode(), CFGNode.Kind.classEntry, name, fqn);
         }
         ccfg.setStartNode(entry);
         ccfg.add(entry);
@@ -54,12 +56,6 @@ public class CFGClassBuilder {
             CFG cfg = CFGFieldBuilder.build(jf);
             entry.addField(cfg);
         }
-        /*
-        for (JavaClass jc : jclass.getInnerClasses()) {
-            CFG cfg = CFGClassBuilder.build(jc);
-            entry.addType(cfg);
-        }
-        */
         return ccfg;
     }
     
@@ -79,12 +75,14 @@ public class CFGClassBuilder {
         CCFG ccfg = new CCFG();
         
         CFGClassEntry entry;
+        String name = tbinding.getName();
+        String fqn = tbinding.getQualifiedName();
         if (tbinding.isEnum()) {
-            entry = new CFGClassEntry(node, CFGNode.Kind.enumEntry, tbinding.getName(), tbinding.getQualifiedName());
+            entry = new CFGClassEntry(node, CFGNode.Kind.enumEntry, name, fqn);
         } else if (tbinding.isInterface()) {
-            entry = new CFGClassEntry(node, CFGNode.Kind.interfaceEntry, tbinding.getName(), tbinding.getQualifiedName());
+            entry = new CFGClassEntry(node, CFGNode.Kind.interfaceEntry, name, fqn);
         } else {
-            entry = new CFGClassEntry(node, CFGNode.Kind.classEntry, tbinding.getName(), tbinding.getQualifiedName());
+            entry = new CFGClassEntry(node, CFGNode.Kind.classEntry, name, fqn);
         }
         ccfg.setStartNode(entry);
         ccfg.add(entry);
