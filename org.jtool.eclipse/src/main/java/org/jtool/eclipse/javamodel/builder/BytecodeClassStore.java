@@ -280,7 +280,7 @@ public class BytecodeClassStore {
         
         void setDescendants(BytecodeClassInfo classInfo) {
             for (BytecodeClassInfo child : classInfo.getChildren()) {
-                ancestors.add(child.getCtClass());
+                descendants.add(child.getCtClass());
                 setDescendants(child);
             }
         }
