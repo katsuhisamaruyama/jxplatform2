@@ -614,19 +614,27 @@ public class JavaMethod extends JavaElement {
     }
     
     private void findOverriddenMethods() {
-        overriddenMethods = new HashSet<JavaMethod>();
-        overridingMethods = new HashSet<JavaMethod>();
         for (JavaClass jc : declaringClass.getAncestors()) {
             for (JavaMethod jm : jc.getMethods()) {
                 if (hasSameSigantureAndModifier(jm)) {
-                    overriddenMethods.add(jm);
+                    addOverriddenMethod(jm);
                     jm.addOverridingMethod(this);
                 }
             }
         }
     }
     
+    void addOverriddenMethod(JavaMethod jm) {
+        if (overriddenMethods == null) {
+            overriddenMethods = new HashSet<JavaMethod>();
+        }
+        overriddenMethods.add(jm);
+    }
+    
     void addOverridingMethod(JavaMethod jm) {
+        if (overridingMethods == null) {
+            overridingMethods = new HashSet<JavaMethod>();
+        }
         overridingMethods.add(jm);
     }
     

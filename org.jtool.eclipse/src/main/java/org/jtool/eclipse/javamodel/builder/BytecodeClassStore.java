@@ -7,6 +7,7 @@
 package org.jtool.eclipse.javamodel.builder;
 
 import org.jtool.eclipse.javamodel.JavaProject;
+import org.jtool.eclipse.javamodel.JavaClass;
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.Modifier;
@@ -71,7 +72,7 @@ public class BytecodeClassStore {
         if (classInfo != null) {
             return classInfo.getAncestors();
         } else {
-            return null;
+            return new HashSet<CtClass>();
         }
     }
     
@@ -80,7 +81,16 @@ public class BytecodeClassStore {
         if (classInfo != null) {
             return classInfo.getDescendants();
         } else {
-            return null;
+            return new HashSet<CtClass>();
+        }
+    }
+    
+    public Set<JavaClass> getJavaDescendants(String fqn) {
+        BytecodeClassInfo classInfo = classStore.get(fqn);
+        if (classInfo != null) {
+            return classInfo.getJavaDescendants();
+        } else {
+            return new HashSet<JavaClass>();
         }
     }
     
@@ -218,16 +228,41 @@ public class BytecodeClassStore {
             classInfo.setAncestors(classInfo);
             classInfo.setDescendants(classInfo);
         }
+        
+        collectJavaDescendants();
+    }
+    
+    private void collectJavaDescendants() {
+        for (JavaClass jc : jproject.getClasses()) {
+            for (JavaClass ancestor : jc.getAllSuperClasses()) {
+                if (!ancestor.isInProject()) {
+                    BytecodeClassInfo classInfo = classStore.get(ancestor.getQualifiedName());
+                    if (classInfo != null) {
+                        classInfo.addJavaDescendant(jc);
+                    }
+                }
+            }
+            for (JavaClass ancestor : jc.getAllSuperInterfaces()) {
+                if (!ancestor.isInProject()) {
+                    BytecodeClassInfo classInfo = classStore.get(ancestor.getQualifiedName());
+                    if (classInfo != null) {
+                        classInfo.addJavaDescendant(jc);
+                    }
+                }
+            }
+        }
     }
     
     private class BytecodeClassInfo {
         
         private CtClass ctClass;
         private Set<BytecodeClassInfo> parents = new HashSet<BytecodeClassInfo>();
-        private Set<BytecodeClassInfo> childrens = new HashSet<BytecodeClassInfo>();
+        private Set<BytecodeClassInfo> children = new HashSet<BytecodeClassInfo>();
         
         private Set<CtClass> ancestors = new HashSet<CtClass>();
         private Set<CtClass> descendants = new HashSet<CtClass>();
+        
+        private Set<JavaClass> jdescendants = new HashSet<JavaClass>();
         
         BytecodeClassInfo(CtClass ctClass) {
             this.ctClass = ctClass;
@@ -256,11 +291,11 @@ public class BytecodeClassStore {
         }
         
         Set<BytecodeClassInfo> getChildren() {
-            return childrens;
+            return children;
         }
         
         void addChild(BytecodeClassInfo child) {
-            childrens.add(child);
+            children.add(child);
         }
         
         Set<CtClass> getAncestors() {
@@ -283,6 +318,15 @@ public class BytecodeClassStore {
                 descendants.add(child.getCtClass());
                 setDescendants(child);
             }
+        }
+        
+        
+        void addJavaDescendant(JavaClass jdescendant) {
+            jdescendants.add(jdescendant);
+        }
+        
+        Set<JavaClass> getJavaDescendants() {
+            return jdescendants;
         }
     }
 }

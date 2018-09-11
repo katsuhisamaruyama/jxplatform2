@@ -36,7 +36,7 @@ public class JavaModelBuilderTest {
         builder.unbuild();
     }
     
-    
+    @Test
     public void testTetris() {
         String target = TEST_PROECT_DIR + "Tetris/";
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
