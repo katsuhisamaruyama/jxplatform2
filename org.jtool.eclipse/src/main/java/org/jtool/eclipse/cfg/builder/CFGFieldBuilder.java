@@ -19,15 +19,17 @@ import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
+
 import java.util.Set;
 import java.util.HashSet;
 
 /**
  * Builds a CFG that corresponds to a field.
+ * All methods of this class are not intended to be directly called by clients.
  * 
  * @author Katsuhisa Maruyama
  */
@@ -45,23 +47,18 @@ public class CFGFieldBuilder {
     }
     
     public static CFG build(VariableDeclaration node) {
-        IVariableBinding vbinding = node.resolveBinding().getVariableDeclaration();
-        String name = vbinding.getName();
-        String className = vbinding.getDeclaringClass().getTypeDeclaration().getQualifiedName();
-        String fqn = className + QualifiedNameSeparator + name;
-        return build(node, vbinding, name, fqn, className, new HashSet<JMethod>());
+        return CFGFieldBuilder.build(node, node.resolveBinding().getVariableDeclaration());
     }
     
     public static CFG build(VariableDeclarationFragment node) {
-        IVariableBinding vbinding = node.resolveBinding().getVariableDeclaration();
-        String name = vbinding.getName();
-        String className = vbinding.getDeclaringClass().getTypeDeclaration().getQualifiedName();
-        String fqn = className + QualifiedNameSeparator + name;
-        return build(node, vbinding, name, fqn, className, new HashSet<JMethod>());
+        return CFGFieldBuilder.build(node, node.resolveBinding().getVariableDeclaration());
     }
     
     public static CFG build(EnumConstantDeclaration node) {
-        IVariableBinding vbinding = node.resolveVariable().getVariableDeclaration();
+        return CFGFieldBuilder.build(node, node.resolveVariable().getVariableDeclaration());
+    }
+    
+    private static CFG build(ASTNode node, IVariableBinding vbinding) {
         String name = vbinding.getName();
         String className = vbinding.getDeclaringClass().getTypeDeclaration().getQualifiedName();
         String fqn = className + QualifiedNameSeparator + name;

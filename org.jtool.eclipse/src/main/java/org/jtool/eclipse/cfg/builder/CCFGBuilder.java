@@ -15,20 +15,21 @@ import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import java.util.List;
 
 /**
- * Builds a CFG that corresponds to a field.
+ * Builds a CCFG that corresponds to a class.
+ * All methods of this class are not intended to be directly called by clients.
  * 
  * @author Katsuhisa Maruyama
  */
-public class CFGClassBuilder {
+public class CCFGBuilder {
     
     public static CCFG build(JavaClass jclass) {
         CCFG ccfg = new CCFG();
@@ -55,19 +56,23 @@ public class CFGClassBuilder {
             CFG cfg = CFGFieldBuilder.build(jf);
             entry.addField(cfg);
         }
+        for (JavaClass jc : jclass.getInnerClasses()) {
+            CFG cfg = build(jc);
+            entry.addType(cfg);
+        }
         return ccfg;
     }
     
     public static CCFG build(TypeDeclaration node) {
-        return build(node, node.resolveBinding().getTypeDeclaration(), node.getMethods(), node.getFields(), node.getTypes());
+        return CCFGBuilder.build(node, node.resolveBinding().getTypeDeclaration(), node.getMethods(), node.getFields(), node.getTypes());
     }
     
     public static CCFG build(AnonymousClassDeclaration node) {
-        return build(node, node.resolveBinding().getTypeDeclaration(), null, null, null);
+        return CCFGBuilder.build(node, node.resolveBinding().getTypeDeclaration(), null, null, null);
     }
     
     public static CCFG build(EnumDeclaration node) {
-        return build(node, node.resolveBinding().getTypeDeclaration(), null, null, null);
+        return CCFGBuilder.build(node, node.resolveBinding().getTypeDeclaration(), null, null, null);
     }
     
     private static CCFG build(ASTNode node, ITypeBinding tbinding, MethodDeclaration[] methods, FieldDeclaration[] fields, TypeDeclaration[] types) {
@@ -106,7 +111,7 @@ public class CFGClassBuilder {
         
         if (types != null) {
             for (TypeDeclaration typeDecl : types) {
-                CFG cfg = CFGClassBuilder.build(typeDecl);
+                CFG cfg = build(typeDecl);
                 entry.addType(cfg);
             }
         }

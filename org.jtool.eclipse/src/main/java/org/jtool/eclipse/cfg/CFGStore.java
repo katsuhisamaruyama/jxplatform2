@@ -7,7 +7,16 @@
 package org.jtool.eclipse.cfg;
 
 import org.jtool.eclipse.cfg.builder.JInfoStore;
-import org.jtool.eclipse.cfg.builder.CFGClassBuilder;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
+import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
+import org.eclipse.jdt.core.dom.Initializer;
+import org.eclipse.jdt.core.dom.LambdaExpression;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.jtool.eclipse.cfg.builder.CCFGBuilder;
 import org.jtool.eclipse.cfg.builder.CFGFieldBuilder;
 import org.jtool.eclipse.cfg.builder.CFGMethodBuilder;
 import org.jtool.eclipse.javamodel.JavaProject;
@@ -88,11 +97,11 @@ public class CFGStore {
         return cfgStore.size();
     }
     
-    public CCFG getCFG(JavaClass jclass) {
+    public CCFG getCCFG(JavaClass jclass) {
         CFG ccfg = getCFG(jclass.getQualifiedName());
         if (ccfg == null || !(ccfg instanceof CCFG)) {
             if (visible) {
-                System.out.print(" - " + jclass.getQualifiedName() + " - CFG");
+                System.out.print(" - " + jclass.getQualifiedName() + " - CCFG");
             }
             ccfg = build(jclass);
         }
@@ -100,13 +109,15 @@ public class CFGStore {
     }
     
     private CCFG build(JavaClass jclass) {
-        CCFG ccfg = CFGClassBuilder.build(jclass);
+        CCFG ccfg = CCFGBuilder.build(jclass);
         CFGStore.getInstance().addCFG(ccfg);
         
         for (CFG cfg : ccfg.getStartNode().getMethods()) {
+            ccfg.add(cfg);
             addCFG(cfg);
         }
         for (CFG cfg : ccfg.getStartNode().getFields()) {
+            ccfg.add(cfg);
             addCFG(cfg);
         }
         return ccfg;
@@ -152,10 +163,46 @@ public class CFGStore {
         System.out.println();
         System.out.println("** Building CFGs of " + size + " classes ");
         for (JavaClass jclass : jclasses) {
-            CFGStore.getInstance().getCFG(jclass);
+            CFGStore.getInstance().getCCFG(jclass);
             System.out.println(" (" + count + "/" + size + ")");
             count++;
         }
+    }
+    
+    public CCFG build(TypeDeclaration node) {
+        return CCFGBuilder.build(node);
+    }
+    
+    public CCFG build(AnonymousClassDeclaration node) {
+        return CCFGBuilder.build(node);
+    }
+    
+    public CCFG build(EnumDeclaration node) {
+        return CCFGBuilder.build(node);
+    }
+    
+    public CFG build(MethodDeclaration node) {
+        return CFGMethodBuilder.build(node);
+    }
+    
+    public CFG build(Initializer node) {
+        return CFGMethodBuilder.build(node);
+    }
+    
+    public CFG build(LambdaExpression node) {
+        return CFGMethodBuilder.build(node);
+    }
+    
+    public CFG build(VariableDeclaration node) {
+        return CFGFieldBuilder.build(node);
+    }
+    
+    public CFG build(VariableDeclarationFragment node) {
+        return CFGFieldBuilder.build(node);
+    }
+    
+    public CFG build(EnumConstantDeclaration node) {
+        return CFGFieldBuilder.build(node);
     }
     
     public void setVisible(boolean visible) {
