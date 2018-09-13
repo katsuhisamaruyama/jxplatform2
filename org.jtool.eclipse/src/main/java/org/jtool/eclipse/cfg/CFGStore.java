@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * An object representing a virtual project.
+ * An object stores CFGs.
  * 
  * @author Katsuhisa Maruyama
  */

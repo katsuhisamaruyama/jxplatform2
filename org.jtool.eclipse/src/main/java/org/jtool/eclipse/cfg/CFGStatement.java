@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * A statement node of a CFG.
+ * A statement node of a CFG, which stores defined and used variables.
  * 
  * @author Katsuhisa Maruyama
  */

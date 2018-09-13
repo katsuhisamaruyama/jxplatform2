@@ -479,8 +479,8 @@ public class ExpressionVisitor extends ASTVisitor {
         for (int ordinal = 0; ordinal < arguments.size(); ordinal++) {
             CFGParameter actualIn = callNode.getActualIn(ordinal);
             if (actualIn.getUseVariables().size() == 1) {
-                JReference jacc = actualIn.getDefVariable();
-                if (!jacc.isPrimitiveType()) {
+                JReference jvar = actualIn.getDefVariable();
+                if (!jvar.isPrimitiveType()) {
                     createActualOut(callNode, actualIn);
                 }
             }
