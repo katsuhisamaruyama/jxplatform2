@@ -38,13 +38,6 @@ public class CCFG extends CFG {
     public void add(CFG cfg) {
         if (!cfgs.values().contains(cfg)) {
             cfgs.put(cfg.getQualifiedName(), cfg);
-            
-            for (CFGNode node : cfg.getNodes()) {
-                add(node);
-            }
-            for (ControlFlow edge : cfg.getEdges()) {
-                add(edge);
-            }
         }
     }
     
