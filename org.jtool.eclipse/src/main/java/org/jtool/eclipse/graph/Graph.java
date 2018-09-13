@@ -74,11 +74,6 @@ public class Graph<N extends GraphNode, E extends GraphEdge> {
     }
     
     @Override
-    public int hashCode() {
-        return getNodes().size() + getEdges().size();
-    }
-    
-    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("----- Graph (from here) -----\n");

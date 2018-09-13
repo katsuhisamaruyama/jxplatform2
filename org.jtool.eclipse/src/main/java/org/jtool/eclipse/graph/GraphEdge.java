@@ -56,11 +56,18 @@ public abstract class GraphEdge extends GraphElement {
         return dst;
     }
     
-    public boolean equals(GraphElement obj) {
-        if (obj == null || !(obj instanceof GraphEdge)) {
+    @Override
+    public boolean equals(GraphElement elem) {
+        if (elem instanceof GraphEdge) {
+            return equals((GraphEdge)elem);
+        }
+        return false;
+    }
+    
+    public boolean equals(GraphEdge edge) {
+        if (edge == null) {
             return false;
         }
-        GraphEdge edge = (GraphEdge)obj;
         return this == edge || (src.equals(edge.src) && dst.equals(edge.dst));
     }
     

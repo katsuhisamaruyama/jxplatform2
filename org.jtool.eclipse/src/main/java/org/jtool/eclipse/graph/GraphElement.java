@@ -18,6 +18,14 @@ public abstract class GraphElement {
     protected GraphElement() {
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof GraphElement) {
+            return equals((GraphElement)obj);
+        }
+        return false;
+    }
+    
     public abstract boolean equals(GraphElement elem);
     
     public static <E extends GraphElement> boolean equals(Set<E> s1, Set<E> s2) {

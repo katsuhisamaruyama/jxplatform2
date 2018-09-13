@@ -116,11 +116,17 @@ public abstract class GraphNode extends GraphElement {
     }
     
     @Override
-    public boolean equals(GraphElement obj) {
-        if (obj == null || !(obj instanceof GraphNode)) {
+    public boolean equals(GraphElement elem) {
+        if (elem instanceof GraphNode) {
+            return equals((GraphNode)elem);
+        }
+        return false;
+    }
+    
+    public boolean equals(GraphNode node) {
+        if (node == null) {
             return false;
         }
-        GraphNode node = (GraphNode)obj;
         return this == node || id == node.id;
     }
     
