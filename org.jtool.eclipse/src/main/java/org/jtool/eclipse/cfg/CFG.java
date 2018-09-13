@@ -235,7 +235,7 @@ public class CFG extends Graph<CFGNode, ControlFlow> {
     public Set<CFGNode> reachableNodes(CFGNode from, final CFGNode to, boolean loopbackOk) {
         Set<CFGNode> ftrack = forwardReachableNodes(from, to, loopbackOk);
         Set<CFGNode> btrack = backwardReachableNodes(to, from, loopbackOk);
-        Set<CFGNode> track = new HashSet<CFGNode>(GraphElement.intersection(ftrack, btrack));
+        Set<CFGNode> track = GraphElement.intersection(ftrack, btrack);
         return track;
     }
     
@@ -252,6 +252,19 @@ public class CFG extends Graph<CFGNode, ControlFlow> {
             }
         }
         return postDominator;
+    }
+    
+    public Set<CFGNode> constrainedReachableNodes(CFGNode from, CFGNode to) {
+        Set<CFGNode> btrackf = backwardReachableNodes(to, from, true);
+        Set<CFGNode> ftrackf = forwardReachableNodes(from, getEndNode(), true);
+        Set<CFGNode> fCRP = GraphElement.intersection(btrackf, ftrackf);
+        
+        
+        Set<CFGNode> ftrackb = forwardReachableNodes(from, to, true);
+        Set<CFGNode> btrackb = backwardReachableNodes(to, getStartNode(), true);
+        Set<CFGNode> bCRP = GraphElement.intersection(ftrackb, btrackb);
+        Set<CFGNode> CRP = GraphElement.union(fCRP, bCRP);
+        return CRP;
     }
     
     private void walkForward(CFGNode node, StopConditionOnReachablePath condition, boolean loopbackOk, Set<CFGNode> track) {
