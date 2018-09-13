@@ -9,9 +9,9 @@ package org.jtool.eclipse.slice;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGStore;
-import org.jtool.eclipse.cfg.JAccess;
+import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.pdg.DD;
-import org.jtool.eclipse.pdg.DependenceEdge;
+import org.jtool.eclipse.pdg.Dependence;
 import org.jtool.eclipse.pdg.PDG;
 import org.jtool.eclipse.pdg.PDGNode;
 import org.jtool.eclipse.pdg.PDGStatement;
@@ -23,34 +23,35 @@ import java.util.ArrayList;
 
 /**
  * An object storing information about a program slice.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class Slice extends PDG {
     
     private PDG pdg;
     private PDGStatement criterionNode;
-    private List<JAccess> criterionVariables;
+    private List<JReference> criterionVariables;
     
-    public Slice(PDG pdg, PDGStatement node, JAccess jv) {
+    public Slice(PDG pdg, PDGStatement node, JReference jv) {
         this.pdg = pdg;
         criterionNode = node;
-        criterionVariables = new ArrayList<JAccess>();
+        criterionVariables = new ArrayList<JReference>();
         criterionVariables.add(jv);
         
         extract(node, jv);
     }
     
-    public Slice(PDG pdg, PDGStatement node, List<JAccess> jvs) {
+    public Slice(PDG pdg, PDGStatement node, List<JReference> jvs) {
         this.pdg = pdg;
         criterionNode = node;
         criterionVariables = jvs;
         
-        for (JAccess jv : jvs) {
+        for (JReference jv : jvs) {
             extract(node, jv);
         }
     }
     
-    private void extract(PDGStatement node, JAccess jv) {
+    private void extract(PDGStatement node, JReference jv) {
         if (jv.isFieldAccess()) {
             traverseOnCFG(node, jv);
         } else {
@@ -70,14 +71,14 @@ public class Slice extends PDG {
         return criterionNode;
     }
     
-    public List<JAccess> getCriterionVariables() {
+    public List<JReference> getCriterionVariables() {
         return criterionVariables;
     }
     
-    private void traverseOnCFG(PDGStatement node, JAccess jv) {
+    private void traverseOnCFG(PDGStatement node, JReference jv) {
         String fqn = jv.getEnclosingMethodName();
         CFG cfg = CFGStore.getInstance().getCFG(fqn);
-        Set<CFGNode> cfgNodes = cfg.getBackwardReachableNodes(node.getCFGNode(), cfg.getStartNode());
+        Set<CFGNode> cfgNodes = cfg.backwardReachableNodes(node.getCFGNode(), cfg.getStartNode(), true);
         
         for (CFGNode cfgNode : cfgNodes) {
             PDGNode pdgNode = cfgNode.getPDGNode();
@@ -90,7 +91,7 @@ public class Slice extends PDG {
         }
     }
     
-    private void traverseOnPDG(PDGStatement node, JAccess jv) {
+    private void traverseOnPDG(PDGStatement node, JReference jv) {
         if (node.definesVariable(jv)) {
             traverseBackward(node);
         } else if (node.usesVariable(jv)) {
@@ -101,7 +102,7 @@ public class Slice extends PDG {
         }
     }
     
-    private Set<PDGStatement> findDefNode(PDGStatement anchor, JAccess jvar) {
+    private Set<PDGStatement> findDefNode(PDGStatement anchor, JReference jvar) {
         Set<PDGStatement> defs = new HashSet<PDGStatement>();
         
         for (DD edge : anchor.getIncomingDDEdges()) {
@@ -115,7 +116,7 @@ public class Slice extends PDG {
     
     private void traverseBackward(PDGStatement anchor) {
         add(anchor);
-        for (DependenceEdge edge : anchor.getIncomingDependeceEdges()) {
+        for (Dependence edge : anchor.getIncomingDependeceEdges()) {
             add(edge);
             PDGStatement node = (PDGStatement)edge.getSrcNode();
             if (!getNodes().contains(node)) {
@@ -136,9 +137,9 @@ public class Slice extends PDG {
         return buf.toString();
     }
     
-    private String getVariableNames(List<JAccess> jvs) {
+    private String getVariableNames(List<JReference> jvs) {
         StringBuilder buf = new StringBuilder();
-        for (JAccess jv : jvs) {
+        for (JReference jv : jvs) {
             buf.append(" " + jv.getName());
         }
         return buf.toString();
