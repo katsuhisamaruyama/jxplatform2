@@ -13,9 +13,10 @@ import org.jtool.eclipse.graph.Graph;
 
 /**
  * An object storing information about a program dependence graph (PDG).
+ * 
  * @author Katsuhisa Maruyama
  */
-public class PDG extends Graph<PDGNode, DependenceEdge> {
+public class PDG extends Graph<PDGNode, Dependence> {
     
     protected PDGEntry entry;
     
@@ -49,7 +50,7 @@ public class PDG extends Graph<PDGNode, DependenceEdge> {
         for (PDGNode node : pdg.getNodes()) {
             add(node);
         }
-        for (DependenceEdge edge : pdg.getEdges()) {
+        for (Dependence edge : pdg.getEdges()) {
             add(edge);
         }
     }
@@ -60,7 +61,7 @@ public class PDG extends Graph<PDGNode, DependenceEdge> {
     }
     
     @Override
-    public void add(DependenceEdge edge) {
+    public void add(Dependence edge) {
         super.add(edge);
     }
     
@@ -98,7 +99,7 @@ public class PDG extends Graph<PDGNode, DependenceEdge> {
     protected String getEdgeInfo() {
         StringBuffer buf = new StringBuffer();
         int index = 1;
-        for (DependenceEdge edge : DependenceEdge.sortDependenceEdge(getEdges())) {
+        for (Dependence edge : Dependence.sortDependenceEdges(getEdges())) {
             buf.append(String.valueOf(index));
             buf.append(": ");
             buf.append(edge.toString());
@@ -132,7 +133,7 @@ public class PDG extends Graph<PDGNode, DependenceEdge> {
     
     protected String getCDEdgeInfo() {
         StringBuffer buf = new StringBuffer();
-        for (DependenceEdge edge : DependenceEdge.sortDependenceEdge(getEdges())) {
+        for (Dependence edge : Dependence.sortDependenceEdges(getEdges())) {
             if (edge.isCD()) {
                 buf.append(edge.toString());
                 buf.append("\n");
@@ -143,7 +144,7 @@ public class PDG extends Graph<PDGNode, DependenceEdge> {
     
     protected String getDDEdgeInfo() {
         StringBuffer buf = new StringBuffer();
-        for (DependenceEdge edge : DependenceEdge.sortDependenceEdge(getEdges())) {
+        for (Dependence edge : Dependence.sortDependenceEdges(getEdges())) {
             if (edge.isDD()) {
                 buf.append(edge.toString());
                 buf.append("\n");

@@ -6,16 +6,17 @@
 
 package org.jtool.eclipse.pdg;
 
-import org.jtool.eclipse.cfg.JAccess;
+import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.graph.GraphElement;
 
 /**
- * An edge of a PDG, which represents data dependence between PDG nodes.
+ * An edge that represents data dependence between PDG nodes.
+ * 
  * @author Katsuhisa Maruyama
  */
-public class DD extends DependenceEdge {
+public class DD extends Dependence {
     
-    protected JAccess jvar;
+    protected JReference jvar;
     private PDGNode loopCarriedNode = null;
     
     protected DD() {
@@ -26,16 +27,16 @@ public class DD extends DependenceEdge {
         super(src, dst);
     }
     
-    public DD(PDGNode src, PDGNode dst, JAccess jvar) {
+    public DD(PDGNode src, PDGNode dst, JReference jvar) {
         super(src, dst);
         this.jvar = jvar;
     }
     
-    public void setVariable(JAccess jvar) {
+    public void setVariable(JReference jvar) {
         this.jvar = jvar;
     }
     
-    public JAccess getVariable() {
+    public JReference getVariable() {
         return jvar;
     }
     

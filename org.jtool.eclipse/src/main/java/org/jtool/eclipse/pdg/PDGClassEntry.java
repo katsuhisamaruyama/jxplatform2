@@ -9,7 +9,8 @@ package org.jtool.eclipse.pdg;
 import org.jtool.eclipse.cfg.CFGEntry;
 
 /**
- * The entry node of PDGs for a class or an interface.
+ * The entry node of a PDG for a class or an interface.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class PDGClassEntry extends PDGEntry {

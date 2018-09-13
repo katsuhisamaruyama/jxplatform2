@@ -6,10 +6,11 @@
 
 package org.jtool.eclipse.pdg;
 
-import org.jtool.eclipse.cfg.JAccess;
+import org.jtool.eclipse.cfg.JReference;
 
 /**
- * Constructs dependences related to parameters in a class dependence graph (ClDG).
+ * An edge that represents a caller and its parameters in PDGs.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class ParameterEdge extends DD {
@@ -22,13 +23,13 @@ public class ParameterEdge extends DD {
         super(src, dst);
     }
     
-    public ParameterEdge(PDGNode src, PDGNode dst, JAccess jvar) {
+    public ParameterEdge(PDGNode src, PDGNode dst, JReference jvar) {
         super(src, dst);
         this.jvar = jvar;
     }
     
     @Override
-    public JAccess getVariable() {
+    public JReference getVariable() {
         return jvar;
     }
     

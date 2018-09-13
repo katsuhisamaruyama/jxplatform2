@@ -11,6 +11,7 @@ import java.util.HashSet;
 
 /**
  * An object storing information about a class dependence graph (ClDG).
+ * 
  * @author Katsuhisa Maruyama
  */
 public class ClDG extends PDG {
@@ -48,12 +49,12 @@ public class ClDG extends PDG {
             for (PDGNode node : pdg.getNodes()) {
                 add(node);
             }
-            for (DependenceEdge edge : pdg.getEdges()) {
+            for (Dependence edge : pdg.getEdges()) {
                 add(edge);
             }
             
             ClassMemberEdge edge = new ClassMemberEdge(entry, pdg.getEntryNode());
-            edge.setKind(DependenceEdge.Kind.classMember);
+            edge.setKind(Dependence.Kind.classMember);
             add(edge);
         }
     }

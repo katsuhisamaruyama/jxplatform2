@@ -7,11 +7,12 @@
 package org.jtool.eclipse.pdg;
 
 import org.jtool.eclipse.cfg.CFGStatement;
-import org.jtool.eclipse.cfg.JAccess;
+import org.jtool.eclipse.cfg.JReference;
 import java.util.List;
 
 /**
- * A statement node of a PDG.
+ * A statement node of a PDG, which stores defined and used variables.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class PDGStatement extends PDGNode {
@@ -28,19 +29,19 @@ public class PDGStatement extends PDGNode {
         return (CFGStatement)getCFGNode();
     }
     
-    public List<JAccess> getDefVariables() {
+    public List<JReference> getDefVariables() {
         return getCFGStatement().getDefVariables();
     }
     
-    public List<JAccess> getUseVariables() {
+    public List<JReference> getUseVariables() {
         return getCFGStatement().getUseVariables();
     }
     
-    public boolean definesVariable(JAccess jvar) {
+    public boolean definesVariable(JReference jvar) {
         return getCFGStatement().getDefVariables().contains(jvar);
     }
     
-    public boolean usesVariable(JAccess jvar) {
+    public boolean usesVariable(JReference jvar) {
         return getCFGStatement().getUseVariables().contains(jvar);
     }
     

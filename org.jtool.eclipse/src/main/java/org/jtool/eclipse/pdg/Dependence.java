@@ -15,10 +15,11 @@ import java.util.Collections;
 import java.util.Comparator;
 
 /**
- * An edge of a PDG, which represents dependence between PDG nodes.
+ * An edge of PDGs, ClDGs, and SDGs.
+ * 
  * @author Katsuhisa Maruyama
  */
-public class DependenceEdge extends GraphEdge {
+public class Dependence extends GraphEdge {
     
     protected Kind kind;
     
@@ -26,7 +27,7 @@ public class DependenceEdge extends GraphEdge {
         controlDependence,               // Control dependence in general
         trueControlDependence,           // Control dependence with respect to a true-branch flow
         falseControlDependence,          // Control dependence with respect to a false-branch flow
-        fallControlDependence,           // Control dependence with respect to a fall-through flow
+        fallThroughControlDependence,    // Control dependence with respect to a fall-through flow
         
         dataDependence,                  // Data dependence in general
         loopIndependentDefUseDependence, // Data dependence with respect to a loop-independent variable
@@ -39,13 +40,14 @@ public class DependenceEdge extends GraphEdge {
         summary,                         // Data dependence between actual-in and actual-out nodes
         
         classMember,                     // Connection between a class and its members
+        call,                            // Connection between a caller and its callee
     }
     
-    protected DependenceEdge() {
+    protected Dependence() {
         super();
     }
     
-    protected DependenceEdge(PDGNode src, PDGNode dst) {
+    protected Dependence(PDGNode src, PDGNode dst) {
         super(src, dst);
     }
     
@@ -56,7 +58,7 @@ public class DependenceEdge extends GraphEdge {
     public boolean isCD() {
         return kind == Kind.trueControlDependence ||
                kind == Kind.falseControlDependence ||
-               kind == Kind.fallControlDependence;
+               kind == Kind.fallThroughControlDependence;
     }
     
     public boolean isDD() {
@@ -82,10 +84,10 @@ public class DependenceEdge extends GraphEdge {
     
     @Override
     public boolean equals(GraphElement elem) {
-        if (elem == null || !(elem instanceof DependenceEdge)) {
+        if (elem == null || !(elem instanceof Dependence)) {
             return false;
         }
-        DependenceEdge edge = (DependenceEdge)elem;
+        Dependence edge = (Dependence)elem;
         return this == edge || (src.equals(edge.src) && dst.equals(dst) && kind == edge.kind);
     }
     
@@ -95,8 +97,8 @@ public class DependenceEdge extends GraphEdge {
     }
     
     @Override
-    public DependenceEdge clone() {
-        DependenceEdge cloneEdge = new DependenceEdge(getSrcNode(), getDstNode());
+    public Dependence clone() {
+        Dependence cloneEdge = new Dependence(getSrcNode(), getDstNode());
         super.setClone(cloneEdge);
         setClone(cloneEdge);
         return cloneEdge;
@@ -115,11 +117,11 @@ public class DependenceEdge extends GraphEdge {
         return buf.toString();
     }
     
-    public static List<DependenceEdge> sortDependenceEdge(Collection<? extends DependenceEdge> co) {
-        List<DependenceEdge> edges = new ArrayList<DependenceEdge>(co);
-        Collections.sort(edges, new Comparator<DependenceEdge>() {
+    public static List<Dependence> sortDependenceEdges(Collection<? extends Dependence> co) {
+        List<Dependence> edges = new ArrayList<Dependence>(co);
+        Collections.sort(edges, new Comparator<Dependence>() {
             
-            public int compare(DependenceEdge edge1, DependenceEdge edge2) {
+            public int compare(Dependence edge1, Dependence edge2) {
                 if (edge2.src.getId() == edge1.src.getId()) {
                     if (edge2.dst.getId() == edge1.dst.getId()) {
                         return edge2.kind.toString().compareTo(edge1.kind.toString());

@@ -7,10 +7,11 @@
 package org.jtool.eclipse.pdg;
 
 /**
- * Constructs a class member edge in a class dependence graph (ClDG).
+ * An edge that represents a class and its members in ClDGs.
+ * 
  * @author Katsuhisa Maruyama
  */
-public class ClassMemberEdge extends DependenceEdge {
+public class ClassMemberEdge extends Dependence {
     
     protected ClassMemberEdge() {
         super();

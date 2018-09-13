@@ -7,10 +7,11 @@
 package org.jtool.eclipse.pdg;
 
 /**
- * Constructs a call edge in a class dependence graph (ClDG).
+ * An edge that represents a relationship between caller and callee in ClDGs and SDGs.
+ * 
  * @author Katsuhisa Maruyama
  */
-public class CallEdge extends DependenceEdge {
+public class CallEdge extends Dependence {
     
     protected CallEdge() {
         super();

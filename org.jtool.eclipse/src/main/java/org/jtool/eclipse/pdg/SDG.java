@@ -12,9 +12,10 @@ import java.util.HashSet;
 
 /**
  * An object storing information about a system dependence graph (SDG).
+ * 
  * @author Katsuhisa Maruyama
  */
-public class SDG extends Graph<PDGNode, DependenceEdge> {
+public class SDG extends Graph<PDGNode, Dependence> {
     
     private Set<PDGEntry> entries = new HashSet<PDGEntry>();
     
@@ -39,7 +40,7 @@ public class SDG extends Graph<PDGNode, DependenceEdge> {
             for (PDGNode node : pdg.getNodes()) {
                 add(node);
             }
-            for (DependenceEdge edge : pdg.getEdges()) {
+            for (Dependence edge : pdg.getEdges()) {
                 add(edge);
             }
         }

@@ -7,10 +7,11 @@
 package org.jtool.eclipse.pdg;
 
 /**
- * An edge of a PDG, which represents control dependence between PDG nodes.
+ * An edge represents control dependence between PDG nodes.
+ * 
  * @author Katsuhisa Maruyama
  */
-public class CD extends DependenceEdge {
+public class CD extends Dependence {
     
     protected CD() {
         super();
@@ -36,12 +37,12 @@ public class CD extends DependenceEdge {
         return kind == Kind.falseControlDependence;
     }
     
-    public void setFall() {
-        kind = Kind.fallControlDependence;
+    public void setFallThrough() {
+        kind = Kind.fallThroughControlDependence;
     }
     
-    public boolean isFall() {
-        return kind == Kind.fallControlDependence;
+    public boolean isFallThrough() {
+        return kind == Kind.fallThroughControlDependence;
     }
     
     @Override
@@ -52,7 +53,7 @@ public class CD extends DependenceEdge {
             buf.append(" T");
         } else if (kind == Kind.falseControlDependence) {
             buf.append(" F");
-        } else if (kind == Kind.fallControlDependence) {
+        } else if (kind == Kind.fallThroughControlDependence) {
             buf.append(" Fall:");
         }
         return buf.toString();

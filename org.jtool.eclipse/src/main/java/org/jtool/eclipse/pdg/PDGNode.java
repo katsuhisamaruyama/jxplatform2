@@ -19,7 +19,8 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * A node of a PDG.
+ * A node of PDGs, ClDGs, and SDG.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class PDGNode extends GraphNode {
@@ -56,18 +57,18 @@ public class PDGNode extends GraphNode {
         return cfgnode.isBranch();
     }
     
-    public Set<DependenceEdge> getIncomingDependeceEdges() {
-        Set<DependenceEdge> edges = new HashSet<DependenceEdge>();
+    public Set<Dependence> getIncomingDependeceEdges() {
+        Set<Dependence> edges = new HashSet<Dependence>();
         for (GraphEdge edge : getIncomingEdges()) {
-            edges.add((DependenceEdge)edge);
+            edges.add((Dependence)edge);
         }
         return edges;
     }
     
-    public Set<DependenceEdge> getOutgoingDependeceEdges() {
-        Set<DependenceEdge> edges = new HashSet<DependenceEdge>();
+    public Set<Dependence> getOutgoingDependeceEdges() {
+        Set<Dependence> edges = new HashSet<Dependence>();
         for (GraphEdge edge : getOutgoingEdges()) {
-            edges.add((DependenceEdge)edge);
+            edges.add((Dependence)edge);
         }
         return edges;
     }
@@ -75,7 +76,7 @@ public class PDGNode extends GraphNode {
     public Set<CD> getIncomingCDEdges() {
         Set<CD> edges = new HashSet<CD>();
         for (GraphEdge edge : getIncomingEdges()) {
-            DependenceEdge dependence = (DependenceEdge)edge;
+            Dependence dependence = (Dependence)edge;
             if (dependence.isCD()) {
                 edges.add((CD)dependence);
             }
@@ -86,7 +87,7 @@ public class PDGNode extends GraphNode {
     public Set<CD> getOutgoingCDEdges() {
         Set<CD> edges = new HashSet<CD>();
         for (GraphEdge edge : getOutgoingEdges()) {
-            DependenceEdge dependence = (DependenceEdge)edge;
+            Dependence dependence = (Dependence)edge;
             if (dependence.isCD()) {
                 edges.add((CD)dependence);
             }
@@ -97,7 +98,7 @@ public class PDGNode extends GraphNode {
     public Set<DD> getIncomingDDEdges() {
         Set<DD> edges = new HashSet<DD>();
         for (GraphEdge edge : getIncomingEdges()) {
-            DependenceEdge dependence = (DependenceEdge)edge;
+            Dependence dependence = (Dependence)edge;
             if (dependence.isDD()) {
                 edges.add((DD)dependence);
             }
@@ -108,7 +109,7 @@ public class PDGNode extends GraphNode {
     public Set<DD> getOutgoingDDEdges() {
         Set<DD> edges = new HashSet<DD>();
         for (GraphEdge edge : getOutgoingEdges()) {
-            DependenceEdge dependence = (DependenceEdge)edge;
+            Dependence dependence = (Dependence)edge;
             if (dependence.isDD()) {
                 edges.add((DD)dependence);
             }
@@ -173,7 +174,7 @@ public class PDGNode extends GraphNode {
         System.out.println(toString());
     }
     
-    public static List<PDGNode> sortPDGNode(Collection<? extends PDGNode> co) {
+    public static List<PDGNode> sortPDGNodes(Collection<? extends PDGNode> co) {
         List<PDGNode> nodes = new ArrayList<PDGNode>(co);
         Collections.sort(nodes, new Comparator<PDGNode>() {
             public int compare(PDGNode node1, PDGNode node2) {
