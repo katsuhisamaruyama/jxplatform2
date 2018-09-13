@@ -123,7 +123,7 @@ public class PDGBuilder {
         }
     }
     
-    private static Set<PDGStatement> findActualIns(CFGMethodCall callnode) {
+    static Set<PDGStatement> findActualIns(CFGMethodCall callnode) {
         Set<PDGStatement> nodes = new HashSet<PDGStatement>();
         for (CFGNode node : callnode.getActualIns()) {
             nodes.add((PDGStatement)node.getPDGNode());
@@ -131,7 +131,7 @@ public class PDGBuilder {
         return nodes;
     }
     
-    private static Set<PDGStatement> findActualOuts(CFGMethodCall callnode) {
+    static Set<PDGStatement> findActualOuts(CFGMethodCall callnode) {
         Set<PDGStatement> nodes = new HashSet<PDGStatement>();
         for (CFGNode node : callnode.getActualOuts()) {
             nodes.add((PDGStatement)node.getPDGNode());

@@ -51,7 +51,7 @@ public class PDGStore {
         return pdgStore.get(fqn);
     }
     
-    public PDG getPDGWithoutCache(JavaClass jclass) {
+    public ClDG getClDGWithoutCache(JavaClass jclass) {
         if (visible) {
             System.out.print(" - " + jclass.getQualifiedName() + " - PDG");
         }
@@ -194,23 +194,6 @@ public class PDGStore {
         return pdgStore.size();
     }
     
-    public void buildPDGs(List<JavaClass> jclasses) {
-        int size = jclasses.size();
-        if (visible) {
-            System.out.println();
-            System.out.println("** Building PDGs of " + size + " classes ");
-        }
-        int count = 1;
-        for (JavaClass jclass : jclasses) {
-            getPDGWithoutCache(jclass);
-            if (visible) {
-                System.out.println(" (" + count + "/" + size + ")");
-            }
-            count++;
-        }
-        PDGStore.getInstance().destroy();
-    }
-    
     public void setVisible(boolean visible) {
         this.visible = visible;
     }
@@ -218,4 +201,23 @@ public class PDGStore {
     public boolean isVisible() {
         return visible;
     }
+    
+    public ClDG[] buildPDGsForTest(List<JavaClass> jclasses) {
+        int size = jclasses.size();
+        ClDG[] cldgs = new ClDG[size];
+        if (visible) {
+            System.out.println();
+            System.out.println("** Building PDGs of " + size + " classes ");
+        }
+        int count = 1;
+        for (JavaClass jclass : jclasses) {
+            cldgs[count - 1] = getClDGWithoutCache(jclass);
+            if (visible) {
+                System.out.println(" (" + count + "/" + size + ")");
+            }
+            count++;
+        }
+        return cldgs;
+    }
+    
 }

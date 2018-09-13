@@ -30,7 +30,7 @@ public class PDGModelBuilderTest {
         CFGStore.getInstance().setAnalysisLevel(jproject, false);
         CFGStore.getInstance().setCreatingActualNodes(false);
         
-        PDGStore.getInstance().buildPDGs(jproject.getClasses());
+        PDGStore.getInstance().buildPDGsForTest(jproject.getClasses());
         PDGStore.getInstance().destroy();
         builder.unbuild();
     }
@@ -43,7 +43,7 @@ public class PDGModelBuilderTest {
         CFGStore.getInstance().setAnalysisLevel(jproject, false);
         CFGStore.getInstance().setCreatingActualNodes(false);
         
-        PDGStore.getInstance().buildPDGs(jproject.getClasses());
+        PDGStore.getInstance().buildPDGsForTest(jproject.getClasses());
         PDGStore.getInstance().destroy();
         builder.unbuild();
     }
@@ -56,7 +56,7 @@ public class PDGModelBuilderTest {
         CFGStore.getInstance().setAnalysisLevel(jproject, false);
         CFGStore.getInstance().setCreatingActualNodes(false);
         
-        PDGStore.getInstance().buildPDGs(jproject.getClasses());
+        PDGStore.getInstance().buildPDGsForTest(jproject.getClasses());
         PDGStore.getInstance().destroy();
         builder.unbuild();
     }
@@ -69,7 +69,7 @@ public class PDGModelBuilderTest {
         CFGStore.getInstance().setAnalysisLevel(jproject, false);
         CFGStore.getInstance().setCreatingActualNodes(false);
         
-        PDGStore.getInstance().buildPDGs(jproject.getClasses());
+        PDGStore.getInstance().buildPDGsForTest(jproject.getClasses());
         PDGStore.getInstance().destroy();
         builder.unbuild();
     }
@@ -82,7 +82,7 @@ public class PDGModelBuilderTest {
         CFGStore.getInstance().setAnalysisLevel(jproject, false);
         CFGStore.getInstance().setCreatingActualNodes(false);
         
-        PDGStore.getInstance().buildPDGs(jproject.getClasses());
+        PDGStore.getInstance().buildPDGsForTest(jproject.getClasses());
         PDGStore.getInstance().destroy();
         builder.unbuild();
     }
