@@ -9,6 +9,7 @@ package org.jtool.eclipse.cfg;
 import org.jtool.eclipse.cfg.builder.BasicBlockBuilder;
 import org.jtool.eclipse.graph.Graph;
 import org.jtool.eclipse.graph.GraphElement;
+import org.jtool.eclipse.pdg.Dependence;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -297,6 +298,26 @@ public class CFG extends Graph<CFGNode, ControlFlow> {
                 }
             }
         }
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof CFG) {
+            return equals((CFG)obj);
+        }
+        return false;
+    }
+    
+    public boolean equals(CFG cfg) {
+        if (cfg == null) {
+            return false;
+        }
+        return this == cfg || getQualifiedName().equals(cfg.getQualifiedName());
+    }
+    
+    @Override
+    public int hashCode() {
+        return getQualifiedName().hashCode();
     }
     
     @Override

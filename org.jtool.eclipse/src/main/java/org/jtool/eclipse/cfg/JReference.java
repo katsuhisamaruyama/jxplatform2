@@ -115,13 +115,16 @@ public abstract class JReference {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj == null || !(obj instanceof JReference)) {
-            return false;
+        if (obj instanceof JClass) {
+            return equals((JReference)obj);
         }
-        return equals((JReference)obj);
+        return false;
     }
     
     public boolean equals(JReference jvar) {
+        if (jvar == null) {
+            return false;
+        }
         return this == jvar || fqn.equals(jvar.fqn);
     }
     

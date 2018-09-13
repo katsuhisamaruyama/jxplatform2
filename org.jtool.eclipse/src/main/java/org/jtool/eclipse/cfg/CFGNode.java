@@ -7,7 +7,6 @@
 package org.jtool.eclipse.cfg;
 
 import org.jtool.eclipse.graph.GraphEdge;
-import org.jtool.eclipse.graph.GraphElement;
 import org.jtool.eclipse.graph.GraphNode;
 import org.jtool.eclipse.pdg.PDGNode;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -401,6 +400,15 @@ public class CFGNode extends GraphNode {
         return basicBlock != null && equals(basicBlock.getLeader());
     }
     
+    public boolean equals(CFGNode node) {
+        return super.equals((GraphNode)node);
+    }
+    
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+    
     @Override
     public CFGNode clone() {
         CFGNode cloneNode = new CFGNode(astNode, kind);
@@ -412,20 +420,6 @@ public class CFGNode extends GraphNode {
     protected void setClone(CFGNode cloneNode) {
         cloneNode.setPDGNode(pdgNode);
         cloneNode.setBasicBlock(basicBlock);
-    }
-    
-    @Override
-    public boolean equals(GraphElement obj) {
-        if (obj == null || !(obj instanceof CFGNode)) {
-            return false;
-        }
-        CFGNode node = (CFGNode)obj;
-        return this == node || id == node.id;
-    }
-    
-    @Override
-    public int hashCode() {
-        return Long.valueOf(id).hashCode();
     }
     
     public static <E extends GraphNode> CFGNode[] toArray(Set<E> set) {

@@ -104,16 +104,22 @@ public class ControlFlow extends GraphEdge {
     
     @Override
     public boolean equals(GraphElement elem) {
-        if (elem == null || !(elem instanceof ControlFlow)) {
+        if (elem instanceof ControlFlow) {
+            return equals((ControlFlow)elem);
+        }
+        return false;
+    }
+    
+    public boolean equals(ControlFlow flow) {
+        if (flow == null) {
             return false;
         }
-        ControlFlow flow = (ControlFlow)elem;
-        return super.equals(flow)  && kind == flow.kind;
+        return super.equals((GraphEdge)flow) && kind == flow.kind;
     }
     
     @Override
     public int hashCode() {
-        return Long.valueOf(src.getId()).hashCode();
+        return Long.valueOf(src.getId() + dst.getId()).hashCode();
     }
     
     @Override
