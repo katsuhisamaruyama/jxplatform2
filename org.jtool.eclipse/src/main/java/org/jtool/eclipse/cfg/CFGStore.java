@@ -98,14 +98,16 @@ public class CFGStore {
     }
     
     public CCFG getCCFG(JavaClass jclass) {
-        CFG ccfg = getCFG(jclass.getQualifiedName());
-        if (ccfg == null || !(ccfg instanceof CCFG)) {
-            if (visible) {
-                System.out.print(" - " + jclass.getQualifiedName() + " - CCFG");
-            }
-            ccfg = build(jclass);
+        CFG cfg = getCFG(jclass.getQualifiedName());
+        if (cfg != null && cfg instanceof CCFG) {
+            return (CCFG)cfg;
         }
-        return (CCFG)ccfg;
+        
+        if (visible) {
+            System.out.print(" - " + jclass.getQualifiedName() + " - CCFG");
+        }
+        CCFG ccfg = build(jclass);
+        return ccfg;
     }
     
     private CCFG build(JavaClass jclass) {
