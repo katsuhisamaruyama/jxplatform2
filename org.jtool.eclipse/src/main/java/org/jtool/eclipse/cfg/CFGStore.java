@@ -6,7 +6,14 @@
 
 package org.jtool.eclipse.cfg;
 
+import org.jtool.eclipse.cfg.builder.CCFGBuilder;
+import org.jtool.eclipse.cfg.builder.CFGFieldBuilder;
+import org.jtool.eclipse.cfg.builder.CFGMethodBuilder;
 import org.jtool.eclipse.cfg.builder.JInfoStore;
+import org.jtool.eclipse.javamodel.JavaProject;
+import org.jtool.eclipse.javamodel.JavaClass;
+import org.jtool.eclipse.javamodel.JavaField;
+import org.jtool.eclipse.javamodel.JavaMethod;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
@@ -16,13 +23,6 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.jtool.eclipse.cfg.builder.CCFGBuilder;
-import org.jtool.eclipse.cfg.builder.CFGFieldBuilder;
-import org.jtool.eclipse.cfg.builder.CFGMethodBuilder;
-import org.jtool.eclipse.javamodel.JavaProject;
-import org.jtool.eclipse.javamodel.JavaClass;
-import org.jtool.eclipse.javamodel.JavaField;
-import org.jtool.eclipse.javamodel.JavaMethod;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -159,18 +159,6 @@ public class CFGStore {
         return cfg;
     }
     
-    public void buildCFGs(List<JavaClass> jclasses) {
-        int size = jclasses.size();
-        int count = 1;
-        System.out.println();
-        System.out.println("** Building CFGs of " + size + " classes ");
-        for (JavaClass jclass : jclasses) {
-            getCCFG(jclass);
-            System.out.println(" (" + count + "/" + size + ")");
-            count++;
-        }
-    }
-    
     public CCFG build(TypeDeclaration node) {
         return CCFGBuilder.build(node);
     }
@@ -214,4 +202,19 @@ public class CFGStore {
     public boolean isVisible() {
         return visible;
     }
+    
+    public CCFG[] buildCFGsForTest(List<JavaClass> jclasses) {
+        int size = jclasses.size();
+        CCFG[] ccfgs = new CCFG[size];
+        int count = 1;
+        System.out.println();
+        System.out.println("** Building CFGs of " + size + " classes ");
+        for (JavaClass jclass : jclasses) {
+            ccfgs[count - 1] = getCCFG(jclass);
+            System.out.println(" (" + count + "/" + size + ")");
+            count++;
+        }
+        return ccfgs;
+    }
+    
 }

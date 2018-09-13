@@ -7,12 +7,10 @@
 package org.jtool.eclipse.test;
 
 import org.jtool.eclipse.batch.JavaModelBuilder;
+import org.jtool.eclipse.cfg.CCFG;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGStore;
 import org.jtool.eclipse.javamodel.JavaProject;
-import org.jtool.eclipse.javamodel.JavaClass;
-import org.jtool.eclipse.javamodel.JavaField;
-import org.jtool.eclipse.javamodel.JavaMethod;
 import org.junit.Test;
 
 /**
@@ -25,18 +23,13 @@ public class CFGModelBuilderTest {
     
     private final String TEST_PROECT_DIR = "/Users/maru/Desktop/TestSamples/";
     
-    private boolean checkDetails(JavaProject jproject) {
-        for (JavaClass jclass : jproject.getClasses()) {
-            CFG cfg = CFGStore.getInstance().getCFG(jclass);
+    private boolean checkDetails(CCFG[] ccfgs) {
+        for (CCFG ccfg : ccfgs) {
             StringBuilder buf = new StringBuilder();
-            buf.append(cfg.toString());
-            for (JavaMethod jmethod : jclass.getMethods()) {
-                CFG mcfg = CFGStore.getInstance().getCFG(jmethod);
-                buf.append(mcfg.toString());
-            }
-            for (JavaField jfield : jclass.getFields()) {
-                CFG fcfg = CFGStore.getInstance().getCFG(jfield);
-                buf.append(fcfg.toString());
+            buf.append(ccfg.getQualifiedName());
+            buf.append("\n");
+            for (CFG cfg : ccfg.getCFGs()) {
+                buf.append(cfg.toString());
             }
             System.out.println(buf.toString());
         }
@@ -51,8 +44,8 @@ public class CFGModelBuilderTest {
         CFGStore.getInstance().setAnalysisLevel(jproject, true);
         CFGStore.getInstance().setCreatingActualNodes(false);
         
-        CFGStore.getInstance().buildCFGs(jproject.getClasses());
-        checkDetails(jproject);
+        CCFG[] ccfgs = CFGStore.getInstance().buildCFGsForTest(jproject.getClasses());
+        checkDetails(ccfgs);
         CFGStore.getInstance().destroy();
         builder.unbuild();
     }
@@ -65,7 +58,7 @@ public class CFGModelBuilderTest {
         CFGStore.getInstance().setAnalysisLevel(jproject, false);
         CFGStore.getInstance().setCreatingActualNodes(false);
         
-        CFGStore.getInstance().buildCFGs(jproject.getClasses());
+        CFGStore.getInstance().buildCFGsForTest(jproject.getClasses());
         CFGStore.getInstance().destroy();
         builder.unbuild();
     }
@@ -78,7 +71,7 @@ public class CFGModelBuilderTest {
         CFGStore.getInstance().setAnalysisLevel(jproject, false);
         CFGStore.getInstance().setCreatingActualNodes(false);
         
-        CFGStore.getInstance().buildCFGs(jproject.getClasses());
+        CFGStore.getInstance().buildCFGsForTest(jproject.getClasses());
         CFGStore.getInstance().destroy();
         builder.unbuild();
     }
@@ -91,7 +84,7 @@ public class CFGModelBuilderTest {
         CFGStore.getInstance().setAnalysisLevel(jproject, false);
         CFGStore.getInstance().setCreatingActualNodes(false);
         
-        CFGStore.getInstance().buildCFGs(jproject.getClasses());
+        CFGStore.getInstance().buildCFGsForTest(jproject.getClasses());
         CFGStore.getInstance().destroy();
         builder.unbuild();
     }
@@ -102,7 +95,7 @@ public class CFGModelBuilderTest {
         JavaModelBuilder builder = new JavaModelBuilder(target, target);
         JavaProject jproject = builder.build();
         CFGStore.getInstance().setAnalysisLevel(jproject, false);
-        CFGStore.getInstance().buildCFGs(jproject.getClasses());
+        CFGStore.getInstance().buildCFGsForTest(jproject.getClasses());
         builder.unbuild();
     }
     

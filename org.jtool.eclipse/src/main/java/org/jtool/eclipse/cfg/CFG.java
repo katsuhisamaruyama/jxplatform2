@@ -9,8 +9,6 @@ package org.jtool.eclipse.cfg;
 import org.jtool.eclipse.cfg.builder.BasicBlockBuilder;
 import org.jtool.eclipse.graph.Graph;
 import org.jtool.eclipse.graph.GraphElement;
-import org.jtool.eclipse.pdg.Dependence;
-
 import java.util.Set;
 import java.util.HashSet;
 import java.util.HashMap;
