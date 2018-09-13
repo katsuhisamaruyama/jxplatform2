@@ -6,18 +6,16 @@
 
 package org.jtool.eclipse.pdg.builder;
 
+import org.jtool.eclipse.pdg.CD;
+import org.jtool.eclipse.pdg.DD;
+import org.jtool.eclipse.pdg.Dependence;
+import org.jtool.eclipse.pdg.PDG;
+import org.jtool.eclipse.pdg.PDGNode;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.ControlFlow;
-import org.jtool.eclipse.cfg.JAccess;
-import org.jtool.eclipse.graph.GraphEdge;
-import org.jtool.eclipse.pdg.CD;
-import org.jtool.eclipse.pdg.DD;
-import org.jtool.eclipse.pdg.DependenceEdge;
-import org.jtool.eclipse.pdg.PDG;
-import org.jtool.eclipse.pdg.PDGNode;
-
+import org.jtool.eclipse.cfg.JReference;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
@@ -26,6 +24,8 @@ import java.util.HashSet;
 /**
  * Finds data dependences of a PDG from its CFG.
  * This class does not guarantee a loop carried node to be correct if a given PDG contains no control dependence.
+ * All methods of this class are not intended to be directly called by clients.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class DDFinder {
@@ -44,22 +44,22 @@ public class DDFinder {
     }
     
     private static void findDDs(PDG pdg, CFG cfg, CFGStatement anchor) {
-        for (JAccess jvar : anchor.getDefVariables()) {
+        for (JReference jvar : anchor.getDefVariables()) {
             findDDs(pdg, cfg, anchor, jvar);
         }
     }
     
-    private static void findDDs(PDG pdg, CFG cfg, CFGStatement anchor, JAccess jvar) {
+    private static void findDDs(PDG pdg, CFG cfg, CFGStatement anchor, JReference jvar) {
         for (ControlFlow flow : anchor.getOutgoingFlows()) {
             if (!flow.isFallThrough()) {
                 Set<CFGNode> track = new HashSet<CFGNode>();
-                CFGNode cfgNode = (CFGNode)flow.getDstNode();
-                findDD(pdg, cfg, anchor, cfgNode, jvar, track);
+                CFGNode cfgnode = (CFGNode)flow.getDstNode();
+                findDD(pdg, cfg, anchor, cfgnode, jvar, track);
             }
         }
     }
     
-    private static void findDD(PDG pdg, CFG cfg, CFGNode anchor, CFGNode node, JAccess jvar, Set<CFGNode> track) {
+    private static void findDD(PDG pdg, CFG cfg, CFGNode anchor, CFGNode node, JReference jvar, Set<CFGNode> track) {
         track.add(node);
         if (node.hasUseVariable()) {
             CFGStatement candidate = (CFGStatement)node;
@@ -105,56 +105,50 @@ public class DDFinder {
     }
     
     private static PDGNode getLoopCarried(PDG pdg, CFG cfg, CFGNode def, CFGNode use) {
-        Set<PDGNode> atrack = new HashSet<PDGNode>();
-        
-        ArrayList<PDGNode> dtrack = new ArrayList<PDGNode>();
-        atrack.clear();
-        findDominators(def.getPDGNode(), dtrack, atrack);
+        List<PDGNode> dtrack = new ArrayList<PDGNode>();
+        findDominators(def.getPDGNode(), dtrack);
         if (dtrack.isEmpty()) {
             return null;
         }
         
-        ArrayList<PDGNode> utrack = new ArrayList<PDGNode>();
-        atrack.clear();
-        findDominators(use.getPDGNode(), utrack, atrack);
+        List<PDGNode> utrack = new ArrayList<PDGNode>();
+        findDominators(use.getPDGNode(), utrack);
         if (utrack.isEmpty()) {
             return null;
         }
         
-        ConstrainedReachableNodes path = new ConstrainedReachableNodes(cfg, def, use);
+        Set<CFGNode> reachanbleNodes = cfg.constrainedReachableNodes(def, use);
         for (PDGNode pdgnode : dtrack) {
-            CFGNode cfgNode = pdgnode.getCFGNode();
-            if (utrack.contains(pdgnode) && path.contains(cfgNode)) {
+            CFGNode cfgnode = pdgnode.getCFGNode();
+            if (utrack.contains(pdgnode) && reachanbleNodes.contains(cfgnode)) {
                 return pdgnode;
             }
         }
         return null;
     }
     
-    private static void findDominators(PDGNode pdgnode, ArrayList<PDGNode> dominators, Set<PDGNode> atrack) {
+    private static void findDominators(PDGNode pdgnode, List<PDGNode> dominators) {
+        Set<PDGNode> atrack = new HashSet<PDGNode>();
+        findDominators(pdgnode, dominators, atrack);
+    }
+    
+    private static void findDominators(PDGNode pdgnode, List<PDGNode> dominators, Set<PDGNode> atrack) {
         atrack.add(pdgnode);
         if (pdgnode.isLoop()) {
             dominators.add(pdgnode);
         }
         
-        for (GraphEdge edge : pdgnode.getIncomingEdges()) {
-            DependenceEdge dependence = (DependenceEdge)edge;
-            
-            if (dependence.isCD()) {
-                PDGNode src = dependence.getSrcNode();
-                
-                if (!atrack.contains(src)) {
-                    findDominators(src, dominators, atrack);
-                }
+        for (CD edge : pdgnode.getIncomingCDEdges()) {
+            PDGNode src = edge.getSrcNode();
+            if (!atrack.contains(src)) {
+                findDominators(src, dominators, atrack);
             }
         }
     }
     
     private static void findDefOrderDDs(PDG pdg, CFG cfg) {
-        for (GraphEdge edge : pdg.getEdges()) {
-            DependenceEdge dependence = (DependenceEdge)edge;
-            
-            if (dependence.isDD()) {
+        for (Dependence edge : pdg.getEdges()) {
+            if (edge.isDD()) {
                 DD dd = (DD)edge;
                 if (dd.isOutput() && isDefOrder(dd)) {
                     dd.setDefOrder();
@@ -166,17 +160,14 @@ public class DDFinder {
     private static boolean isDefOrder(DD dd) {
         PDGNode src = dd.getSrcNode();
         PDGNode dst = dd.getDstNode();
-        List<CD> srcEdges = new ArrayList<CD>(src.getIncomingCDEdges());
-        List<CD> dstEdges = new ArrayList<CD>(src.getIncomingCDEdges());
-        CD srcCD = srcEdges.get(0);
-        CD dstCD = dstEdges.get(0);
-        if (!srcCD.getSrcNode().equals(dstCD.getSrcNode())) {
+        CD[] srcCDs = src.getIncomingCDEdges().toArray(new CD[0]);
+        CD[] dstCDs = dst.getIncomingCDEdges().toArray(new CD[0]);
+        if (!srcCDs[0].getSrcNode().equals(dstCDs[0].getSrcNode())) {
             return false;
         }
         
         for (DD srcDD : src.getOutgoingDDEdges()) {
             if (srcDD.isLCDD() || srcDD.isLIDD()) {
-                
                 for (DD dstDD : dst.getOutgoingDDEdges()) {
                     if (dstDD.isLCDD() || dstDD.isLIDD()) {
                         if (srcDD.getDstNode().equals(dstDD.getDstNode())) {

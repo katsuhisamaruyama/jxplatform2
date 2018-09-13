@@ -8,7 +8,6 @@ package org.jtool.eclipse.pdg;
 
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.graph.GraphEdge;
-import org.jtool.eclipse.graph.GraphElement;
 import org.jtool.eclipse.graph.GraphNode;
 import java.util.Set;
 import java.util.ArrayList;
@@ -149,25 +148,20 @@ public class PDGNode extends GraphNode {
         return num;
     }
     
+    public boolean equals(PDGNode node) {
+        return super.equals((GraphNode)node);
+    }
+    
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+    
     @Override
     public PDGNode clone() {
         PDGNode cloneNode = new PDGNode(getCFGNode());
         super.setClone(cloneNode);
         return cloneNode;
-    }
-    
-    @Override
-    public boolean equals(GraphElement obj) {
-        if (obj == null || !(obj instanceof PDGNode)) {
-            return false;
-        }
-        PDGNode node = (PDGNode)obj;
-        return this == node || id == node.id;
-    }
-    
-    @Override
-    public int hashCode() {
-        return Long.valueOf(id).hashCode();
     }
     
     public void print() {

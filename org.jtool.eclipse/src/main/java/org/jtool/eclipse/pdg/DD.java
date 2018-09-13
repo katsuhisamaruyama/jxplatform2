@@ -126,16 +126,22 @@ public class DD extends Dependence {
     
     @Override
     public boolean equals(GraphElement elem) {
-        if (elem == null || !(elem instanceof DD)) {
+        if (elem instanceof DD) {
+            return equals((DD)elem);
+        }
+        return false;
+    }
+    
+    public boolean equals(DD edge) {
+        if (edge == null) {
             return false;
         }
-        DD edge = (DD)elem;
-        return super.equals(elem) && jvar.equals(edge.jvar);
+        return super.equals((Dependence)edge) && jvar.equals(edge.jvar);
     }
     
     @Override
     public int hashCode() {
-        return Long.valueOf(src.getId() + dst.getId()).hashCode();
+        return super.hashCode();
     }
     
     @Override

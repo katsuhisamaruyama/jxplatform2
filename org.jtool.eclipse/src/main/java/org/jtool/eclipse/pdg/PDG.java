@@ -46,6 +46,10 @@ public class PDG extends Graph<PDGNode, Dependence> {
         return entry.getName();
     }
     
+    public String getQualifiedName() {
+        return entry.getQualifiedName();
+    }
+    
     public void append(PDG pdg) {
         for (PDGNode node : pdg.getNodes()) {
             add(node);
@@ -74,6 +78,26 @@ public class PDG extends Graph<PDGNode, Dependence> {
         return null;
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof PDG) {
+            return equals((PDG)obj);
+        }
+        return false;
+    }
+    
+    public boolean equals(PDG pdg) {
+        if (pdg == null) {
+            return false;
+        }
+        return this == pdg || getQualifiedName().equals(pdg.getQualifiedName());
+    }
+    
+    @Override
+    public int hashCode() {
+        return getQualifiedName().hashCode();
+    }
+    
     public PDG clone() {
         CFG cloneCFG = getCFG().clone();
         return PDGBuilder.build(cloneCFG);
@@ -93,6 +117,11 @@ public class PDG extends Graph<PDGNode, Dependence> {
         buf.append(getEdgeInfo());
         buf.append("----- PDG (to here) -----\n");
         return buf.toString();
+    }
+    
+    @Override
+    protected String getNodeInfo() {
+        return super.getNodeInfo();
     }
     
     @Override

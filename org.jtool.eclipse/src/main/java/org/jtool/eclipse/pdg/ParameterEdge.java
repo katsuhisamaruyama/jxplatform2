@@ -9,7 +9,7 @@ package org.jtool.eclipse.pdg;
 import org.jtool.eclipse.cfg.JReference;
 
 /**
- * An edge that represents a caller and its parameters in PDGs.
+ * An edge that represents a relationship between parameters of a caller and its callee in PDGs.
  * 
  * @author Katsuhisa Maruyama
  */

@@ -84,11 +84,17 @@ public class Dependence extends GraphEdge {
     
     @Override
     public boolean equals(GraphElement elem) {
-        if (elem == null || !(elem instanceof Dependence)) {
+        if (elem instanceof Dependence) {
+            return equals((Dependence)elem);
+        }
+        return false;
+    }
+    
+    public boolean equals(Dependence dependence) {
+        if (dependence == null) {
             return false;
         }
-        Dependence edge = (Dependence)elem;
-        return this == edge || (src.equals(edge.src) && dst.equals(dst) && kind == edge.kind);
+        return super.equals((GraphEdge)dependence) && kind == dependence.kind;
     }
     
     @Override

@@ -6,6 +6,8 @@
 
 package org.jtool.eclipse.pdg;
 
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -16,8 +18,7 @@ import java.util.HashSet;
  */
 public class ClDG extends PDG {
     
-    protected PDGClassEntry entry;
-    private Set<PDG> pdgs = new HashSet<PDG>();
+    protected Map<String, PDG> pdgs = new HashMap<String, PDG>();
     
     public ClDG() {
         super();
@@ -29,7 +30,7 @@ public class ClDG extends PDG {
     
     @Override
     public PDGClassEntry getEntryNode() {
-        return entry;
+        return (PDGClassEntry)entry;
     }
     
     @Override
@@ -42,25 +43,23 @@ public class ClDG extends PDG {
         return entry.getName();
     }
     
+    @Override
+    public String getQualifiedName() {
+        return entry.getQualifiedName();
+    }
+    
     public void add(PDG pdg) {
-        if (!pdgs.contains(pdg)) {
-            pdgs.add(pdg);
-            
-            for (PDGNode node : pdg.getNodes()) {
-                add(node);
-            }
-            for (Dependence edge : pdg.getEdges()) {
-                add(edge);
-            }
-            
-            ClassMemberEdge edge = new ClassMemberEdge(entry, pdg.getEntryNode());
-            edge.setKind(Dependence.Kind.classMember);
-            add(edge);
+        if (!pdgs.values().contains(pdg)) {
+            pdgs.put(pdg.getQualifiedName(), pdg);
         }
     }
     
     public Set<PDG> getPDGs() {
-        return pdgs;
+        return new HashSet<PDG>(pdgs.values());
+    }
+    
+    public PDG getPDG(String fqn) {
+        return pdgs.get(fqn);
     }
     
     @Override
@@ -69,8 +68,12 @@ public class ClDG extends PDG {
         buf.append("----- ClDG (from here) -----\n");
         buf.append("Name = " + getName());
         buf.append("\n");
-        buf.append(getNodeInfo()); 
-        buf.append(getEdgeInfo());
+        for (PDG pdg : pdgs.values()) {
+            buf.append(pdg.getNodeInfo());
+        }
+        for (PDG pdg : pdgs.values()) {
+            buf.append(pdg.getEdgeInfo());
+        }
         buf.append("----- ClDG (to here) -----\n");
         return buf.toString();
     }

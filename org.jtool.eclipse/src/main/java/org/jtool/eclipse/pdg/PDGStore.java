@@ -6,28 +6,30 @@
 
 package org.jtool.eclipse.pdg;
 
-import org.jtool.eclipse.cfg.CCFG;
+import org.jtool.eclipse.pdg.builder.PDGBuilder;
+import org.jtool.eclipse.pdg.builder.ClDGBuilder;
+import org.jtool.eclipse.pdg.builder.SDGBuilder;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGStore;
-import org.jtool.eclipse.cfg.builder.CFGClassBuilder;
-import org.jtool.eclipse.cfg.builder.CFGFieldBuilder;
-import org.jtool.eclipse.cfg.builder.CFGMethodBuilder;
+import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
-import org.jtool.eclipse.pdg.builder.PDGBuilder;
+import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 
 /**
- * An object representing a virtual project.
+ * An object stores PDGs.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class PDGStore {
     
     private static PDGStore instance = new PDGStore();
     
+    protected SDG currentSDG = null;
     protected Map<String, PDG> pdgStore = new HashMap<String, PDG>();
     
     private boolean visible = true;
@@ -41,97 +43,155 @@ public class PDGStore {
     
     public void destroy() {
         pdgStore.clear();
+        currentSDG = null;
         CFGStore.getInstance().destroy();
-    }
-    
-    public PDG getPDG(CFG cfg) {
-        return PDGBuilder.build(cfg);
-    }
-    
-    public PDG getPDG(JavaClass jclass) {
-        PDG cldg = getPDG(jclass.getQualifiedName());
-        if (cldg == null) {
-            if (visible) {
-                System.out.print(" - " + jclass.getQualifiedName() + " - PDG");
-            }
-            cldg = buildPDG(jclass);
-        }
-        return cldg;
-    }
-    
-    public PDG getPDG(JavaMethod jmethod) {
-        PDG pdg = getPDG(jmethod.getQualifiedName());
-        if (pdg == null) {
-            if (visible) {
-                System.out.print(" - " + jmethod.getQualifiedName() + " - PDG");
-            }
-            pdg = buildPDG(jmethod);
-        }
-        return pdg;
-    }
-    
-    public PDG getPDG(JavaField jfield) {
-        PDG pdg = getPDG(jfield.getQualifiedName());
-        if (pdg == null) {
-            if (visible) {
-                System.out.print(" - " + jfield.getQualifiedName() + " - PDG");
-            }
-            pdg = buildPDG(jfield);
-        }
-        return pdg;
-    }
-    
-    private void addPDG(PDG pdg) {
-        pdgStore.put(pdg.getEntryNode().getQualifiedName(), pdg);
     }
     
     public PDG getPDG(String fqn) {
         return pdgStore.get(fqn);
     }
     
-    public int size() {
-        return pdgStore.size();
-    }
-    
-    private ClDG buildPDG(JavaClass jclass) {
-        ClDG cldg = new ClDG();
-        CCFG ccfg = CFGClassBuilder.build(jclass);
-        PDGClassEntry pdgentry = new PDGClassEntry(ccfg.getStartNode());
-        cldg.setEntryNode(pdgentry);
+    public PDG getPDGWithoutCache(JavaClass jclass) {
+        if (visible) {
+            System.out.print(" - " + jclass.getQualifiedName() + " - PDG");
+        }
         
-        for (JavaMethod jm : jclass.getMethods()) {
-            PDG pdg = buildPDG(jm);
-            addPDG(pdg);
-            cldg.add(pdg);
+        ClDG cldg = ClDGBuilder.build(jclass);
+        if (CFGStore.getInstance().creatingActualNodes()) {
+            for (PDG pdg : cldg.getPDGs()) {
+                PDGBuilder.connectParametersConservatively(pdg);
+            }
         }
-        for (JavaField jf : jclass.getFields()) {
-            PDG pdg = buildPDG(jf);
-            addPDG(pdg);
-            cldg.add(pdg);
-        }
-        /*
-        for (JavaClass jt : jclass.getInnerClasses()) {
-            PDG pdg = buildPDG(jt);
-            addPDG(pdg);
-            cldg.add(pdg);
-        }
-        */
         return cldg;
     }
     
-    private PDG buildPDG(JavaMethod jmethod) {
-        CFG cfg = CFGMethodBuilder.build(jmethod);
-        PDG pdg = PDGBuilder.build(cfg);
+    public PDG getPDGWithoutCache(JavaMethod jmethod) {
+        if (visible) {
+            System.out.print(" - " + jmethod.getQualifiedName() + " - PDG");
+        }
+        
+        PDG pdg = PDGBuilder.build(jmethod);
         if (CFGStore.getInstance().creatingActualNodes()) {
-            PDGBuilder.connectActualParameters(pdg);
+            PDGBuilder.connectParametersConservatively(pdg);
         }
         return pdg;
     }
     
-    private PDG buildPDG(JavaField jfield) {
-        CFG cfg = CFGFieldBuilder.build(jfield);
-        PDG pdg = PDGBuilder.build(cfg);
+    public PDG getPDGWithoutCache(JavaField jfield) {
+        if (visible) {
+            System.out.print(" - " + jfield.getQualifiedName() + " - PDG");
+        }
+        
+        PDG pdg = PDGBuilder.build(jfield);
+        if (CFGStore.getInstance().creatingActualNodes()) {
+            PDGBuilder.connectParametersConservatively(pdg);
+        }
         return pdg;
+    }
+    
+    public PDG getPDGWithoutCache(CFG cfg) {
+        if (visible) {
+            System.out.print(" - " + cfg.getStartNode().getQualifiedName() + " - PDG");
+        }
+        
+        PDG pdg = PDGBuilder.build(cfg);
+        if (CFGStore.getInstance().creatingActualNodes()) {
+            PDGBuilder.connectParametersConservatively(pdg);
+        }
+        return pdg;
+    }
+    
+    public SDG getSDG(JavaProject jproject) {
+        if (!jproject.getPath().equals(ProjectStore.getInstance().getCurrentProject().getPath())) {
+            currentSDG = SDGBuilder.build(jproject.getClasses());
+        }
+        return currentSDG;
+    }
+    
+    public ClDG getClDG(JavaClass jclass) {
+        PDG found = getPDG(jclass.getQualifiedName());
+        if (found != null && found instanceof ClDG) {
+            return (ClDG)found;
+        }
+        
+        if (visible) {
+            System.out.print(" - " + jclass.getQualifiedName() + " - ClDG");
+        }
+        
+        if (CFGStore.getInstance().creatingActualNodes()) {
+            SDG sdg = SDGBuilder.build(jclass);
+            for (PDG pdg : sdg.getPDGs()) {
+                addPDG(pdg);
+            }
+            SDGBuilder.connectParameters(sdg);
+            return sdg.getClDG(jclass.getQualifiedName());
+        } else {
+            return ClDGBuilder.build(jclass);
+        }
+    }
+    
+    public PDG getPDG(JavaMethod jmethod) {
+        PDG found = getPDG(jmethod.getQualifiedName());
+        if (found != null && found instanceof PDG) {
+            return found;
+        }
+        
+        if (visible) {
+            System.out.print(" - " + jmethod.getQualifiedName() + " - PDG");
+        }
+        
+        if (CFGStore.getInstance().creatingActualNodes()) {
+            SDG sdg = SDGBuilder.build(jmethod);
+            for (PDG pdg : sdg.getPDGs()) {
+                addPDG(pdg);
+            }
+            SDGBuilder.connectParameters(sdg);
+            return sdg.getPDG(jmethod.getQualifiedName());
+            
+        } else {
+            ClDG cldg = ClDGBuilder.build(jmethod);
+            for (PDG pdg : cldg.getPDGs()) {
+                addPDG(pdg);
+            }
+            ClDGBuilder.connectParameters(cldg);
+            return cldg.getPDG(jmethod.getQualifiedName());
+        }
+    }
+    
+    public PDG getPDG(JavaField jfield) {
+        PDG found = getPDG(jfield.getQualifiedName());
+        if (found != null && found instanceof PDG) {
+            return found;
+        }
+        
+        if (visible) {
+            System.out.print(" - " + jfield.getQualifiedName() + " - PDG");
+        }
+        
+        if (CFGStore.getInstance().creatingActualNodes()) {
+            SDG sdg = SDGBuilder.build(jfield);
+            for (PDG pdg : sdg.getPDGs()) {
+                addPDG(pdg);
+            }
+            SDGBuilder.connectParameters(sdg);
+            return sdg.getPDG(jfield.getQualifiedName());
+            
+        } else {
+            ClDG cldg = ClDGBuilder.build(jfield);
+            for (PDG pdg : cldg.getPDGs()) {
+                addPDG(pdg);
+            }
+            ClDGBuilder.connectParameters(cldg);
+            return cldg.getPDG(jfield.getQualifiedName());
+        }
+    }
+    
+    private void addPDG(PDG pdg) {
+        pdgStore.put(pdg.getEntryNode().getQualifiedName(), pdg);
+    }
+    
+    public int size() {
+        return pdgStore.size();
     }
     
     public void buildPDGs(List<JavaClass> jclasses) {
@@ -142,7 +202,7 @@ public class PDGStore {
         }
         int count = 1;
         for (JavaClass jclass : jclasses) {
-            PDGStore.getInstance().getPDG(jclass);
+            getPDGWithoutCache(jclass);
             if (visible) {
                 System.out.println(" (" + count + "/" + size + ")");
             }
