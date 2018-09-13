@@ -8,6 +8,8 @@ package org.jtool.eclipse.cfg;
 
 import org.jtool.eclipse.cfg.builder.BasicBlockBuilder;
 import org.jtool.eclipse.graph.Graph;
+import org.jtool.eclipse.graph.GraphElement;
+
 import java.util.Set;
 import java.util.HashSet;
 import java.util.HashMap;
@@ -160,65 +162,125 @@ public class CFG extends Graph<CFGNode, ControlFlow> {
         return set;
     }
     
-    public Set<CFGNode> getForwardReachableNodes(CFGNode from, CFGNode to) {
+    public Set<CFGNode> forwardReachableNodes(CFGNode from, boolean loopbackOk, StopConditionOnReachablePath condition) {
         Set<CFGNode> track = new HashSet<CFGNode>();
-        walkForward(from, to, true, track);
-        return track;
-    }
-    
-    public Set<CFGNode> getForwardReachableNodesWithoutLoopback(CFGNode from, CFGNode to) {
-        Set<CFGNode> track = new HashSet<CFGNode>();
-        walkForward(from, to, false, track);
-        return track;
-    }
-    
-    public Set<CFGNode> getBackwardReachableNodes(CFGNode from, CFGNode to) {
-        Set<CFGNode> track = new HashSet<CFGNode>();
-        walkBackward(from, to, true, track);
-        return track;
-    }
-    
-    public Set<CFGNode> getBackwardReachableNodesWithoutLoopback(CFGNode from, CFGNode to) {
-        Set<CFGNode> track = new HashSet<CFGNode>();
-        walkBackward(from, to, false, track);
-        return track;
-    }
-    
-    private void walkForward(CFGNode from, CFGNode to, boolean loopbackOk, Set<CFGNode> track) {
-        if (from == null) {
-            return;
+        if (from != null) {
+            walkForward(from, condition, loopbackOk, track);
         }
-        if (from.equals(to) && !track.isEmpty()) {
+        return track;
+    }
+    
+    public Set<CFGNode> backwardReachableNodes(CFGNode from, boolean loopbackOk, StopConditionOnReachablePath condition) {
+        Set<CFGNode> track = new HashSet<CFGNode>();
+        if (from != null) {
+            walkBackward(from, condition, loopbackOk, track);
+        }
+        return track;
+    }
+    
+    public Set<CFGNode> forwardReachableNodes(CFGNode from, boolean loopbackOk) {
+        return forwardReachableNodes(from, loopbackOk, new StopConditionOnReachablePath() {
+            @Override
+            public boolean isStop(CFGNode node) {
+                return false;
+            }
+        });
+    }
+    
+    public Set<CFGNode> backwardReachableNodes(CFGNode from, boolean loopbackOk) {
+        return backwardReachableNodes(from, loopbackOk, new StopConditionOnReachablePath() {
+            @Override
+            public boolean isStop(CFGNode node) {
+                return false;
+            }
+        });
+    }
+    
+    public Set<CFGNode> forwardReachableNodes(CFGNode from, final CFGNode to, boolean loopbackOk) {
+        Set<CFGNode> track = new HashSet<CFGNode>();
+        if (from.equals(to)) {
             track.add(from);
+            return track;
+        }
+        
+        Set<CFGNode> ftrack = forwardReachableNodes(from, loopbackOk, new StopConditionOnReachablePath() {
+            @Override
+            public boolean isStop(CFGNode node) {
+                return node.equals(to);
+            }
+        });
+        track.addAll(ftrack);
+        track.add(to);
+        return track;
+    }
+    
+    public Set<CFGNode> backwardReachableNodes(CFGNode from, final CFGNode to, boolean loopbackOk) {
+        Set<CFGNode> track = new HashSet<CFGNode>();
+        if (from.equals(to)) {
+            track.add(from);
+            return track;
+        }
+        
+        Set<CFGNode> btrack = backwardReachableNodes(from, loopbackOk, new StopConditionOnReachablePath() {
+            @Override
+            public boolean isStop(CFGNode node) {
+                return node.equals(to);
+            }
+        });
+        track.addAll(btrack);
+        track.add(to);
+        return track;
+    }
+    
+    public Set<CFGNode> reachableNodes(CFGNode from, final CFGNode to, boolean loopbackOk) {
+        Set<CFGNode> ftrack = forwardReachableNodes(from, to, loopbackOk);
+        Set<CFGNode> btrack = backwardReachableNodes(to, from, loopbackOk);
+        Set<CFGNode> track = new HashSet<CFGNode>(GraphElement.intersection(ftrack, btrack));
+        return track;
+    }
+    
+    public Set<CFGNode> postDominator(CFGNode anchor) {
+        Set<CFGNode> postDominator = new HashSet<CFGNode>();
+        Set<CFGNode> track = new HashSet<CFGNode>();
+        for (CFGNode node : getNodes()) {
+            if (!anchor.equals(node)) {
+                track.clear();
+                track = forwardReachableNodes(anchor, node, true);
+                if (track.contains(node) && !track.contains(getEndNode())) {
+                    postDominator.add(node);
+                }
+            }
+        }
+        return postDominator;
+    }
+    
+    private void walkForward(CFGNode node, StopConditionOnReachablePath condition, boolean loopbackOk, Set<CFGNode> track) {
+        if (condition.isStop(node)) {
             return;
         }
-        track.add(from);
+        track.add(node);
         
-        for (ControlFlow flow : from.getOutgoingFlows()) {
+        for (ControlFlow flow : node.getOutgoingFlows()) {
             if (loopbackOk || !flow.isLoopBack()) {
                 CFGNode succ = flow.getDstNode();
                 if (!track.contains(succ)) {
-                    walkForward(succ, to, loopbackOk, track);
+                    walkForward(succ, condition, loopbackOk, track);
                 }
             }
         }
     }
     
-    private void walkBackward(CFGNode to, CFGNode from, boolean loopbackOk, Set<CFGNode> track) {
-        if (to == null) {
+    private void walkBackward(CFGNode node, StopConditionOnReachablePath condition, boolean loopbackOk, Set<CFGNode> track) {
+        if (condition.isStop(node)) {
             return;
         }
-        if (to.equals(from) && !track.isEmpty()) {
-            track.add(to);
-            return;
-        }
-        track.add(to);
+        track.add(node);
         
-        for (ControlFlow flow : to.getIncomingFlows()) {
+        for (ControlFlow flow : node.getIncomingFlows()) {
             if (loopbackOk || !flow.isLoopBack()) {
                 CFGNode pred = flow.getSrcNode();
                 if (!track.contains(pred)) {
-                    walkBackward(pred, from, loopbackOk, track);
+                    walkBackward(pred, condition, loopbackOk, track);
                 }
             }
         }
