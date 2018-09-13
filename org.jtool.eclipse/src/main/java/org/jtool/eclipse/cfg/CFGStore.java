@@ -165,7 +165,7 @@ public class CFGStore {
         System.out.println();
         System.out.println("** Building CFGs of " + size + " classes ");
         for (JavaClass jclass : jclasses) {
-            CFGStore.getInstance().getCCFG(jclass);
+            getCCFG(jclass);
             System.out.println(" (" + count + "/" + size + ")");
             count++;
         }
