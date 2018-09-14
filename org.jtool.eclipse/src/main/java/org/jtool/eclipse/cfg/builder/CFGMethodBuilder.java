@@ -28,6 +28,7 @@ import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -45,7 +46,7 @@ public class CFGMethodBuilder {
     
     @SuppressWarnings("unchecked")
     public static CFG build(JavaMethod jmethod, Set<JMethod> visitedMethods) {
-        List<VariableDeclaration> params = null;
+        List<VariableDeclaration> params;
         if (!jmethod.isInitializer()) {
             if (jmethod.isLambda()) {
                 LambdaExpression node = (LambdaExpression)jmethod.getASTNode();
@@ -54,6 +55,8 @@ public class CFGMethodBuilder {
                 MethodDeclaration node = (MethodDeclaration)jmethod.getASTNode();
                 params = node.parameters();
             }
+        } else {
+            params = new ArrayList<VariableDeclaration>();
         }
         
         IMethodBinding mbinding = jmethod.getMethodBinding();
