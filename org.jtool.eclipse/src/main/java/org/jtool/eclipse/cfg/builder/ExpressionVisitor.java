@@ -224,15 +224,6 @@ public class ExpressionVisitor extends ASTVisitor {
     
     @Override
     public boolean visit(InfixExpression node) {
-        Expression lefthand = node.getLeftOperand();
-        analysisMode.push(AnalysisMode.USE);
-        lefthand.accept(this);
-        analysisMode.pop();
-        
-        Expression righthand = node.getRightOperand();
-        analysisMode.push(AnalysisMode.USE);
-        righthand.accept(this);
-        analysisMode.pop();
         return true;
     }
     
