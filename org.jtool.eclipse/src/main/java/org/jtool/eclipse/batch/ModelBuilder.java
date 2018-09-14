@@ -102,6 +102,8 @@ public class ModelBuilder implements IModelBuilder {
             
             parse(paths, encodings, sources, charsets);
             collectInfo();
+        } else {
+            System.err.println("Found no Java source files in " + currentProject.getPath());
         }
     }
     
