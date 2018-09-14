@@ -12,7 +12,9 @@ import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -186,6 +188,27 @@ public class JavaProject {
             return externalClasseStore.get(fqn);
         }
         return null;
+    }
+    
+    public Set<JavaClass> collectDanglingClasses(JavaClass jclass) {
+        Set<JavaClass> classes = new HashSet<JavaClass>();
+        collectDanglingClasses(jclass, classes);
+        return classes;
+    }
+    
+    private void collectDanglingClasses(JavaClass jclass, Set<JavaClass> classes) {
+        if (jclass != null && getClass(jclass.getQualifiedName()) != null) {
+            removeClass(jclass);
+            removeFile(jclass.getFile().getPath());
+            for (JavaClass jc : jclass.getDescendants()) {
+                classes.add(jc);
+                collectDanglingClasses(jc, classes);
+            }
+            for (JavaClass jc: jclass.getAfferentClassesInProject()) {
+                classes.add(jc);
+                collectDanglingClasses(jc, classes);
+            }
+        }
     }
     
     public void setClassPath(String[] classPath) {

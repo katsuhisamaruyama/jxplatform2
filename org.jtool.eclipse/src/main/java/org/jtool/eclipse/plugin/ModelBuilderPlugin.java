@@ -122,7 +122,7 @@ public class ModelBuilderPlugin implements IModelBuilder {
         JavaFile jfile = jproject.getFile(file.getFullPath().toString());
         Set<JavaClass> classes = new HashSet<JavaClass>();
         for (JavaClass jclass : jfile.getClasses()) {
-            collectClassesRelatedTo(jfile.getProject(), jclass, classes);
+            classes.addAll(jfile.getProject().collectDanglingClasses(jclass));
         }
         
         Set<JavaFile> files = new HashSet<JavaFile>();
@@ -130,21 +130,6 @@ public class ModelBuilderPlugin implements IModelBuilder {
             files.add(jclass.getFile());
         }
         return files;
-    }
-    
-    private void collectClassesRelatedTo(JavaProject jproject, JavaClass jclass, Set<JavaClass> classes) {
-        if (jclass != null && jproject.getClass(jclass.getQualifiedName()) != null) {
-            jproject.removeClass(jclass);
-            jproject.removeFile(jclass.getFile().getPath());
-            for (JavaClass jc : jclass.getDescendants()) {
-                classes.add(jc);
-                collectClassesRelatedTo(jproject, jc, classes);
-            }
-            for (JavaClass jc: jclass.getAfferentClassesInProject()) {
-                classes.add(jc);
-                collectClassesRelatedTo(jproject, jc, classes);
-            }
-        }
     }
     
     private void setPaths(JavaProject jproject, IJavaProject project) {
