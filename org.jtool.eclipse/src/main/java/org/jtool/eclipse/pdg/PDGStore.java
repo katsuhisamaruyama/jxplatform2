@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
 
 /**
  * An object stores PDGs.
@@ -221,54 +220,6 @@ public class PDGStore {
             }
         }
         return currentSDG;
-    }
-    
-    public PDG updatePDG(JavaProject jproject, JavaMethod jmethod) {
-        removePDGsWithJavaModel(jproject, jproject.collectDanglingClasses(jmethod.getDeclaringClass()));
-        return getPDG(jmethod);
-    }
-    
-    public PDG updatePDG(JavaProject jproject, JavaField jfield) {
-        removePDGsWithJavaModel(jproject, jproject.collectDanglingClasses(jfield.getDeclaringClass()));
-        return getPDG(jfield);
-    }
-    
-    public ClDG updatePDG(JavaProject jproject, JavaClass jclass) {
-        removePDGsWithJavaModel(jproject,jproject.collectDanglingClasses(jclass));
-        return getClDG(jclass);
-    }
-    
-    public PDG updatePDGWithinSDG(JavaProject jproject, JavaMethod jmethod) {
-        removePDGsWithJavaModel(jproject, jproject.collectDanglingClasses(jmethod.getDeclaringClass()));
-        return getPDGWithinSDG(jmethod);
-    }
-    
-    public PDG updatePDGWithinSDG(JavaProject jproject, JavaField jfield) {
-        removePDGsWithJavaModel(jproject, jproject.collectDanglingClasses(jfield.getDeclaringClass()));
-        return getPDGWithinSDG(jfield);
-    }
-    
-    public ClDG updatePDGWithinSDG(JavaProject jproject, JavaClass jclass) {
-        removePDGsWithJavaModel(jproject, jproject.collectDanglingClasses(jclass));
-        return getClDGWithinSDG(jclass);
-    }
-    
-    public void removePDGsWithJavaModel(JavaProject jproject, Set<JavaClass> classes) {
-        removePDGs(jproject, classes);
-        CFGStore.getInstance().removeCFGs(jproject, classes);
-        jproject.removeClasses(classes);
-    }
-    
-    public void removePDGs(JavaProject jproject, Set<JavaClass> classes) {
-        for (JavaClass jclass : classes) {
-            for (JavaMethod jmethod : jclass.getMethods()) {
-                pdgStore.remove(jmethod.getQualifiedName());
-            }
-            for (JavaField jfeild : jclass.getFields()) {
-                pdgStore.remove(jfeild.getQualifiedName());
-            }
-            pdgStore.remove(jclass.getQualifiedName());
-        }
     }
     
     public void setVisible(boolean visible) {
