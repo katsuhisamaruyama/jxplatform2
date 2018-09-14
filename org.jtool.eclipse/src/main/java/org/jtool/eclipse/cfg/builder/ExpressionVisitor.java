@@ -233,7 +233,7 @@ public class ExpressionVisitor extends ASTVisitor {
         analysisMode.push(AnalysisMode.USE);
         righthand.accept(this);
         analysisMode.pop();
-        return false;
+        return true;
     }
     
     @Override
@@ -324,32 +324,35 @@ public class ExpressionVisitor extends ASTVisitor {
         
         Expression primary = node.getExpression();
         if (primary != null) {
-            int defVarNumBefore = curNode.getDefVariables().size();
+            CFGStatement tmpNode = curNode;
+            curNode = callNode;
             
             analysisMode.push(AnalysisMode.USE);
             primary.accept(this);
             analysisMode.pop();
+            checkPrimary(jcall);
             
-            if (analysisLevel > 0) {
+            curNode = tmpNode;
+        }
+        return false;
+    }
+    
+    private void checkPrimary(JMethodReference jcall) {
+        JReference primary = null;
+        if (curNode.getUseVariables().size() == 1) {
+            primary = curNode.getUseVariables().get(0);
+            
+            if (analysisLevel > 0 && (primary.isLocalAccess() || primary.isFieldAccess())) {
                 JMethod method = JInfoStore.getInstance().getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
                 if (method != null && !visitedMethods.contains(method)) {
-                    for (JReference jvar : curNode.getUseVariables()) {
-                        if ((jvar.isLocalAccess() || jvar.isFieldAccess()) && jvar.getName().equals(primary.toString())) {
-                            visitedMethods.add(method);
-                            if (method.hasSideEffects(visitedMethods)) {
-                                curNode.addDefVariable(jvar);
-                            }
-                        }
+                    visitedMethods.add(method);
+                    if (method.hasSideEffects(visitedMethods)) {
+                        curNode.addDefVariable(primary);
                     }
                 }
             }
-            
-            int defVarNumAfter = curNode.getDefVariables().size();
-            if (defVarNumAfter - defVarNumBefore == 1) {
-                jcall.setPrimary(curNode.getDefVariables().get(defVarNumAfter - 1));
-            }
         }
-        return false;
+        jcall.setPrimary(primary);
     }
     
     @Override
@@ -380,9 +383,15 @@ public class ExpressionVisitor extends ASTVisitor {
         
         Expression primary = node.getExpression();
         if (primary != null) {
+            CFGStatement tmpNode = curNode;
+            curNode = callNode;
+            
             analysisMode.push(AnalysisMode.USE);
             primary.accept(this);
             analysisMode.pop();
+            checkPrimary(jcall);
+            
+            curNode = tmpNode;
         }
         return false;
     }
