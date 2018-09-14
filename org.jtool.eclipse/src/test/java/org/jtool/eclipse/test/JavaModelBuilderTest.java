@@ -87,7 +87,6 @@ public class JavaModelBuilderTest {
         builder.unbuild();
     }
     
-    @Test
     public void notestJdk8() {
         String target = TEST_PROECT_DIR + "jdk1.8.0_131/";
         String classpath = TEST_PROECT_DIR + "jdk1.8.0_131/lib/*";
