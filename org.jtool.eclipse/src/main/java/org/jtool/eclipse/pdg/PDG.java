@@ -100,7 +100,7 @@ public class PDG extends Graph<PDGNode, Dependence> {
     
     public PDG clone() {
         CFG cloneCFG = getCFG().clone();
-        return PDGBuilder.build(cloneCFG);
+        return PDGBuilder.buildPDG(cloneCFG);
     }
     
     public void print() {

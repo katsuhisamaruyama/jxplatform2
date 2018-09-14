@@ -21,6 +21,10 @@ public class CallEdge extends Dependence {
         super(src, dst);
     }
     
+    public void setCall() {
+        kind = Kind.call;
+    }
+    
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
