@@ -224,46 +224,50 @@ public class PDGStore {
     }
     
     public PDG updatePDG(JavaProject jproject, JavaMethod jmethod) {
-        removePDGs(jproject, jproject.collectDanglingClasses(jmethod.getDeclaringClass()));
+        removePDGsWithJavaModel(jproject, jproject.collectDanglingClasses(jmethod.getDeclaringClass()));
         return getPDG(jmethod);
     }
     
     public PDG updatePDG(JavaProject jproject, JavaField jfield) {
-        removePDGs(jproject, jproject.collectDanglingClasses(jfield.getDeclaringClass()));
+        removePDGsWithJavaModel(jproject, jproject.collectDanglingClasses(jfield.getDeclaringClass()));
         return getPDG(jfield);
     }
     
     public ClDG updatePDG(JavaProject jproject, JavaClass jclass) {
-        removePDGs(jproject,jproject.collectDanglingClasses(jclass));
+        removePDGsWithJavaModel(jproject,jproject.collectDanglingClasses(jclass));
         return getClDG(jclass);
     }
     
     public PDG updatePDGWithinSDG(JavaProject jproject, JavaMethod jmethod) {
-        removePDGs(jproject, jproject.collectDanglingClasses(jmethod.getDeclaringClass()));
+        removePDGsWithJavaModel(jproject, jproject.collectDanglingClasses(jmethod.getDeclaringClass()));
         return getPDGWithinSDG(jmethod);
     }
     
     public PDG updatePDGWithinSDG(JavaProject jproject, JavaField jfield) {
-        removePDGs(jproject, jproject.collectDanglingClasses(jfield.getDeclaringClass()));
+        removePDGsWithJavaModel(jproject, jproject.collectDanglingClasses(jfield.getDeclaringClass()));
         return getPDGWithinSDG(jfield);
     }
     
     public ClDG updatePDGWithinSDG(JavaProject jproject, JavaClass jclass) {
-        removePDGs(jproject, jproject.collectDanglingClasses(jclass));
+        removePDGsWithJavaModel(jproject, jproject.collectDanglingClasses(jclass));
         return getClDGWithinSDG(jclass);
     }
     
-    public void removePDGs(JavaProject jproject, Set<JavaClass> classes) {
+    public void removePDGsWithJavaModel(JavaProject jproject, Set<JavaClass> classes) {
+        removePDGs(jproject, classes);
         CFGStore.getInstance().removeCFGs(jproject, classes);
-        
+        jproject.removeClasses(classes);
+    }
+    
+    public void removePDGs(JavaProject jproject, Set<JavaClass> classes) {
         for (JavaClass jclass : classes) {
-            pdgStore.remove(jclass.getQualifiedName());
             for (JavaMethod jmethod : jclass.getMethods()) {
                 pdgStore.remove(jmethod.getQualifiedName());
             }
             for (JavaField jfeild : jclass.getFields()) {
                 pdgStore.remove(jfeild.getQualifiedName());
             }
+            pdgStore.remove(jclass.getQualifiedName());
         }
     }
     

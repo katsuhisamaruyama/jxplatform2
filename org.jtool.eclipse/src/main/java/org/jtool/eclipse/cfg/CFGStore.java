@@ -160,29 +160,34 @@ public class CFGStore {
     }
     
     public CFG updateCFG(JavaProject jproject, JavaMethod jmethod) {
-        removeCFGs(jproject, jproject.collectDanglingClasses(jmethod.getDeclaringClass()));
+        removeCFGsWithJavaModel(jproject, jproject.collectDanglingClasses(jmethod.getDeclaringClass()));
         return getCFG(jmethod);
     }
     
-    public CFG updatePDG(JavaProject jproject, JavaField jfield) {
-        removeCFGs(jproject, jproject.collectDanglingClasses(jfield.getDeclaringClass()));
+    public CFG updateCFG(JavaProject jproject, JavaField jfield) {
+        removeCFGsWithJavaModel(jproject, jproject.collectDanglingClasses(jfield.getDeclaringClass()));
         return getCFG(jfield);
     }
     
     public CCFG updatePDG(JavaProject jproject, JavaClass jclass) {
-        removeCFGs(jproject,jproject.collectDanglingClasses(jclass));
+        removeCFGsWithJavaModel(jproject,jproject.collectDanglingClasses(jclass));
         return getCCFG(jclass);
+    }
+    
+    public void removeCFGsWithJavaModel(JavaProject jproject, Set<JavaClass> classes) {
+        removeCFGs(jproject, classes);
+        jproject.removeClasses(classes);
     }
     
     public void removeCFGs(JavaProject jproject, Set<JavaClass> classes) {
         for (JavaClass jclass : classes) {
-            cfgStore.remove(jclass.getQualifiedName());
             for (JavaMethod jmethod : jclass.getMethods()) {
                 cfgStore.remove(jmethod.getQualifiedName());
             }
             for (JavaField jfeild : jclass.getFields()) {
                 cfgStore.remove(jfeild.getQualifiedName());
             }
+            cfgStore.remove(jclass.getQualifiedName());
         }
     }
     

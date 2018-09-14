@@ -98,7 +98,7 @@ public class ModelBuilderPlugin implements IModelBuilder {
             return;
         }
         
-        Set<JavaFile> files = collectFilesRelatedTo(jproject, file);
+        Set<JavaFile> files = collectDanglingClasses(jproject, file);
         for (JavaFile jfile : files) {
             for (JavaClass jc : jfile.getClasses()) {
                 jproject.removeClass(jc);
@@ -118,7 +118,7 @@ public class ModelBuilderPlugin implements IModelBuilder {
         addFile(file);
     }
     
-    private Set<JavaFile> collectFilesRelatedTo(JavaProject jproject, IFile file) {
+    private Set<JavaFile> collectDanglingClasses(JavaProject jproject, IFile file) {
         JavaFile jfile = jproject.getFile(file.getFullPath().toString());
         Set<JavaClass> classes = new HashSet<JavaClass>();
         for (JavaClass jclass : jfile.getClasses()) {
@@ -191,7 +191,7 @@ public class ModelBuilderPlugin implements IModelBuilder {
             
             if (project != null) {
                 compilationUnits.add(JavaCore.createCompilationUnitFrom(file));
-                Set<JavaFile> files = collectFilesRelatedTo(jproject, file);
+                Set<JavaFile> files = collectDanglingClasses(jproject, file);
                 for (JavaFile jf : files) {
                     ICompilationUnit icu = compilationUnitMap.get(jf.getPath());
                     if (icu != null) {
@@ -222,7 +222,7 @@ public class ModelBuilderPlugin implements IModelBuilder {
         
         for (IFile file : dirtyFiles) {
             compilationUnits.add(JavaCore.createCompilationUnitFrom(file));
-            Set<JavaFile> files = collectFilesRelatedTo(jproject, file);
+            Set<JavaFile> files = collectDanglingClasses(jproject, file);
             for (JavaFile jf : files) {
                 ICompilationUnit icu = compilationUnitMap.get(jf.getPath());
                 if (icu != null) {

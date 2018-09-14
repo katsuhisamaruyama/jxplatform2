@@ -198,8 +198,6 @@ public class JavaProject {
     
     private void collectDanglingClasses(JavaClass jclass, Set<JavaClass> classes) {
         if (jclass != null && getClass(jclass.getQualifiedName()) != null) {
-            removeClass(jclass);
-            removeFile(jclass.getFile().getPath());
             for (JavaClass jc : jclass.getDescendants()) {
                 classes.add(jc);
                 collectDanglingClasses(jc, classes);
@@ -208,6 +206,13 @@ public class JavaProject {
                 classes.add(jc);
                 collectDanglingClasses(jc, classes);
             }
+        }
+    }
+    
+    public void removeClasses(Set<JavaClass> classes) {
+        for (JavaClass jclass : classes) {
+            removeFile(jclass.getFile().getPath());
+            removeClass(jclass);
         }
     }
     
