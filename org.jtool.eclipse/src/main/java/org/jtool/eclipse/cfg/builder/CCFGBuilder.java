@@ -10,6 +10,7 @@ import org.jtool.eclipse.cfg.CCFG;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGClassEntry;
 import org.jtool.eclipse.cfg.CFGNode;
+import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
@@ -33,7 +34,18 @@ public class CCFGBuilder {
     
     public static CCFG build(JavaClass jclass) {
         CCFG ccfg = new CCFG();
-        
+        return build(ccfg, jclass);
+    }
+    
+    public static CCFG build(JavaProject jproject) {
+        CCFG ccfg = new CCFG();
+        for (JavaClass jclass : jproject.getClasses()) {
+            build(ccfg, jclass);
+        }
+        return ccfg;
+    }
+    
+    private static CCFG build(CCFG ccfg, JavaClass jclass) {
         CFGClassEntry entry;
         String name = jclass.getName();
         String fqn = jclass.getQualifiedName();
@@ -56,6 +68,7 @@ public class CCFGBuilder {
             CFG cfg = CFGFieldBuilder.build(jf);
             entry.addField(cfg);
         }
+        
         for (JavaClass jc : jclass.getInnerClasses()) {
             CFG cfg = build(jc);
             entry.addType(cfg);
