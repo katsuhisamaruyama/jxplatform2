@@ -542,7 +542,7 @@ public class StatementVisitor extends ASTVisitor {
         }
         if (jumpNode != null) {
             ControlFlow edge = createFlow(breakNode, jumpNode);
-            edge.setTrue();
+            edge.setJump();
             edge = createFlow(breakNode, nextNode);
             edge.setFallThrough();
         }
@@ -563,7 +563,7 @@ public class StatementVisitor extends ASTVisitor {
         }
         if (jumpNode != null) {
             ControlFlow edge = createFlow(continueNode, jumpNode);
-            edge.setTrue();
+            edge.setJump();
             edge = createFlow(continueNode, nextNode);
             edge.setFallThrough();
         }
@@ -591,7 +591,7 @@ public class StatementVisitor extends ASTVisitor {
         }
         
         ControlFlow trueEdge = createFlow(curNode, cfg.getEndNode());
-        trueEdge.setTrue();
+        trueEdge.setJump();
         
         ControlFlow fallEdge = createFlow(curNode, nextNode);
         fallEdge.setFallThrough();
