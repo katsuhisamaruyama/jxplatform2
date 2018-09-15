@@ -104,6 +104,6 @@ public class CFGMethodEntry extends CFGEntry {
     
     @Override
     public String toString() {
-        return super.toString() + " METHOD [ " + getName() + "]";
+        return super.toString() + " METHOD [ " + getName() + " ]";
     }
 }

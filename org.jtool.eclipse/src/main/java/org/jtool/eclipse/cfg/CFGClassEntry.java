@@ -62,6 +62,6 @@ public class CFGClassEntry extends CFGEntry {
     
     @Override
     public String toString() {
-        return super.toString() + " CLASS [ " + getName() + "]";
+        return super.toString() + " CLASS [ " + getName() + " ]";
     }
 }

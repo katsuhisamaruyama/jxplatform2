@@ -56,6 +56,6 @@ public class CFGFieldEntry extends CFGEntry {
     
     @Override
     public String toString() {
-        return super.toString() + " FIELD [ " + getName() + "]";
+        return super.toString() + " FIELD [ " + getName() + " ]";
     }
 }
