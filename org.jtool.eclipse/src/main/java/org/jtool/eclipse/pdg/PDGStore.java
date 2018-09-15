@@ -35,6 +35,8 @@ public class PDGStore {
     protected SDG currentSDG = null;
     protected Map<String, PDG> pdgStore = new HashMap<String, PDG>();
     
+    private boolean ignoringFallThrough = false;
+    
     private boolean visible = true;
     
     private PDGStore() {
@@ -48,6 +50,14 @@ public class PDGStore {
         pdgStore.clear();
         currentSDG = null;
         CFGStore.getInstance().destroy();
+    }
+    
+    public void setIgnoringFallThrough(boolean ignoringFallThrough) {
+        this.ignoringFallThrough = ignoringFallThrough;
+    }
+    
+    public boolean ignoringFallThrough() {
+        return ignoringFallThrough;
     }
     
     public int size() {

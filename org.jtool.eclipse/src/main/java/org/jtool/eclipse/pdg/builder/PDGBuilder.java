@@ -15,6 +15,7 @@ import org.jtool.eclipse.pdg.PDGClassEntry;
 import org.jtool.eclipse.pdg.PDGEntry;
 import org.jtool.eclipse.pdg.PDGNode;
 import org.jtool.eclipse.pdg.PDGStatement;
+import org.jtool.eclipse.pdg.PDGStore;
 import org.jtool.eclipse.pdg.ParameterEdge;
 import org.jtool.eclipse.pdg.CallEdge;
 import org.jtool.eclipse.cfg.CCFG;
@@ -43,7 +44,7 @@ public class PDGBuilder {
     public static PDG buildPDG(CFG cfg) {
         PDG pdg = new PDG();
         createNodes(pdg, cfg);
-        CDFinder.find(pdg, cfg);
+        CDFinder.find(pdg, cfg, PDGStore.getInstance().ignoringFallThrough());
         DDFinder.find(pdg, cfg);
         return pdg;
     }
