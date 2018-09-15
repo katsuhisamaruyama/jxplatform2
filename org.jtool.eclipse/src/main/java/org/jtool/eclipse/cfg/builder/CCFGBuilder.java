@@ -61,16 +61,19 @@ public class CCFGBuilder {
         
         for (JavaMethod jm : jclass.getMethods()) {
             CFG cfg = CFGMethodBuilder.build(jm);
+            ccfg.add(cfg);
             entry.addMethod(cfg);
         }
         
         for (JavaField jf : jclass.getFields()) {
             CFG cfg = CFGFieldBuilder.build(jf);
+            ccfg.add(cfg);
             entry.addField(cfg);
         }
         
         for (JavaClass jc : jclass.getInnerClasses()) {
             CFG cfg = build(jc);
+            ccfg.add(cfg);
             entry.addType(cfg);
         }
         return ccfg;

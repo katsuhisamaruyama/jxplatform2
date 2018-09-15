@@ -48,4 +48,20 @@ public class CCFG extends CFG {
     public CFG getCFG(String fqn) {
         return cfgs.get(fqn);
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder();
+        buf.append("----- CCFG (from here) -----\n");
+        buf.append("Name = " + getName());
+        buf.append("\n");
+        for (CFG cfg : cfgs.values()) {
+            buf.append(cfg.getNodeInfo());
+        }
+        for (CFG cfg : cfgs.values()) {
+            buf.append(cfg.getEdgeInfo());
+        }
+        buf.append("----- CCFG (to here) -----\n");
+        return buf.toString();
+    }
 }

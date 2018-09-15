@@ -115,11 +115,15 @@ public class CFGStore {
         CFGStore.getInstance().addCFG(ccfg);
         
         for (CFG cfg : ccfg.getStartNode().getMethods()) {
-            ccfg.add(cfg);
             addCFG(cfg);
         }
         for (CFG cfg : ccfg.getStartNode().getFields()) {
-            ccfg.add(cfg);
+            addCFG(cfg);
+        }
+        for (CFG cfg : ccfg.getStartNode().getFields()) {
+            addCFG(cfg);
+        }
+        for (CFG cfg : ccfg.getStartNode().getTypes()) {
             addCFG(cfg);
         }
         return ccfg;
