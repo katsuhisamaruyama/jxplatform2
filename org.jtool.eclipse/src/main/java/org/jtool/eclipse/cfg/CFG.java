@@ -240,11 +240,9 @@ public class CFG extends Graph<CFGNode, ControlFlow> {
     
     public Set<CFGNode> postDominator(CFGNode anchor) {
         Set<CFGNode> postDominator = new HashSet<CFGNode>();
-        Set<CFGNode> track = new HashSet<CFGNode>();
         for (CFGNode node : getNodes()) {
             if (!anchor.equals(node)) {
-                track.clear();
-                track = forwardReachableNodes(anchor, node, true);
+                Set<CFGNode> track = forwardReachableNodes(anchor, node, true);
                 if (track.contains(node) && !track.contains(getEndNode())) {
                     postDominator.add(node);
                 }
