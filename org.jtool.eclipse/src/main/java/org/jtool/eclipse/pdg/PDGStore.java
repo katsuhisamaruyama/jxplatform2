@@ -64,7 +64,7 @@ public class PDGStore {
     
     public PDG getPDG(CFG cfg) {
         if (visible) {
-            System.out.print(" - " + cfg.getStartNode().getQualifiedName() + " - PDG");
+            System.out.print(" - " + cfg.getStartNode().getQualifiedName() + " - PDG\n");
         }
         
         PDG pdg = PDGBuilder.buildPDG(cfg);
@@ -121,7 +121,7 @@ public class PDGStore {
         }
         
         if (visible) {
-            System.out.print(" - " + jclass.getQualifiedName() + " - ClDG");
+            System.out.print(" - " + jclass.getQualifiedName() + " - ClDG\n");
         }
         
         CCFG ccfg = CCFGBuilder.build(jclass);
@@ -207,7 +207,7 @@ public class PDGStore {
     public SDG getSDG(JavaProject jproject) {
         if (!jproject.getPath().equals(ProjectStore.getInstance().getCurrentProject().getPath())) {
             if (visible) {
-                System.out.print(" - " + jproject.getName() + " - SDG");
+                System.out.print(" - " + jproject.getName() + " - SDG\n");
             }
             
             pdgStore.clear();
@@ -233,16 +233,12 @@ public class PDGStore {
     public ClDG[] buildPDGsForTest(List<JavaClass> jclasses) {
         int size = jclasses.size();
         ClDG[] cldgs = new ClDG[size];
-        if (visible) {
-            System.out.println();
-            System.out.println("** Building PDGs of " + size + " classes ");
-        }
+        System.out.println();
+        System.out.println("** Building PDGs of " + size + " classes ");
         int count = 1;
         for (JavaClass jclass : jclasses) {
             cldgs[count - 1] = getClDG(jclass);
-            if (visible) {
-                System.out.println(" (" + count + "/" + size + ")");
-            }
+            System.out.println(" (" + count + "/" + size + ")");
             count++;
         }
         return cldgs;

@@ -65,7 +65,6 @@ public class SDG extends PDG {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("----- SDG (from here) -----\n");
-        buf.append("\n");
         for (PDG pdg : pdgs.values()) {
             buf.append(pdg.getNodeInfo());
         }

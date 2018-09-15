@@ -104,7 +104,7 @@ public class CFGStore {
         }
         
         if (visible) {
-            System.out.print(" - " + jclass.getQualifiedName() + " - CCFG");
+            System.out.print(" - " + jclass.getQualifiedName() + " - CCFG\n");
         }
         CCFG ccfg = build(jclass);
         return ccfg;
@@ -137,7 +137,7 @@ public class CFGStore {
         CFG cfg = getCFG(jmethod.getQualifiedName());
         if (cfg == null) {
             if (visible) {
-                System.out.print(" - " + jmethod.getQualifiedName() + " - CFG");
+                System.out.print(" - " + jmethod.getQualifiedName() + " - CFG\n");
             }
             
             cfg = CFGMethodBuilder.build(jmethod, visitedMethods);
@@ -214,8 +214,8 @@ public class CFGStore {
         System.out.println();
         System.out.println("** Building CFGs of " + size + " classes ");
         for (JavaClass jclass : jclasses) {
+            System.out.print("(" + count + "/" + size + ")");
             ccfgs[count - 1] = getCCFG(jclass);
-            System.out.println(" (" + count + "/" + size + ")");
             count++;
         }
         return ccfgs;
