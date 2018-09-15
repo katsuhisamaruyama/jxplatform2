@@ -258,10 +258,10 @@ public class CFG extends Graph<CFGNode, ControlFlow> {
         Set<CFGNode> ftrackf = forwardReachableNodes(from, getEndNode(), true);
         Set<CFGNode> fCRP = GraphElement.intersection(btrackf, ftrackf);
         
-        
         Set<CFGNode> ftrackb = forwardReachableNodes(from, to, true);
         Set<CFGNode> btrackb = backwardReachableNodes(to, getStartNode(), true);
         Set<CFGNode> bCRP = GraphElement.intersection(ftrackb, btrackb);
+        
         Set<CFGNode> CRP = GraphElement.union(fCRP, bCRP);
         return CRP;
     }
