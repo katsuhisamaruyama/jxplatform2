@@ -8,13 +8,12 @@ package org.jtool.eclipse.javamodel;
 
 import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
 import org.jtool.eclipse.javamodel.builder.ProjectStore;
-
+import java.util.Set;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -209,7 +208,7 @@ public class JavaProject {
         }
     }
     
-    public void removeClasses(Set<JavaClass> classes) {
+    public void removeClasses(List<JavaClass> classes) {
         for (JavaClass jclass : classes) {
             removeFile(jclass.getFile().getPath());
             removeClass(jclass);
