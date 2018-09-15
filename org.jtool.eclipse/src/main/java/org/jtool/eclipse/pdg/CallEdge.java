@@ -29,7 +29,7 @@ public class CallEdge extends Dependence {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append(super.toString());
-        buf.append("CALL");
+        buf.append(" CALL");
         return buf.toString();
     }
 }
