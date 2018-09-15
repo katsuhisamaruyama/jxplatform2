@@ -104,10 +104,16 @@ public class CFGMethodCall extends CFGStatement {
     }
     
     public CFGParameter getActualIn(int pos) {
+        if (pos < 0 || pos >= actualIns.size()) {
+            return null;
+        }
         return actualIns.get(pos);
     }
     
     public CFGParameter getActualOut(int pos) {
+        if (pos < 0 || pos >= actualOuts.size()) {
+            return null;
+        }
         return actualOuts.get(pos);
     }
     
