@@ -31,20 +31,20 @@ import java.util.ArrayList;
  */
 public class ExternalJMethod extends JMethod {
     
-    protected CtMethod cmethod;
+    protected CtMethod ctMethod;
     
     public ExternalJMethod(JClass clazz, CtMethod cmethod) {
-        this.cmethod = cmethod;
+        this.ctMethod = cmethod;
         declaringClass = clazz;
     }
     
     public CtMethod getCtMethod() {
-        return cmethod;
+        return ctMethod;
     }
     
     @Override
     public String getName() {
-        return cmethod.getName();
+        return ctMethod.getName();
     }
     
     @Override
@@ -54,13 +54,13 @@ public class ExternalJMethod extends JMethod {
     
     @Override
     public String getSignature() {
-        return cmethod.getName() + MethodSignature.methodSignatureToString(cmethod.getSignature());
+        return ctMethod.getName() + MethodSignature.methodSignatureToString(ctMethod.getSignature());
     }
     
     @Override
     public String getReturnType() {
         try {
-            return cmethod.getReturnType().getName();
+            return ctMethod.getReturnType().getName();
         } catch (NotFoundException e) {
             return "";
         }
@@ -69,7 +69,7 @@ public class ExternalJMethod extends JMethod {
     @Override
     public boolean isPrimitiveReturnType() {
         try {
-            return cmethod.getReturnType().isPrimitive();
+            return ctMethod.getReturnType().isPrimitive();
         } catch (NotFoundException e) {
             return false;
         }
@@ -78,7 +78,7 @@ public class ExternalJMethod extends JMethod {
     @Override
     public boolean isVoid() {
         try {
-            return cmethod.getReturnType().equals(CtClass.voidType);
+            return ctMethod.getReturnType().equals(CtClass.voidType);
         } catch (NotFoundException e) {
             return false;
         }
@@ -101,17 +101,17 @@ public class ExternalJMethod extends JMethod {
     
     @Override
     public boolean isPublic() {
-        return Modifier.isPublic(cmethod.getModifiers());
+        return Modifier.isPublic(ctMethod.getModifiers());
     }
     
     @Override
     public boolean isProtected() {
-        return Modifier.isProtected(cmethod.getModifiers());
+        return Modifier.isProtected(ctMethod.getModifiers());
     }
     
     @Override
     public boolean isPrivate() {
-        return Modifier.isPrivate(cmethod.getModifiers());
+        return Modifier.isPrivate(ctMethod.getModifiers());
     }
     
     @Override
@@ -128,7 +128,7 @@ public class ExternalJMethod extends JMethod {
     protected JMethod[] findAccessedMethods() {
         List<JMethod> methods = new ArrayList<JMethod>();
         try {
-            cmethod.instrument(new ExprEditor() {
+            ctMethod.instrument(new ExprEditor() {
                 
                 @Override
                 public void edit(MethodCall cm) throws CannotCompileException {
@@ -157,7 +157,7 @@ public class ExternalJMethod extends JMethod {
     protected JField[] findAccessedFields() {
         List<JField> fields = new ArrayList<JField>();
         try {
-            cmethod.instrument(new ExprEditor() {
+            ctMethod.instrument(new ExprEditor() {
                 
                 @Override
                 public void edit(FieldAccess cf) throws CannotCompileException {
@@ -199,7 +199,7 @@ public class ExternalJMethod extends JMethod {
     @Override
     protected void checkSideEffectsOnFields(Set<JMethod> visitedMethods) {
         try {
-            cmethod.instrument(new ExprEditor() {
+            ctMethod.instrument(new ExprEditor() {
                 
                 @Override
                 public void edit(FieldAccess cf) throws CannotCompileException {

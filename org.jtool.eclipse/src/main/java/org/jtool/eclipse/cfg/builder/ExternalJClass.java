@@ -28,43 +28,43 @@ import java.util.ArrayList;
 public class ExternalJClass extends JClass {
     
     protected JavaProject jproject;
-    protected CtClass cclass;
+    protected CtClass ctClass;
     
-    public ExternalJClass(CtClass cclass, JavaProject jproject) {
-        this.cclass = cclass;
+    public ExternalJClass(CtClass ctClass, JavaProject jproject) {
+        this.ctClass = ctClass;
         this.jproject = jproject;
         
         int num = 0;
-        fields = new ExternalJField[cclass.getFields().length];
-        for (CtField cf : cclass.getFields()) {
+        fields = new ExternalJField[ctClass.getFields().length];
+        for (CtField cf : ctClass.getFields()) {
             fields[num] = new ExternalJField(this, cf);
             num++;
         }
         
         num = 0;
-        methods = new JMethod[cclass.getMethods().length + cclass.getConstructors().length];
-        for (CtMethod cm: cclass.getMethods()) {
+        methods = new JMethod[ctClass.getMethods().length + ctClass.getConstructors().length];
+        for (CtMethod cm: ctClass.getMethods()) {
             methods[num] = new ExternalJMethod(this, cm);
             num++;
         }
-        for (CtConstructor cm: cclass.getConstructors()) {
+        for (CtConstructor cm: ctClass.getConstructors()) {
             methods[num] = new ExternalJConstructor(this, cm);
             num++;
         }
     }
     
     public CtClass getCtClass() {
-        return cclass;
+        return ctClass;
     }
     
     @Override
     public String getName() {
-        return cclass.getSimpleName();
+        return ctClass.getSimpleName();
     }
     
     @Override
     public String getQualifiedName() {
-        return cclass.getName();
+        return ctClass.getName();
     }
     
     @Override
@@ -74,27 +74,27 @@ public class ExternalJClass extends JClass {
     
     @Override
     public boolean isInterface() {
-        return cclass.isInterface();
+        return ctClass.isInterface();
     }
     
     @Override
     public boolean isEnum() {
-        return cclass.isEnum();
+        return ctClass.isEnum();
     }
     
     @Override
     public boolean isPublic() {
-        return Modifier.isPublic(cclass.getModifiers());
+        return Modifier.isPublic(ctClass.getModifiers());
     }
     
     @Override
     public boolean isProtected() {
-        return Modifier.isProtected(cclass.getModifiers());
+        return Modifier.isProtected(ctClass.getModifiers());
     }
     
     @Override
     public boolean isPrivate() {
-        return Modifier.isPrivate(cclass.getModifiers());
+        return Modifier.isPrivate(ctClass.getModifiers());
     }
     
     @Override
@@ -115,7 +115,7 @@ public class ExternalJClass extends JClass {
             return new JClass[0];
         }
         
-        for (CtClass cc : bytecodeClassStore.getAncestors(cclass.getName())) {
+        for (CtClass cc : bytecodeClassStore.getAncestors(ctClass.getName())) {
             JClass clazz = JInfoStore.getInstance().getJClass(cc.getName());
             if (clazz != null) {
                 classes.add(clazz);
@@ -132,13 +132,13 @@ public class ExternalJClass extends JClass {
             return new JClass[0];
         }
         
-        for (CtClass cc : bytecodeClassStore.getDescendants(cclass.getName())) {
+        for (CtClass cc : bytecodeClassStore.getDescendants(ctClass.getName())) {
             JClass clazz = JInfoStore.getInstance().getJClass(cc.getName());
             if (clazz != null) {
                 classes.add(clazz);
             }
         }
-        for (JavaClass jc : bytecodeClassStore.getJavaDescendants(cclass.getName())) {
+        for (JavaClass jc : bytecodeClassStore.getJavaDescendants(ctClass.getName())) {
             JClass clazz = JInfoStore.getInstance().getJClass(jc.getQualifiedName());
             if (clazz != null) {
                 classes.add(clazz);

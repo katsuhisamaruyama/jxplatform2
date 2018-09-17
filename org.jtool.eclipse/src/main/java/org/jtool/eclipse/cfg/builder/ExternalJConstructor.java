@@ -18,8 +18,8 @@ import javassist.expr.MethodCall;
 import javassist.expr.ConstructorCall;
 import javassist.expr.FieldAccess;
 import java.util.List;
-import java.util.Set;
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * An object that represents a constructor outside the project.

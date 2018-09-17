@@ -21,31 +21,31 @@ import javassist.NotFoundException;
  */
 public class ExternalJField extends JField {
     
-    protected CtField cfield;
+    protected CtField ctField;
     
     public ExternalJField(JClass clazz, CtField cfield) {
-        this.cfield = cfield;
+        this.ctField = cfield;
         declaringClass = clazz;
     }
     
     public CtField getCtField() {
-        return cfield;
+        return ctField;
     }
     
     @Override
     public String getName() {
-        return cfield.getName();
+        return ctField.getName();
     }
     
     @Override
     public String getQualifiedName() {
-        return declaringClass.getQualifiedName() + JavaElement.QualifiedNameSeparator + cfield.getName();
+        return declaringClass.getQualifiedName() + JavaElement.QualifiedNameSeparator + ctField.getName();
     }
     
     @Override
     public String getType() {
         try {
-            return cfield.getType().getName();
+            return ctField.getType().getName();
         } catch (NotFoundException e) {
             return "";
         }
@@ -54,7 +54,7 @@ public class ExternalJField extends JField {
     @Override
     public boolean isPrimitiveType() {
         try {
-            return cfield.getType().isPrimitive();
+            return ctField.getType().isPrimitive();
         } catch (NotFoundException e) {
             return false;
         }
@@ -62,17 +62,17 @@ public class ExternalJField extends JField {
     
     @Override
     public boolean isPublic() {
-        return Modifier.isPublic(cfield.getModifiers());
+        return Modifier.isPublic(ctField.getModifiers());
     }
     
     @Override
     public boolean isProtected() {
-        return Modifier.isProtected(cfield.getModifiers());
+        return Modifier.isProtected(ctField.getModifiers());
     }
     
     @Override
     public boolean isPrivate() {
-        return Modifier.isPrivate(cfield.getModifiers());
+        return Modifier.isPrivate(ctField.getModifiers());
     }
     
     @Override
