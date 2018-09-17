@@ -39,8 +39,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.HashMap;
 
 /**
@@ -387,6 +387,7 @@ public class ModelBuilderPlugin implements IModelBuilder {
         console.println(mesg);
     }
     
+    @Override
     public void resisterBytecodeClasses(BytecodeClassStore bytecodeClassStore) {
         try {
             IWorkbenchWindow workbenchWindow = Activator.getDefault().getWorkbenchWindow();

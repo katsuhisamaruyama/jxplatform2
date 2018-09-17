@@ -197,9 +197,10 @@ public class ModelBuilder implements IModelBuilder {
         return  content.toString();
     }
     
+    @Override
     public void resisterBytecodeClasses(BytecodeClassStore bytecodeClassStore) {
         int size = bytecodeClassStore.getBytecodeClassNames().size();
-        Logger.getInstance().printMessage("** Ready to build java models of " + size + " bytecode-classes outside the project");
+        Logger.getInstance().printMessage("** Ready to build java models of " + size + " bytecode-classes");
         ConsoleProgressMonitor pm = new ConsoleProgressMonitor();
         pm.begin(size);
         int count = 0;
@@ -208,7 +209,7 @@ public class ModelBuilder implements IModelBuilder {
             
             pm.work(1);
             count++;
-            Logger.getInstance().printLog("-Parse " + className + " (" + count + "/" + size + ")");
+            Logger.getInstance().printLog("-Analize " + className + " (" + count + "/" + size + ")");
         }
         pm.done();
     }
