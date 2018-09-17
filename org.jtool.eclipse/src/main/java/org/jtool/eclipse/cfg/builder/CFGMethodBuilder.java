@@ -125,18 +125,22 @@ public class CFGMethodBuilder {
         CFGNode tmpExit = new CFGNode();
         cfg.setEndNode(tmpExit);
         
-        CFGNode formalInNode = createFormalIn(params, cfg, entry, entry);
+        CFGNode finalFormalInNode = createFormalIn(params, cfg, entry, entry);
         CFGNode nextNode = new CFGNode();
         
-        ControlFlow entryEdge = new ControlFlow(formalInNode, nextNode);
+        ControlFlow entryEdge = new ControlFlow(finalFormalInNode, nextNode);
         entryEdge.setTrue();
         cfg.add(entryEdge);
         
-        StatementVisitor visitor = new StatementVisitor(cfg, formalInNode, nextNode, visitedMethods);
+        StatementVisitor visitor = new StatementVisitor(cfg, finalFormalInNode, nextNode, visitedMethods);
         node.accept(visitor);
         nextNode = visitor.getNextCFGNode();
         
-        CFGNode formalOutNode = createFormalOut(node, cfg, entry, nextNode);
+        CFGNode formalOutNodeForReturn = createFormalOutForReturn(node, cfg, entry);
+        replace(cfg, nextNode, formalOutNodeForReturn);
+        replace(cfg, tmpExit, formalOutNodeForReturn);
+        
+        List<CFGParameter> formalOutNodes = createFormalOut(params, cfg, entry, formalOutNodeForReturn);
         
         CFGExit exit;
         if (mbinding == null) {
@@ -149,22 +153,30 @@ public class CFGMethodBuilder {
             }
         }
         cfg.setEndNode(exit);
+        cfg.add(exit);
         
-        if (formalOutNode != null) {
-            replace(cfg, nextNode, formalOutNode);
-            replace(cfg, tmpExit, formalOutNode);
-            cfg.add(exit);
-            
-            ControlFlow exitEdge = new ControlFlow(formalOutNode, exit);
-            exitEdge.setTrue();
-            cfg.add(exitEdge);
-            
+        if (entry.isVoidType()) {
+            if (formalOutNodes.size() > 0) {
+                replace(cfg, formalOutNodeForReturn, formalOutNodes.get(0));
+                
+                ControlFlow exitEdge = new ControlFlow(formalOutNodes.get(formalOutNodes.size() - 1), exit);
+                exitEdge.setTrue();
+                cfg.add(exitEdge);
+            } else {
+                replace(cfg, formalOutNodeForReturn, exit);
+            }
         } else {
-            replace(cfg, nextNode, exit);
-            replace(cfg, tmpExit, exit);
-            cfg.add(exit);
+            
+            if (formalOutNodes.size() > 0) {
+                ControlFlow exitEdge = new ControlFlow(formalOutNodes.get(formalOutNodes.size() - 1), exit);
+                exitEdge.setTrue();
+                cfg.add(exitEdge);
+            } else {
+                ControlFlow exitEdge = new ControlFlow(formalOutNodeForReturn, exit);
+                exitEdge.setTrue();
+                cfg.add(exitEdge);
+            }
         }
-        
         return cfg;
     }
     
@@ -196,27 +208,51 @@ public class CFGMethodBuilder {
             
             prevNode = formalInNode;
         }
-        
         return prevNode;
     }
     
-    private static CFGNode createFormalOut(ASTNode node, CFG cfg, CFGMethodEntry entry, CFGNode prevNode) {
-        if (entry.isVoidType()) {
-            return null;
+    private static List<CFGParameter> createFormalOut(List<VariableDeclaration> params, CFG cfg, CFGMethodEntry entry, CFGNode prevNode) {
+        List<CFGParameter> formalOuts = new ArrayList<CFGParameter>();
+        for (int ordinal = 0; ordinal < params.size(); ordinal++) {
+            VariableDeclaration param = params.get(ordinal);
+            if (!param.resolveBinding().getType().isPrimitive()) {
+                CFGParameter formalOutNode = new CFGParameter(param, CFGNode.Kind.formalOut, ordinal);
+                formalOutNode.setParent(entry);
+                entry.addFormalOut(formalOutNode);
+                cfg.add(formalOutNode);
+                
+                JReference jvout = new JLocalReference(param, param.resolveBinding());
+                formalOutNode.setUseVariable(jvout);
+                
+                JReference jvin = new JVirtualReference(param, "$" + String.valueOf(ExpressionVisitor.paramNumber), jvout.getType(), jvout.isPrimitiveType());
+                formalOutNode.setDefVariable(jvin);
+                ExpressionVisitor.paramNumber++;
+                
+                ControlFlow edge = new ControlFlow(prevNode, formalOutNode);
+                edge.setTrue();
+                cfg.add(edge);
+                
+                prevNode = formalOutNode;
+                formalOuts.add(formalOutNode);
+            }
         }
-        
+        return formalOuts;
+    }
+    
+    private static CFGNode createFormalOutForReturn(ASTNode node, CFG cfg, CFGMethodEntry entry) {
         CFGParameter formalOutNode = new CFGParameter(node, CFGNode.Kind.formalOut, 0);
-        formalOutNode.setParent(entry);
-        entry.addFormalOut(formalOutNode);
-        cfg.add(formalOutNode);
-        
-        JReference jvout = new JVirtualReference(node, "$" + String.valueOf(ExpressionVisitor.paramNumber), entry.getReturnType(), entry.isPrimitiveType());
-        formalOutNode.addDefVariable(jvout);
-        ExpressionVisitor.paramNumber++;
-        
-        JReference jvin = new JVirtualReference(node, "$_", entry.getReturnType(), entry.isPrimitiveType());
-        formalOutNode.addUseVariable(jvin);
-        
+        if (!entry.isVoidType()) {
+            formalOutNode.setParent(entry);
+            entry.addFormalOut(formalOutNode);
+            cfg.add(formalOutNode);
+            
+            JReference jvout = new JVirtualReference(node, "$" + String.valueOf(ExpressionVisitor.paramNumber), entry.getReturnType(), entry.isPrimitiveType());
+            formalOutNode.addDefVariable(jvout);
+            ExpressionVisitor.paramNumber++;
+            
+            JReference jvin = new JVirtualReference(node, "$_", entry.getReturnType(), entry.isPrimitiveType());
+            formalOutNode.addUseVariable(jvin);
+        }
         return formalOutNode;
     }
 }
