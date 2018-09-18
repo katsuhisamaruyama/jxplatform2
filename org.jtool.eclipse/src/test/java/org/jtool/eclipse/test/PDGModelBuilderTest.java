@@ -6,10 +6,12 @@
 
 package org.jtool.eclipse.test;
 
-import org.jtool.eclipse.pdg.PDGStore;
-import org.jtool.eclipse.batch.JavaModelBuilder;
-import org.jtool.eclipse.cfg.CFGStore;
+import org.jtool.eclipse.batch.ModelBuilderBatch;
+import org.jtool.eclipse.pdg.PDG;
+import org.jtool.eclipse.pdg.ClDG;
+import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaProject;
+import java.util.List;
 import org.junit.Test;
 
 /**
@@ -22,73 +24,91 @@ public class PDGModelBuilderTest {
     
     private final String TEST_PROECT_DIR = "/Users/maru/Desktop/TestSamples/";
     
+    private ClDG[] buildPDGsForTest(ModelBuilderBatch builder, List<JavaClass> jclasses) {
+        int size = jclasses.size();
+        ClDG[] cldgs = new ClDG[size];
+        System.out.println();
+        System.out.println("** Building PDGs of " + size + " classes ");
+        int count = 1;
+        for (JavaClass jclass : jclasses) {
+            cldgs[count - 1] = builder.getClDG(jclass);
+            System.out.println(" (" + count + "/" + size + ")");
+            count++;
+        }
+        return cldgs;
+    }
+    
+    private boolean checkDetails(ClDG[] cclgs) {
+        for (ClDG cldg : cclgs) {
+            StringBuilder buf = new StringBuilder();
+            buf.append(cldg.getQualifiedName());
+            buf.append("\n");
+            for (PDG pdg : cldg.getPDGs()) {
+                buf.append(pdg.toString());
+            }
+            System.out.println(buf.toString());
+        }
+        return true;
+    }
+    
     @Test
     public void testSimple() {
         String target = TEST_PROECT_DIR + "Simple/";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        JavaProject jproject = builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        JavaProject jproject = builder.build(target, target, target);
         
-        CFGStore.getInstance().setAnalysisLevel(jproject, false);
-        CFGStore.getInstance().setCreatingActualNodes(false);
-        
-        PDGStore.getInstance().buildPDGsForTest(jproject.getClasses());
-        PDGStore.getInstance().destroy();
+        builder.setAnalysisLevel(jproject, false, false);
+        builder.setCreatingActualNodes(false);
+        ClDG[] cldgs = buildPDGsForTest(builder, jproject.getClasses());
+        checkDetails(cldgs);
         builder.unbuild();
     }
     
     @Test
     public void testJrb() {
         String target = TEST_PROECT_DIR +  "jrb-1.0.2/src/";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        JavaProject jproject = builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        JavaProject jproject = builder.build(target, target, target);
         
-        CFGStore.getInstance().setAnalysisLevel(jproject, false);
-        CFGStore.getInstance().setCreatingActualNodes(false);
-        
-        PDGStore.getInstance().buildPDGsForTest(jproject.getClasses());
-        PDGStore.getInstance().destroy();
+        builder.setAnalysisLevel(jproject, false, false);
+        builder.setCreatingActualNodes(false);
+        buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
     
     @Test
     public void testTetris() {
         String target = TEST_PROECT_DIR + "Tetris/src/";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        JavaProject jproject = builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        JavaProject jproject = builder.build(target, target, target);
         
-        CFGStore.getInstance().setAnalysisLevel(jproject, false);
-        CFGStore.getInstance().setCreatingActualNodes(false);
-        
-        PDGStore.getInstance().buildPDGsForTest(jproject.getClasses());
-        PDGStore.getInstance().destroy();
+        builder.setAnalysisLevel(jproject, false, false);
+        builder.setCreatingActualNodes(false);
+        buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
     
     @Test
     public void testDrawTool() {
         String target = TEST_PROECT_DIR +  "DrawTool/src/";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        JavaProject jproject = builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        JavaProject jproject = builder.build(target, target, target);
         
-        CFGStore.getInstance().setAnalysisLevel(jproject, false);
-        CFGStore.getInstance().setCreatingActualNodes(false);
-        
-        PDGStore.getInstance().buildPDGsForTest(jproject.getClasses());
-        PDGStore.getInstance().destroy();
+        builder.setAnalysisLevel(jproject, false, false);
+        builder.setCreatingActualNodes(false);
+        buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
     
     @Test
     public void testLambda() {
         String target = TEST_PROECT_DIR +  "Lambda/";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        JavaProject jproject = builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        JavaProject jproject = builder.build(target, target, target);
         
-        CFGStore.getInstance().setAnalysisLevel(jproject, false);
-        CFGStore.getInstance().setCreatingActualNodes(false);
-        
-        PDGStore.getInstance().buildPDGsForTest(jproject.getClasses());
-        PDGStore.getInstance().destroy();
+        builder.setAnalysisLevel(jproject, false, false);
+        builder.setCreatingActualNodes(false);
+        buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
     
@@ -96,14 +116,12 @@ public class PDGModelBuilderTest {
     public void testCSSample() {
         String target = TEST_PROECT_DIR + "CS-Sample/";
         String classpath = TEST_PROECT_DIR + "CS-Sample/lib/*";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target, classpath);
-        JavaProject jproject = builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        JavaProject jproject = builder.build(target, target, classpath);
         
-        CFGStore.getInstance().setAnalysisLevel(jproject, false);
-        CFGStore.getInstance().setCreatingActualNodes(false);
-        
-        PDGStore.getInstance().buildPDGsForTest(jproject.getClasses());
-        PDGStore.getInstance().destroy();
+        builder.setAnalysisLevel(jproject, false, false);
+        builder.setCreatingActualNodes(false);
+        buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
     
@@ -111,14 +129,12 @@ public class PDGModelBuilderTest {
     public void testFindbugs() {
         String target = TEST_PROECT_DIR + "findbugs/";
         String classpath = TEST_PROECT_DIR + "findbugs/lib/*";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target, classpath);
-        JavaProject jproject = builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        JavaProject jproject = builder.build(target, target, classpath);
         
-        CFGStore.getInstance().setAnalysisLevel(jproject, false);
-        CFGStore.getInstance().setCreatingActualNodes(false);
-        
-        PDGStore.getInstance().buildPDGsForTest(jproject.getClasses());
-        PDGStore.getInstance().destroy();
+        builder.setAnalysisLevel(jproject, false, false);
+        builder.setCreatingActualNodes(false);
+        buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
     
@@ -126,28 +142,24 @@ public class PDGModelBuilderTest {
     public void testApacheAnt() {
         String target = TEST_PROECT_DIR + "apache-ant/";
         String classpath = TEST_PROECT_DIR + "apache-ant/lib/*";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target, classpath);
-        JavaProject jproject = builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        JavaProject jproject = builder.build(target, target, classpath);
         
-        CFGStore.getInstance().setAnalysisLevel(jproject, false);
-        CFGStore.getInstance().setCreatingActualNodes(false);
-        
-        PDGStore.getInstance().buildPDGsForTest(jproject.getClasses());
-        PDGStore.getInstance().destroy();
+        builder.setAnalysisLevel(jproject, false, false);
+        builder.setCreatingActualNodes(false);
+        buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
     
     public void notestJdk8() {
         String target = TEST_PROECT_DIR + "jdk1.8.0_131/";
         String classpath = TEST_PROECT_DIR + "jdk1.8.0_131/lib/*";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target, classpath);
-        JavaProject jproject = builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        JavaProject jproject = builder.build(target, target, classpath);
         
-        CFGStore.getInstance().setAnalysisLevel(jproject, false);
-        CFGStore.getInstance().setCreatingActualNodes(false);
-        
-        PDGStore.getInstance().buildPDGsForTest(jproject.getClasses());
-        PDGStore.getInstance().destroy();
+        builder.setAnalysisLevel(jproject, false, false);
+        builder.setCreatingActualNodes(false);
+        buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
     

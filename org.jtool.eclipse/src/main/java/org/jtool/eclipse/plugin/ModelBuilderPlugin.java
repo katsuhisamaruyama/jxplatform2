@@ -10,12 +10,10 @@ import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaFile;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaPackage;
-import org.jtool.eclipse.javamodel.builder.IModelBuilder;
 import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
 import org.jtool.eclipse.javamodel.builder.JavaASTVisitor;
+import org.jtool.eclipse.javamodel.builder.ModelBuilder;
 import org.jtool.eclipse.javamodel.builder.ProjectStore;
-import org.jtool.eclipse.plugin.IFileChangeListener;
-import org.jtool.eclipse.plugin.ResourceChangeListener;
 import org.jtool.eclipse.util.Logger;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -48,10 +46,10 @@ import java.util.HashMap;
  * 
  * @author Katsuhisa Maruyama
  */
-public class ModelBuilderPlugin implements IModelBuilder {
+
+public class ModelBuilderPlugin extends ModelBuilder {
     
     private IJavaProject javaProject;
-    private JavaProject currentProject;
     
     private ResourceChangeListener resourceChangeListener;
     
@@ -66,10 +64,6 @@ public class ModelBuilderPlugin implements IModelBuilder {
     
     public boolean isUnderPlugin() {
         return true;
-    }
-    
-    public JavaProject getCurrentProject() {
-        return currentProject;
     }
     
     public void start() {
@@ -248,6 +242,7 @@ public class ModelBuilderPlugin implements IModelBuilder {
         String dir = project.getProject().getLocation().toString();
         javaProject = project;
         currentProject = new JavaProject(name, path, dir);
+        currentProject.setModelBuilder(this);
         setPaths(currentProject, project);
         ProjectStore.getInstance().addProject(currentProject);
         

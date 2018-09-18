@@ -7,7 +7,6 @@
 package org.jtool.eclipse.plugin;
 
 import org.jtool.eclipse.javamodel.JavaProject;
-import org.jtool.eclipse.plugin.ModelBuilderPlugin;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.core.commands.AbstractHandler;

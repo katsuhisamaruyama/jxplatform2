@@ -7,6 +7,7 @@
 package org.jtool.eclipse.javamodel.builder;
 
 import org.jtool.eclipse.javamodel.JavaProject;
+
 import java.util.Map;
 import java.util.HashMap;
 
@@ -22,7 +23,7 @@ public class ProjectStore {
     
     private Map<String, JavaProject> projectStore = new HashMap<String, JavaProject>();
     
-    private IModelBuilder modelBuilder;
+    private ModelBuilder modelBuilder;
     
     private ProjectStore() {
     }
@@ -31,7 +32,7 @@ public class ProjectStore {
         return instance;
     }
     
-    public void setModelBuilder(IModelBuilder modelBuilder) {
+    public void setModelBuilder(ModelBuilder modelBuilder) {
         this.modelBuilder = modelBuilder;
     }
     

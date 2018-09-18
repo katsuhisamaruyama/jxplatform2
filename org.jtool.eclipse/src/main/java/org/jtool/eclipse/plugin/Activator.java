@@ -48,6 +48,7 @@ public class Activator extends AbstractUIPlugin implements IStartup {
     @Override
     public void stop(BundleContext context) throws Exception {
         modelBuilder.stop();
+        modelBuilder.unbuild();
         plugin = null;
         super.stop(context);
     }

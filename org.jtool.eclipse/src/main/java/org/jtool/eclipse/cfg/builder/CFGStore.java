@@ -4,13 +4,13 @@
  *  Department of Computer Science, Ritsumeikan University
  */
 
-package org.jtool.eclipse.cfg;
+package org.jtool.eclipse.cfg.builder;
 
-import org.jtool.eclipse.cfg.builder.CCFGBuilder;
-import org.jtool.eclipse.cfg.builder.CFGFieldBuilder;
-import org.jtool.eclipse.cfg.builder.CFGMethodBuilder;
-import org.jtool.eclipse.cfg.builder.JInfoStore;
 import org.jtool.eclipse.javamodel.JavaProject;
+import org.jtool.eclipse.cfg.CCFG;
+import org.jtool.eclipse.cfg.CFG;
+import org.jtool.eclipse.cfg.CFGNode;
+import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
@@ -27,10 +27,10 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.List;
 
 /**
  * An object stores CFGs.
+ * All methods of this class are not intended to be directly called by clients.
  * 
  * @author Katsuhisa Maruyama
  */
@@ -43,6 +43,8 @@ public class CFGStore {
     private int analysisLevel = 0;
     
     private boolean creatingActualNodes = false;
+    
+    private boolean usingBytecodeCache = false;
     
     private boolean visible = true;
     
@@ -58,8 +60,9 @@ public class CFGStore {
         return instance;
     }
     
-    public void setAnalysisLevel(JavaProject jproject, boolean analyzingBytecode) {
-        JInfoStore.getInstance().build(jproject, analyzingBytecode);
+    public void setAnalysisLevel(JavaProject jproject, boolean analyzingBytecode, boolean usingBytecodeCache) {
+        this.usingBytecodeCache = usingBytecodeCache;
+        JInfoStore.getInstance().build(jproject, analyzingBytecode, usingBytecodeCache);
         if (jproject != null) {
             analysisLevel = 1;
             if (analyzingBytecode) {
@@ -76,13 +79,17 @@ public class CFGStore {
         this.creatingActualNodes = creatingActualNodes;
     }
     
-    public void destroy() {
-        cfgStore.clear();
-        CFGNode.resetId();
-    }
-    
     public boolean creatingActualNodes() {
         return creatingActualNodes;
+    }
+    
+    public void destroy() {
+        if (usingBytecodeCache) {
+            JInfoStore.getInstance().writeCache();
+        }
+        
+        cfgStore.clear();
+        CFGNode.resetId();
     }
     
     private void addCFG(CFG cfg) {
@@ -133,7 +140,7 @@ public class CFGStore {
         return getCFG(jmethod, new HashSet<JMethod>());
     }
     
-    public CFG getCFG(JavaMethod jmethod, Set<JMethod> visitedMethods) {
+    CFG getCFG(JavaMethod jmethod, Set<JMethod> visitedMethods) {
         CFG cfg = getCFG(jmethod.getQualifiedName());
         if (cfg == null) {
             if (visible) {
@@ -150,7 +157,7 @@ public class CFGStore {
         return getCFG(jfield, new HashSet<JMethod>());
     }
     
-    public CFG getCFG(JavaField jfield, Set<JMethod> visitedMethods) {
+    CFG getCFG(JavaField jfield, Set<JMethod> visitedMethods) {
         CFG cfg = getCFG(jfield.getQualifiedName());
         if (cfg == null) {
             if (visible) {
@@ -206,19 +213,4 @@ public class CFGStore {
     public boolean isVisible() {
         return visible;
     }
-    
-    public CCFG[] buildCFGsForTest(List<JavaClass> jclasses) {
-        int size = jclasses.size();
-        CCFG[] ccfgs = new CCFG[size];
-        int count = 1;
-        System.out.println();
-        System.out.println("** Building CFGs of " + size + " classes ");
-        for (JavaClass jclass : jclasses) {
-            System.out.print("(" + count + "/" + size + ")");
-            ccfgs[count - 1] = getCCFG(jclass);
-            count++;
-        }
-        return ccfgs;
-    }
-    
 }

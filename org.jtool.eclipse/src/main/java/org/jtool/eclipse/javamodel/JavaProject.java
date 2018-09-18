@@ -7,7 +7,9 @@
 package org.jtool.eclipse.javamodel;
 
 import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
+import org.jtool.eclipse.javamodel.builder.ModelBuilder;
 import org.jtool.eclipse.javamodel.builder.ProjectStore;
+
 import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
@@ -39,6 +41,8 @@ public class JavaProject {
     private String[] sourcePath;
     private String binaryPath;
     
+    private ModelBuilder modelBuilder;
+    
     private BytecodeClassStore bytecodeClassStore = null;
     
     public JavaProject(String name, String path) {
@@ -55,9 +59,18 @@ public class JavaProject {
         return ProjectStore.getInstance().getProject(path);
     }
     
+    public void setModelBuilder(ModelBuilder modelBuilder) {
+        this.modelBuilder = modelBuilder;
+    }
+    
+    public ModelBuilder getModelBuilder() {
+        return modelBuilder;
+    }
+    
     public void clear() {
         this.name = null;
         this.path = null;
+        this.dir = null;
         
         for (JavaFile jfile : fileStore.values()) {
             jfile.dispose();

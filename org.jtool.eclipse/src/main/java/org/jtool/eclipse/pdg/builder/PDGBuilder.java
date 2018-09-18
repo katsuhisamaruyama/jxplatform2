@@ -15,7 +15,6 @@ import org.jtool.eclipse.pdg.PDGClassEntry;
 import org.jtool.eclipse.pdg.PDGEntry;
 import org.jtool.eclipse.pdg.PDGNode;
 import org.jtool.eclipse.pdg.PDGStatement;
-import org.jtool.eclipse.pdg.PDGStore;
 import org.jtool.eclipse.pdg.ParameterEdge;
 import org.jtool.eclipse.pdg.CallEdge;
 import org.jtool.eclipse.cfg.CCFG;
@@ -26,7 +25,6 @@ import org.jtool.eclipse.cfg.CFGMethodEntry;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGParameter;
 import org.jtool.eclipse.cfg.CFGStatement;
-import org.jtool.eclipse.cfg.CFGStore;
 import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaMethod;
@@ -44,7 +42,7 @@ public class PDGBuilder {
     public static PDG buildPDG(CFG cfg) {
         PDG pdg = new PDG();
         createNodes(pdg, cfg);
-        CDFinder.find(pdg, cfg, PDGStore.getInstance().ignoringFallThrough());
+        CDFinder.find(pdg, cfg, PDGStore.getInstance().ignoringJumpEdge());
         DDFinder.find(pdg, cfg);
         return pdg;
     }
@@ -105,7 +103,7 @@ public class PDGBuilder {
                         CallEdge edge = new CallEdge(callnode.getPDGNode(), callee.getEntryNode());
                         edge.setCall();
                         pdg.add(edge);
-                        connectParameters(cldg, callnode, (CFGMethodEntry)callee.getCFG().getStartNode());
+                        connectParameters(pdg, callnode, (CFGMethodEntry)callee.getCFG().getStartNode());
                     }
                 }
             }
@@ -116,34 +114,32 @@ public class PDGBuilder {
     }
     
     public static void connectParameters(List<JavaClass> classes, SDG sdg) {
-        if (CFGStore.getInstance().creatingActualNodes()) {
-            for (PDG pdg : sdg.getPDGs()) {
-                CFG cfg = pdg.getCFG();
-                for (CFGNode node : cfg.getNodes()) {
-                    if (node.isMethodCall()) {
-                        CFGMethodCall callnode = (CFGMethodCall)node;
-                        PDG callee = sdg.getPDG(callnode.getQualifiedName());
-                        if (callee != null) {
-                            CallEdge edge = new CallEdge(callnode.getPDGNode(), callee.getEntryNode());
+        for (PDG pdg : sdg.getPDGs()) {
+            CFG cfg = pdg.getCFG();
+            for (CFGNode node : cfg.getNodes()) {
+                if (node.isMethodCall()) {
+                    CFGMethodCall callnode = (CFGMethodCall)node;
+                    PDG callee = sdg.getPDG(callnode.getQualifiedName());
+                    if (callee != null) {
+                        CallEdge edge = new CallEdge(callnode.getPDGNode(), callee.getEntryNode());
+                        edge.setCall();
+                        pdg.add(edge);
+                        connectParameters(pdg, callnode, (CFGMethodEntry)callee.getCFG().getStartNode());
+                    }
+                    for (JavaMethod jm : findOverrindingMethods(classes, callnode)) {
+                        PDG callee2 = sdg.getPDG(jm.getQualifiedName());
+                        if (callee2 != null) {
+                            CallEdge edge = new CallEdge(callnode.getPDGNode(), callee2.getEntryNode());
                             edge.setCall();
                             pdg.add(edge);
-                            connectParameters(sdg, callnode, (CFGMethodEntry)callee.getCFG().getStartNode());
-                        }
-                        for (JavaMethod jm : findOverrindingMethods(classes, callnode)) {
-                            PDG callee2 = sdg.getPDG(jm.getQualifiedName());
-                            if (callee2 != null) {
-                                CallEdge edge = new CallEdge(callnode.getPDGNode(), callee2.getEntryNode());
-                                edge.setCall();
-                                pdg.add(edge);
-                                connectParameters(sdg, callnode, (CFGMethodEntry)callee2.getCFG().getStartNode());
-                            }
+                            connectParameters(pdg, callnode, (CFGMethodEntry)callee2.getCFG().getStartNode());
                         }
                     }
                 }
             }
-            for (PDG pdg : sdg.getPDGs()) {
-                SummaryEdgeFinder.find(pdg);
-            }
+        }
+        for (PDG pdg : sdg.getPDGs()) {
+            SummaryEdgeFinder.find(pdg);
         }
     }
     
@@ -163,19 +159,17 @@ public class PDGBuilder {
     private static void connectParameters(PDG pdg, CFGMethodCall caller, CFGMethodEntry callee) {
         for (int ordinal = 0; ordinal < caller.getActualIns().size(); ordinal++) {
             CFGParameter actualIn = caller.getActualIn(ordinal);
-            CFGParameter formalIn = callee.getFormalIn(Math.min(ordinal, callee.getFormalIns().size() - 1));
-            
+            CFGParameter formalIn = callee.getFormalIn(ordinal);
             JReference jvar = formalIn.getUseVariables().get(0);
             ParameterEdge edge = new ParameterEdge(actualIn.getPDGNode(), formalIn.getPDGNode(), jvar);
             edge.setParameterIn();
             pdg.add(edge);
         }
         
-        if (!callee.isVoidType()) {
-            CFGParameter actualOut = caller.getActualOuts().get(0);
-            CFGParameter formalOut = callee.getFormalOuts().get(0);
-            
-            JReference jvar = formalOut.getDefVariables().get(0);
+        for (int ordinal = 0; ordinal < caller.getActualOuts().size(); ordinal++) {
+            CFGParameter actualOut = caller.getActualOut(ordinal);
+            CFGParameter formalOut = callee.getFormalOut(ordinal);
+            JReference jvar = formalOut.getUseVariables().get(0);
             ParameterEdge edge = new ParameterEdge(formalOut.getPDGNode(), actualOut.getPDGNode(), jvar);
             edge.setParameterOut();
             pdg.add(edge);

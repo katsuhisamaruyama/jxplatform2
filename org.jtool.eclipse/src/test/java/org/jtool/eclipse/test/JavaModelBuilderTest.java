@@ -6,7 +6,7 @@
 
 package org.jtool.eclipse.test;
 
-import org.jtool.eclipse.batch.JavaModelBuilder;
+import org.jtool.eclipse.batch.ModelBuilderBatch;
 import org.junit.Test;
 
 /**
@@ -22,41 +22,40 @@ public class JavaModelBuilderTest {
     @Test
     public void testSimple() {
         String target = TEST_PROECT_DIR + "Simple/";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, target);
         builder.unbuild();
-        
     }
     
     @Test
     public void testJrb() {
         String target = TEST_PROECT_DIR + "jrb-1.0.2/";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, target);
         builder.unbuild();
     }
     
     @Test
     public void testTetris() {
         String target = TEST_PROECT_DIR + "Tetris/";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, target);
         builder.unbuild();
     }
     
     @Test
     public void testDrawTool() {
         String target = TEST_PROECT_DIR + "DrawTool/";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, target);
         builder.unbuild();
     }
     
     @Test
     public void testLambda() {
         String target = TEST_PROECT_DIR + "Lambda/";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target);
-        builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, target);
         builder.unbuild();
     }
     
@@ -64,8 +63,8 @@ public class JavaModelBuilderTest {
     public void testCSSample() {
         String target = TEST_PROECT_DIR + "CS-Sample/";
         String classpath = TEST_PROECT_DIR + "CS-Sample/lib/*";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target, classpath);
-        builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, classpath);
         builder.unbuild();
     }
     
@@ -73,8 +72,8 @@ public class JavaModelBuilderTest {
     public void testFindbugs() {
         String target = TEST_PROECT_DIR + "findbugs/";
         String classpath = TEST_PROECT_DIR + "findbugs/lib/*";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target, classpath);
-        builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, classpath);
         builder.unbuild();
     }
     
@@ -82,16 +81,16 @@ public class JavaModelBuilderTest {
     public void testApacheAnt() {
         String target = TEST_PROECT_DIR + "apache-ant/";
         String classpath = TEST_PROECT_DIR + "apache-ant/lib/*";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target, classpath);
-        builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, classpath);
         builder.unbuild();
     }
     
     public void notestJdk8() {
         String target = TEST_PROECT_DIR + "jdk1.8.0_131/";
         String classpath = TEST_PROECT_DIR + "jdk1.8.0_131/lib/*";
-        JavaModelBuilder builder = new JavaModelBuilder(target, target, classpath);
-        builder.build();
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, classpath);
         builder.unbuild();
     }
     
@@ -105,6 +104,6 @@ public class JavaModelBuilderTest {
         tester.testCSSample();
         tester.testFindbugs();
         tester.testApacheAnt();
-        //tester.notestJdk8();
+        tester.notestJdk8();
     }
 }

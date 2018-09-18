@@ -19,9 +19,6 @@ public class CachedJMethod extends CachedJElement {
     
     CachedJMethod(String fqn, Map<String, String> cachedData) {
         super(fqn, cachedData);
-        
-        System.out.println("METHOD = "  + fqn + " " + getSignature());
-        
     }
     
     CachedJMethod(JMethod method) {

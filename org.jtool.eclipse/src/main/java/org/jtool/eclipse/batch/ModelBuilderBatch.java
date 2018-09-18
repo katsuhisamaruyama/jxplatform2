@@ -6,13 +6,22 @@
 
 package org.jtool.eclipse.batch;
 
+import org.jtool.eclipse.cfg.CCFG;
+import org.jtool.eclipse.cfg.CFG;
+import org.jtool.eclipse.cfg.builder.CFGStore;
+import org.jtool.eclipse.pdg.ClDG;
+import org.jtool.eclipse.pdg.PDG;
+import org.jtool.eclipse.pdg.SDG;
+import org.jtool.eclipse.pdg.builder.PDGStore;
 import org.jtool.eclipse.javamodel.JavaClass;
+import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaFile;
+import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.javamodel.JavaProject;
-import org.jtool.eclipse.javamodel.builder.IModelBuilder;
-import org.jtool.eclipse.javamodel.builder.JavaASTVisitor;
-import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
+import org.jtool.eclipse.javamodel.builder.JavaASTVisitor;
+import org.jtool.eclipse.javamodel.builder.ModelBuilder;
+import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import org.jtool.eclipse.util.DetectCharset;
 import org.jtool.eclipse.util.Logger;
 import org.jtool.eclipse.util.ConsoleProgressMonitor;
@@ -35,25 +44,24 @@ import java.io.IOException;
  * 
  * @author Katsuhisa Maruyama
  */
-public class ModelBuilder implements IModelBuilder {
+public class ModelBuilderBatch extends ModelBuilder {
     
-    private JavaProject currentProject;
-    
-    public ModelBuilder() {
+    public ModelBuilderBatch() {
     }
     
     public boolean isUnderPlugin() {
         return false;
     }
     
-    public JavaProject getCurrentProject() {
-        return currentProject;
+    public JavaProject build(String name, String target, String classPath) {
+        return build(name, target, getClassPath(classPath));
     }
     
     public JavaProject build(String name, String target, String[] classPath) {
         try {
             File dir = new File(target);
             currentProject = new JavaProject(name, dir.getCanonicalPath());
+            currentProject.setModelBuilder(this);
             currentProject.setClassPath(classPath);
             ProjectStore.getInstance().addProject(currentProject);
             ProjectStore.getInstance().setModelBuilder(this);
@@ -66,17 +74,53 @@ public class ModelBuilder implements IModelBuilder {
         return currentProject;
     }
     
+    static String[] getClassPath(String classpath) {
+        List<String> classpaths = new ArrayList<String>();
+        try {
+            String cdir = new File(".").getAbsoluteFile().getParent();
+            if (classpath != null && classpath.length() != 0) {
+                String[] paths = classpath.split(File.pathSeparator);
+                if (paths != null) {
+                    for (int i = 0; i < paths.length; i++) {
+                        String path = getFullPath(paths[i], cdir); 
+                        if (path.endsWith(File.separator + "*")) {
+                            path = path.substring(0, path.length() - 1);
+                            File dir = new File(path);
+                            if (dir != null && dir.exists()) {
+                                for (File file : dir.listFiles()) {
+                                    if (file.getAbsolutePath().endsWith(".jar")) {
+                                        classpaths.add(file.getCanonicalPath());
+                                    }
+                                }
+                            }
+                        } else {
+                            File file = new File(path);
+                            if (file != null && file.exists()) {
+                                classpaths.add(path);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            return new String[0];
+        }
+        return classpaths.toArray(new String[classpaths.size()]);
+    }
+    
+    static String getFullPath(String path, String cdir) {
+        if (path.charAt(0) == File.separatorChar) {
+            return path;
+        } else {
+            return cdir + File.separatorChar + path;
+        }
+    }
+    
     public JavaProject update() {
         ProjectStore.getInstance().removeProject(currentProject.getPath());
         return build(currentProject.getName(), currentProject.getPath(), currentProject.getClassPath());
     }
     
-    public void unbuild() {
-        if (currentProject != null) {
-            ProjectStore.getInstance().removeProject(currentProject.getPath());
-            currentProject.clear();
-        }
-    }
     
     private void run() {
         List<File> sourceFiles = collectAllJavaFiles(currentProject.getPath());
@@ -212,5 +256,99 @@ public class ModelBuilder implements IModelBuilder {
             Logger.getInstance().printLog("-Analize " + className + " (" + count + "/" + size + ")");
         }
         pm.done();
+    }
+    
+    public CFG getCFG(String fqn) {
+        return CFGStore.getInstance().getCFG(fqn);
+    }
+    
+    public int sizeOfCFG() {
+        return CFGStore.getInstance().size();
+    }
+    
+    public CCFG getCCFG(JavaClass jclass) {
+        return CFGStore.getInstance().getCCFG(jclass);
+    }
+    
+    public CFG getCFG(JavaMethod jmethod) {
+        return CFGStore.getInstance().getCFG(jmethod);
+    }
+    
+    public CFG getCFG(JavaField jfield) {
+        return CFGStore.getInstance().getCFG(jfield);
+    }
+    
+    public int sizeOfPDG() {
+        return PDGStore.getInstance().size();
+    }
+    
+    public PDG getPDG(String fqn) {
+        return PDGStore.getInstance().getPDG(fqn);
+    }
+    
+    public PDG getPDG(CFG cfg) {
+        return PDGStore.getInstance().getPDG(cfg);
+    }
+    
+    public PDG getPDG(JavaMethod jmethod) {
+        return PDGStore.getInstance().getPDG(jmethod);
+    }
+    
+    public PDG getPDG(JavaField jfield) {
+        return PDGStore.getInstance().getPDG(jfield);
+    }
+    
+    public PDG getPDGWithinSDG(JavaMethod jmethod) {
+        return PDGStore.getInstance().getPDGWithinSDG(jmethod);
+    }
+    
+    public PDG getPDGWithinSDG(JavaField jfield) {
+        return PDGStore.getInstance().getPDGWithinSDG(jfield);
+    }
+    
+    public ClDG getClDG(JavaClass jclass) {
+        return PDGStore.getInstance().getClDG(jclass);
+    }
+    
+    public ClDG getClDGWithinSDG(JavaClass jclass) {
+        return PDGStore.getInstance().getClDGWithinSDG(jclass);
+    }
+    
+    public ClDG getClDG(JavaMethod jmethod) {
+        return PDGStore.getInstance().getClDG(jmethod);
+    }
+    
+    public ClDG getClDGWithinSDG(JavaMethod jmethod) {
+        return PDGStore.getInstance().getClDGWithinSDG(jmethod);
+    }
+    
+    public ClDG getClDG(JavaField jfield) {
+        return PDGStore.getInstance().getClDG(jfield);
+    }
+    
+    public ClDG getClDGWithinSDG(JavaField jfield) {
+        return PDGStore.getInstance().getClDGWithinSDG(jfield);
+    }
+    
+    public SDG getSDG(JavaClass jclass) {
+        return PDGStore.getInstance().getSDG(jclass);
+    }
+    
+    public SDG getSDG(JavaProject jproject) {
+        return PDGStore.getInstance().getSDG(jproject);
+    }
+    
+    public ClDG[] buildPDGsForTest(List<JavaClass> jclasses) {
+        int size = jclasses.size();
+        ClDG[] cldgs = new ClDG[size];
+        System.out.println();
+        System.out.println("** Building PDGs of " + size + " classes ");
+        int count = 1;
+        for (JavaClass jclass : jclasses) {
+            cldgs[count - 1] = getClDG(jclass);
+            System.out.println(" (" + count + "/" + size + ")");
+            count++;
+        }
+        return cldgs;
     }
 }

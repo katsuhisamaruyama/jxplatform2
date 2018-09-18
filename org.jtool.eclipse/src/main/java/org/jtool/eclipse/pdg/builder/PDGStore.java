@@ -4,13 +4,12 @@
  *  Department of Computer Science, Ritsumeikan University
  */
 
-package org.jtool.eclipse.pdg;
+package org.jtool.eclipse.pdg.builder;
 
-import org.jtool.eclipse.pdg.builder.PDGBuilder;
 import org.jtool.eclipse.cfg.CCFG;
 import org.jtool.eclipse.cfg.CFG;
-import org.jtool.eclipse.cfg.CFGStore;
 import org.jtool.eclipse.cfg.builder.CFGMethodBuilder;
+import org.jtool.eclipse.cfg.builder.CFGStore;
 import org.jtool.eclipse.cfg.builder.CCFGBuilder;
 import org.jtool.eclipse.cfg.builder.CFGFieldBuilder;
 import org.jtool.eclipse.javamodel.JavaProject;
@@ -18,6 +17,10 @@ import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.javamodel.builder.ProjectStore;
+import org.jtool.eclipse.pdg.ClDG;
+import org.jtool.eclipse.pdg.PDG;
+import org.jtool.eclipse.pdg.SDG;
+
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +38,7 @@ public class PDGStore {
     protected SDG currentSDG = null;
     protected Map<String, PDG> pdgStore = new HashMap<String, PDG>();
     
-    private boolean ignoringFallThrough = false;
+    private boolean ignoringJumpEdge = false;
     
     private boolean visible = true;
     
@@ -49,15 +52,14 @@ public class PDGStore {
     public void destroy() {
         pdgStore.clear();
         currentSDG = null;
-        CFGStore.getInstance().destroy();
     }
     
-    public void setIgnoringFallThrough(boolean ignoringFallThrough) {
-        this.ignoringFallThrough = ignoringFallThrough;
+    public void setIgnoringJumpEdge(boolean ignoringJumpEdge) {
+        this.ignoringJumpEdge = ignoringJumpEdge;
     }
     
-    public boolean ignoringFallThrough() {
-        return ignoringFallThrough;
+    public boolean ignoringJumpEdge() {
+        return ignoringJumpEdge;
     }
     
     public int size() {
@@ -204,12 +206,13 @@ public class PDGStore {
         }
     }
     
-    private SDG getSDG(List<JavaClass> jclasses) {
+    private SDG getSDG(List<JavaClass> classes) {
         SDG sdg = new SDG();
-        for (JavaClass jclass : jclasses) {
+        for (JavaClass jclass : classes) {
             CCFG ccfg = CCFGBuilder.build(jclass);
             ClDG cldg = PDGBuilder.buildClDG(ccfg);
             sdg.add(cldg);
+            sdg.setCCFG(ccfg);
         }
         return sdg;
     }
@@ -238,19 +241,5 @@ public class PDGStore {
     
     public boolean isVisible() {
         return visible;
-    }
-    
-    public ClDG[] buildPDGsForTest(List<JavaClass> jclasses) {
-        int size = jclasses.size();
-        ClDG[] cldgs = new ClDG[size];
-        System.out.println();
-        System.out.println("** Building PDGs of " + size + " classes ");
-        int count = 1;
-        for (JavaClass jclass : jclasses) {
-            cldgs[count - 1] = getClDG(jclass);
-            System.out.println(" (" + count + "/" + size + ")");
-            count++;
-        }
-        return cldgs;
     }
 }
