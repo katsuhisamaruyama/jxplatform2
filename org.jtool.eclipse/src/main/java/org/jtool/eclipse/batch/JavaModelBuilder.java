@@ -91,6 +91,12 @@ public class JavaModelBuilder {
         return modelBuilder.build(projectName, projectPath, projectClasspath);
     }
     
+    public void unbuild() {
+        if (modelBuilder != null) {
+            modelBuilder.unbuild();
+        }
+    }
+    
     public static void main(String[] args) {
         JavaModelBuilder builder = new JavaModelBuilder(args);
         builder.build();
