@@ -24,15 +24,16 @@ public class CFGModelBuilderTest {
     
     private final String TEST_PROECT_DIR = "/Users/maru/Desktop/TestSamples/";
     
-    private CCFG[] buildCFGsForTest(ModelBuilderBatch builder, List<JavaClass> jclasses) {
-        int size = jclasses.size();
+    private CCFG[] buildCFGsForTest(ModelBuilderBatch builder, List<JavaClass> classes) {
+        int size = classes.size();
         CCFG[] ccfgs = new CCFG[size];
         int count = 1;
         System.out.println();
         System.out.println("** Building CFGs of " + size + " classes ");
-        for (JavaClass jclass : jclasses) {
+        for (JavaClass jclass : classes) {
             System.out.print("(" + count + "/" + size + ")");
             ccfgs[count - 1] = builder.getCCFG(jclass);
+            System.out.print(" - " + jclass.getQualifiedName() + " - CCFG\n");
             count++;
         }
         return ccfgs;
@@ -57,7 +58,7 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, target);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         CCFG[] ccfgs = buildCFGsForTest(builder, jproject.getClasses());
         checkDetails(ccfgs);
@@ -70,19 +71,7 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, target);
         
-        builder.setAnalysisLevel(jproject, true, false);
-        builder.setCreatingActualNodes(false);
-        buildCFGsForTest(builder, jproject.getClasses());
-        builder.unbuild();
-    }
-    
-    @Test
-    public void testSimple2() {
-        String target = TEST_PROECT_DIR + "Simple/";
-        ModelBuilderBatch builder = new ModelBuilderBatch();
-        JavaProject jproject = builder.build(target, target, target);
-        
-        builder.setAnalysisLevel(jproject, false, true);
+        builder.setAnalysisLevel(jproject, true);
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
@@ -94,7 +83,7 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, target);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
@@ -106,7 +95,7 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, target);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
@@ -118,7 +107,7 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, target);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
@@ -130,7 +119,7 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, target);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
@@ -143,7 +132,7 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, classpath);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
@@ -156,7 +145,7 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, classpath);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
@@ -169,7 +158,7 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, classpath);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
@@ -181,7 +170,7 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, classpath);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
@@ -189,10 +178,8 @@ public class CFGModelBuilderTest {
     
     public static void main(String[] args) {
         CFGModelBuilderTest tester = new CFGModelBuilderTest();
-        //tester.testSimple();
-        //tester.testSimple1();
-        tester.testSimple2();
-        /*
+        tester.testSimple();
+        tester.testSimple1();
         tester.testJrb();
         tester.testTetris();
         tester.testDrawTool();
@@ -200,7 +187,6 @@ public class CFGModelBuilderTest {
         tester.testCSSample();
         tester.testFindbugs();
         tester.testApacheAnt();
-        */
         //tester.notestJdk8();
     }
 }

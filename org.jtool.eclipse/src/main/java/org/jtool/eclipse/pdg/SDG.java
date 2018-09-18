@@ -6,6 +6,8 @@
 
 package org.jtool.eclipse.pdg;
 
+import org.jtool.eclipse.cfg.CFG;
+import org.jtool.eclipse.cfg.CCFG;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -18,21 +20,47 @@ import java.util.HashSet;
  */
 public class SDG extends PDG {
     
-    private Set<PDGEntry> entries = new HashSet<PDGEntry>();
-    
     protected Map<String, ClDG> cldgs = new HashMap<String, ClDG>();
     protected Map<String, PDG> pdgs = new HashMap<String, PDG>();
+    
+    protected CCFG ccfg;
     
     public SDG() {
         super();
     }
     
-    public void addEntryNode(PDGClassEntry node) {
-        entries.add(node);
+    public void setCCFG(CCFG ccfg) {
+        this.ccfg = ccfg;
     }
     
-    public Set<PDGEntry> getEntries() {
-        return entries;
+    
+    public CCFG getCCFG() {
+        return ccfg;
+    }
+    
+    @Override
+    public PDGEntry getEntryNode() {
+        return null;
+    }
+    
+    @Override
+    public long getId() {
+        return -1;
+    }
+    
+    @Override
+    public CFG getCFG() {
+        return null;
+    }
+    
+    @Override
+    public String getName() {
+        return "SDG";
+    }
+    
+    @Override
+    public String getQualifiedName() {
+        return "SDG";
     }
     
     public void add(ClDG cldg) {

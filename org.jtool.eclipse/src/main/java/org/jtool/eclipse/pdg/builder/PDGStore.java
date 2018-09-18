@@ -35,18 +35,21 @@ public class PDGStore {
     
     private static PDGStore instance = new PDGStore();
     
-    protected SDG currentSDG = null;
     protected Map<String, PDG> pdgStore = new HashMap<String, PDG>();
-    
-    private boolean ignoringJumpEdge = false;
-    
-    private boolean visible = true;
+    protected SDG currentSDG;
+    private boolean ignoringJumpEdge;
     
     private PDGStore() {
     }
     
     public static PDGStore getInstance() {
         return instance;
+    }
+    
+    public void create() {
+        pdgStore.clear();
+        currentSDG = null;
+        ignoringJumpEdge = false;
     }
     
     public void destroy() {
@@ -75,10 +78,6 @@ public class PDGStore {
     }
     
     public PDG getPDG(CFG cfg) {
-        if (visible) {
-            System.out.print(" - " + cfg.getStartNode().getQualifiedName() + " - PDG\n");
-        }
-        
         PDG pdg = PDGBuilder.buildPDG(cfg);
         addPDG(pdg);
         if (CFGStore.getInstance().creatingActualNodes()) {
@@ -130,10 +129,6 @@ public class PDGStore {
         PDG pdg = getPDG(jclass.getQualifiedName());
         if (pdg != null && pdg instanceof ClDG) {
             return (ClDG)pdg;
-        }
-        
-        if (visible) {
-            System.out.print(" - " + jclass.getQualifiedName() + " - ClDG\n");
         }
         
         CCFG ccfg = CCFGBuilder.build(jclass);
@@ -219,10 +214,6 @@ public class PDGStore {
     
     public SDG getSDG(JavaProject jproject) {
         if (!jproject.getPath().equals(ProjectStore.getInstance().getCurrentProject().getPath())) {
-            if (visible) {
-                System.out.print(" - " + jproject.getName() + " - SDG\n");
-            }
-            
             pdgStore.clear();
             currentSDG = getSDG(jproject.getClasses());
             for (PDG pdg : currentSDG.getPDGs()) {
@@ -233,13 +224,5 @@ public class PDGStore {
             }
         }
         return currentSDG;
-    }
-    
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-    
-    public boolean isVisible() {
-        return visible;
     }
 }

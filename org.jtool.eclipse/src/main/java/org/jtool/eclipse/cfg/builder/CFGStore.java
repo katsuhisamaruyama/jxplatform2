@@ -39,17 +39,9 @@ public class CFGStore {
     private static CFGStore instance = new CFGStore();
     
     private Map<String, CFG> cfgStore = new HashMap<String, CFG>();
-    
-    private int analysisLevel = 0;
-    
-    private boolean creatingActualNodes = false;
-    
-    private boolean usingBytecodeCache = false;
-    
-    private boolean visible = true;
+    private boolean creatingActualNodes;
     
     private CFGStore() {
-        CFGNode.resetId();
     }
     
     public void resetId() {
@@ -60,19 +52,21 @@ public class CFGStore {
         return instance;
     }
     
-    public void setAnalysisLevel(JavaProject jproject, boolean analyzingBytecode, boolean usingBytecodeCache) {
-        this.usingBytecodeCache = usingBytecodeCache;
-        JInfoStore.getInstance().build(jproject, analyzingBytecode, usingBytecodeCache);
-        if (jproject != null) {
-            analysisLevel = 1;
-            if (analyzingBytecode) {
-                analysisLevel = 2;
-            }
-        }
+    public void create() {
+        cfgStore.clear();
+        creatingActualNodes = false;
+        CFGNode.resetId();
     }
     
-    public int getAnalysisLevel() {
-        return analysisLevel;
+    public void destroy() {
+        JInfoStore.getInstance().writeCache();
+        cfgStore.clear();
+        creatingActualNodes = false;
+        CFGNode.resetId();
+    }
+    
+    public void setAnalysisLevel(JavaProject jproject, boolean analyzingBytecode) {
+        JInfoStore.getInstance().create(jproject, analyzingBytecode);
     }
     
     public void setCreatingActualNodes(boolean creatingActualNodes) {
@@ -81,15 +75,6 @@ public class CFGStore {
     
     public boolean creatingActualNodes() {
         return creatingActualNodes;
-    }
-    
-    public void destroy() {
-        if (usingBytecodeCache) {
-            JInfoStore.getInstance().writeCache();
-        }
-        
-        cfgStore.clear();
-        CFGNode.resetId();
     }
     
     private void addCFG(CFG cfg) {
@@ -108,10 +93,6 @@ public class CFGStore {
         CFG cfg = getCFG(jclass.getQualifiedName());
         if (cfg != null && cfg instanceof CCFG) {
             return (CCFG)cfg;
-        }
-        
-        if (visible) {
-            System.out.print(" - " + jclass.getQualifiedName() + " - CCFG\n");
         }
         CCFG ccfg = build(jclass);
         return ccfg;
@@ -137,16 +118,17 @@ public class CFGStore {
     }
     
     public CFG getCFG(JavaMethod jmethod) {
-        return getCFG(jmethod, new HashSet<JMethod>());
+        CFG cfg = getCFG(jmethod.getQualifiedName());
+        if (cfg == null) {
+            cfg = CFGMethodBuilder.build(jmethod, new HashSet<JMethod>());
+            addCFG(cfg);
+        }
+        return cfg;
     }
     
     CFG getCFG(JavaMethod jmethod, Set<JMethod> visitedMethods) {
         CFG cfg = getCFG(jmethod.getQualifiedName());
         if (cfg == null) {
-            if (visible) {
-                System.out.print(" - " + jmethod.getQualifiedName() + " - CFG\n");
-            }
-            
             cfg = CFGMethodBuilder.build(jmethod, visitedMethods);
             addCFG(cfg);
         }
@@ -160,10 +142,6 @@ public class CFGStore {
     CFG getCFG(JavaField jfield, Set<JMethod> visitedMethods) {
         CFG cfg = getCFG(jfield.getQualifiedName());
         if (cfg == null) {
-            if (visible) {
-                System.out.print(" - " + jfield.getQualifiedName() + " - CFG");
-            }
-            
             cfg = CFGFieldBuilder.build(jfield, visitedMethods);
             addCFG(cfg);
         }
@@ -204,13 +182,5 @@ public class CFGStore {
     
     public CFG build(EnumConstantDeclaration node) {
         return CFGFieldBuilder.build(node);
-    }
-    
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-    
-    public boolean isVisible() {
-        return visible;
     }
 }

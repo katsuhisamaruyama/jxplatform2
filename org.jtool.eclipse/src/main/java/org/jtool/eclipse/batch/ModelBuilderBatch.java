@@ -58,6 +58,8 @@ public class ModelBuilderBatch extends ModelBuilder {
     }
     
     public JavaProject build(String name, String target, String[] classPath) {
+        super.build();
+        
         try {
             File dir = new File(target);
             currentProject = new JavaProject(name, dir.getCanonicalPath());

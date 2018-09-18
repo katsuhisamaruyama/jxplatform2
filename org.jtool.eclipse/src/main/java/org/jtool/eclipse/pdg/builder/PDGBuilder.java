@@ -57,7 +57,7 @@ public class PDGBuilder {
     }
     
     private static PDGNode createNode(PDG pdg, CFGNode node) {
-        if (node.isClassEntry() || node.isEnumEntry()) {
+        if (node.isInterfaceEntry() || node.isClassEntry() || node.isEnumEntry()) {
             PDGClassEntry pnode = new PDGClassEntry((CFGEntry)node);
             pdg.setEntryNode(pnode);
             return pnode;

@@ -24,15 +24,16 @@ public class PDGModelBuilderTest {
     
     private final String TEST_PROECT_DIR = "/Users/maru/Desktop/TestSamples/";
     
-    private ClDG[] buildPDGsForTest(ModelBuilderBatch builder, List<JavaClass> jclasses) {
-        int size = jclasses.size();
+    private ClDG[] buildPDGsForTest(ModelBuilderBatch builder, List<JavaClass> classes) {
+        int size = classes.size();
         ClDG[] cldgs = new ClDG[size];
         System.out.println();
         System.out.println("** Building PDGs of " + size + " classes ");
         int count = 1;
-        for (JavaClass jclass : jclasses) {
+        for (JavaClass jclass : classes) {
+            System.out.print(" (" + count + "/" + size + ")");
             cldgs[count - 1] = builder.getClDG(jclass);
-            System.out.println(" (" + count + "/" + size + ")");
+            System.out.print(" - " + jclass.getQualifiedName() + " - ClDG\n");
             count++;
         }
         return cldgs;
@@ -57,20 +58,19 @@ public class PDGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, target);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         ClDG[] cldgs = buildPDGsForTest(builder, jproject.getClasses());
         checkDetails(cldgs);
         builder.unbuild();
     }
     
-    @Test
-    public void testJrb() {
+    public void notestJrb() {
         String target = TEST_PROECT_DIR +  "jrb-1.0.2/src/";
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, target);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
@@ -82,7 +82,7 @@ public class PDGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, target);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
@@ -94,7 +94,7 @@ public class PDGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, target);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
@@ -106,7 +106,7 @@ public class PDGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, target);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
@@ -119,20 +119,19 @@ public class PDGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, classpath);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
     
-    @Test
-    public void testFindbugs() {
+    public void notestFindbugs() {
         String target = TEST_PROECT_DIR + "findbugs/";
         String classpath = TEST_PROECT_DIR + "findbugs/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, classpath);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
@@ -145,7 +144,7 @@ public class PDGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, classpath);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
@@ -157,7 +156,7 @@ public class PDGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, classpath);
         
-        builder.setAnalysisLevel(jproject, false, false);
+        builder.setAnalysisLevel(jproject, false);
         builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
@@ -165,14 +164,14 @@ public class PDGModelBuilderTest {
     
     public static void main(String[] args) {
         PDGModelBuilderTest tester = new PDGModelBuilderTest();
-        //tester.testSimple();
-        //tester.testJrb();
-        //tester.testTetris();
-        //tester.testDrawTool();
-        //tester.testLambda();
-        //tester.testCSSample();
-        //tester.testFindbugs();
-        //tester.testApacheAnt();
-        tester.notestJdk8();
+        tester.testSimple();
+        // tester.notestJrb();
+        tester.testTetris();
+        tester.testDrawTool();
+        tester.testLambda();
+        tester.testCSSample();
+        //tester.notestFindbugs();
+        tester.testApacheAnt();
+        //tester.notestJdk8();
     }
 }

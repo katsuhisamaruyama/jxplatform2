@@ -28,27 +28,15 @@ public abstract class ModelBuilder {
     }
     
     public void setAnalysisLevel(JavaProject jproject) {
-        CFGStore.getInstance().setAnalysisLevel(jproject, false, false);
+        CFGStore.getInstance().setAnalysisLevel(jproject, false);
     }
     
     public void setAnalysisLevel(JavaProject jproject, boolean analyzingBytecode) {
-        CFGStore.getInstance().setAnalysisLevel(jproject, analyzingBytecode, false);
-    }
-    
-    public void setAnalysisLevel(JavaProject jproject, boolean analyzingBytecode, boolean usingBytecodeCache) {
-        CFGStore.getInstance().setAnalysisLevel(jproject, analyzingBytecode, usingBytecodeCache);
-    }
-    
-    public int getAnalysisLevel() {
-        return CFGStore.getInstance().getAnalysisLevel();
+        CFGStore.getInstance().setAnalysisLevel(jproject, analyzingBytecode);
     }
     
     public void setCreatingActualNodes(boolean creatingActualNodes) {
         CFGStore.getInstance().setCreatingActualNodes(creatingActualNodes);
-    }
-    
-    public boolean creatingActualNodes() {
-        return CFGStore.getInstance().creatingActualNodes();
     }
     
     public void setIgnoringJumpEdge(boolean ignoringJumpEdge) {
@@ -57,6 +45,12 @@ public abstract class ModelBuilder {
     
     public boolean ignoringJumpEdge() {
         return PDGStore.getInstance().ignoringJumpEdge();
+    }
+    
+    public void build() {
+        CFGStore.getInstance().create();
+        PDGStore.getInstance().create();
+        JInfoStore.getInstance().create();
     }
     
     public void unbuild() {
@@ -71,8 +65,6 @@ public abstract class ModelBuilder {
     
     public void setVisible(boolean visible) {
         Logger.getInstance().setVisible(visible);
-        CFGStore.getInstance().setVisible(visible);
-        PDGStore.getInstance().setVisible(visible);
     }
     
     public abstract JavaProject update();

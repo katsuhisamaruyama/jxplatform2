@@ -7,6 +7,8 @@
 package org.jtool.eclipse.cfg.builder;
 
 import org.jtool.eclipse.cfg.JMethod;
+import org.jtool.eclipse.cfg.JMethod.SideEffectStatus;
+
 import java.util.Map;
 
 /**
@@ -25,6 +27,7 @@ public class CachedJMethod extends CachedJElement {
         super(method.getQualifiedName());
         cachedData.put(BytecodeCache.ClassNameAttr, method.getDeclaringClass().getQualifiedName());
         cachedData.put(BytecodeCache.SignatureAttr, method.getQualifiedName());
+        cachedData.put(BytecodeCache.SideEffectsAttr, method.sideEffects().toString());
     }
     
     public String getClassName() {
@@ -33,5 +36,21 @@ public class CachedJMethod extends CachedJElement {
     
     public String getSignature() {
         return cachedData.get(BytecodeCache.SignatureAttr);
+    }
+    
+    public String sideEffects() {
+        return cachedData.get(BytecodeCache.SideEffectsAttr);
+    }
+    
+    public boolean sideEffectsYes() {
+        return SideEffectStatus.YES.toString().equals(cachedData.get(BytecodeCache.SideEffectsAttr));
+    }
+    
+    public boolean sideEffectsNo() {
+        return SideEffectStatus.NO.toString().equals(cachedData.get(BytecodeCache.SideEffectsAttr));
+    }
+    
+    public boolean sideEffectsMaybe() {
+        return SideEffectStatus.MAYBE.toString().equals(cachedData.get(BytecodeCache.SideEffectsAttr));
     }
 }

@@ -56,9 +56,11 @@ public class InternalJMethod extends JMethod {
         List<JMethod> methods = new ArrayList<JMethod>();
         for (JavaMethod jm : jmethod.getCalledMethods()) {
             JClass clazz = JInfoStore.getInstance().getJClass(jm.getDeclaringClass().getQualifiedName());
-            JMethod method = clazz.getMethod(jm.getSignature());
-            if (method != null) {
-                methods.add(method);
+            if (clazz != null) {
+                JMethod method = clazz.getMethod(jm.getSignature());
+                if (method != null) {
+                    methods.add(method);
+                }
             }
         }
         return methods.toArray(new JMethod[methods.size()]);
@@ -69,9 +71,11 @@ public class InternalJMethod extends JMethod {
         List<JField> fields = new ArrayList<JField>();
         for (JavaField jf : jmethod.getAccessedFields()) {
             JClass clazz = JInfoStore.getInstance().getJClass(jf.getDeclaringClass().getQualifiedName());
-            JField field = clazz.getField(jf.getName());
-            if (field != null) {
-                fields.add(field);
+            if (clazz != null) {
+                JField field = clazz.getField(jf.getName());
+                if (field != null) {
+                    fields.add(field);
+                }
             }
         }
         return fields.toArray(new JField[fields.size()]);
@@ -82,9 +86,11 @@ public class InternalJMethod extends JMethod {
         List<JMethod> methods = new ArrayList<JMethod>();
         for (JavaMethod jm : jmethod.getOverridingMethods()) {
             JClass clazz = JInfoStore.getInstance().getJClass(jm.getDeclaringClass().getQualifiedName());
-            JMethod method = clazz.getMethod(jm.getSignature());
-            if (method != null) {
-                methods.add(method);
+            if (clazz != null) {
+                JMethod method = clazz.getMethod(jm.getSignature());
+                if (method != null) {
+                    methods.add(method);
+                }
             }
         }
         return methods.toArray(new JMethod[methods.size()]);
@@ -95,9 +101,11 @@ public class InternalJMethod extends JMethod {
         List<JMethod> methods = new ArrayList<JMethod>();
         for (JavaMethod jm : jmethod.getOverriddenMethods()) {
             JClass clazz = JInfoStore.getInstance().getJClass(jm.getDeclaringClass().getQualifiedName());
-            JMethod method = clazz.getMethod(jm.getSignature());
-            if (method != null) {
-                methods.add(method);
+            if (clazz != null) {
+                JMethod method = clazz.getMethod(jm.getSignature());
+                if (method != null) {
+                    methods.add(method);
+                }
             }
         }
         return methods.toArray(new JMethod[methods.size()]);
@@ -116,6 +124,9 @@ public class InternalJMethod extends JMethod {
                     }
                 }
             }
+        }
+        if (sideEffects == SideEffectStatus.UNKNOWM) {
+            sideEffects = SideEffectStatus.NO;
         }
     }
 }

@@ -32,7 +32,7 @@ public abstract class JMethod {
     protected JMethod[] overrindingMethods = null;
     protected JMethod[] overriddenMethods = null;
     
-    protected enum SideEffectStatus {
+    public enum SideEffectStatus {
         YES, NO, MAYBE, UNKNOWM;
     }
     protected SideEffectStatus sideEffects = SideEffectStatus.UNKNOWM;
@@ -155,6 +155,10 @@ public abstract class JMethod {
     protected abstract JMethod[] findOverridingMethods();
     
     protected abstract JMethod[] findOverriddenMethods();
+    
+    public SideEffectStatus sideEffects() {
+        return sideEffects;
+    }
     
     public boolean sideEffectsYes() {
         return sideEffects == SideEffectStatus.YES || sideEffects == SideEffectStatus.MAYBE;

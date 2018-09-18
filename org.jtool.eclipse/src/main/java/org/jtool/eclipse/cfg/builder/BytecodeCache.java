@@ -56,6 +56,18 @@ public class BytecodeCache {
         this.jproject = jproject;
     }
     
+    public CachedJClass getCachedJClass(String fqn) {
+        return cachedClasses.get(fqn);
+    }
+    
+    public CachedJMethod getCachedJMethod(String fqn) {
+        return cachedMethods.get(fqn);
+    }
+    
+    public CachedJField getCachedJField(String fqn) {
+        return cachedFields.get(fqn);
+    }
+    
     public void writeCache(List<ExternalJClass> classes) {
         try {
             String filename = jproject.getPath() + File.separator + BYTECODE_INFO_FILENAME;
@@ -111,7 +123,7 @@ public class BytecodeCache {
     
     static final String ProjectElem = "project";
     static final String ClassElem = "class";
-    static final String MethodElem = "methods";
+    static final String MethodElem = "method";
     static final String FieldElem = "field";
     
     static final String ClassNameAttr = "cname";
@@ -120,6 +132,8 @@ public class BytecodeCache {
     static final String TimeAttr = "time";
     static final String SignatureAttr = "sig";
     static final String NameAttr = "name";
+    
+    static final String SideEffectsAttr = "sideEffects";
 }
 
 class CacheExporter {
@@ -142,16 +156,12 @@ class CacheExporter {
             
             for (JClass clazz : classes) {
                 if (clazz.isTopLevelClass()) {
-                    export(doc, projectElem, new CachedJClass(clazz));
-                }
-            }
-            for (JClass clazz : classes) {
-                if (clazz.isTopLevelClass()) {
+                    bytecodeCache.cachedClasses.put(clazz.getQualifiedName(), new CachedJClass(clazz));
                     for (JMethod method : clazz.getMethods()) {
-                        export(doc, projectElem, new CachedJMethod(method));
+                        bytecodeCache.cachedMethods.put(method.getQualifiedName(), new CachedJMethod(method));
                     }
                     for (JField field : clazz.getFields()) {
-                        export(doc, projectElem, new CachedJField(field));
+                        bytecodeCache.cachedFields.put(field.getQualifiedName(), new CachedJField(field));
                     }
                 }
             }
@@ -184,6 +194,7 @@ class CacheExporter {
         Element methodElem = doc.createElement(BytecodeCache.MethodElem);
         methodElem.setAttribute(BytecodeCache.ClassNameAttr, cmethod.getClassName());
         methodElem.setAttribute(BytecodeCache.SignatureAttr, cmethod.getSignature());
+        methodElem.setAttribute(BytecodeCache.SideEffectsAttr, cmethod.sideEffects());
         methodElem.setAttribute(BytecodeCache.FqnAttr, cmethod.getQualifiedName());
         parent.appendChild(methodElem);
     }

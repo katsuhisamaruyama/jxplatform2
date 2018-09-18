@@ -107,7 +107,6 @@ public class ExpressionVisitor extends ASTVisitor {
     protected static int paramNumber = 1;
     
     private boolean creatingActuals;
-    private int analysisLevel;
     
     private Stack<AnalysisMode> analysisMode = new Stack<AnalysisMode>();
     private enum AnalysisMode {
@@ -123,7 +122,6 @@ public class ExpressionVisitor extends ASTVisitor {
         
         analysisMode.push(AnalysisMode.USE);
         creatingActuals = CFGStore.getInstance().creatingActualNodes();
-        analysisLevel = CFGStore.getInstance().getAnalysisLevel();
         this.visitedMethods = visitedMethods;
     }
     
@@ -332,21 +330,42 @@ public class ExpressionVisitor extends ASTVisitor {
         if (curNode.getUseVariables().size() == 1) {
             primary = curNode.getUseVariables().get(0);
             
-            if (analysisLevel > 0 && (primary.isLocalAccess() || primary.isFieldAccess())) {
-                JMethod method = JInfoStore.getInstance().getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
-                if (method != null) {
-                    if (method.sideEffectsYes() || method.sideEffectsNo()) {
-                        if (method.sideEffectsYes()) {
-                            curNode.addDefVariable(primary);
-                        }
-                    } else {
-                        if (!visitedMethods.contains(method)) {
-                            visitedMethods.add(method);
-                            if (method.hasSideEffects(visitedMethods)) {
+            if (primary.isLocalAccess() || primary.isFieldAccess()) {
+                int analysisLevel = JInfoStore.getInstance().getAnalysisLevel();
+                if (analysisLevel > 0) {
+                    
+                    if (analysisLevel > 1 && JInfoStore.getInstance().getJavaClass(jcall.getDeclaringClassName()) == null) {
+                        CachedJMethod cmethod = JInfoStore.getInstance().findCache(jcall.getDeclaringClassName(), jcall.getSignature());
+                        if (cmethod != null) {
+                            if (cmethod.sideEffectsYes() || cmethod.sideEffectsMaybe()) {
                                 curNode.addDefVariable(primary);
+                            }
+                            jcall.setPrimary(primary);
+                            return;
+                        }
+                        
+                        //if (analysisLevel < 3) {
+                        //    JInfoStore.getInstance().analyzeBytecode();
+                        //}
+                    }
+                    
+                    JMethod method = JInfoStore.getInstance().getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
+                    if (method != null) {
+                        if (method.sideEffectsYes() || method.sideEffectsNo()) {
+                            if (method.sideEffectsYes()) {
+                                curNode.addDefVariable(primary);
+                            }
+                        } else {
+                            if (!visitedMethods.contains(method)) {
+                                visitedMethods.add(method);
+                                if (method.hasSideEffects(visitedMethods)) {
+                                    curNode.addDefVariable(primary);
+                                }
                             }
                         }
                     }
+                } else {
+                    curNode.addDefVariable(primary);
                 }
             }
         }

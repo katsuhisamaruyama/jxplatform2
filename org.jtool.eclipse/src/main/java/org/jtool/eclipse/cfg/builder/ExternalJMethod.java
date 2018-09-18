@@ -116,8 +116,12 @@ public class ExternalJMethod extends JMethod {
                 public void edit(MethodCall cm) throws CannotCompileException {
                     try {
                         JClass clazz = JInfoStore.getInstance().getJClass(cm.getClassName());
-                        JMethod method = clazz.getMethod(cm.getSignature());
-                        methods.add(method);
+                        if (clazz != null) {
+                            JMethod method = clazz.getMethod(cm.getSignature());
+                            if (method != null) {
+                                methods.add(method);
+                            }
+                        }
                     } catch (ClassCastException e) {
                         // javassit's bug related to invocation for Lambda interface methods
                         // javassist.bytecode.InterfaceMethodrefInfo cannot be cast to javassist.bytecode.MethodrefInfo
@@ -127,8 +131,12 @@ public class ExternalJMethod extends JMethod {
                 @Override
                 public void edit(ConstructorCall cm) throws CannotCompileException {
                     JClass clazz = JInfoStore.getInstance().getJClass(cm.getClassName());
-                    JMethod method = clazz.getMethod(cm.getSignature());
-                    methods.add(method);
+                    if (clazz != null) {
+                        JMethod method = clazz.getMethod(cm.getSignature());
+                        if (method != null) {
+                            methods.add(method);
+                        }
+                    }
                 }
             });
         } catch (CannotCompileException e) { /* empty */ }
@@ -144,8 +152,12 @@ public class ExternalJMethod extends JMethod {
                 @Override
                 public void edit(FieldAccess cf) throws CannotCompileException {
                     JClass clazz = JInfoStore.getInstance().getJClass(cf.getClassName());
-                    JField field = clazz.getField(cf.getFieldName());
-                    fields.add(field);
+                    if (clazz != null) {
+                        JField field = clazz.getField(cf.getFieldName());
+                        if (field != null) {
+                            fields.add(field);
+                        }
+                    }
                 }
             });
         } catch (CannotCompileException e) { /* empty */ }
@@ -195,6 +207,9 @@ public class ExternalJMethod extends JMethod {
             if (sideEffects == SideEffectStatus.UNKNOWM) {
                 sideEffects = SideEffectStatus.MAYBE;
             }
+        }
+        if (sideEffects == SideEffectStatus.UNKNOWM) {
+            sideEffects = SideEffectStatus.NO;
         }
     }
 }

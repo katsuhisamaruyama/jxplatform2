@@ -216,6 +216,7 @@ public class StatementVisitor extends ASTVisitor {
         ExpressionVisitor condVisitor = new ExpressionVisitor(cfg, ifNode, visitedMethods);
         condition.accept(condVisitor);
         CFGNode curNode = condVisitor.getExitNode();
+        ifNode.setKind(CFGNode.Kind.ifSt);
         
         ControlFlow trueEdge = createFlow(curNode, nextNode);
         trueEdge.setTrue();
@@ -451,6 +452,8 @@ public class StatementVisitor extends ASTVisitor {
             edge.setTrue();
             entryNode = condVisitor.getEntryNode();
         } else {
+            reconnect(forNode);
+            
             ControlFlow edge = createFlow(forNode, nextNode);
             edge.setTrue();
             entryNode = forNode;
