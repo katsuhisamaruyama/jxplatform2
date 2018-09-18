@@ -46,11 +46,17 @@ public class BytecodeCache {
     
     private static final String BYTECODE_INFO_FILENAME = ".bytecode.info";
     
-    static Map<String, CachedJClass> cachedClasses = new HashMap<String, CachedJClass>();
-    static Map<String, CachedJMethod> cachedMethods = new HashMap<String, CachedJMethod>();
-    static Map<String, CachedJField> cachedFields = new HashMap<String, CachedJField>();
+    Map<String, CachedJClass> cachedClasses = new HashMap<String, CachedJClass>();
+    Map<String, CachedJMethod> cachedMethods = new HashMap<String, CachedJMethod>();
+    Map<String, CachedJField> cachedFields = new HashMap<String, CachedJField>();
     
-    public static void writeCache(JavaProject jproject, List<ExternalJClass> classes) {
+    private JavaProject jproject;
+    
+    BytecodeCache(JavaProject jproject) {
+        this.jproject = jproject;
+    }
+    
+    public void writeCache(List<ExternalJClass> classes) {
         try {
             String filename = jproject.getPath() + File.separator + BYTECODE_INFO_FILENAME;
             File file = new File(filename);
@@ -58,7 +64,7 @@ public class BytecodeCache {
                 file.delete();
             }
             
-            CacheExporter exporter = new CacheExporter();
+            CacheExporter exporter = new CacheExporter(this);
             Document doc = exporter.getDocument(jproject, classes);
             write(file, doc);
         } catch (IOException e) {
@@ -66,7 +72,7 @@ public class BytecodeCache {
         }
     }
     
-    private static void write(File file, Document doc) throws IOException {
+    private void write(File file, Document doc) throws IOException {
         try {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
@@ -83,16 +89,9 @@ public class BytecodeCache {
         } catch (TransformerException e) {
             System.err.println("DOM: Export error occurred: " + e.getMessage() + ".");
         }
-        cachedClasses.clear();
-        cachedMethods.clear();
-        cachedFields.clear();
     }
     
-    public static boolean loadCache(JavaProject jproject) {
-        cachedClasses.clear();
-        cachedMethods.clear();
-        cachedFields.clear();
-        
+    public boolean loadCache() {
         String filename = jproject.getPath() + File.separator + BYTECODE_INFO_FILENAME;
         File file = new File(filename);
         if (!file.canRead()) {
@@ -102,7 +101,7 @@ public class BytecodeCache {
         SAXParserFactory factory = SAXParserFactory.newInstance();
         try {
             SAXParser parser = factory.newSAXParser();
-            CacheImporter handler = new CacheImporter();
+            CacheImporter handler = new CacheImporter(this);
             parser.parse(file, handler);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             return false;
@@ -125,7 +124,10 @@ public class BytecodeCache {
 
 class CacheExporter {
     
-    CacheExporter() {
+    private BytecodeCache bytecodeCache;
+    
+    CacheExporter(BytecodeCache bytecodeCache) {
+        this.bytecodeCache = bytecodeCache;
     }
     
     Document getDocument(JavaProject jproject, List<ExternalJClass> classes) {
@@ -154,13 +156,13 @@ class CacheExporter {
                 }
             }
             
-            for (CachedJClass cclass : BytecodeCache.cachedClasses.values()) {
+            for (CachedJClass cclass : bytecodeCache.cachedClasses.values()) {
                 export(doc, projectElem, cclass);
             }
-            for (CachedJMethod cmethod : BytecodeCache.cachedMethods.values()) {
+            for (CachedJMethod cmethod : bytecodeCache.cachedMethods.values()) {
                 export(doc, projectElem, cmethod);
             }
-            for (CachedJField cfield : BytecodeCache.cachedFields.values()) {
+            for (CachedJField cfield : bytecodeCache.cachedFields.values()) {
                 export(doc, projectElem, cfield);
             }
             return doc;
@@ -229,7 +231,10 @@ class CacheExporter {
     
 class CacheImporter extends DefaultHandler {
     
-    public CacheImporter() {
+    private BytecodeCache bytecodeCache;
+    
+    public CacheImporter(BytecodeCache bytecodeCache) {
+        this.bytecodeCache = bytecodeCache;
     }
     
     @Override
@@ -240,7 +245,7 @@ class CacheImporter extends DefaultHandler {
             map.remove(BytecodeCache.FqnAttr);
             
             CachedJClass cclass = new CachedJClass(fqn, map);
-            BytecodeCache.cachedClasses.put(fqn, cclass);
+            bytecodeCache.cachedClasses.put(fqn, cclass);
             return;
         }
         
@@ -250,7 +255,7 @@ class CacheImporter extends DefaultHandler {
             map.remove(BytecodeCache.FqnAttr);
             
             CachedJMethod cmethod = new CachedJMethod(fqn, map);
-            BytecodeCache.cachedMethods.put(fqn, cmethod);
+            bytecodeCache.cachedMethods.put(fqn, cmethod);
             return;
         }
         
@@ -260,7 +265,7 @@ class CacheImporter extends DefaultHandler {
             map.remove(BytecodeCache.FqnAttr);
             
             CachedJField cfield = new CachedJField(fqn, map);
-            BytecodeCache.cachedFields.put(fqn, cfield);
+            bytecodeCache.cachedFields.put(fqn, cfield);
             return;
         }
     }

@@ -8,6 +8,7 @@ package org.jtool.eclipse.javamodel.builder;
 
 import org.jtool.eclipse.cfg.builder.CFGStore;
 import org.jtool.eclipse.pdg.builder.PDGStore;
+import org.jtool.eclipse.cfg.builder.JInfoStore;
 import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.util.Logger;
 
@@ -61,6 +62,7 @@ public abstract class ModelBuilder {
     public void unbuild() {
         CFGStore.getInstance().destroy();
         PDGStore.getInstance().destroy();
+        JInfoStore.getInstance().destory();
         if (currentProject != null) {
             ProjectStore.getInstance().removeProject(currentProject.getPath());
             currentProject.clear();

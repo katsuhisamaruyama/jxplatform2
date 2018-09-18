@@ -32,6 +32,7 @@ public class JInfoStore {
     
     private JavaProject jproject;
     private BytecodeClassStore bytecodeClassStore = null;
+    private BytecodeCache bytecodeCache = null;
     
     private JInfoStore() {
     }
@@ -50,23 +51,26 @@ public class JInfoStore {
             if (bytecodeAnalysized) {
                 bytecodeClassStore = jproject.registerBytecodeClasses();
             } else if (usingBytecodeCache) {
-                if (!BytecodeCache.loadCache(jproject)) {
+                bytecodeCache = new BytecodeCache(jproject);
+                if (!bytecodeCache.loadCache()) {
                     bytecodeClassStore = jproject.registerBytecodeClasses();
-                };
+                }
             }
         }
     }
     
     public void writeCache() {
-        BytecodeCache.writeCache(jproject, new ArrayList<ExternalJClass>(externalClassStore.values()));
+        if (bytecodeCache != null) {
+            bytecodeCache.writeCache(new ArrayList<ExternalJClass>(externalClassStore.values()));
+        }
     }
     
     public void clearInternalOnly() {
         internalClassStore.clear();
     }
     
-    public void clearAll() {
-        clearInternalOnly();
+    public void destory() {
+        internalClassStore.clear();
         externalClassStore.clear();
     }
     
