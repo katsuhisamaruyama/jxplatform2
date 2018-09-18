@@ -23,27 +23,22 @@ public class ExternalJField extends JField {
     
     protected CtField ctField;
     
-    public ExternalJField(JClass clazz, CtField cfield) {
-        this.ctField = cfield;
-        declaringClass = clazz;
+    ExternalJField(JClass clazz) {
+        super(clazz);
     }
     
-    public CtField getCtField() {
-        return ctField;
+    ExternalJField(CtField ctField, JClass clazz) {
+        super(clazz);
+        this.ctField = ctField;
+        
+        name = ctField.getName();
+        fqn = declaringClass.getQualifiedName() + JavaElement.QualifiedNameSeparator + name;
+        type = findType();
+        isPrimitiveType = checkPrimitiveType();
+        modifiers = getModfifiers(ctField);
     }
     
-    @Override
-    public String getName() {
-        return ctField.getName();
-    }
-    
-    @Override
-    public String getQualifiedName() {
-        return declaringClass.getQualifiedName() + JavaElement.QualifiedNameSeparator + ctField.getName();
-    }
-    
-    @Override
-    public String getType() {
+    private String findType() {
         try {
             return ctField.getType().getName();
         } catch (NotFoundException e) {
@@ -51,8 +46,7 @@ public class ExternalJField extends JField {
         }
     }
     
-    @Override
-    public boolean isPrimitiveType() {
+    private boolean checkPrimitiveType() {
         try {
             return ctField.getType().isPrimitive();
         } catch (NotFoundException e) {
@@ -60,24 +54,16 @@ public class ExternalJField extends JField {
         }
     }
     
-    @Override
-    public boolean isPublic() {
-        return Modifier.isPublic(ctField.getModifiers());
-    }
-    
-    @Override
-    public boolean isProtected() {
-        return Modifier.isProtected(ctField.getModifiers());
-    }
-    
-    @Override
-    public boolean isPrivate() {
-        return Modifier.isPrivate(ctField.getModifiers());
-    }
-    
-    @Override
-    public boolean isDefault() {
-        return !isPublic() && !isProtected() && !isPrivate();
+    private int getModfifiers(CtField ctField) {
+        if (Modifier.isPublic(ctField.getModifiers())) {
+            return org.eclipse.jdt.core.dom.Modifier.PUBLIC;
+        } else if (Modifier.isProtected(ctField.getModifiers())) {
+            return org.eclipse.jdt.core.dom.Modifier.PROTECTED;
+        } else if (Modifier.isPrivate(ctField.getModifiers())) {
+            return org.eclipse.jdt.core.dom.Modifier.PRIVATE;
+        } else {
+            return org.eclipse.jdt.core.dom.Modifier.DEFAULT;
+        }
     }
     
     @Override

@@ -11,7 +11,6 @@ import org.jtool.eclipse.cfg.CFGMethodCall;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGParameter;
 import org.jtool.eclipse.cfg.CFGStatement;
-import org.jtool.eclipse.cfg.CFGStore;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JVirtualReference;
 import org.jtool.eclipse.cfg.JFieldReference;
@@ -335,10 +334,18 @@ public class ExpressionVisitor extends ASTVisitor {
             
             if (analysisLevel > 0 && (primary.isLocalAccess() || primary.isFieldAccess())) {
                 JMethod method = JInfoStore.getInstance().getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
-                if (method != null && !visitedMethods.contains(method)) {
-                    visitedMethods.add(method);
-                    if (method.hasSideEffects(visitedMethods)) {
-                        curNode.addDefVariable(primary);
+                if (method != null) {
+                    if (method.sideEffectsYes() || method.sideEffectsNo()) {
+                        if (method.sideEffectsYes()) {
+                            curNode.addDefVariable(primary);
+                        }
+                    } else {
+                        if (!visitedMethods.contains(method)) {
+                            visitedMethods.add(method);
+                            if (method.hasSideEffects(visitedMethods)) {
+                                curNode.addDefVariable(primary);
+                            }
+                        }
                     }
                 }
             }

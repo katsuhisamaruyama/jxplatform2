@@ -10,11 +10,12 @@ import org.jtool.eclipse.cfg.JClass;
 import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.cfg.JField;
 import org.jtool.eclipse.javamodel.JavaProject;
-import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
 import org.jtool.eclipse.javamodel.JavaClass;
+import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
 import javassist.CtClass;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.ArrayList;
 
 /**
  * An object holds a collection of all projects.
@@ -30,7 +31,7 @@ public class JInfoStore {
     private Map<String, ExternalJClass> externalClassStore = new HashMap<String, ExternalJClass>();
     
     private JavaProject jproject;
-    private BytecodeClassStore bytecodeClassStore;
+    private BytecodeClassStore bytecodeClassStore = null;
     
     private JInfoStore() {
     }
@@ -43,13 +44,21 @@ public class JInfoStore {
         return jproject;
     }
     
-    public void build(JavaProject jproject, boolean bytecodeAnalysized) {
+    public void build(JavaProject jproject, boolean bytecodeAnalysized, boolean usingBytecodeCache) {
         this.jproject = jproject;
-        if (jproject != null && bytecodeAnalysized) {
-            bytecodeClassStore = jproject.registerBytecodeClasses();
-        } else {
-            bytecodeClassStore = null;
+        if (jproject != null) {
+            if (bytecodeAnalysized) {
+                bytecodeClassStore = jproject.registerBytecodeClasses();
+            } else if (usingBytecodeCache) {
+                if (!BytecodeCache.loadCache(jproject)) {
+                    bytecodeClassStore = jproject.registerBytecodeClasses();
+                };
+            }
         }
+    }
+    
+    public void writeCache() {
+        BytecodeCache.writeCache(jproject, new ArrayList<ExternalJClass>(externalClassStore.values()));
     }
     
     public void clearInternalOnly() {
@@ -61,11 +70,11 @@ public class JInfoStore {
         externalClassStore.clear();
     }
     
-    private JClass registerInternalClass(String fqn) {
+    public JClass registerInternalClass(String fqn) {
         if (jproject != null) {
             JavaClass jclass = jproject.getClass(fqn);
             if (jclass != null) {
-                InternalJClass clazz = new InternalJClass(jclass);
+                InternalJClass clazz = new InternalJClass(jclass, jproject);
                 internalClassStore.put(clazz.getQualifiedName(), clazz);
                 return clazz;
             }
@@ -73,11 +82,11 @@ public class JInfoStore {
         return null;
     }
     
-    private JClass registerExternalClass(String fqn) {
+    public JClass registerExternalClass(String fqn) {
         if (bytecodeClassStore != null) {
-            CtClass cclass = bytecodeClassStore.getCtClass(fqn);
-            if (cclass != null) {
-                ExternalJClass clazz = new ExternalJClass(cclass, jproject);
+            CtClass ctClass = bytecodeClassStore.getCtClass(fqn);
+            if (ctClass != null) {
+                ExternalJClass clazz = new ExternalJClass(ctClass, jproject);
                 externalClassStore.put(clazz.getQualifiedName(), clazz);
                 return clazz;
             }
@@ -85,7 +94,7 @@ public class JInfoStore {
         return null;
     }
     
-    private JClass registerClass(String fqn) {
+    public JClass registerClass(String fqn) {
         JClass clazz = registerInternalClass(fqn);
         if (clazz == null) {
             clazz = registerExternalClass(fqn);
@@ -128,11 +137,7 @@ public class JInfoStore {
             if (method.isInProject()) {
                 return (InternalJMethod)method;
             } else {
-                if (method.isConstructor()) {
-                    return (ExternalJConstructor)method;
-                } else {
-                    return (ExternalJMethod)method;
-                }
+                return (ExternalJMethod)method;
             }
         }
         return UnregisteredJMethod.getInstance();

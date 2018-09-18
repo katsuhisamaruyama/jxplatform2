@@ -8,11 +8,11 @@ package org.jtool.eclipse.cfg;
 
 import org.jtool.eclipse.graph.GraphEdge;
 import org.jtool.eclipse.graph.GraphElement;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * An edge of CFGs, which represents a control flow between CFG nodes.

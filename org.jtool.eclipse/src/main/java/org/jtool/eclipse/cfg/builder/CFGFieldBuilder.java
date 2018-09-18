@@ -6,7 +6,6 @@
 
 package org.jtool.eclipse.cfg.builder;
 
-import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGExit;
 import org.jtool.eclipse.cfg.CFGFieldEntry;
@@ -17,13 +16,13 @@ import org.jtool.eclipse.cfg.JFieldReference;
 import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.javamodel.JavaField;
+import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
-
 import java.util.Set;
 import java.util.HashSet;
 

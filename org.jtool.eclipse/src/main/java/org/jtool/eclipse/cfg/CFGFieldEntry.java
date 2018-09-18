@@ -8,7 +8,6 @@ package org.jtool.eclipse.cfg;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.jtool.eclipse.cfg.builder.JInfoStore;
-
 import java.util.List;
 
 /**

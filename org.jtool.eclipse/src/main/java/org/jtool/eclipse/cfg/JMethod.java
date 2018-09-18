@@ -6,6 +6,8 @@
 
 package org.jtool.eclipse.cfg;
 
+import org.jtool.eclipse.javamodel.JavaMethod;
+import org.eclipse.jdt.core.dom.Modifier;
 import java.util.Set;
 
 /**
@@ -16,6 +18,14 @@ import java.util.Set;
 public abstract class JMethod {
     
     protected JClass declaringClass;
+    
+    protected String name;
+    protected String fqn;
+    protected String signature;
+    protected String returnType;
+    protected boolean isPrimitiveType;
+    protected JavaMethod.Kind kind;
+    protected int modifiers;
     
     protected JMethod[] accessedMethods = null;
     protected JField[] accessedFields = null;
@@ -28,38 +38,84 @@ public abstract class JMethod {
     protected SideEffectStatus sideEffects = SideEffectStatus.UNKNOWM;
     protected static final int SideEffectCheckCount = 5;
     
-    protected JMethod() {
+    protected JMethod(JClass clazz) {
+        declaringClass = clazz;
+    }
+    
+    public void setAttribute(String name, String fqn, String signature, String returnType, boolean isPrimitiveType,
+                                String kind, int modifiers) {
+        this.name = name;
+        this.fqn = fqn;
+        this.signature = signature;
+        this.returnType = returnType;
+        this.isPrimitiveType = isPrimitiveType;
+        this.kind = JavaMethod.Kind.valueOf(kind);
+        this.modifiers = modifiers;
     }
     
     public JClass getDeclaringClass() {
         return declaringClass;
     }
     
-    public abstract String getName();
+    public String getName() {
+        return name;
+    }
     
-    public abstract String getQualifiedName();
+    public String getQualifiedName() {
+        return fqn;
+    }
     
-    public abstract String getSignature();
+    public String getSignature() {
+        return signature;
+    }
     
-    public abstract String getReturnType();
+    public String getReturnType() {
+        return returnType;
+    }
     
-    public abstract boolean isPrimitiveReturnType();
+    public boolean isPrimitiveReturnType() {
+        return isPrimitiveType;
+    }
     
-    public abstract boolean isVoid();
+    public boolean isVoid() {
+        return returnType.equals("void");
+    }
     
-    public abstract boolean isMethod();
+    public JavaMethod.Kind getKind() {
+        return kind;
+    }
     
-    public abstract boolean isConstructor();
+    public boolean isMethod() {
+        return kind == JavaMethod.Kind.J_METHOD;
+    }
     
-    public abstract boolean isInitializer();
+    public boolean isConstructor() {
+        return kind == JavaMethod.Kind.J_CONSTRUCTOR;
+    }
     
-    public abstract boolean isPublic();
+    public boolean isInitializer() {
+        return kind == JavaMethod.Kind.J_INITIALIZER;
+    }
     
-    public abstract boolean isProtected();
+    public int getModifiers() {
+        return modifiers;
+    }
     
-    public abstract boolean isPrivate();
+    public boolean isPublic() {
+        return Modifier.isPublic(modifiers);
+    }
     
-    public abstract boolean isDefault();
+    public boolean isProtected() {
+        return Modifier.isProtected(modifiers);
+    }
+    
+    public boolean isPrivate() {
+        return Modifier.isPrivate(modifiers);
+    }
+    
+    public boolean isDefault() {
+        return !isPublic() && !isProtected() && !isPrivate();
+    }
     
     public abstract boolean isInProject();
     
@@ -100,11 +156,19 @@ public abstract class JMethod {
     
     protected abstract JMethod[] findOverriddenMethods();
     
-    public boolean hasSideEffects(Set<JMethod> visitedMethods) {
-        return hasSideEffects(SideEffectCheckCount, visitedMethods);
+    public boolean sideEffectsYes() {
+        return sideEffects == SideEffectStatus.YES || sideEffects == SideEffectStatus.MAYBE;
     }
     
-    protected boolean hasSideEffects(int count, Set<JMethod> visitedMethods) {
+    public boolean sideEffectsNo() {
+        return sideEffects == SideEffectStatus.NO;
+    }
+    
+    public boolean hasSideEffects(Set<JMethod> visitedMethods) {
+        return checkSideEffects(SideEffectCheckCount, visitedMethods);
+    }
+    
+    protected boolean checkSideEffects(int count, Set<JMethod> visitedMethods) {
         if (count == 0) {
             sideEffects = SideEffectStatus.MAYBE;
         }
@@ -112,7 +176,7 @@ public abstract class JMethod {
             checkSideEffectsOnFields(visitedMethods);
             checkSideEffectsOnMethods(count, visitedMethods);
         }
-        return sideEffects == SideEffectStatus.YES || sideEffects == SideEffectStatus.MAYBE;
+        return sideEffectsYes();
     }
     
     protected void checkSideEffectsOnFields(Set<JMethod> visitedMethods) {
@@ -120,14 +184,14 @@ public abstract class JMethod {
     
     protected void checkSideEffectsOnMethods(int count, Set<JMethod> visitedMethods) {
         for (JMethod method : getOverridingMethods()) {
-            if (method != null && !visitedMethods.contains(method) && method.hasSideEffects(count, visitedMethods)) {
+            if (method != null && !visitedMethods.contains(method) && method.checkSideEffects(count, visitedMethods)) {
                 sideEffects = SideEffectStatus.YES;
                 return;
             }
         }
         
         for (JMethod method : getAccessedMethods()) {
-            if (method != null && !visitedMethods.contains(method) && method.hasSideEffects(count - 1, visitedMethods)) {
+            if (method != null && !visitedMethods.contains(method) && method.checkSideEffects(count - 1, visitedMethods)) {
                 sideEffects = SideEffectStatus.YES;
                 return;
             }

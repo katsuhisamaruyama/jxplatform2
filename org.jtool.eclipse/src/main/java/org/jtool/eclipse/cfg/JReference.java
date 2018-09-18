@@ -6,8 +6,8 @@
 
 package org.jtool.eclipse.cfg;
 
+import org.jtool.eclipse.javamodel.JavaMethod;
 import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
-
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -15,7 +15,6 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.jtool.eclipse.javamodel.JavaMethod;
 
 /**
  * An abstract class that represents a reference to a field,  a local variable, or a method.

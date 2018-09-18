@@ -6,6 +6,10 @@
 
 package org.jtool.eclipse.cfg;
 
+import org.jtool.eclipse.javamodel.JavaClass;
+import org.jtool.eclipse.javamodel.JavaProject;
+import org.eclipse.jdt.core.dom.Modifier;
+
 /**
  * An abstract class that provides concise information on a class.
  * 
@@ -13,13 +17,31 @@ package org.jtool.eclipse.cfg;
  */
 public abstract class JClass {
     
-    protected JField[] fields;
-    protected JMethod[] methods;
+    protected JavaProject jproject;
+    
+    protected String name;
+    protected String fqn;
+    protected JavaClass.Kind kind;
+    protected int modifiers;
     
     protected JClass[] ancestors = null;
     protected JClass[] descendants = null;
     
+    protected JField[] fields;
+    protected JMethod[] methods;
+    
     protected JClass() {
+    }
+    
+    protected JClass(JavaProject jproject) {
+        this.jproject = jproject;
+    }
+    
+    public void setAttribute(String name, String fqn, String kind, int modifiers) {
+        this.name = name;
+        this.fqn = fqn;
+        this.kind = JavaClass.Kind.valueOf(kind);
+        this.modifiers = modifiers;
     }
     
     public JField[] getFields() {
@@ -48,23 +70,51 @@ public abstract class JClass {
         return null;
     }
     
-    public abstract String getName();
+    public String getName() {
+        return name;
+    }
     
-    public abstract String getQualifiedName();
+    public String getQualifiedName() {
+        return fqn;
+    }
     
-    public abstract boolean isClass();
+    public JavaClass.Kind getKind() {
+        return kind;
+    }
     
-    public abstract boolean isInterface();
+    public boolean isClass() {
+        return kind == JavaClass.Kind.J_CLASS;
+    }
     
-    public abstract boolean isEnum();
+    public boolean isInterface() {
+        return kind == JavaClass.Kind.J_INTERFACE;
+    }
     
-    public abstract boolean isPublic();
+    public boolean isEnum() {
+        return kind == JavaClass.Kind.J_ENUM;
+    }
     
-    public abstract boolean isProtected();
+    public int getModifiers() {
+        return modifiers;
+    }
     
-    public abstract boolean isPrivate();
+    public boolean isPublic() {
+        return Modifier.isPublic(modifiers);
+    }
     
-    public abstract boolean isDefault();
+    public boolean isProtected() {
+        return Modifier.isProtected(modifiers);
+    }
+    
+    public boolean isPrivate() {
+        return Modifier.isPrivate(modifiers);
+    }
+    
+    public boolean isDefault() {
+        return !isPublic() && !isProtected() && !isPrivate();
+    }
+    
+    public abstract boolean isTopLevelClass();
     
     public abstract boolean isInProject();
     

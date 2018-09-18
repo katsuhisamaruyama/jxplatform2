@@ -16,6 +16,7 @@ import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtConstructor;
 import javassist.Modifier;
+import javassist.NotFoundException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -27,79 +28,65 @@ import java.util.ArrayList;
  */
 public class ExternalJClass extends JClass {
     
-    protected JavaProject jproject;
-    protected CtClass ctClass;
+    private CtClass ctClass;
     
-    public ExternalJClass(CtClass ctClass, JavaProject jproject) {
+    ExternalJClass(JavaProject jproject) {
+        super(jproject);
+    }
+    
+    ExternalJClass(CtClass ctClass, JavaProject jproject) {
+        super(jproject);
         this.ctClass = ctClass;
-        this.jproject = jproject;
+        
+        this.name = ctClass.getSimpleName();
+        this.fqn = ctClass.getName();
+        if (ctClass.isInterface()) {
+            kind = JavaClass.Kind.J_INTERFACE;
+        } else if (ctClass.isEnum()) {
+            kind = JavaClass.Kind.J_ENUM;
+        } else {
+            kind = JavaClass.Kind.J_CLASS;
+        }
+        this.modifiers = getModfifiers(ctClass);
         
         int num = 0;
-        fields = new ExternalJField[ctClass.getFields().length];
-        for (CtField cf : ctClass.getFields()) {
-            fields[num] = new ExternalJField(this, cf);
+        methods = new JMethod[ctClass.getMethods().length + ctClass.getConstructors().length];
+        for (CtMethod ctMtheod: ctClass.getMethods()) {
+            methods[num] = new ExternalJMethod(ctMtheod, this);
+            num++;
+        }
+        for (CtConstructor ctMtheod: ctClass.getConstructors()) {
+            methods[num] = new ExternalJMethod(ctMtheod, this);
             num++;
         }
         
         num = 0;
-        methods = new JMethod[ctClass.getMethods().length + ctClass.getConstructors().length];
-        for (CtMethod cm: ctClass.getMethods()) {
-            methods[num] = new ExternalJMethod(this, cm);
-            num++;
-        }
-        for (CtConstructor cm: ctClass.getConstructors()) {
-            methods[num] = new ExternalJConstructor(this, cm);
+        fields = new ExternalJField[ctClass.getFields().length];
+        for (CtField ctField : ctClass.getFields()) {
+            fields[num] = new ExternalJField(ctField, this);
             num++;
         }
     }
     
-    public CtClass getCtClass() {
-        return ctClass;
+    private int getModfifiers(CtClass ctClass) {
+        if (Modifier.isPublic(ctClass.getModifiers())) {
+            return org.eclipse.jdt.core.dom.Modifier.PUBLIC;
+        } else if (Modifier.isProtected(ctClass.getModifiers())) {
+            return org.eclipse.jdt.core.dom.Modifier.PROTECTED;
+        } else if (Modifier.isPrivate(ctClass.getModifiers())) {
+            return org.eclipse.jdt.core.dom.Modifier.PRIVATE;
+        } else {
+            return org.eclipse.jdt.core.dom.Modifier.DEFAULT;
+        }
     }
     
     @Override
-    public String getName() {
-        return ctClass.getSimpleName();
-    }
-    
-    @Override
-    public String getQualifiedName() {
-        return ctClass.getName();
-    }
-    
-    @Override
-    public boolean isClass() {
-        return !isInterface() && !isEnum();
-    }
-    
-    @Override
-    public boolean isInterface() {
-        return ctClass.isInterface();
-    }
-    
-    @Override
-    public boolean isEnum() {
-        return ctClass.isEnum();
-    }
-    
-    @Override
-    public boolean isPublic() {
-        return Modifier.isPublic(ctClass.getModifiers());
-    }
-    
-    @Override
-    public boolean isProtected() {
-        return Modifier.isProtected(ctClass.getModifiers());
-    }
-    
-    @Override
-    public boolean isPrivate() {
-        return Modifier.isPrivate(ctClass.getModifiers());
-    }
-    
-    @Override
-    public boolean isDefault() {
-        return !isPublic() && !isProtected() && !isPrivate();
+    public boolean isTopLevelClass() {
+        try {
+            return ctClass.getDeclaringClass() == null;
+        } catch (NotFoundException e) {
+            return false;
+        }
     }
     
     @Override

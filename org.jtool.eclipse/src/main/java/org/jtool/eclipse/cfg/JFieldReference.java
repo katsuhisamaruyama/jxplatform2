@@ -6,11 +6,10 @@
 
 package org.jtool.eclipse.cfg;
 
+import org.jtool.eclipse.javamodel.JavaClass;
 import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
-
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.jtool.eclipse.javamodel.JavaClass;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
 /**

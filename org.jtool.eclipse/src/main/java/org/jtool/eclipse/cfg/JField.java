@@ -6,6 +6,8 @@
 
 package org.jtool.eclipse.cfg;
 
+import org.eclipse.jdt.core.dom.Modifier;
+
 /**
  * An abstract class that provides concise information on a field.
  * 
@@ -15,29 +17,63 @@ public abstract class JField {
     
     protected JClass declaringClass;
     
-    protected JField() {
+    protected String name;
+    protected String fqn;
+    protected String type;
+    protected boolean isPrimitiveType;
+    protected int modifiers;
+    
+    protected JField(JClass clazz) {
+        declaringClass = clazz;
+    }
+    
+    public void setAttribute(String name, String fqn, String type, boolean isPrimitiveType, int modifiers) {
+        this.name = name;
+        this.fqn = fqn;
+        this.type = type;
+        this.isPrimitiveType = isPrimitiveType;
+        this.modifiers = modifiers;
     }
     
     public JClass getDeclaringClass() {
         return declaringClass;
     }
     
-    public abstract String getName();
+    public String getName() {
+        return name;
+    }
     
-    public abstract String getQualifiedName();
+    public String getQualifiedName() {
+        return fqn;
+    }
     
-    public abstract String getType();
+    public String getType() {
+        return type;
+    }
     
-    public abstract boolean isPrimitiveType();
+    public boolean isPrimitiveType() {
+        return isPrimitiveType;
+    }
     
-    public abstract boolean isPublic();
+    public int getModifiers() {
+        return modifiers;
+    }
     
-    public abstract boolean isProtected();
+    public boolean isPublic() {
+        return Modifier.isPublic(modifiers);
+    }
     
-    public abstract boolean isPrivate();
+    public boolean isProtected() {
+        return Modifier.isProtected(modifiers);
+    }
     
-    public abstract boolean isDefault();
+    public boolean isPrivate() {
+        return Modifier.isPrivate(modifiers);
+    }
     
+    public boolean isDefault() {
+        return !isPublic() && !isProtected() && !isPrivate();
+    }
     public abstract boolean isInProject();
     
     public boolean equals(JField field) {

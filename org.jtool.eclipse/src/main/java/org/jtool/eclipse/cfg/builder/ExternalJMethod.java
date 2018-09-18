@@ -10,8 +10,11 @@ import org.jtool.eclipse.cfg.JClass;
 import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.cfg.JField;
 import org.jtool.eclipse.javamodel.JavaElement;
+import org.jtool.eclipse.javamodel.JavaMethod;
 import javassist.CtClass;
+import javassist.CtBehavior;
 import javassist.CtMethod;
+import javassist.CtConstructor;
 import javassist.Modifier;
 import javassist.NotFoundException;
 import javassist.CannotCompileException;
@@ -20,8 +23,8 @@ import javassist.expr.MethodCall;
 import javassist.expr.ConstructorCall;
 import javassist.expr.FieldAccess;
 import java.util.List;
-import java.util.Set;
 import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * An object that represents a method outside the project.
@@ -31,43 +34,54 @@ import java.util.ArrayList;
  */
 public class ExternalJMethod extends JMethod {
     
-    protected CtMethod ctMethod;
+    protected CtBehavior ctMethod;
     
-    public ExternalJMethod(JClass clazz, CtMethod cmethod) {
-        this.ctMethod = cmethod;
-        declaringClass = clazz;
+    ExternalJMethod(JClass clazz) {
+        super(clazz);
     }
     
-    public CtMethod getCtMethod() {
-        return ctMethod;
+    ExternalJMethod(CtMethod ctMethod, JClass clazz) {
+        super(clazz);
+        this.ctMethod = ctMethod;
+        
+        name = ctMethod.getName();
+        signature = ctMethod.getName() + MethodSignature.methodSignatureToString(ctMethod.getSignature());
+        fqn = declaringClass.getQualifiedName() + JavaElement.QualifiedNameSeparator + signature;
+        returnType = findReturnType(ctMethod);
+        isPrimitiveType = checkPrimitiveReturnType(ctMethod);
+        kind = JavaMethod.Kind.J_METHOD;
+        modifiers = getModfifiers(ctMethod);
     }
     
-    @Override
-    public String getName() {
-        return ctMethod.getName();
+    public ExternalJMethod(CtConstructor ctMethod, JClass clazz) {
+        super(clazz);
+        this.ctMethod = ctMethod;
+        
+        name = ctMethod.getName();
+        signature = ctMethod.getName() + MethodSignature.methodSignatureToString(ctMethod.getSignature());
+        fqn = declaringClass.getQualifiedName() + JavaElement.QualifiedNameSeparator + signature;
+        returnType = declaringClass.getQualifiedName();
+        isPrimitiveType = false;
+        if (ctMethod.isClassInitializer()) {
+            kind = JavaMethod.Kind.J_INITIALIZER;
+        } else {
+            kind = JavaMethod.Kind.J_CONSTRUCTOR;
+        }
+        modifiers = getModfifiers(ctMethod);
     }
     
-    @Override
-    public String getQualifiedName() {
-        return declaringClass.getQualifiedName() + JavaElement.QualifiedNameSeparator + getSignature();
-    }
-    
-    @Override
-    public String getSignature() {
-        return ctMethod.getName() + MethodSignature.methodSignatureToString(ctMethod.getSignature());
-    }
-    
-    @Override
-    public String getReturnType() {
+    private String findReturnType(CtMethod ctMethod) {
         try {
+            if (ctMethod.getReturnType().equals(CtClass.voidType)) {
+                return "void";
+            }
             return ctMethod.getReturnType().getName();
         } catch (NotFoundException e) {
             return "";
         }
     }
     
-    @Override
-    public boolean isPrimitiveReturnType() {
+    private boolean checkPrimitiveReturnType(CtMethod ctMethod) {
         try {
             return ctMethod.getReturnType().isPrimitive();
         } catch (NotFoundException e) {
@@ -75,48 +89,16 @@ public class ExternalJMethod extends JMethod {
         }
     }
     
-    @Override
-    public boolean isVoid() {
-        try {
-            return ctMethod.getReturnType().equals(CtClass.voidType);
-        } catch (NotFoundException e) {
-            return false;
+    private int getModfifiers(CtBehavior ctMethod) {
+        if (Modifier.isPublic(ctMethod.getModifiers())) {
+            return org.eclipse.jdt.core.dom.Modifier.PUBLIC;
+        } else if (Modifier.isProtected(ctMethod.getModifiers())) {
+            return org.eclipse.jdt.core.dom.Modifier.PROTECTED;
+        } else if (Modifier.isPrivate(ctMethod.getModifiers())) {
+            return org.eclipse.jdt.core.dom.Modifier.PRIVATE;
+        } else {
+            return org.eclipse.jdt.core.dom.Modifier.DEFAULT;
         }
-    }
-    
-    @Override
-    public boolean isMethod() {
-        return true;
-    }
-    
-    @Override
-    public boolean isConstructor() {
-        return false;
-    }
-    
-    @Override
-    public boolean isInitializer() {
-        return false;
-    }
-    
-    @Override
-    public boolean isPublic() {
-        return Modifier.isPublic(ctMethod.getModifiers());
-    }
-    
-    @Override
-    public boolean isProtected() {
-        return Modifier.isProtected(ctMethod.getModifiers());
-    }
-    
-    @Override
-    public boolean isPrivate() {
-        return Modifier.isPrivate(ctMethod.getModifiers());
-    }
-    
-    @Override
-    public boolean isDefault() {
-        return !isPublic() && !isProtected() && !isPrivate();
     }
     
     @Override

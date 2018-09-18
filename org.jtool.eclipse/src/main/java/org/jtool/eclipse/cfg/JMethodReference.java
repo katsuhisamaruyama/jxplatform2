@@ -6,14 +6,12 @@
 
 package org.jtool.eclipse.cfg;
 
+import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import java.util.List;
-
-import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
-
 import java.util.ArrayList;
 
 /**

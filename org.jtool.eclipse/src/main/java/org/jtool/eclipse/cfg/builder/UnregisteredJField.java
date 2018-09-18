@@ -19,7 +19,7 @@ public class UnregisteredJField extends JField {
     private static UnregisteredJField instance = new UnregisteredJField();
     
     private UnregisteredJField() {
-        declaringClass = UnregisteredJClass.getInstance();
+        super(UnregisteredJClass.getInstance());
     }
     
     public static UnregisteredJField getInstance() {

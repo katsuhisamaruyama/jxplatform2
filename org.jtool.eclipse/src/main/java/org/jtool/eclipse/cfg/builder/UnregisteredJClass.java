@@ -80,6 +80,11 @@ public class UnregisteredJClass extends JClass {
     }
     
     @Override
+    public boolean isTopLevelClass() {
+        return false;
+    }
+    
+    @Override
     public JClass[] findAncestors() {
         return new JClass[0];
     }

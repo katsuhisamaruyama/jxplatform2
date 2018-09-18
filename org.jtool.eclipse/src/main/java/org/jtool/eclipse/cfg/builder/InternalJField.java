@@ -20,53 +20,19 @@ public class InternalJField extends JField {
     
     protected JavaField jfield;
     
-    public InternalJField(JClass clazz, JavaField jfield) {
+    InternalJField(JClass clazz) {
+        super(clazz);
+    }
+    
+    InternalJField(JavaField jfield, JClass clazz) {
+        super(clazz);
         this.jfield = jfield;
-        declaringClass = clazz;
-    }
-    
-    public JavaField getJavaField() {
-        return jfield;
-    }
-    
-    @Override
-    public String getName() {
-        return jfield.getName();
-    }
-    
-    @Override
-    public String getQualifiedName() {
-        return jfield.getQualifiedName();
-    }
-    
-    @Override
-    public String getType() {
-        return jfield.getType();
-    }
-    
-    @Override
-    public boolean isPrimitiveType() {
-        return jfield.isPrimitiveType();
-    }
-    
-    @Override
-    public boolean isPublic() {
-        return jfield.isPublic();
-    }
-    
-    @Override
-    public boolean isProtected() {
-        return jfield.isProtected();
-    }
-    
-    @Override
-    public boolean isPrivate() {
-        return jfield.isPrivate();
-    }
-    
-    @Override
-    public boolean isDefault() {
-        return jfield.isDefault();
+        
+        name = jfield.getName();
+        fqn = jfield.getQualifiedName();
+        type = jfield.getType();
+        isPrimitiveType = jfield.isPrimitiveType();
+        modifiers = jfield.getModifiers();
     }
     
     @Override

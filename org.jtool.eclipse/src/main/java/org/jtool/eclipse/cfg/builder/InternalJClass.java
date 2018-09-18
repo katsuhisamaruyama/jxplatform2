@@ -7,6 +7,7 @@
 package org.jtool.eclipse.cfg.builder;
 
 import org.jtool.eclipse.cfg.JClass;
+import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
@@ -21,82 +22,44 @@ import java.util.ArrayList;
  */
 public class InternalJClass extends JClass {
     
-    protected JavaClass jclass;
+    private JavaClass jclass;
     
-    public InternalJClass(JavaClass jclass) {
-        this(null, jclass);
+    InternalJClass(JavaProject jproject) {
+        super(jproject);
     }
     
-    public InternalJClass(JClass clazz, JavaClass jclass) {
+    InternalJClass(JavaClass jclass, JavaProject jproject) {
+        super(jproject);
         this.jclass = jclass;
+        
+        this.name = jclass.getName();
+        this.fqn = jclass.getQualifiedName();
+        this.kind = jclass.getKind();
+        this.modifiers = jclass.getModifiers();
         
         int num = 0;
         fields = new InternalJField[jclass.getFields().size()];
-        for (JavaField jf : jclass.getFields()) {
-            fields[num] = new InternalJField(this, jf);
+        for (JavaField jfield : jclass.getFields()) {
+            fields[num] = new InternalJField(jfield, this);
             num++;
         }
         
         num = 0;
         methods = new InternalJMethod[jclass.getMethods().size()];
-        for (JavaMethod jm: jclass.getMethods()) {
-            methods[num] = new InternalJMethod(this, jm);
+        for (JavaMethod jmethod: jclass.getMethods()) {
+            methods[num] = new InternalJMethod(jmethod, this);
             num++;
         }
-    }
-    
-    public JavaClass getJavaClass() {
-        return jclass;
-    }
-    
-    @Override
-    public String getName() {
-        return jclass.getName();
-    }
-    
-    @Override
-    public String getQualifiedName() {
-        return jclass.getQualifiedName();
-    }
-    
-    @Override
-    public boolean isClass() {
-        return jclass.isClass();
-    }
-    
-    @Override
-    public boolean isInterface() {
-        return jclass.isInterface();
-    }
-    
-    @Override
-    public boolean isEnum() {
-        return jclass.isEnum();
-    }
-    
-    @Override
-    public boolean isPublic() {
-        return jclass.isPublic();
-    }
-    
-    @Override
-    public boolean isProtected() {
-        return jclass.isProtected();
-    }
-    
-    @Override
-    public boolean isPrivate() {
-        return jclass.isPrivate();
-    }
-    
-    @Override
-    public boolean isDefault() {
-        return jclass.isDefault();
     }
     
     @Override
     public boolean isInProject() {
         return true;
+    }
+    
+    @Override
+    public boolean isTopLevelClass() {
+        return jclass.getDeclaringClass() == null;
     }
     
     @Override

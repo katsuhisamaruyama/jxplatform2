@@ -11,7 +11,6 @@ import org.jtool.eclipse.cfg.CFGExit;
 import org.jtool.eclipse.cfg.CFGMethodEntry;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGParameter;
-import org.jtool.eclipse.cfg.CFGStore;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JVirtualReference;
 import org.jtool.eclipse.cfg.JLocalReference;

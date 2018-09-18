@@ -7,13 +7,11 @@
 package org.jtool.eclipse.cfg.builder;
 
 import org.jtool.eclipse.cfg.JMethod;
-
+import org.jtool.eclipse.cfg.JField;
 import java.util.Set;
 
-import org.jtool.eclipse.cfg.JField;
-
 /**
- *  An object that represents a method unregistered.
+ * An object that represents a method unregistered.
  * All methods of this class are not intended to be directly called by clients.
  * 
  * @author Katsuhisa Maruyama
@@ -23,7 +21,7 @@ public class UnregisteredJMethod extends JMethod {
     private static UnregisteredJMethod instance = new UnregisteredJMethod();
     
     private UnregisteredJMethod() {
-        declaringClass = UnregisteredJClass.getInstance();
+        super(UnregisteredJClass.getInstance());
         accessedMethods = new JMethod[0];
         accessedFields = new JField[0];
         overrindingMethods = new JMethod[0];

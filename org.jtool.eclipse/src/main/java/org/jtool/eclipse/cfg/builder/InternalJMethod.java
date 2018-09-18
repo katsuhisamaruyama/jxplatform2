@@ -6,7 +6,6 @@
 
 package org.jtool.eclipse.cfg.builder;
 
-import org.jtool.eclipse.cfg.CFGStore;
 import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
@@ -14,8 +13,8 @@ import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.JClass;
 import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.cfg.JField;
-import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
+import org.jtool.eclipse.javamodel.JavaField;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
@@ -30,77 +29,21 @@ public class InternalJMethod extends JMethod {
     
     protected JavaMethod jmethod;
     
-    public InternalJMethod(JClass clazz, JavaMethod jmethod) {
+    InternalJMethod(JClass clazz) {
+        super(clazz);
+    }
+    
+    InternalJMethod(JavaMethod jmethod, JClass clazz) {
+        super(clazz);
         this.jmethod = jmethod;
-        declaringClass = clazz;
-    }
-    
-    public JavaMethod getJavaMethod() {
-        return jmethod;
-    }
-    
-    @Override
-    public String getName() {
-        return jmethod.getName();
-    }
-    
-    @Override
-    public String getQualifiedName() {
-        return jmethod.getQualifiedName();
-    }
-    
-    @Override
-    public String getSignature() {
-        return jmethod.getSignature();
-    }
-    
-    @Override
-    public String getReturnType() {
-        return jmethod.getReturnType();
-    }
-    
-    @Override
-    public boolean isPrimitiveReturnType() {
-        return jmethod.isPrimitiveReturnType();
-    }
-    
-    @Override
-    public boolean isVoid() {
-        return jmethod.isVoid();
-    }
-    
-    @Override
-    public boolean isMethod() {
-        return jmethod.isMethod();
-    }
-    
-    @Override
-    public boolean isConstructor() {
-        return jmethod.isConstructor();
-    }
-    
-    @Override
-    public boolean isInitializer() {
-        return jmethod.isInitializer();
-    }
-    
-    @Override
-    public boolean isPublic() {
-        return jmethod.isPublic();
-    }
-    
-    @Override
-    public boolean isProtected() {
-        return jmethod.isProtected();
-    }
-    
-    public boolean isPrivate() {
-        return jmethod.isPrivate();
-    }
-    
-    @Override
-    public boolean isDefault() {
-        return jmethod.isDefault();
+        
+        name = jmethod.getName();
+        fqn = jmethod.getQualifiedName();
+        signature = jmethod.getSignature();
+        returnType = jmethod.getReturnType();
+        isPrimitiveType = jmethod.isPrimitiveReturnType();
+        kind = jmethod.getKind();
+        modifiers = jmethod.getModifiers();
     }
     
     @Override
