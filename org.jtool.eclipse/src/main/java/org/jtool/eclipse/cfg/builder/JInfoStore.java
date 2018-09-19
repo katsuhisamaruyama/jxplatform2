@@ -6,14 +6,13 @@
 
 package org.jtool.eclipse.cfg.builder;
 
-import org.jtool.eclipse.cfg.JClass;
-import org.jtool.eclipse.cfg.JMethod;
-import org.jtool.eclipse.cfg.JMethod.SideEffectStatus;
-import org.jtool.eclipse.cfg.JField;
+import org.jtool.eclipse.cfg.builder.JMethod.SideEffectStatus;
 import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaElement;
 import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
+import org.jtool.eclipse.javamodel.builder.ProjectStore;
+
 import javassist.CtClass;
 import java.util.Map;
 import java.util.HashMap;
@@ -25,59 +24,55 @@ import java.util.ArrayList;
  * 
  * @author Katsuhisa Maruyama
  */
-public class JInfoStore {
-    
-    private static JInfoStore instance = new JInfoStore();
-    
-    private Map<String, InternalJClass> internalClassStore = new HashMap<String, InternalJClass>();
-    private Map<String, ExternalJClass> externalClassStore = new HashMap<String, ExternalJClass>();
+class JInfoStore {
     
     private JavaProject jproject;
     private int analysisLevel;
+    
+    private Map<String, JClassInternal> internalClassStore = new HashMap<String, JClassInternal>();
+    private Map<String, JClassExternal> externalClassStore = new HashMap<String, JClassExternal>();
+    
     private BytecodeClassStore bytecodeClassStore;
     private BytecodeCache bytecodeCache;
     
-    private JInfoStore() {
+    JInfoStore() {
     }
     
-    public static JInfoStore getInstance() {
-        return instance;
-    }
-    
-    public void create() {
-        internalClassStore.clear();
-        externalClassStore.clear();
-        jproject = null;
+    void create(JavaProject jproject, boolean analyzingBytecode) {
+        this.jproject = jproject;
         analysisLevel = 0;
-        bytecodeClassStore = null;
-        bytecodeCache = null;
+        if (analyzingBytecode) {
+            bytecodeCache = new BytecodeCache(jproject);
+            bytecodeCache.loadCache();
+            analysisLevel = 1;
+        }
     }
     
     public void destory() {
+        writeCache();
+        
         internalClassStore.clear();
         externalClassStore.clear();
         jproject = null;
+        
         bytecodeClassStore = null;
         bytecodeCache = null;
+    }
+    
+    public void analyzeBytecode() {
+        if (bytecodeClassStore == null) {
+            bytecodeClassStore = ProjectStore.getInstance().registerBytecodeClasses(jproject);
+            bytecodeClassStore.collectBytecodeClassInfo();
+            analysisLevel = 2;
+        }
+    }
+    
+    public BytecodeClassStore getBytecodeClassStore() {
+        return bytecodeClassStore;
     }
     
     public JavaProject getProject() {
         return jproject;
-    }
-    
-    public void create(JavaProject jproject, boolean bytecodeAnalysized) {
-        this.jproject = jproject;
-        if (jproject != null) {
-            analysisLevel = 1;
-            
-            System.out.println(jproject.getPath() + " " + bytecodeAnalysized);
-            
-            if (bytecodeAnalysized) {
-                bytecodeCache = new BytecodeCache(jproject);
-                bytecodeCache.loadCache();
-                analysisLevel = 2;
-            }
-        }
     }
     
     public int getAnalysisLevel() {
@@ -86,7 +81,7 @@ public class JInfoStore {
     
     public void writeCache() {
         if (bytecodeCache != null) {
-            bytecodeCache.writeCache(new ArrayList<ExternalJClass>(externalClassStore.values()));
+            bytecodeCache.writeCache(new ArrayList<JClassExternal>(externalClassStore.values()));
         }
     }
     
@@ -94,7 +89,7 @@ public class JInfoStore {
         if (jproject != null) {
             JavaClass jclass = jproject.getClass(fqn);
             if (jclass != null) {
-                InternalJClass clazz = new InternalJClass(jclass, jproject);
+                JClassInternal clazz = new JClassInternal(jclass, jproject);
                 internalClassStore.put(clazz.getQualifiedName(), clazz);
                 return clazz;
             }
@@ -106,7 +101,7 @@ public class JInfoStore {
         if (bytecodeClassStore != null) {
             CtClass ctClass = bytecodeClassStore.getCtClass(fqn);
             if (ctClass != null) {
-                ExternalJClass clazz = new ExternalJClass(ctClass, jproject);
+                JClassExternal clazz = new JClassExternal(ctClass, jproject);
                 externalClassStore.put(clazz.getQualifiedName(), clazz);
                 return clazz;
             }
@@ -118,6 +113,9 @@ public class JInfoStore {
         JClass clazz = registerInternalClass(fqn);
         if (clazz == null) {
             if (analysisLevel < 3 && analysisLevel > 1) {
+                
+                System.out.println("BYTECODE = " + fqn);
+                
                 JInfoStore.getInstance().analyzeBytecode();
             }
             clazz = registerExternalClass(fqn);
@@ -158,9 +156,9 @@ public class JInfoStore {
         JMethod method = clazz.getMethod(signature);
         if (method != null) {
             if (method.isInProject()) {
-                return (InternalJMethod)method;
+                return (JMethodInternal)method;
             } else {
-                return (ExternalJMethod)method;
+                return (JMethodExternal)method;
             }
         }
         return null;
@@ -179,9 +177,9 @@ public class JInfoStore {
         return null;
     }
     
-    public CachedJMethod findCache(String className, String signature) {
+    public JMethodCache findCache(String className, String signature) {
         if (bytecodeCache != null) {
-            CachedJMethod cmethod = JInfoStore.getInstance().getCachedJMethod(className, signature);
+            JMethodCache cmethod = JInfoStore.getInstance().getCachedJMethod(className, signature);
             if (cmethod == null || SideEffectStatus.UNKNOWM.toString().equals(cmethod.sideEffects())) {
                 return null;
             } else {
@@ -191,22 +189,15 @@ public class JInfoStore {
         return null;
     }
     
-    public void analyzeBytecode() {
-        if (bytecodeClassStore == null) {
-            bytecodeClassStore = jproject.registerBytecodeClasses();
-            analysisLevel = 3;
-        }
-    }
-    
-    CachedJClass getCachedJClass(String fqn) {
+    JClassCache getCachedJClass(String fqn) {
         return bytecodeCache.getCachedJClass(fqn);
     }
     
-    CachedJMethod getCachedJMethod(String className, String signature) {
+    JMethodCache getCachedJMethod(String className, String signature) {
         return bytecodeCache.getCachedJMethod(className + JavaElement.QualifiedNameSeparator + signature);
     }
     
-    CachedJField getCachdeJMField(String className, String name) {
+    JFieldCache getCachdeJMField(String className, String name) {
         return bytecodeCache.getCachedJField(className + JavaElement.QualifiedNameSeparator + name);
     }
 }

@@ -6,21 +6,18 @@
 
 package org.jtool.eclipse.pdg.builder;
 
+import org.jtool.eclipse.pdg.ClDG;
+import org.jtool.eclipse.pdg.PDG;
+import org.jtool.eclipse.pdg.SDG;
 import org.jtool.eclipse.cfg.CCFG;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.builder.CFGMethodBuilder;
 import org.jtool.eclipse.cfg.builder.CFGStore;
 import org.jtool.eclipse.cfg.builder.CCFGBuilder;
 import org.jtool.eclipse.cfg.builder.CFGFieldBuilder;
-import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
-import org.jtool.eclipse.javamodel.builder.ProjectStore;
-import org.jtool.eclipse.pdg.ClDG;
-import org.jtool.eclipse.pdg.PDG;
-import org.jtool.eclipse.pdg.SDG;
-
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -33,28 +30,20 @@ import java.util.ArrayList;
  */
 public class PDGStore {
     
-    private static PDGStore instance = new PDGStore();
+    private CFGStore cfgStore;
     
-    protected Map<String, PDG> pdgStore = new HashMap<String, PDG>();
-    protected SDG currentSDG;
-    private boolean ignoringJumpEdge;
+    private Map<String, PDG> pdgMap = new HashMap<String, PDG>();
+    private boolean ignoringJumpEdge = false;
     
-    private PDGStore() {
-    }
+    private SDG currentSDG;
     
-    public static PDGStore getInstance() {
-        return instance;
-    }
-    
-    public void create() {
-        pdgStore.clear();
-        currentSDG = null;
-        ignoringJumpEdge = false;
+    public PDGStore(CFGStore cfgStore) {
+        this.cfgStore = cfgStore;
     }
     
     public void destroy() {
-        pdgStore.clear();
-        currentSDG = null;
+        pdgMap.clear();
+        cfgStore = null;
     }
     
     public void setIgnoringJumpEdge(boolean ignoringJumpEdge) {
@@ -66,21 +55,21 @@ public class PDGStore {
     }
     
     public int size() {
-        return pdgStore.size();
+        return pdgMap.size();
     }
     
     private void addPDG(PDG pdg) {
-        pdgStore.put(pdg.getEntryNode().getQualifiedName(), pdg);
+        pdgMap.put(pdg.getEntryNode().getQualifiedName(), pdg);
     }
     
     public PDG getPDG(String fqn) {
-        return pdgStore.get(fqn);
+        return pdgMap.get(fqn);
     }
     
     public PDG getPDG(CFG cfg) {
-        PDG pdg = PDGBuilder.buildPDG(cfg);
+        PDG pdg = PDGBuilder.buildPDG(cfg, ignoringJumpEdge);
         addPDG(pdg);
-        if (CFGStore.getInstance().creatingActualNodes()) {
+        if (cfgStore.creatingActualNodes()) {
             PDGBuilder.connectParametersConservatively(pdg);
         }
         return pdg;
@@ -107,7 +96,7 @@ public class PDGStore {
     }
     
     public PDG getPDGWithinSDG(JavaMethod jmethod) {
-        if (CFGStore.getInstance().creatingActualNodes()) {
+        if (cfgStore.creatingActualNodes()) {
             SDG sdg = getSDG(jmethod.getDeclaringClass());
             return sdg.getPDG(jmethod.getQualifiedName());
         } else {
@@ -116,7 +105,7 @@ public class PDGStore {
     }
     
     public PDG getPDGWithinSDG(JavaField jfield) {
-        if (CFGStore.getInstance().creatingActualNodes()) {
+        if (cfgStore.creatingActualNodes()) {
             SDG sdg = getSDG(jfield.getDeclaringClass());
             return sdg.getPDG(jfield.getQualifiedName());
             
@@ -132,15 +121,15 @@ public class PDGStore {
         }
         
         CCFG ccfg = CCFGBuilder.build(jclass);
-        ClDG cldg = PDGBuilder.buildClDG(ccfg);
-        if (CFGStore.getInstance().creatingActualNodes()) {
+        ClDG cldg = PDGBuilder.buildClDG(ccfg, ignoringJumpEdge);
+        if (cfgStore.creatingActualNodes()) {
             PDGBuilder.connectParameters(cldg);
         }
         return cldg;
     }
     
     public ClDG getClDGWithinSDG(JavaClass jclass) {
-        if (CFGStore.getInstance().creatingActualNodes()) {
+        if (cfgStore.creatingActualNodes()) {
             SDG sdg = getSDG(jclass);
             return sdg.getClDG(jclass.getQualifiedName());
             
@@ -174,7 +163,7 @@ public class PDGStore {
         for (PDG pdg : sdg.getPDGs()) {
             addPDG(pdg);
         }
-        if (CFGStore.getInstance().creatingActualNodes()) {
+        if (cfgStore.creatingActualNodes()) {
             PDGBuilder.connectParameters(jclasses, sdg);
         }
         return sdg;
@@ -205,22 +194,21 @@ public class PDGStore {
         SDG sdg = new SDG();
         for (JavaClass jclass : classes) {
             CCFG ccfg = CCFGBuilder.build(jclass);
-            ClDG cldg = PDGBuilder.buildClDG(ccfg);
+            ClDG cldg = PDGBuilder.buildClDG(ccfg, ignoringJumpEdge);
             sdg.add(cldg);
             sdg.setCCFG(ccfg);
         }
         return sdg;
     }
     
-    public SDG getSDG(JavaProject jproject) {
-        if (!jproject.getPath().equals(ProjectStore.getInstance().getCurrentProject().getPath())) {
-            pdgStore.clear();
-            currentSDG = getSDG(jproject.getClasses());
+    public SDG getSDG() {
+        if (currentSDG == null) {
+            currentSDG = getSDG(cfgStore.getJavaProject().getClasses());
             for (PDG pdg : currentSDG.getPDGs()) {
                 addPDG(pdg);
             }
-            if (CFGStore.getInstance().creatingActualNodes()) {
-                PDGBuilder.connectParameters(jproject.getClasses(), currentSDG);
+            if (cfgStore.creatingActualNodes()) {
+                PDGBuilder.connectParameters(cfgStore.getJavaProject().getClasses(), currentSDG);
             }
         }
         return currentSDG;

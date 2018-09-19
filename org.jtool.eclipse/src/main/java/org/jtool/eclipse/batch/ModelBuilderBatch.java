@@ -38,6 +38,11 @@ import java.io.IOException;
 public class ModelBuilderBatch extends ModelBuilder {
     
     public ModelBuilderBatch() {
+        super(false);
+    }
+    
+    public ModelBuilderBatch(boolean analyzingBytecode) {
+        super(analyzingBytecode);
     }
     
     public boolean isUnderPlugin() {

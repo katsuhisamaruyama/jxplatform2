@@ -10,19 +10,9 @@ import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.cfg.CCFG;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
-import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.Initializer;
-import org.eclipse.jdt.core.dom.LambdaExpression;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -36,37 +26,38 @@ import java.util.HashSet;
  */
 public class CFGStore {
     
-    private static CFGStore instance = new CFGStore();
+    private JavaProject jproject;
+    private JInfoStore infoStore;
     
-    private Map<String, CFG> cfgStore = new HashMap<String, CFG>();
-    private boolean creatingActualNodes;
+    private Map<String, CFG> cfgMap = new HashMap<String, CFG>();
+    private boolean creatingActualNodes = false;
     
-    private CFGStore() {
+    public CFGStore() {
+        infoStore = new JInfoStore();
+        CFGNode.resetId();
+    }
+    
+    public void create(JavaProject jproject, boolean analyzingBytecode) {
+        this.jproject = jproject;
+        infoStore.create(jproject, analyzingBytecode);
+    }
+    
+    public void destroy() {
+        infoStore.destory();
+        cfgMap.clear();
+        jproject = null;
     }
     
     public void resetId() {
         CFGNode.resetId();
     }
     
-    public static CFGStore getInstance() {
-        return instance;
+    public JavaProject getJavaProject() {
+        return jproject;
     }
     
-    public void create() {
-        cfgStore.clear();
-        creatingActualNodes = false;
-        CFGNode.resetId();
-    }
-    
-    public void destroy() {
-        JInfoStore.getInstance().writeCache();
-        cfgStore.clear();
-        creatingActualNodes = false;
-        CFGNode.resetId();
-    }
-    
-    public void setAnalysisLevel(JavaProject jproject, boolean analyzingBytecode) {
-        JInfoStore.getInstance().create(jproject, analyzingBytecode);
+    public JInfoStore getJInfoStore() {
+        return infoStore;
     }
     
     public void setCreatingActualNodes(boolean creatingActualNodes) {
@@ -78,15 +69,15 @@ public class CFGStore {
     }
     
     private void addCFG(CFG cfg) {
-        cfgStore.put(cfg.getQualifiedName(), cfg);
+        cfgMap.put(cfg.getQualifiedName(), cfg);
     }
     
     public CFG getCFG(String fqn) {
-        return cfgStore.get(fqn);
+        return cfgMap.get(fqn);
     }
     
     public int size() {
-        return cfgStore.size();
+        return cfgMap.size();
     }
     
     public CCFG getCCFG(JavaClass jclass) {
@@ -100,7 +91,7 @@ public class CFGStore {
     
     private CCFG build(JavaClass jclass) {
         CCFG ccfg = CCFGBuilder.build(jclass);
-        CFGStore.getInstance().addCFG(ccfg);
+        addCFG(ccfg);
         
         for (CFG cfg : ccfg.getStartNode().getMethods()) {
             addCFG(cfg);
@@ -146,41 +137,5 @@ public class CFGStore {
             addCFG(cfg);
         }
         return cfg;
-    }
-    
-    public CCFG build(TypeDeclaration node) {
-        return CCFGBuilder.build(node);
-    }
-    
-    public CCFG build(AnonymousClassDeclaration node) {
-        return CCFGBuilder.build(node);
-    }
-    
-    public CCFG build(EnumDeclaration node) {
-        return CCFGBuilder.build(node);
-    }
-    
-    public CFG build(MethodDeclaration node) {
-        return CFGMethodBuilder.build(node);
-    }
-    
-    public CFG build(Initializer node) {
-        return CFGMethodBuilder.build(node);
-    }
-    
-    public CFG build(LambdaExpression node) {
-        return CFGMethodBuilder.build(node);
-    }
-    
-    public CFG build(VariableDeclaration node) {
-        return CFGFieldBuilder.build(node);
-    }
-    
-    public CFG build(VariableDeclarationFragment node) {
-        return CFGFieldBuilder.build(node);
-    }
-    
-    public CFG build(EnumConstantDeclaration node) {
-        return CFGFieldBuilder.build(node);
     }
 }

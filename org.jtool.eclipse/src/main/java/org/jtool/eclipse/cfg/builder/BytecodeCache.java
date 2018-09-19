@@ -6,9 +6,6 @@
 
 package org.jtool.eclipse.cfg.builder;
 
-import org.jtool.eclipse.cfg.JClass;
-import org.jtool.eclipse.cfg.JMethod;
-import org.jtool.eclipse.cfg.JField;
 import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.util.TimeInfo;
 import javax.xml.parsers.DocumentBuilder;
@@ -46,9 +43,9 @@ public class BytecodeCache {
     
     private static final String BYTECODE_INFO_FILENAME = ".bytecode.info";
     
-    Map<String, CachedJClass> cachedClasses = new HashMap<String, CachedJClass>();
-    Map<String, CachedJMethod> cachedMethods = new HashMap<String, CachedJMethod>();
-    Map<String, CachedJField> cachedFields = new HashMap<String, CachedJField>();
+    Map<String, JClassCache> cachedClasses = new HashMap<String, JClassCache>();
+    Map<String, JMethodCache> cachedMethods = new HashMap<String, JMethodCache>();
+    Map<String, JFieldCache> cachedFields = new HashMap<String, JFieldCache>();
     
     private JavaProject jproject;
     
@@ -56,19 +53,19 @@ public class BytecodeCache {
         this.jproject = jproject;
     }
     
-    public CachedJClass getCachedJClass(String fqn) {
+    public JClassCache getCachedJClass(String fqn) {
         return cachedClasses.get(fqn);
     }
     
-    public CachedJMethod getCachedJMethod(String fqn) {
+    public JMethodCache getCachedJMethod(String fqn) {
         return cachedMethods.get(fqn);
     }
     
-    public CachedJField getCachedJField(String fqn) {
+    public JFieldCache getCachedJField(String fqn) {
         return cachedFields.get(fqn);
     }
     
-    public void writeCache(List<ExternalJClass> classes) {
+    public void writeCache(List<JClassExternal> classes) {
         try {
             String filename = jproject.getPath() + File.separator + BYTECODE_INFO_FILENAME;
             File file = new File(filename);
@@ -144,7 +141,7 @@ class CacheExporter {
         this.bytecodeCache = bytecodeCache;
     }
     
-    Document getDocument(JavaProject jproject, List<ExternalJClass> classes) {
+    Document getDocument(JavaProject jproject, List<JClassExternal> classes) {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document doc = builder.newDocument();
@@ -156,23 +153,23 @@ class CacheExporter {
             
             for (JClass clazz : classes) {
                 if (clazz.isTopLevelClass()) {
-                    bytecodeCache.cachedClasses.put(clazz.getQualifiedName(), new CachedJClass(clazz));
+                    bytecodeCache.cachedClasses.put(clazz.getQualifiedName(), new JClassCache(clazz));
                     for (JMethod method : clazz.getMethods()) {
-                        bytecodeCache.cachedMethods.put(method.getQualifiedName(), new CachedJMethod(method));
+                        bytecodeCache.cachedMethods.put(method.getQualifiedName(), new JMethodCache(method));
                     }
                     for (JField field : clazz.getFields()) {
-                        bytecodeCache.cachedFields.put(field.getQualifiedName(), new CachedJField(field));
+                        bytecodeCache.cachedFields.put(field.getQualifiedName(), new JFieldCache(field));
                     }
                 }
             }
             
-            for (CachedJClass cclass : bytecodeCache.cachedClasses.values()) {
+            for (JClassCache cclass : bytecodeCache.cachedClasses.values()) {
                 export(doc, projectElem, cclass);
             }
-            for (CachedJMethod cmethod : bytecodeCache.cachedMethods.values()) {
+            for (JMethodCache cmethod : bytecodeCache.cachedMethods.values()) {
                 export(doc, projectElem, cmethod);
             }
-            for (CachedJField cfield : bytecodeCache.cachedFields.values()) {
+            for (JFieldCache cfield : bytecodeCache.cachedFields.values()) {
                 export(doc, projectElem, cfield);
             }
             return doc;
@@ -183,14 +180,14 @@ class CacheExporter {
         return null;
     }
     
-    private void export(Document doc, Element parent, CachedJClass cclass) {
+    private void export(Document doc, Element parent, JClassCache cclass) {
         Element classElem = doc.createElement(BytecodeCache.ClassElem);
         classElem.setAttribute(BytecodeCache.NameAttr, cclass.getName());
         classElem.setAttribute(BytecodeCache.FqnAttr, cclass.getQualifiedName());
         parent.appendChild(classElem);
     }
     
-    private void export(Document doc, Element parent, CachedJMethod cmethod) {
+    private void export(Document doc, Element parent, JMethodCache cmethod) {
         Element methodElem = doc.createElement(BytecodeCache.MethodElem);
         methodElem.setAttribute(BytecodeCache.ClassNameAttr, cmethod.getClassName());
         methodElem.setAttribute(BytecodeCache.SignatureAttr, cmethod.getSignature());
@@ -199,7 +196,7 @@ class CacheExporter {
         parent.appendChild(methodElem);
     }
     
-    private void export(Document doc, Element parent, CachedJField cfield) {
+    private void export(Document doc, Element parent, JFieldCache cfield) {
         Element fieldElem = doc.createElement(BytecodeCache.FieldElem);
         fieldElem.setAttribute(BytecodeCache.ClassNameAttr, cfield.getClassName());
         fieldElem.setAttribute(BytecodeCache.NameAttr, cfield.getName());
@@ -255,7 +252,7 @@ class CacheImporter extends DefaultHandler {
             String fqn = map.get(BytecodeCache.FqnAttr);
             map.remove(BytecodeCache.FqnAttr);
             
-            CachedJClass cclass = new CachedJClass(fqn, map);
+            JClassCache cclass = new JClassCache(fqn, map);
             bytecodeCache.cachedClasses.put(fqn, cclass);
             return;
         }
@@ -265,7 +262,7 @@ class CacheImporter extends DefaultHandler {
             String fqn = map.get(BytecodeCache.FqnAttr);
             map.remove(BytecodeCache.FqnAttr);
             
-            CachedJMethod cmethod = new CachedJMethod(fqn, map);
+            JMethodCache cmethod = new JMethodCache(fqn, map);
             bytecodeCache.cachedMethods.put(fqn, cmethod);
             return;
         }
@@ -275,7 +272,7 @@ class CacheImporter extends DefaultHandler {
             String fqn = map.get(BytecodeCache.FqnAttr);
             map.remove(BytecodeCache.FqnAttr);
             
-            CachedJField cfield = new CachedJField(fqn, map);
+            JFieldCache cfield = new JFieldCache(fqn, map);
             bytecodeCache.cachedFields.put(fqn, cfield);
             return;
         }

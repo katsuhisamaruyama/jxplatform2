@@ -17,7 +17,6 @@ import org.jtool.eclipse.cfg.JFieldReference;
 import org.jtool.eclipse.cfg.JLocalReference;
 import org.jtool.eclipse.cfg.JMethodReference;
 import org.jtool.eclipse.cfg.JReference;
-import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.graph.GraphEdge;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -333,9 +332,8 @@ public class ExpressionVisitor extends ASTVisitor {
             if (primary.isLocalAccess() || primary.isFieldAccess()) {
                 int analysisLevel = JInfoStore.getInstance().getAnalysisLevel();
                 if (analysisLevel > 0) {
-                    
                     if (analysisLevel > 1 && JInfoStore.getInstance().getJavaClass(jcall.getDeclaringClassName()) == null) {
-                        CachedJMethod cmethod = JInfoStore.getInstance().findCache(jcall.getDeclaringClassName(), jcall.getSignature());
+                        JMethodCache cmethod = JInfoStore.getInstance().findCache(jcall.getDeclaringClassName(), jcall.getSignature());
                         if (cmethod != null) {
                             if (cmethod.sideEffectsYes() || cmethod.sideEffectsMaybe()) {
                                 curNode.addDefVariable(primary);
@@ -343,10 +341,6 @@ public class ExpressionVisitor extends ASTVisitor {
                             jcall.setPrimary(primary);
                             return;
                         }
-                        
-                        //if (analysisLevel < 3) {
-                        //    JInfoStore.getInstance().analyzeBytecode();
-                        //}
                     }
                     
                     JMethod method = JInfoStore.getInstance().getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
@@ -363,6 +357,9 @@ public class ExpressionVisitor extends ASTVisitor {
                                 }
                             }
                         }
+                        
+                    } else {
+                        curNode.addDefVariable(primary);
                     }
                 } else {
                     curNode.addDefVariable(primary);

@@ -16,7 +16,6 @@ import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JVirtualReference;
 import org.jtool.eclipse.cfg.JLocalReference;
 import org.jtool.eclipse.cfg.JReference;
-import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.graph.GraphEdge;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;

@@ -39,10 +39,10 @@ import java.util.List;
  */
 public class PDGBuilder {
     
-    public static PDG buildPDG(CFG cfg) {
+    public static PDG buildPDG(CFG cfg, boolean ignoringJumpEdge) {
         PDG pdg = new PDG();
         createNodes(pdg, cfg);
-        CDFinder.find(pdg, cfg, PDGStore.getInstance().ignoringJumpEdge());
+        CDFinder.find(pdg, cfg, ignoringJumpEdge);
         DDFinder.find(pdg, cfg);
         return pdg;
     }
@@ -75,14 +75,14 @@ public class PDGBuilder {
         return null;
     }
     
-    public static ClDG buildClDG(CCFG ccfg) {
+    public static ClDG buildClDG(CCFG ccfg, boolean ignoringJumpEdge) {
         ClDG cldg = new ClDG();
         PDGClassEntry entry = new PDGClassEntry(ccfg.getStartNode());
         cldg.setEntryNode(entry);
         cldg.add(entry);
         
         for (CFG cfg : ccfg.getCFGs()) {
-            PDG pdg = buildPDG(cfg);
+            PDG pdg = buildPDG(cfg, ignoringJumpEdge);
             cldg.add(pdg);
             
             ClassMemberEdge edge = new ClassMemberEdge(entry, pdg.getEntryNode());

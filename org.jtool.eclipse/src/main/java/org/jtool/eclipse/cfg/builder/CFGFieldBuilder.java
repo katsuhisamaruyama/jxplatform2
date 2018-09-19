@@ -14,15 +14,11 @@ import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JFieldReference;
 import org.jtool.eclipse.cfg.JReference;
-import org.jtool.eclipse.cfg.JMethod;
 import org.jtool.eclipse.javamodel.JavaField;
-import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
 import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.eclipse.jdt.core.dom.VariableDeclaration;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -39,48 +35,24 @@ public class CFGFieldBuilder {
     }
     
     public static CFG build(JavaField jfield, Set<JMethod> visitedMethods) {
-        String name = jfield.getName();
-        String fqn = jfield.getQualifiedName();
-        String className = jfield.getDeclaringClass().getQualifiedName();
-        return build(jfield.getASTNode(), jfield.getVariableBinding(), name, fqn, className, visitedMethods);
+        return build(jfield, jfield.getVariableBinding(), visitedMethods);
     }
     
-    public static CFG build(VariableDeclaration node) {
-        return CFGFieldBuilder.build(node, node.resolveBinding().getVariableDeclaration());
-    }
-    
-    public static CFG build(VariableDeclarationFragment node) {
-        return CFGFieldBuilder.build(node, node.resolveBinding().getVariableDeclaration());
-    }
-    
-    public static CFG build(EnumConstantDeclaration node) {
-        return CFGFieldBuilder.build(node, node.resolveVariable().getVariableDeclaration());
-    }
-    
-    private static CFG build(ASTNode node, IVariableBinding vbinding) {
-        String name = vbinding.getName();
-        String className = vbinding.getDeclaringClass().getTypeDeclaration().getQualifiedName();
-        String fqn = className + QualifiedNameSeparator + name;
-        return build(node, vbinding, name, fqn, className, new HashSet<JMethod>());
-    }
-    
-    private static CFG build(ASTNode node, IVariableBinding vbinding,
-            String name, String fqn, String className, Set<JMethod> visitedMethods) {
+    private static CFG build(JavaField jfield, IVariableBinding vbinding, Set<JMethod> visitedMethods) {
         CFG cfg = new CFG();
         ExpressionVisitor.paramNumber = 1;
         
         CFGFieldEntry entry;
         if (vbinding.isEnumConstant()) {
-            entry = new CFGFieldEntry(node, CFGNode.Kind.enumConstantEntry, name, fqn, className);
+            entry = new CFGFieldEntry(jfield, CFGNode.Kind.enumConstantEntry);
         } else {
-            entry = new CFGFieldEntry(node, CFGNode.Kind.fieldEntry, name, fqn, className);
+            entry = new CFGFieldEntry(jfield, CFGNode.Kind.fieldEntry);
         }
-        entry.setType(vbinding.getType().getTypeDeclaration().getQualifiedName());
         cfg.setStartNode(entry);
         cfg.add(entry);
         
-        CFGStatement declNode = new CFGStatement(node, CFGNode.Kind.fieldDeclaration);
-        JReference jvar = new JFieldReference(node, vbinding);
+        CFGStatement declNode = new CFGStatement(jfield.getASTNode(), CFGNode.Kind.fieldDeclaration);
+        JReference jvar = new JFieldReference(jfield.getASTNode(), vbinding);
         declNode.addDefVariable(jvar);
         declNode.addUseVariable(jvar);
         cfg.add(declNode);
@@ -91,14 +63,14 @@ public class CFGFieldBuilder {
         
         CFGNode curNode = declNode;
         if (vbinding.isEnumConstant()) {
-            EnumConstantDeclaration decl = (EnumConstantDeclaration)node;
+            EnumConstantDeclaration decl = (EnumConstantDeclaration)jfield.getASTNode();
             if (decl.resolveConstructorBinding() != null) {
                 ExpressionVisitor visitor = new ExpressionVisitor(cfg, declNode, visitedMethods);
                 decl.accept(visitor);
                 curNode = visitor.getExitNode();
             }
         } else {
-            VariableDeclarationFragment decl = (VariableDeclarationFragment)node;
+            VariableDeclarationFragment decl = (VariableDeclarationFragment)jfield.getASTNode();
             Expression initializer = decl.getInitializer();
             if (initializer != null) {
                 ExpressionVisitor visitor = new ExpressionVisitor(cfg, declNode, visitedMethods);
@@ -109,9 +81,9 @@ public class CFGFieldBuilder {
         
         CFGExit exit;
         if (vbinding.isEnumConstant()) {
-            exit = new CFGExit(node, CFGNode.Kind.enumConstantExit);
+            exit = new CFGExit(jfield.getASTNode(), CFGNode.Kind.enumConstantExit);
         } else {
-            exit = new CFGExit(node, CFGNode.Kind.fieldExit);
+            exit = new CFGExit(jfield.getASTNode(), CFGNode.Kind.fieldExit);
         }
         cfg.setEndNode(exit);
         cfg.add(exit);

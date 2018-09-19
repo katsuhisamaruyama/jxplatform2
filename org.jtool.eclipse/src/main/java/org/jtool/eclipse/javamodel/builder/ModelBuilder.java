@@ -6,18 +6,17 @@
 
 package org.jtool.eclipse.javamodel.builder;
 
-import org.jtool.eclipse.cfg.CCFG;
-import org.jtool.eclipse.cfg.CFG;
-import org.jtool.eclipse.cfg.builder.CFGStore;
-import org.jtool.eclipse.cfg.builder.JInfoStore;
-import org.jtool.eclipse.pdg.ClDG;
-import org.jtool.eclipse.pdg.PDG;
-import org.jtool.eclipse.pdg.SDG;
-import org.jtool.eclipse.pdg.builder.PDGStore;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.javamodel.JavaProject;
+import org.jtool.eclipse.cfg.CCFG;
+import org.jtool.eclipse.cfg.CFG;
+import org.jtool.eclipse.cfg.builder.CFGStore;
+import org.jtool.eclipse.pdg.ClDG;
+import org.jtool.eclipse.pdg.PDG;
+import org.jtool.eclipse.pdg.SDG;
+import org.jtool.eclipse.pdg.builder.PDGStore;
 import org.jtool.eclipse.util.Logger;
 
 /**
@@ -29,42 +28,37 @@ public abstract class ModelBuilder {
     
     protected JavaProject currentProject;
     
+    protected boolean analyzingBytecode;
+    protected CFGStore cfgStore;
+    protected PDGStore pdgStore;
+    
     public abstract boolean isUnderPlugin();
+    
+    protected ModelBuilder(boolean analyzingBytecode) {
+        this.analyzingBytecode = analyzingBytecode;
+        cfgStore = new CFGStore();
+        pdgStore = new PDGStore(cfgStore);
+    }
     
     public JavaProject getCurrentProject() {
         return currentProject;
     }
     
-    public void setAnalysisLevel(JavaProject jproject) {
-        CFGStore.getInstance().setAnalysisLevel(jproject, false);
-    }
-    
-    public void setAnalysisLevel(JavaProject jproject, boolean analyzingBytecode) {
-        CFGStore.getInstance().setAnalysisLevel(jproject, analyzingBytecode);
-    }
-    
     public void setCreatingActualNodes(boolean creatingActualNodes) {
-        CFGStore.getInstance().setCreatingActualNodes(creatingActualNodes);
+        cfgStore.setCreatingActualNodes(creatingActualNodes);
     }
     
     public void setIgnoringJumpEdge(boolean ignoringJumpEdge) {
-        PDGStore.getInstance().setIgnoringJumpEdge(ignoringJumpEdge);
-    }
-    
-    public boolean ignoringJumpEdge() {
-        return PDGStore.getInstance().ignoringJumpEdge();
+        pdgStore.setIgnoringJumpEdge(ignoringJumpEdge);
     }
     
     public void build() {
-        CFGStore.getInstance().create();
-        PDGStore.getInstance().create();
-        JInfoStore.getInstance().create();
+        cfgStore.create(currentProject, analyzingBytecode);
     }
     
     public void unbuild() {
-        CFGStore.getInstance().destroy();
-        PDGStore.getInstance().destroy();
-        JInfoStore.getInstance().destory();
+        cfgStore.destroy();
+        pdgStore.destroy();
         if (currentProject != null) {
             ProjectStore.getInstance().removeProject(currentProject.getPath());
             currentProject.clear();
@@ -72,83 +66,79 @@ public abstract class ModelBuilder {
     }
     
     public CFG getCFG(String fqn) {
-        return CFGStore.getInstance().getCFG(fqn);
-    }
-    
-    public int sizeOfCFG() {
-        return CFGStore.getInstance().size();
+        return cfgStore.getCFG(fqn);
     }
     
     public CCFG getCCFG(JavaClass jclass) {
-        return CFGStore.getInstance().getCCFG(jclass);
+        return cfgStore.getCCFG(jclass);
     }
     
     public CFG getCFG(JavaMethod jmethod) {
-        return CFGStore.getInstance().getCFG(jmethod);
+        return cfgStore.getCFG(jmethod);
     }
     
     public CFG getCFG(JavaField jfield) {
-        return CFGStore.getInstance().getCFG(jfield);
+        return cfgStore.getCFG(jfield);
     }
     
     public int sizeOfPDG() {
-        return PDGStore.getInstance().size();
+        return cfgStore.size();
     }
     
     public PDG getPDG(String fqn) {
-        return PDGStore.getInstance().getPDG(fqn);
+        return pdgStore.getPDG(fqn);
     }
     
     public PDG getPDG(CFG cfg) {
-        return PDGStore.getInstance().getPDG(cfg);
+        return pdgStore.getPDG(cfg);
     }
     
     public PDG getPDG(JavaMethod jmethod) {
-        return PDGStore.getInstance().getPDG(jmethod);
+        return pdgStore.getPDG(jmethod);
     }
     
     public PDG getPDG(JavaField jfield) {
-        return PDGStore.getInstance().getPDG(jfield);
+        return pdgStore.getPDG(jfield);
     }
     
     public PDG getPDGWithinSDG(JavaMethod jmethod) {
-        return PDGStore.getInstance().getPDGWithinSDG(jmethod);
+        return pdgStore.getPDGWithinSDG(jmethod);
     }
     
     public PDG getPDGWithinSDG(JavaField jfield) {
-        return PDGStore.getInstance().getPDGWithinSDG(jfield);
+        return pdgStore.getPDGWithinSDG(jfield);
     }
     
     public ClDG getClDG(JavaClass jclass) {
-        return PDGStore.getInstance().getClDG(jclass);
+        return pdgStore.getClDG(jclass);
     }
     
     public ClDG getClDGWithinSDG(JavaClass jclass) {
-        return PDGStore.getInstance().getClDGWithinSDG(jclass);
+        return pdgStore.getClDGWithinSDG(jclass);
     }
     
     public ClDG getClDG(JavaMethod jmethod) {
-        return PDGStore.getInstance().getClDG(jmethod);
+        return pdgStore.getClDG(jmethod);
     }
     
     public ClDG getClDGWithinSDG(JavaMethod jmethod) {
-        return PDGStore.getInstance().getClDGWithinSDG(jmethod);
+        return pdgStore.getClDGWithinSDG(jmethod);
     }
     
     public ClDG getClDG(JavaField jfield) {
-        return PDGStore.getInstance().getClDG(jfield);
+        return pdgStore.getClDG(jfield);
     }
     
     public ClDG getClDGWithinSDG(JavaField jfield) {
-        return PDGStore.getInstance().getClDGWithinSDG(jfield);
+        return pdgStore.getClDGWithinSDG(jfield);
     }
     
     public SDG getSDG(JavaClass jclass) {
-        return PDGStore.getInstance().getSDG(jclass);
+        return pdgStore.getSDG(jclass);
     }
     
-    public SDG getSDG(JavaProject jproject) {
-        return PDGStore.getInstance().getSDG(jproject);
+    public SDG getSDG() {
+        return pdgStore.getSDG();
     }
     
     public void setVisible(boolean visible) {

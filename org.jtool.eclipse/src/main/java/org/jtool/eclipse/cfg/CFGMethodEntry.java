@@ -6,8 +6,7 @@
 
 package org.jtool.eclipse.cfg;
 
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.jtool.eclipse.cfg.builder.JInfoStore;
+import org.jtool.eclipse.javamodel.JavaMethod;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -18,43 +17,21 @@ import java.util.ArrayList;
  */
 public class CFGMethodEntry extends CFGEntry {
     
-    private String returnType;
-    private boolean isPrimitiveType;
+    private JavaMethod jmethod;
+    
     private List<CFGParameter> formalIns = new ArrayList<CFGParameter>();
     private List<CFGParameter> formalOuts = new ArrayList<CFGParameter>();
-    
-    private JMethod jmethod;
     
     protected CFGMethodEntry() {
     }
     
-    public CFGMethodEntry(ASTNode node, CFGNode.Kind kind, String name, String signature, String fqn, String className) {
-        super(node, kind, name, signature, fqn);
-        jmethod = JInfoStore.getInstance().getJMethod(className, signature);
+    public CFGMethodEntry(JavaMethod jmethod, CFGNode.Kind kind) {
+        super(jmethod.getASTNode(), kind, jmethod.getName(), jmethod.getSignature(), jmethod.getQualifiedName());
+        this.jmethod = jmethod;
     }
     
-    public JMethod getJMethod() {
+    public JavaMethod getJavaMethod() {
         return jmethod;
-    }
-    
-    public void setReturnType(String type) {
-        returnType = type;
-    }
-    
-    public String getReturnType() {
-        return returnType;
-    }
-    
-    public void setPrimitiveType(boolean primitive) {
-        isPrimitiveType = primitive;
-    }
-    
-    public boolean isPrimitiveType() {
-        return isPrimitiveType;
-    }
-    
-    public boolean isVoidType() {
-        return returnType.equals("void");
     }
     
     public void addFormalIn(CFGParameter node) {

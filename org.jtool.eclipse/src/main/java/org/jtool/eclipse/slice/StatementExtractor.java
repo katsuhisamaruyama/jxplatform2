@@ -38,14 +38,15 @@ import java.util.HashSet;
 
 /**
  * Visits a Java program and extracts statements contained in a slice.
+ * 
  * @author Katsuhisa Maruyama
  */
 public class StatementExtractor extends ASTVisitor {
     
     private Set<ASTNode> sliceNodes = new HashSet<ASTNode>();
     
-    public StatementExtractor(Slice slice) {
-        for (PDGNode pdfNode : slice.getNodes()) {
+    public StatementExtractor(Set<PDGNode> nodes) {
+        for (PDGNode pdfNode : nodes) {
             sliceNodes.add(pdfNode.getCFGNode().getASTNode());
         }
     }

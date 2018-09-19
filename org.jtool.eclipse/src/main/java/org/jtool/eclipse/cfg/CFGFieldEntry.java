@@ -6,8 +6,7 @@
 
 package org.jtool.eclipse.cfg;
 
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.jtool.eclipse.cfg.builder.JInfoStore;
+import org.jtool.eclipse.javamodel.JavaField;
 import java.util.List;
 
 /**
@@ -17,28 +16,16 @@ import java.util.List;
  */
 public class CFGFieldEntry extends CFGEntry {
     
-    private String type;
+    private JavaField jfield;
     
-    private JField jfield;
-    
-    protected CFGFieldEntry() {
+    public CFGFieldEntry(JavaField jfield, CFGNode.Kind kind) {
+        super(jfield.getASTNode(), kind, jfield.getName(), jfield.getQualifiedName(),
+                jfield.getDeclaringClass().getQualifiedName());
+        this.jfield = jfield;
     }
     
-    public CFGFieldEntry(ASTNode node, CFGNode.Kind kind, String name, String fqn, String className) {
-        super(node, kind, name, name, fqn);
-        jfield = JInfoStore.getInstance().getJField(className, name);
-    }
-    
-    public JField getJField() {
+    public JavaField getJavaField() {
         return jfield;
-    }
-    
-    public void setType(String type) {
-        this.type = type;
-    }
-    
-    public String getType() {
-        return type;
     }
     
     public JReference getDefField() {

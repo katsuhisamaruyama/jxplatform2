@@ -6,31 +6,51 @@
 
 package org.jtool.eclipse.slice;
 
-import org.jtool.eclipse.pdg.DD;
-import org.jtool.eclipse.pdg.PDG;
-import org.jtool.eclipse.pdg.PDGStatement;
+import org.jtool.eclipse.pdg.PDGNode;
+import org.jtool.eclipse.pdg.CD;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
- * An object storing information about a closure created by traversing only the data dependence.
+ * An object storing information about a closure created by traversing only the control dependence.
  * 
  * @author Katsuhisa Maruyama
  */
-public class CDClosure extends PDG {
+public class CDClosure {
     
-    public CDClosure(PDGStatement node) {
-        traverseBackward(node);
+    public static List<PDGNode> getForwardCDClosure(PDGNode anchor) {
+        List<PDGNode> nodes = new ArrayList<PDGNode>();
+        traverseForwardCD(anchor, nodes);
+        return nodes;
     }
     
-    private void traverseBackward(PDGStatement anchor) {
-        add(anchor);
+    private static void traverseForwardCD(PDGNode node, List<PDGNode> nodes) {
+        if (nodes.contains(node)) {
+            return;
+        }
+        nodes.add(node);
         
-        for (DD edge : anchor.getIncomingDDEdges()) {
-            add(edge);
-            PDGStatement node = (PDGStatement)edge.getSrcNode();
-            
-            if (!getNodes().contains(node)) {
-                traverseBackward(node);
-            }
+        for (CD edge : node.getOutgoingCDEdges()) {
+            PDGNode next = edge.getSrcNode();
+            traverseForwardCD(next, nodes);
+        }
+    }
+    
+    public static List<PDGNode> getBackwardCDClosure(PDGNode anchor) {
+        List<PDGNode> nodes = new ArrayList<PDGNode>();
+        traverseBackwardCD(anchor, nodes);
+        return nodes;
+    }
+    
+    private static void traverseBackwardCD(PDGNode node, List<PDGNode> nodes) {
+        if (nodes.contains(node)) {
+            return;
+        }
+        nodes.add(node);
+        
+        for (CD edge : node.getIncomingCDEdges()) {
+            PDGNode next = edge.getSrcNode();
+            traverseBackwardCD(next, nodes);
         }
     }
 }

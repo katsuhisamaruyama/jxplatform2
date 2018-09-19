@@ -8,7 +8,6 @@ package org.jtool.eclipse.pdg;
 
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGEntry;
-import org.jtool.eclipse.pdg.builder.PDGBuilder;
 import org.jtool.eclipse.graph.Graph;
 
 /**
@@ -96,11 +95,6 @@ public class PDG extends Graph<PDGNode, Dependence> {
     @Override
     public int hashCode() {
         return getQualifiedName().hashCode();
-    }
-    
-    public PDG clone() {
-        CFG cloneCFG = getCFG().clone();
-        return PDGBuilder.buildPDG(cloneCFG);
     }
     
     public void print() {

@@ -114,7 +114,7 @@ public abstract class JReference {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof JClass) {
+        if (obj instanceof JReference) {
             return equals((JReference)obj);
         }
         return false;

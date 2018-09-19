@@ -6,10 +6,8 @@
 
 package org.jtool.eclipse.javamodel;
 
-import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
 import org.jtool.eclipse.javamodel.builder.ModelBuilder;
 import org.jtool.eclipse.javamodel.builder.ProjectStore;
-
 import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
@@ -42,8 +40,6 @@ public class JavaProject {
     private String binaryPath;
     
     private ModelBuilder modelBuilder;
-    
-    private BytecodeClassStore bytecodeClassStore = null;
     
     public JavaProject(String name, String path) {
         this(name, path, path);
@@ -95,8 +91,6 @@ public class JavaProject {
         classPath = null;
         sourcePath = null;
         binaryPath = null;
-        
-        bytecodeClassStore = null;
     }
     
     public void dispose() {
@@ -251,18 +245,6 @@ public class JavaProject {
     
     public void collectInfo(JavaClass jclass) {
         jclass.collectInfo();
-    }
-    
-    public BytecodeClassStore registerBytecodeClasses() {
-        if (bytecodeClassStore == null) {
-            bytecodeClassStore = ProjectStore.getInstance().registerBytecodeClasses(this);
-            bytecodeClassStore.collectBytecodeClassInfo();
-        }
-        return bytecodeClassStore;
-    }
-    
-    public BytecodeClassStore getBytecodeClassStore() {
-        return bytecodeClassStore;
     }
     
     @Override

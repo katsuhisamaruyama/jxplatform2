@@ -59,6 +59,12 @@ public class ModelBuilderPlugin extends ModelBuilder {
     private JXConsole console = new JXConsole();
     
     public ModelBuilderPlugin() {
+        super(false);
+        resourceChangeListener = new ResourceChangeListener(this);
+    }
+    
+    public ModelBuilderPlugin(boolean analyzingBytecode) {
+        super(analyzingBytecode);
         resourceChangeListener = new ResourceChangeListener(this);
     }
     

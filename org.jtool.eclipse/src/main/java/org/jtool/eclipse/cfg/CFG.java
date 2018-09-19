@@ -6,12 +6,10 @@
 
 package org.jtool.eclipse.cfg;
 
-import org.jtool.eclipse.cfg.builder.BasicBlockBuilder;
 import org.jtool.eclipse.graph.Graph;
 import org.jtool.eclipse.graph.GraphElement;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -314,40 +312,6 @@ public class CFG extends Graph<CFGNode, ControlFlow> {
     @Override
     public int hashCode() {
         return getQualifiedName().hashCode();
-    }
-    
-    @Override
-    public CFG clone() {
-        CFG cloneCFG = new CFG();
-        HashMap<Long, Long> idmap = new HashMap<Long, Long>();
-        
-        for (CFGNode node : getNodes()) {
-            CFGNode cloneNode = node.clone();
-            cloneCFG.add(cloneNode);
-            idmap.put(node.getId(), cloneNode.getId());
-            
-            if (node.isEntry()) {
-                cloneCFG.setStartNode((CFGEntry)cloneNode);
-            } else if (node.isExit()) {
-                cloneCFG.setEndNode((CFGExit)cloneNode);
-            }
-        }
-        
-        for (ControlFlow edge : getEdges()) {
-            CFGNode src = edge.getSrcNode();
-            CFGNode dst = edge.getDstNode();
-            long srcId = idmap.get(src.getId());
-            long dstId = idmap.get(dst.getId());
-            CFGNode cloneSrc = cloneCFG.getNode(srcId);
-            CFGNode cloneDst = cloneCFG.getNode(dstId);
-            
-            ControlFlow cloneEdge = edge.clone();
-            cloneEdge.setSrcNode(cloneSrc);
-            cloneEdge.setDstNode(cloneDst);
-            cloneCFG.add(edge);
-        }
-        BasicBlockBuilder.create(this);
-        return cloneCFG;
     }
     
     public void print() {
