@@ -15,17 +15,20 @@ import org.jtool.eclipse.pdg.PDGClassEntry;
 import org.jtool.eclipse.pdg.PDGEntry;
 import org.jtool.eclipse.pdg.PDGNode;
 import org.jtool.eclipse.pdg.PDGStatement;
+import org.jtool.eclipse.pdg.DD;
 import org.jtool.eclipse.pdg.ParameterEdge;
 import org.jtool.eclipse.pdg.CallEdge;
 import org.jtool.eclipse.cfg.CCFG;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGEntry;
+import org.jtool.eclipse.cfg.CFGClassEntry;
 import org.jtool.eclipse.cfg.CFGMethodCall;
 import org.jtool.eclipse.cfg.CFGMethodEntry;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGParameter;
 import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.JReference;
+import org.jtool.eclipse.cfg.JFieldReference;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import java.util.Set;
@@ -58,7 +61,7 @@ public class PDGBuilder {
     
     private static PDGNode createNode(PDG pdg, CFGNode node) {
         if (node.isInterfaceEntry() || node.isClassEntry() || node.isEnumEntry()) {
-            PDGClassEntry pnode = new PDGClassEntry((CFGEntry)node);
+            PDGClassEntry pnode = new PDGClassEntry((CFGClassEntry)node);
             pdg.setEntryNode(pnode);
             return pnode;
             
@@ -90,6 +93,45 @@ public class PDGBuilder {
             cldg.add(edge);
         }
         return cldg;
+    }
+    
+    public static void connectFieldAccesses(SDG sdg) {
+        for (PDG pdg : sdg.getPDGs()) {
+            CFG cfg = pdg.getCFG();
+            for (CFGNode node : cfg.getNodes()) {
+                if (node.isStatement()) {
+                    CFGStatement stNode = (CFGStatement)node;
+                    
+                    for (JReference var : stNode.getDefVariables()) {
+                        if (var.isFieldAccess()) {
+                            JFieldReference fvar = (JFieldReference)var;
+                            for (PDG graph : sdg.getPDGs()) {
+                                PDGEntry entry = graph.getEntryNode();
+                                if (entry.getQualifiedName().equals(fvar.getQualifiedName())) {
+                                    DD edge = new DD(node.getPDGNode(), entry, fvar);
+                                    edge.setFieldAccess();
+                                    pdg.add(edge);
+                                }
+                            }
+                        }
+                    }
+                    
+                    for (JReference var : stNode.getUseVariables()) {
+                        if (var.isFieldAccess()) {
+                            JFieldReference fvar = (JFieldReference)var;
+                            for (PDG graph : sdg.getPDGs()) {
+                                PDGEntry entry = graph.getEntryNode();
+                                if (entry.getQualifiedName().equals(fvar.getQualifiedName())) {
+                                    DD edge = new DD(entry, node.getPDGNode(), fvar);
+                                    edge.setFieldAccess();
+                                    pdg.add(edge);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     
     public static void connectParameters(ClDG cldg) {

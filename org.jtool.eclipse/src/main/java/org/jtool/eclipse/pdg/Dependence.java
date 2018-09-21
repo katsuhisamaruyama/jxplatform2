@@ -37,6 +37,7 @@ public class Dependence extends GraphEdge {
         antiDependence,                  // Data dependence based on the order of use and definition of variables
         parameterIn,                     // Data dependence with respect to incoming parameter passing
         parameterOut,                    // Data dependence with respect to outgoing parameter passing
+        fieldAccess,                     // Data dependence with respect to a field access
         summary,                         // Data dependence between actual-in and actual-out nodes
         
         classMember,                     // Connection between a class and its members
@@ -69,6 +70,7 @@ public class Dependence extends GraphEdge {
                kind == Kind.antiDependence ||
                kind == Kind.parameterIn ||
                kind == Kind.parameterOut ||
+               kind == Kind.fieldAccess ||
                kind == Kind.summary;
     }
     

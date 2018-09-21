@@ -13,6 +13,7 @@ import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
 import org.jtool.eclipse.javamodel.builder.JavaASTVisitor;
 import org.jtool.eclipse.javamodel.builder.ModelBuilder;
 import org.jtool.eclipse.javamodel.builder.ProjectStore;
+import org.jtool.eclipse.util.ConsoleProgressMonitor;
 import org.jtool.eclipse.util.DetectCharset;
 import org.jtool.eclipse.util.Logger;
 import org.eclipse.jdt.core.JavaCore;

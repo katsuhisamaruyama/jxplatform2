@@ -76,6 +76,10 @@ public class DD extends Dependence {
         return kind == Kind.loopCarriedDefUseDependence;
     }
     
+    public boolean isFieldAccess() {
+        return kind == Kind.fieldAccess;
+    }
+    
     public void setDefOrder() {
         kind = Kind.defOrderDependence;
     }
@@ -114,6 +118,10 @@ public class DD extends Dependence {
     
     public boolean isParameterOut() {
         return kind == Kind.parameterOut;
+    }
+    
+    public void setFieldAccess() {
+        kind = Kind.fieldAccess;
     }
     
     public void setSummary() {
@@ -182,6 +190,8 @@ public class DD extends Dependence {
             buf.append(" PIN");
         } else if (kind == Kind.parameterOut) {
             buf.append(" POUT");
+        } else if (kind == Kind.fieldAccess) {
+            buf.append(" FACC");
         } else if (kind == Kind.summary) {
             buf.append(" SUMM");
         }

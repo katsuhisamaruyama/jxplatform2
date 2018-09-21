@@ -155,16 +155,17 @@ public class PDGStore {
     }
     
     public SDG getSDG(JavaClass jclass) {
-        List<JavaClass> jclasses = new ArrayList<JavaClass>();
-        collectEfferentClasses(jclass, jclasses);
-        collectDescendantClasses(jclasses);
+        List<JavaClass> classes = new ArrayList<JavaClass>();
+        collectEfferentClasses(jclass, classes);
+        collectDescendantClasses(classes);
         
-        SDG sdg = getSDG(jclasses);
+        SDG sdg = getSDG(classes);
         for (PDG pdg : sdg.getPDGs()) {
             addPDG(pdg);
         }
         if (cfgStore.creatingActualNodes()) {
-            PDGBuilder.connectParameters(jclasses, sdg);
+            PDGBuilder.connectParameters(classes, sdg);
+            PDGBuilder.connectFieldAccesses(sdg);
         }
         return sdg;
     }
@@ -196,7 +197,6 @@ public class PDGStore {
             CCFG ccfg = CCFGBuilder.build(jclass, cfgStore.getJInfoStore());
             ClDG cldg = PDGBuilder.buildClDG(ccfg, ignoringJumpEdge);
             sdg.add(cldg);
-            sdg.setCCFG(ccfg);
         }
         return sdg;
     }
