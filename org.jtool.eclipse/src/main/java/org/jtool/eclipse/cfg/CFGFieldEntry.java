@@ -19,8 +19,7 @@ public class CFGFieldEntry extends CFGEntry {
     private JavaField jfield;
     
     public CFGFieldEntry(JavaField jfield, CFGNode.Kind kind) {
-        super(jfield.getASTNode(), kind, jfield.getName(), jfield.getQualifiedName(),
-                jfield.getDeclaringClass().getQualifiedName());
+        super(jfield.getASTNode(), kind, jfield.getName(), jfield.getQualifiedName(), jfield.getQualifiedName());
         this.jfield = jfield;
     }
     

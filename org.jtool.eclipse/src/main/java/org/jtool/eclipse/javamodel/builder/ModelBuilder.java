@@ -85,10 +85,6 @@ public abstract class ModelBuilder {
         return cfgStore.getCFG(jfield);
     }
     
-    public int sizeOfPDG() {
-        return cfgStore.size();
-    }
-    
     public PDG getPDG(String fqn) {
         return pdgStore.getPDG(fqn);
     }
