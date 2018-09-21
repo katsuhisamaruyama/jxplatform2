@@ -48,14 +48,20 @@ public class CCFGBuilder {
         ccfg.setStartNode(entry);
         ccfg.add(entry);
         
-        for (JavaMethod jm : jclass.getMethods()) {
-            CFG cfg = CFGMethodBuilder.build(jm, infoStore);
+        for (JavaMethod jmethod : jclass.getMethods()) {
+            CFG cfg = infoStore.getCFGStore().getCFG(jmethod);
+            if (cfg == null) {
+                cfg = CFGMethodBuilder.build(jmethod, infoStore);
+            }
             ccfg.add(cfg);
             entry.addMethod(cfg);
         }
         
-        for (JavaField jf : jclass.getFields()) {
-            CFG cfg = CFGFieldBuilder.build(jf, infoStore);
+        for (JavaField jfild : jclass.getFields()) {
+            CFG cfg = infoStore.getCFGStore().getCFG(jfild);
+            if (cfg == null) {
+                cfg = CFGFieldBuilder.build(jfild, infoStore);
+            }
             ccfg.add(cfg);
             entry.addField(cfg);
         }

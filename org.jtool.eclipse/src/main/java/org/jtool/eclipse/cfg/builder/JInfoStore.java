@@ -61,6 +61,10 @@ class JInfoStore {
         return jproject;
     }
     
+    CFGStore getCFGStore() {
+        return cfgStore;
+    }
+    
     BytecodeClassStore getBytecodeClassStore() {
         return bytecodeClassStore;
     }

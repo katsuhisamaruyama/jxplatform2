@@ -130,6 +130,9 @@ public class CFGMethodBuilder {
                 cfg.add(exitEdge);
             }
         }
+        
+        LocalAliasResolver.resolve(cfg);
+        
         return cfg;
     }
     
