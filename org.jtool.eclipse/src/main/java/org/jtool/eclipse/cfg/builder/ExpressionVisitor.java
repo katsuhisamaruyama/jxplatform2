@@ -225,19 +225,12 @@ public class ExpressionVisitor extends ASTVisitor {
         analysisMode.pop();
         
         expr = node.getRightOperand();
-        
-        System.out.println(node + " => " + expr);
-        
         analysisMode.push(AnalysisMode.USE);
         expr.accept(this);
         analysisMode.pop();
         
         for (Object obj : node.extendedOperands()) {
             Expression e = (Expression)obj;
-            
-            System.out.println(node + " => " + e);
-            
-            
             analysisMode.push(AnalysisMode.USE);
             e.accept(this);
             analysisMode.pop();
