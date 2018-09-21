@@ -57,9 +57,6 @@ class BytecodeCacheManager {
         try {
             String filename = jproject.getPath() + File.separator + BYTECODE_INFO_FILENAME;
             File file = new File(filename);
-            if (file.exists()) {
-                file.delete();
-            }
             
             CacheExporter exporter = new CacheExporter();
             Document doc = exporter.getDocument(jproject, classes);
@@ -78,6 +75,10 @@ class BytecodeCacheManager {
             
             StringWriter writer = new StringWriter();
             transformer.transform(src, new StreamResult(writer));
+            
+            if (file.exists()) {
+                file.delete();
+            }
             
             BufferedWriter bwriter = new BufferedWriter(new FileWriter(file));
             bwriter.write(writer.toString());
