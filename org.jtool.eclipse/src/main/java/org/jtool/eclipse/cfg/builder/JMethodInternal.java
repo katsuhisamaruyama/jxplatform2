@@ -26,9 +26,10 @@ public class JMethodInternal extends JMethod {
     
     protected JavaMethod jmethod;
     
-    JMethodInternal(JavaMethod jmethod, CFGStore cfgStore) {
+    JMethodInternal(JavaMethod jmethod, JClass declaringClass, CFGStore cfgStore) {
         super(jmethod.getQualifiedName(), cfgStore, jmethod.getDeclaringClass().getQualifiedName(), jmethod.getSignature(),
               jmethod.getModifiers(), jmethod.getSignature(), jmethod.isPrimitiveReturnType());
+        this.declaringClass = declaringClass;
         this.jmethod = jmethod;
     }
     
@@ -111,7 +112,7 @@ public class JMethodInternal extends JMethod {
                 }
             }
         }
-        if (sideEffects == SideEffectStatus.UNKNOWM) {
+        if (sideEffects == SideEffectStatus.UNK) {
             sideEffects = SideEffectStatus.NO;
         }
     }

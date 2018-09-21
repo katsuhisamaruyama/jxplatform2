@@ -30,15 +30,15 @@ import java.util.HashSet;
  */
 public class CFGFieldBuilder {
     
-    public static CFG build(JavaField jfield) {
-        return build(jfield, new HashSet<JMethod>());
+    public static CFG build(JavaField jfield, JInfoStore infoStore) {
+        return build(jfield, infoStore, new HashSet<JMethod>());
     }
     
-    public static CFG build(JavaField jfield, Set<JMethod> visitedMethods) {
-        return build(jfield, jfield.getVariableBinding(), visitedMethods);
+    public static CFG build(JavaField jfield, JInfoStore infoStore, Set<JMethod> visitedMethods) {
+        return build(jfield, jfield.getVariableBinding(), infoStore, visitedMethods);
     }
     
-    private static CFG build(JavaField jfield, IVariableBinding vbinding, Set<JMethod> visitedMethods) {
+    private static CFG build(JavaField jfield, IVariableBinding vbinding, JInfoStore infoStore, Set<JMethod> visitedMethods) {
         CFG cfg = new CFG();
         ExpressionVisitor.paramNumber = 1;
         
@@ -65,7 +65,7 @@ public class CFGFieldBuilder {
         if (vbinding.isEnumConstant()) {
             EnumConstantDeclaration decl = (EnumConstantDeclaration)jfield.getASTNode();
             if (decl.resolveConstructorBinding() != null) {
-                ExpressionVisitor visitor = new ExpressionVisitor(cfg, declNode, visitedMethods);
+                ExpressionVisitor visitor = new ExpressionVisitor(cfg, declNode, infoStore, visitedMethods);
                 decl.accept(visitor);
                 curNode = visitor.getExitNode();
             }
@@ -73,7 +73,7 @@ public class CFGFieldBuilder {
             VariableDeclarationFragment decl = (VariableDeclarationFragment)jfield.getASTNode();
             Expression initializer = decl.getInitializer();
             if (initializer != null) {
-                ExpressionVisitor visitor = new ExpressionVisitor(cfg, declNode, visitedMethods);
+                ExpressionVisitor visitor = new ExpressionVisitor(cfg, declNode, infoStore, visitedMethods);
                 initializer.accept(visitor);
                 curNode = visitor.getExitNode();
             }

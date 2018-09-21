@@ -73,7 +73,6 @@ public class ModelBuilderPlugin extends ModelBuilder {
     }
     
     public void start() {
-        super.build();
         resourceChangeListener.register();
     }
     
@@ -239,15 +238,13 @@ public class ModelBuilderPlugin extends ModelBuilder {
     }
     
     public JavaProject update() {
-        super.build();
+        cfgStore.create(currentProject, analyzingBytecode);
         
         ProjectStore.getInstance().removeProject(currentProject.getPath());
         return buildWhole(javaProject);
     }
     
     private JavaProject buildWhole(IJavaProject project) {
-        super.build();
-        
         String name = project.getProject().getName();
         String path = project.getProject().getFullPath().toString();
         String dir = project.getProject().getLocation().toString();
@@ -256,6 +253,8 @@ public class ModelBuilderPlugin extends ModelBuilder {
         currentProject.setModelBuilder(this);
         setPaths(currentProject, project);
         ProjectStore.getInstance().addProject(currentProject);
+        
+        cfgStore.create(currentProject, analyzingBytecode);
         
         Set<ICompilationUnit> compilationUnits = collectCompilationUnits(project, currentProject);
         buildJavaModel(compilationUnits, currentProject);

@@ -6,6 +6,7 @@
 
 package org.jtool.eclipse.cfg.builder;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,9 +17,17 @@ import java.util.Map;
  */
 class JClassCache extends JClass {
     
-    protected JClassCache(String fqn, CFGStore cfgStore, Map<String, String> cacheData) {
-        super(fqn, cfgStore, cacheData.get(NameAttr), 0);
+    protected JClassCache(CFGStore cfgStore, Map<String, String> cacheData) {
+        super(cacheData.get(FqnAttr), cfgStore, cacheData.get(NameAttr), 0);
         this.cacheData = cacheData;
+    }
+    
+    void setMethods(List<JMethodCache> cmethods) {
+        methods = cmethods.toArray(new JMethodCache[cmethods.size()]);
+    }
+    
+    void setFields(List<JFieldCache> cfields) {
+        fields = cfields.toArray(new JFieldCache[cfields.size()]);
     }
     
     @Override

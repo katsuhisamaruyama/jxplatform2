@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * An object stores PDGs.
+ * An object that stores information on PDGs in the project.
  * 
  * @author Katsuhisa Maruyama
  */
@@ -81,7 +81,7 @@ public class PDGStore {
             return pdg;
         }
         
-        CFG cfg = CFGMethodBuilder.build(jmethod);
+        CFG cfg = CFGMethodBuilder.build(jmethod, cfgStore.getJInfoStore());
         return getPDG(cfg);
     }
     
@@ -91,7 +91,7 @@ public class PDGStore {
             return pdg;
         }
         
-        CFG cfg = CFGFieldBuilder.build(jfield);
+        CFG cfg = CFGFieldBuilder.build(jfield, cfgStore.getJInfoStore());
         return getPDG(cfg);
     }
     
@@ -120,7 +120,7 @@ public class PDGStore {
             return (ClDG)pdg;
         }
         
-        CCFG ccfg = CCFGBuilder.build(jclass);
+        CCFG ccfg = CCFGBuilder.build(jclass, cfgStore.getJInfoStore());
         ClDG cldg = PDGBuilder.buildClDG(ccfg, ignoringJumpEdge);
         if (cfgStore.creatingActualNodes()) {
             PDGBuilder.connectParameters(cldg);
@@ -193,7 +193,7 @@ public class PDGStore {
     private SDG getSDG(List<JavaClass> classes) {
         SDG sdg = new SDG();
         for (JavaClass jclass : classes) {
-            CCFG ccfg = CCFGBuilder.build(jclass);
+            CCFG ccfg = CCFGBuilder.build(jclass, cfgStore.getJInfoStore());
             ClDG cldg = PDGBuilder.buildClDG(ccfg, ignoringJumpEdge);
             sdg.add(cldg);
             sdg.setCCFG(ccfg);

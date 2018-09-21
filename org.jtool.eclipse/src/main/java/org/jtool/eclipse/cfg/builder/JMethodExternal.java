@@ -30,10 +30,9 @@ import java.util.Set;
  */
 public class JMethodExternal extends JMethod {
     
-    protected JClass declaringClass;
     protected CtBehavior ctMethod;
     
-    JMethodExternal(CtMethod ctMethod, CFGStore cfgStore, JClass declaringClass) {
+    JMethodExternal(CtMethod ctMethod, JClass declaringClass, CFGStore cfgStore) {
         super(declaringClass.getQualifiedName(), cfgStore, declaringClass.getQualifiedName(), getSignature(ctMethod),
               getModfifiers(ctMethod), findReturnType(ctMethod), checkPrimitiveReturnType(ctMethod));
         fqn = fqn + JavaElement.QualifiedNameSeparator + signature;
@@ -41,7 +40,7 @@ public class JMethodExternal extends JMethod {
         this.ctMethod = ctMethod;
     }
     
-    public JMethodExternal(CtConstructor ctMethod, CFGStore cfgStore, JClass declaringClass) {
+    public JMethodExternal(CtConstructor ctMethod, JClass declaringClass, CFGStore cfgStore) {
         super(declaringClass.getQualifiedName(), cfgStore, declaringClass.getQualifiedName(), getSignature(ctMethod),
               getModfifiers(ctMethod), declaringClass.getQualifiedName(), false);
         fqn = fqn + JavaElement.QualifiedNameSeparator + signature;
@@ -187,11 +186,11 @@ public class JMethodExternal extends JMethod {
                 }
             });
         } catch (CannotCompileException e) {
-            if (sideEffects == SideEffectStatus.UNKNOWM) {
-                sideEffects = SideEffectStatus.MAYBE;
+            if (sideEffects == SideEffectStatus.UNK) {
+                sideEffects = SideEffectStatus.MAY;
             }
         }
-        if (sideEffects == SideEffectStatus.UNKNOWM) {
+        if (sideEffects == SideEffectStatus.UNK) {
             sideEffects = SideEffectStatus.NO;
         }
     }

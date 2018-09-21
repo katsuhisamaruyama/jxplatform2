@@ -7,6 +7,7 @@
 package org.jtool.eclipse.cfg.builder;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * An object that represents the cached data of a method.
@@ -16,28 +17,19 @@ import java.util.Map;
  */
 class JMethodCache extends JMethod {
     
-    protected JMethodCache(String fqn, CFGStore cfgStore, Map<String, String> cacheData) {
-        super(fqn, cfgStore, cacheData.get(ClassNameAttr), cacheData.get(SignatureAttr), 0, "N/A", false);
+    protected JMethodCache(JClass declaringClass, CFGStore cfgStore, Map<String, String> cacheData) {
+        super(cacheData.get(FqnAttr), cfgStore, cacheData.get(ClassNameAttr), cacheData.get(SignatureAttr), 0, "N/A", false);
+        this.declaringClass = declaringClass;
         this.cacheData = cacheData;
+        
+        sideEffects = SideEffectStatus.valueOf(cacheData.get(SideEffectsAttr));
     }
     
-    /*
-    public String sideEffects() {
-        return cachedData.get(BytecodeCache.SideEffectsAttr);
+    @Override
+    protected boolean hasSideEffects(Set<JMethod> visitedMethods) {
+        cfgStore.getJInfoStore().unregisterJClassCache(declaringClass.getQualifiedName());
+        return super.checkSideEffects(SideEffectCheckCount, visitedMethods);
     }
-    
-    public boolean sideEffectsYes() {
-        return SideEffectStatus.YES.toString().equals(cachedData.get(BytecodeCache.SideEffectsAttr));
-    }
-    
-    public boolean sideEffectsNo() {
-        return SideEffectStatus.NO.toString().equals(cachedData.get(BytecodeCache.SideEffectsAttr));
-    }
-    
-    public boolean sideEffectsMaybe() {
-        return SideEffectStatus.MAYBE.toString().equals(cachedData.get(BytecodeCache.SideEffectsAttr));
-    }
-    */
     
     @Override
     protected boolean isCache() {

@@ -23,6 +23,8 @@ abstract class JField extends JElement {
     protected String type;
     protected boolean isPrimitive;
     
+    protected JClass declaringClass;
+    
     protected JField(String fqn, CFGStore cfgStore, String className, String name,
             int modifiers, String returnType, boolean isPrimitive) {
         super(fqn, cfgStore);
@@ -35,8 +37,9 @@ abstract class JField extends JElement {
     
     protected void cache() {
         cacheData = new HashMap<String, String>();
-        cacheData.put(SignatureAttr, name);
+        cacheData.put(FqnAttr, fqn);
         cacheData.put(ClassNameAttr, className);
+        cacheData.put(SignatureAttr, name);
     }
     
     protected String getName() {
@@ -49,6 +52,10 @@ abstract class JField extends JElement {
     
     protected boolean isPrimitiveType() {
         return isPrimitive;
+    }
+    
+    protected JClass getDeclaringClass() {
+        return declaringClass;
     }
     
     protected boolean isPublic() {

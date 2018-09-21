@@ -8,7 +8,6 @@ package org.jtool.eclipse.cfg.builder;
 
 import org.jtool.eclipse.cfg.builder.CFGStore;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  * An abstract class that provides concise information on a class.
@@ -18,6 +17,7 @@ import java.util.HashMap;
  */
 abstract class JElement {
     
+    protected static final String FqnAttr = "fqn";
     protected static final String ClassNameAttr = "cname";
     protected static final String SignatureAttr = "sig";
     protected static final String NameAttr = "name";
@@ -41,7 +41,11 @@ abstract class JElement {
         return fqn;
     }
     
+    protected void cache() {
+    }
+    
     protected Map<String, String> getCacheData() {
+        cache();
         return cacheData;
     }
     

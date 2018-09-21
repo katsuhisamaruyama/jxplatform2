@@ -18,9 +18,10 @@ public class JFieldInternal extends JField {
     
     protected JavaField jfield;
     
-    JFieldInternal(JavaField jfield, CFGStore cfgStore) {
+    JFieldInternal(JavaField jfield, JClass declaringClass, CFGStore cfgStore) {
         super(jfield.getQualifiedName(), cfgStore, jfield.getDeclaringClass().getQualifiedName(), jfield.getName(),
               jfield.getModifiers(), jfield.getType(), jfield.isPrimitiveType());
+        this.declaringClass = declaringClass;
         this.jfield = jfield;
     }
     

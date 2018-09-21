@@ -35,12 +35,12 @@ import java.util.HashSet;
  */
 public class CFGMethodBuilder {
     
-    public static CFG build(JavaMethod jmethod) {
-        return build(jmethod, new HashSet<JMethod>());
+    public static CFG build(JavaMethod jmethod, JInfoStore infoStore) {
+        return build(jmethod, infoStore, new HashSet<JMethod>());
     }
     
     @SuppressWarnings("unchecked")
-    public static CFG build(JavaMethod jmethod, Set<JMethod> visitedMethods) {
+    public static CFG build(JavaMethod jmethod, JInfoStore infoStore, Set<JMethod> visitedMethods) {
         List<VariableDeclaration> params;
         if (!jmethod.isInitializer()) {
             if (jmethod.isLambda()) {
@@ -53,10 +53,11 @@ public class CFGMethodBuilder {
         } else {
             params = new ArrayList<VariableDeclaration>();
         }
-        return build(jmethod, jmethod.getMethodBinding(), params, visitedMethods);
+        return build(jmethod, jmethod.getMethodBinding(), params, infoStore, visitedMethods);
     }
     
-    private static CFG build(JavaMethod jmethod, IMethodBinding mbinding, List<VariableDeclaration> params, Set<JMethod> visitedMethods) {
+    private static CFG build(JavaMethod jmethod, IMethodBinding mbinding, List<VariableDeclaration> params,
+                             JInfoStore infoStore, Set<JMethod> visitedMethods) {
         CFG cfg = new CFG();
         ExpressionVisitor.paramNumber = 1;
         
@@ -84,7 +85,7 @@ public class CFGMethodBuilder {
         entryEdge.setTrue();
         cfg.add(entryEdge);
         
-        StatementVisitor visitor = new StatementVisitor(cfg, finalFormalInNode, nextNode, visitedMethods);
+        StatementVisitor visitor = new StatementVisitor(cfg, finalFormalInNode, nextNode, infoStore, visitedMethods);
         jmethod.getASTNode().accept(visitor);
         nextNode = visitor.getNextCFGNode();
         

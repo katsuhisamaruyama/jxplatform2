@@ -44,16 +44,20 @@ public abstract class ModelBuilder {
         return currentProject;
     }
     
+    public CFGStore getCFGStore() {
+        return cfgStore;
+    }
+    
+    public PDGStore getPDGStore() {
+        return pdgStore;
+    }
+    
     public void setCreatingActualNodes(boolean creatingActualNodes) {
         cfgStore.setCreatingActualNodes(creatingActualNodes);
     }
     
     public void setIgnoringJumpEdge(boolean ignoringJumpEdge) {
         pdgStore.setIgnoringJumpEdge(ignoringJumpEdge);
-    }
-    
-    public void build() {
-        cfgStore.create(currentProject, analyzingBytecode);
     }
     
     public void unbuild() {

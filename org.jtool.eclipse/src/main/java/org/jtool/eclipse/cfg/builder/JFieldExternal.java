@@ -19,10 +19,9 @@ import javassist.NotFoundException;
  */
 public class JFieldExternal extends JField {
     
-    protected JClass declaringClass;
     protected CtField ctField;
     
-    JFieldExternal(CtField ctField, CFGStore cfgStore, JClass declaringClass) {
+    JFieldExternal(CtField ctField, JClass declaringClass, CFGStore cfgStore) {
         super(declaringClass.getQualifiedName() + JavaElement.QualifiedNameSeparator + ctField.getName(), cfgStore,
               declaringClass.getQualifiedName(), ctField.getName(),
               getModfifiers(ctField), findType(ctField), checkPrimitiveType(ctField));

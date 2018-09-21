@@ -15,7 +15,6 @@ import org.jtool.eclipse.javamodel.builder.ModelBuilder;
 import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import org.jtool.eclipse.util.DetectCharset;
 import org.jtool.eclipse.util.Logger;
-import org.jtool.eclipse.util.ConsoleProgressMonitor;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -54,8 +53,6 @@ public class ModelBuilderBatch extends ModelBuilder {
     }
     
     public JavaProject build(String name, String target, String[] classPath) {
-        super.build();
-        
         try {
             File dir = new File(target);
             currentProject = new JavaProject(name, dir.getCanonicalPath());
@@ -63,6 +60,8 @@ public class ModelBuilderBatch extends ModelBuilder {
             currentProject.setClassPath(classPath);
             ProjectStore.getInstance().addProject(currentProject);
             ProjectStore.getInstance().setModelBuilder(this);
+            
+            cfgStore.create(currentProject, analyzingBytecode);
             
             run();
             Logger.getInstance().writeLog();
@@ -245,13 +244,9 @@ public class ModelBuilderBatch extends ModelBuilder {
         Logger.getInstance().printMessage("** Ready to build java models of " + size + " bytecode-classes");
         ConsoleProgressMonitor pm = new ConsoleProgressMonitor();
         pm.begin(size);
-        int count = 0;
         for (String className : bytecodeClassStore.getBytecodeClassNames()) {
             bytecodeClassStore.registerBytecodeClass(className);
-            
             pm.work(1);
-            count++;
-            Logger.getInstance().printLog("-Analize " + className + " (" + count + "/" + size + ")");
         }
         pm.done();
     }

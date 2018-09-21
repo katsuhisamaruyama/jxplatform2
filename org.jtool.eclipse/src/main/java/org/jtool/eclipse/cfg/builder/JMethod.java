@@ -24,6 +24,8 @@ abstract class JMethod extends JElement {
     protected String returnType;
     protected boolean isPrimitive;
     
+    protected JClass declaringClass;
+    
     protected JMethod[] accessedMethods = null;
     protected JField[] accessedFields = null;
     
@@ -31,9 +33,9 @@ abstract class JMethod extends JElement {
     protected JMethod[] overriddenMethods = null;
     
     protected enum SideEffectStatus {
-        YES, NO, MAYBE, UNKNOWM;
+        YES, NO, MAY, UNK;
     }
-    protected SideEffectStatus sideEffects = SideEffectStatus.UNKNOWM;
+    protected SideEffectStatus sideEffects = SideEffectStatus.UNK;
     protected static final int SideEffectCheckCount = 5;
     
     protected JMethod(String fqn, CFGStore cfgStore, String className, String signature,
@@ -47,8 +49,9 @@ abstract class JMethod extends JElement {
     
     protected void cache() {
         cacheData = new HashMap<String, String>();
-        cacheData.put(SignatureAttr, signature);
+        cacheData.put(FqnAttr, fqn);
         cacheData.put(ClassNameAttr, className);
+        cacheData.put(SignatureAttr, signature);
         cacheData.put(SideEffectsAttr, sideEffects.toString());
     }
     
@@ -70,6 +73,10 @@ abstract class JMethod extends JElement {
     
     protected boolean isVoid() {
         return returnType.equals("void");
+    }
+    
+    protected JClass getDeclaringClass() {
+        return declaringClass;
     }
     
     protected boolean isPublic() {
@@ -121,7 +128,7 @@ abstract class JMethod extends JElement {
     }
     
     protected boolean sideEffectsYes() {
-        return sideEffects == SideEffectStatus.YES || sideEffects == SideEffectStatus.MAYBE;
+        return sideEffects == SideEffectStatus.YES || sideEffects == SideEffectStatus.MAY;
     }
     
     protected boolean sideEffectsNo() {
@@ -134,9 +141,9 @@ abstract class JMethod extends JElement {
     
     protected boolean checkSideEffects(int count, Set<JMethod> visitedMethods) {
         if (count == 0) {
-            sideEffects = SideEffectStatus.MAYBE;
+            sideEffects = SideEffectStatus.MAY;
         }
-        if (sideEffects == SideEffectStatus.UNKNOWM) {
+        if (sideEffects == SideEffectStatus.UNK) {
             checkSideEffectsOnFields(visitedMethods);
             checkSideEffectsOnMethods(count, visitedMethods);
         }

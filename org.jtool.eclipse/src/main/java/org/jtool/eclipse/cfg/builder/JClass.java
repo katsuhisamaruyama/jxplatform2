@@ -34,6 +34,7 @@ abstract class JClass extends JElement {
     
     protected void cache() {
         cacheData = new HashMap<String, String>();
+        cacheData.put(FqnAttr, fqn);
         cacheData.put(NameAttr, name);
     }
     

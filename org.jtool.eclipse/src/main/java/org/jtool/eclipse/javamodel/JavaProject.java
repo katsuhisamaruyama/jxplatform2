@@ -251,7 +251,7 @@ public class JavaProject {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("\n");
-        buf.append("JSTORE: ");
+        buf.append("JPROJECT: ");
         buf.append(getName());
         buf.append(" [");
         buf.append(getPath());

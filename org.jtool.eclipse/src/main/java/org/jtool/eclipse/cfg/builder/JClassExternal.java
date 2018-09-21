@@ -34,18 +34,18 @@ public class JClassExternal extends JClass {
         int num = 0;
         methods = new JMethod[ctClass.getMethods().length + ctClass.getConstructors().length];
         for (CtMethod ctMtheod: ctClass.getMethods()) {
-            methods[num] = new JMethodExternal(ctMtheod, cfgStore, this);
+            methods[num] = new JMethodExternal(ctMtheod, this, cfgStore);
             num++;
         }
         for (CtConstructor ctMtheod: ctClass.getConstructors()) {
-            methods[num] = new JMethodExternal(ctMtheod, cfgStore, this);
+            methods[num] = new JMethodExternal(ctMtheod, this, cfgStore);
             num++;
         }
         
         num = 0;
         fields = new JFieldExternal[ctClass.getFields().length];
         for (CtField ctField : ctClass.getFields()) {
-            fields[num] = new JFieldExternal(ctField, cfgStore, this);
+            fields[num] = new JFieldExternal(ctField, this, cfgStore);
             num++;
         }
     }

@@ -23,20 +23,20 @@ import org.jtool.eclipse.javamodel.JavaMethod;
  */
 public class CCFGBuilder {
     
-    public static CCFG build(JavaProject jproject) {
+    public static CCFG build(JavaProject jproject, JInfoStore infoStore) {
         CCFG ccfg = new CCFG();
         for (JavaClass jclass : jproject.getClasses()) {
-            build(ccfg, jclass);
+            build(ccfg, jclass, infoStore);
         }
         return ccfg;
     }
     
-    public static CCFG build(JavaClass jclass) {
+    public static CCFG build(JavaClass jclass, JInfoStore infoStore) {
         CCFG ccfg = new CCFG();
-        return build(ccfg, jclass);
+        return build(ccfg, jclass, infoStore);
     }
     
-    private static CCFG build(CCFG ccfg, JavaClass jclass) {
+    private static CCFG build(CCFG ccfg, JavaClass jclass, JInfoStore infoStore) {
         CFGClassEntry entry;
         if (jclass.isEnum()) {
             entry = new CFGClassEntry(jclass, CFGNode.Kind.enumEntry);
@@ -49,19 +49,19 @@ public class CCFGBuilder {
         ccfg.add(entry);
         
         for (JavaMethod jm : jclass.getMethods()) {
-            CFG cfg = CFGMethodBuilder.build(jm);
+            CFG cfg = CFGMethodBuilder.build(jm, infoStore);
             ccfg.add(cfg);
             entry.addMethod(cfg);
         }
         
         for (JavaField jf : jclass.getFields()) {
-            CFG cfg = CFGFieldBuilder.build(jf);
+            CFG cfg = CFGFieldBuilder.build(jf, infoStore);
             ccfg.add(cfg);
             entry.addField(cfg);
         }
         
         for (JavaClass jc : jclass.getInnerClasses()) {
-            CFG cfg = build(jc);
+            CFG cfg = build(jc, infoStore);
             ccfg.add(cfg);
             entry.addType(cfg);
         }

@@ -29,14 +29,14 @@ public class JClassInternal extends JClass {
         int num = 0;
         methods = new JMethodInternal[jclass.getMethods().size()];
         for (JavaMethod jmethod: jclass.getMethods()) {
-            methods[num] = new JMethodInternal(jmethod, cfgStore);
+            methods[num] = new JMethodInternal(jmethod, this, cfgStore);
             num++;
         }
         
         num = 0;
         fields = new JFieldInternal[jclass.getFields().size()];
         for (JavaField jfield : jclass.getFields()) {
-            fields[num] = new JFieldInternal(jfield, cfgStore);
+            fields[num] = new JFieldInternal(jfield, this, cfgStore);
             num++;
         }
     }

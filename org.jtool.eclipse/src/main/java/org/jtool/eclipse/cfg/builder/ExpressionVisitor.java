@@ -105,23 +105,23 @@ public class ExpressionVisitor extends ASTVisitor {
     
     protected static int paramNumber = 1;
     
-    private boolean creatingActuals;
-    
     private Stack<AnalysisMode> analysisMode = new Stack<AnalysisMode>();
     private enum AnalysisMode {
         DEF, USE,
     }
     
+    private JInfoStore infoStore;
+    
     private Set<JMethod> visitedMethods;
     
-    protected ExpressionVisitor(CFG cfg, CFGStatement node, Set<JMethod> visitedMethods) {
+    protected ExpressionVisitor(CFG cfg, CFGStatement node, JInfoStore infoStore, Set<JMethod> visitedMethods) {
         this.cfg = cfg;
+        this.infoStore = infoStore;
+        this.visitedMethods = visitedMethods;
+        
         curNode = node;
         entryNode = node;
-        
         analysisMode.push(AnalysisMode.USE);
-        creatingActuals = CFGStore.getInstance().creatingActualNodes();
-        this.visitedMethods = visitedMethods;
     }
     
     public CFGNode getEntryNode() {
@@ -328,39 +328,23 @@ public class ExpressionVisitor extends ASTVisitor {
         JReference primary = null;
         if (curNode.getUseVariables().size() == 1) {
             primary = curNode.getUseVariables().get(0);
-            
             if (primary.isLocalAccess() || primary.isFieldAccess()) {
-                int analysisLevel = JInfoStore.getInstance().getAnalysisLevel();
-                if (analysisLevel > 0) {
-                    if (analysisLevel > 1 && JInfoStore.getInstance().getJavaClass(jcall.getDeclaringClassName()) == null) {
-                        JMethodCache cmethod = JInfoStore.getInstance().findCache(jcall.getDeclaringClassName(), jcall.getSignature());
-                        if (cmethod != null) {
-                            if (cmethod.sideEffectsYes() || cmethod.sideEffectsMaybe()) {
+                
+                JMethod method = infoStore.getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
+                if (method != null) {
+                    if (method.sideEffectsYes() || method.sideEffectsNo()) {
+                        if (method.sideEffectsYes()) {
+                            curNode.addDefVariable(primary);
+                        }
+                    } else {
+                        if (!visitedMethods.contains(method)) {
+                            visitedMethods.add(method);
+                            if (method.hasSideEffects(visitedMethods)) {
                                 curNode.addDefVariable(primary);
                             }
-                            jcall.setPrimary(primary);
-                            return;
                         }
                     }
                     
-                    JMethod method = JInfoStore.getInstance().getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
-                    if (method != null) {
-                        if (method.sideEffectsYes() || method.sideEffectsNo()) {
-                            if (method.sideEffectsYes()) {
-                                curNode.addDefVariable(primary);
-                            }
-                        } else {
-                            if (!visitedMethods.contains(method)) {
-                                visitedMethods.add(method);
-                                if (method.hasSideEffects(visitedMethods)) {
-                                    curNode.addDefVariable(primary);
-                                }
-                            }
-                        }
-                        
-                    } else {
-                        curNode.addDefVariable(primary);
-                    }
                 } else {
                     curNode.addDefVariable(primary);
                 }
@@ -453,7 +437,10 @@ public class ExpressionVisitor extends ASTVisitor {
     }
     
     private void setActualNodes(CFGMethodCall callNode, ASTNode node, List<Expression> arguments) {
-        boolean actual = creatingActuals && callNode.getMethodCall().isInProject() && !callNode.getMethodCall().callSelfDirectly();
+        
+        boolean actual = infoStore.creatingActualNodes() &&
+                callNode.getMethodCall().isInProject() &&
+                !callNode.getMethodCall().callSelfDirectly();
         if (actual) {
             createActualIns(callNode, arguments);
         } else {

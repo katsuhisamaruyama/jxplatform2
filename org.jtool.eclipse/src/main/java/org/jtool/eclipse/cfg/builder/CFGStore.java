@@ -19,14 +19,13 @@ import java.util.Set;
 import java.util.HashSet;
 
 /**
- * An object stores CFGs.
+ * An object that stores information on CFGs in the project.
  * All methods of this class are not intended to be directly called by clients.
  * 
  * @author Katsuhisa Maruyama
  */
 public class CFGStore {
     
-    private JavaProject jproject;
     private JInfoStore infoStore;
     
     private Map<String, CFG> cfgMap = new HashMap<String, CFG>();
@@ -38,22 +37,16 @@ public class CFGStore {
     }
     
     public void create(JavaProject jproject, boolean analyzingBytecode) {
-        this.jproject = jproject;
-        infoStore.create(jproject, analyzingBytecode);
+        infoStore.create(this, jproject, analyzingBytecode);
     }
     
     public void destroy() {
         infoStore.destory();
         cfgMap.clear();
-        jproject = null;
     }
     
     public void resetId() {
         CFGNode.resetId();
-    }
-    
-    public JavaProject getJavaProject() {
-        return jproject;
     }
     
     public JInfoStore getJInfoStore() {
@@ -80,6 +73,10 @@ public class CFGStore {
         return cfgMap.size();
     }
     
+    public JavaProject getJavaProject() {
+        return infoStore.getJavaProject();
+    }
+    
     public CCFG getCCFG(JavaClass jclass) {
         CFG cfg = getCFG(jclass.getQualifiedName());
         if (cfg != null && cfg instanceof CCFG) {
@@ -90,7 +87,7 @@ public class CFGStore {
     }
     
     private CCFG build(JavaClass jclass) {
-        CCFG ccfg = CCFGBuilder.build(jclass);
+        CCFG ccfg = CCFGBuilder.build(jclass, infoStore);
         addCFG(ccfg);
         
         for (CFG cfg : ccfg.getStartNode().getMethods()) {
@@ -111,7 +108,7 @@ public class CFGStore {
     public CFG getCFG(JavaMethod jmethod) {
         CFG cfg = getCFG(jmethod.getQualifiedName());
         if (cfg == null) {
-            cfg = CFGMethodBuilder.build(jmethod, new HashSet<JMethod>());
+            cfg = CFGMethodBuilder.build(jmethod, infoStore, new HashSet<JMethod>());
             addCFG(cfg);
         }
         return cfg;
@@ -120,7 +117,7 @@ public class CFGStore {
     CFG getCFG(JavaMethod jmethod, Set<JMethod> visitedMethods) {
         CFG cfg = getCFG(jmethod.getQualifiedName());
         if (cfg == null) {
-            cfg = CFGMethodBuilder.build(jmethod, visitedMethods);
+            cfg = CFGMethodBuilder.build(jmethod, infoStore, visitedMethods);
             addCFG(cfg);
         }
         return cfg;
@@ -133,7 +130,7 @@ public class CFGStore {
     CFG getCFG(JavaField jfield, Set<JMethod> visitedMethods) {
         CFG cfg = getCFG(jfield.getQualifiedName());
         if (cfg == null) {
-            cfg = CFGFieldBuilder.build(jfield, visitedMethods);
+            cfg = CFGFieldBuilder.build(jfield, infoStore, visitedMethods);
             addCFG(cfg);
         }
         return cfg;
