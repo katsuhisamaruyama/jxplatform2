@@ -44,11 +44,4 @@ public class PDGEntry extends PDGNode {
     public String getQualifiedName() {
         return getCFGEntry().getQualifiedName();
     }
-    
-    @Override
-    public PDGEntry clone() {
-        PDGEntry cloneNode = new PDGEntry(getCFGEntry());
-        super.setClone(cloneNode);
-        return cloneNode;
-    }
 }

@@ -7,7 +7,6 @@
 package org.jtool.eclipse.pdg;
 
 import org.jtool.eclipse.cfg.CFG;
-import org.jtool.eclipse.cfg.CCFG;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -23,19 +22,8 @@ public class SDG extends PDG {
     protected Map<String, ClDG> cldgs = new HashMap<String, ClDG>();
     protected Map<String, PDG> pdgs = new HashMap<String, PDG>();
     
-    protected CCFG ccfg;
-    
     public SDG() {
         super();
-    }
-    
-    public void setCCFG(CCFG ccfg) {
-        this.ccfg = ccfg;
-    }
-    
-    
-    public CCFG getCCFG() {
-        return ccfg;
     }
     
     @Override
@@ -93,11 +81,14 @@ public class SDG extends PDG {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("----- SDG (from here) -----\n");
-        for (PDG pdg : pdgs.values()) {
-            buf.append(pdg.getNodeInfo());
+        buf.append(getNodeInfo());
+        buf.append(getEdgeInfo());
+        
+        for (ClDG cldg : cldgs.values()) {
+            buf.append(cldg.toString());
         }
-        for (PDG pdg : pdgs.values()) {
-            buf.append(pdg.getEdgeInfo());
+        for (ClDG cldg : cldgs.values()) {
+            buf.append(cldg.toString());
         }
         buf.append("----- SDG (to here) -----\n");
         return buf.toString();

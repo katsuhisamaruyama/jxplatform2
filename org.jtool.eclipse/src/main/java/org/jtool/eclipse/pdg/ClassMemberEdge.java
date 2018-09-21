@@ -25,7 +25,7 @@ public class ClassMemberEdge extends Dependence {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append(super.toString());
-        buf.append("MEMBER");
+        buf.append(" MEMBER");
         return buf.toString();
     }
 }
