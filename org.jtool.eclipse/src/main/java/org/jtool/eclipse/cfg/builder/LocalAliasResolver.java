@@ -33,6 +33,10 @@ class LocalAliasResolver {
     }
     
     private static Alias getAliasRelation(CFGNode node) {
+        if (!node.isStatement()) {
+            return null;
+        }
+        
         if (!node.isAssignment() && !node.isLocalDeclaration()) {
             return null;
         }
