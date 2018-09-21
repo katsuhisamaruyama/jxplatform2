@@ -4,9 +4,7 @@
  *  Department of Computer Science, Ritsumeikan University
  */
 
-package org.jtool.eclipse.batch;
-
-import org.jtool.eclipse.util.Logger;
+package org.jtool.eclipse.util;
 
 /**
  * A progress monitor.
