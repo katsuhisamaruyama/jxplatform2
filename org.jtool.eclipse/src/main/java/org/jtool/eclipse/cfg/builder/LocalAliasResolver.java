@@ -27,9 +27,6 @@ class LocalAliasResolver {
         for (CFGNode node : cfg.getNodes()) {
             Alias alias = getAliasRelation(node);
             if (alias != null) {
-                
-                System.out.println("FOUND ALIAS = " + alias.newName + " = " + alias.origName);
-                
                 walkForward(node, alias);
             }
         }
@@ -73,8 +70,6 @@ class LocalAliasResolver {
         if (newAlias != null) {
             return;
         }
-        
-        System.out.println(node.toString());
         
         if (node.isStatement()) {
             CFGStatement stNode = (CFGStatement)node;
