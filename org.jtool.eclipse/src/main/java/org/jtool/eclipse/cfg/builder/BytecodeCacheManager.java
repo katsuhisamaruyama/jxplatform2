@@ -75,7 +75,6 @@ class BytecodeCacheManager {
             
             StringWriter writer = new StringWriter();
             transformer.transform(src, new StreamResult(writer));
-            
             if (file.exists()) {
                 file.delete();
             }
@@ -96,8 +95,10 @@ class BytecodeCacheManager {
             return false;
         }
         
-        SAXParserFactory factory = SAXParserFactory.newInstance();
         try {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            factory.setNamespaceAware(true);
+            
             SAXParser parser = factory.newSAXParser();
             CacheImporter handler = new CacheImporter(cfgStore);
             parser.parse(file, handler);
@@ -139,13 +140,13 @@ class CacheExporter {
         Element classElem = doc.createElement(BytecodeCacheManager.ClassElem);
         for (Entry<String, String> entry : clazz.getCacheData().entrySet()) {
             classElem.setAttribute(entry.getKey(), entry.getValue());
-            
-            for (JMethod method : clazz.getMethods()) {
-                export(doc, classElem, method);
-            }
-            for (JField field : clazz.getFields()) {
-                export(doc, classElem, field);
-            }
+        }
+        
+        for (JMethod method : clazz.getMethods()) {
+            export(doc, classElem, method);
+        }
+        for (JField field : clazz.getFields()) {
+            export(doc, classElem, field);
         }
         parent.appendChild(classElem);
     }
@@ -219,14 +220,18 @@ class CacheImporter extends DefaultHandler {
         }
         
         if (qname.equals(BytecodeCacheManager.MethodElem)) {
-            JMethodCache method = new JMethodCache(clazz, cfgStore, attributes(attrs));
-            cmethods.add(method);
+            if (clazz != null) {
+                JMethodCache method = new JMethodCache(clazz, cfgStore, attributes(attrs));
+                cmethods.add(method);
+            }
             return;
         }
         
         if (qname.equals(BytecodeCacheManager.FieldElem)) {
-            JFieldCache field = new JFieldCache(clazz, cfgStore, attributes(attrs));
-            cfields.add(field);
+            if (clazz != null) {
+                JFieldCache field = new JFieldCache(clazz, cfgStore, attributes(attrs));
+                cfields.add(field);
+            }
             return;
         }
     }
