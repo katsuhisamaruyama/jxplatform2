@@ -45,7 +45,6 @@ import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Stack;
@@ -220,7 +219,30 @@ public class ExpressionVisitor extends ASTVisitor {
     
     @Override
     public boolean visit(InfixExpression node) {
-        return true;
+        Expression expr = node.getLeftOperand();
+        analysisMode.push(AnalysisMode.USE);
+        expr.accept(this);
+        analysisMode.pop();
+        
+        expr = node.getRightOperand();
+        
+        System.out.println(node + " => " + expr);
+        
+        analysisMode.push(AnalysisMode.USE);
+        expr.accept(this);
+        analysisMode.pop();
+        
+        for (Object obj : node.extendedOperands()) {
+            Expression e = (Expression)obj;
+            
+            System.out.println(node + " => " + e);
+            
+            
+            analysisMode.push(AnalysisMode.USE);
+            e.accept(this);
+            analysisMode.pop();
+        }
+        return false;
     }
     
     @Override
@@ -310,17 +332,18 @@ public class ExpressionVisitor extends ASTVisitor {
         setActualNodes(callNode, node, node.arguments());
         
         Expression primary = node.getExpression();
-        if (primary != null) {
+        if (primary != null && !jcall.isStatic()) {
             CFGStatement tmpNode = curNode;
             curNode = callNode;
             
             analysisMode.push(AnalysisMode.USE);
             primary.accept(this);
             analysisMode.pop();
+            
             checkPrimary(jcall);
             
             curNode = tmpNode;
-        }
+    }
         return false;
     }
     
@@ -437,7 +460,6 @@ public class ExpressionVisitor extends ASTVisitor {
     }
     
     private void setActualNodes(CFGMethodCall callNode, ASTNode node, List<Expression> arguments) {
-        
         boolean actual = infoStore.creatingActualNodes() &&
                 callNode.getMethodCall().isInProject() &&
                 !callNode.getMethodCall().callSelfDirectly();
@@ -530,17 +552,15 @@ public class ExpressionVisitor extends ASTVisitor {
     }
     
     private void mergeActualIn(CFGMethodCall callNode, List<Expression> arguments) {
+        CFGStatement tmpNode = curNode;
+        curNode = callNode;
+        
         for (int ordinal = 0; ordinal < arguments.size(); ordinal++) {
             analysisMode.push(AnalysisMode.USE);
             arguments.get(ordinal).accept(this);
             analysisMode.pop();
-            
-            List<JReference> uses = new ArrayList<JReference>(curNode.getUseVariables());
-            for (JReference jvar : uses) {
-                callNode.addUseVariable(jvar);
-                curNode.removeUseVariable(jvar);
-            }
         }
+        curNode = tmpNode;
     }
     
     private void mergeActualOut(CFGMethodCall callNode) {

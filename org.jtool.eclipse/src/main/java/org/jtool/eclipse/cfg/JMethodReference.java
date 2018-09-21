@@ -11,6 +11,8 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.Modifier;
+
 import java.util.List;
 import java.util.ArrayList;
 
@@ -69,6 +71,10 @@ public class JMethodReference extends JReference {
     
     public boolean isLocalCall() {
         return isLocalCall;
+    }
+    
+    public boolean isStatic() {
+        return Modifier.isStatic(modifiers);
     }
     
     public List<Expression> getArguments() {
