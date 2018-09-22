@@ -114,23 +114,23 @@ public class CFGStore {
         return cfg;
     }
     
-    CFG getCFG(JavaMethod jmethod, Set<JMethod> visitedMethods) {
+    public CFG getCFG(JavaField jfield) {
+        return getCFG(jfield, new HashSet<JMethod>());
+    }
+    
+    CFG getCFG(JavaMethod jmethod, Set<JMethod> visited) {
         CFG cfg = getCFG(jmethod.getQualifiedName());
         if (cfg == null) {
-            cfg = CFGMethodBuilder.build(jmethod, infoStore, visitedMethods);
+            cfg = CFGMethodBuilder.build(jmethod, infoStore, visited);
             addCFG(cfg);
         }
         return cfg;
     }
     
-    public CFG getCFG(JavaField jfield) {
-        return getCFG(jfield, new HashSet<JMethod>());
-    }
-    
-    CFG getCFG(JavaField jfield, Set<JMethod> visitedMethods) {
+    CFG getCFG(JavaField jfield, Set<JMethod> visited) {
         CFG cfg = getCFG(jfield.getQualifiedName());
         if (cfg == null) {
-            cfg = CFGFieldBuilder.build(jfield, infoStore, visitedMethods);
+            cfg = CFGFieldBuilder.build(jfield, infoStore, visited);
             addCFG(cfg);
         }
         return cfg;

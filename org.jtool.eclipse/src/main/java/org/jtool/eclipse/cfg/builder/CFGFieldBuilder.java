@@ -34,11 +34,11 @@ public class CFGFieldBuilder {
         return build(jfield, infoStore, new HashSet<JMethod>());
     }
     
-    public static CFG build(JavaField jfield, JInfoStore infoStore, Set<JMethod> visitedMethods) {
-        return build(jfield, jfield.getVariableBinding(), infoStore, visitedMethods);
+    public static CFG build(JavaField jfield, JInfoStore infoStore, Set<JMethod> visited) {
+        return build(jfield, jfield.getVariableBinding(), infoStore, visited);
     }
     
-    private static CFG build(JavaField jfield, IVariableBinding vbinding, JInfoStore infoStore, Set<JMethod> visitedMethods) {
+    private static CFG build(JavaField jfield, IVariableBinding vbinding, JInfoStore infoStore, Set<JMethod> visited) {
         CFG cfg = new CFG();
         ExpressionVisitor.paramNumber = 1;
         
@@ -65,7 +65,7 @@ public class CFGFieldBuilder {
         if (vbinding.isEnumConstant()) {
             EnumConstantDeclaration decl = (EnumConstantDeclaration)jfield.getASTNode();
             if (decl.resolveConstructorBinding() != null) {
-                ExpressionVisitor visitor = new ExpressionVisitor(cfg, declNode, infoStore, visitedMethods);
+                ExpressionVisitor visitor = new ExpressionVisitor(cfg, declNode, infoStore, visited);
                 decl.accept(visitor);
                 curNode = visitor.getExitNode();
             }
@@ -73,7 +73,7 @@ public class CFGFieldBuilder {
             VariableDeclarationFragment decl = (VariableDeclarationFragment)jfield.getASTNode();
             Expression initializer = decl.getInitializer();
             if (initializer != null) {
-                ExpressionVisitor visitor = new ExpressionVisitor(cfg, declNode, infoStore, visitedMethods);
+                ExpressionVisitor visitor = new ExpressionVisitor(cfg, declNode, infoStore, visited);
                 initializer.accept(visitor);
                 curNode = visitor.getExitNode();
             }
