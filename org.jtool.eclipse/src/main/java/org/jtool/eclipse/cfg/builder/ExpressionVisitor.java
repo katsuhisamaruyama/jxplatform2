@@ -339,22 +339,27 @@ public class ExpressionVisitor extends ASTVisitor {
     }
     
     private void checkPrimary(Expression primary, CFGMethodCall callNode, JMethodReference jcall) {
-        if (curNode.getUseVariables().size() == 1 || (curNode.getUseVariables().size() == 0 && jcall.isStatic())) {
-            if (curNode.getUseVariables().size() == 1) {
-                jcall.setPrimary(curNode.getUseVariables().get(0));
-            }
-            
-            JMethod method = infoStore.getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
-            if (method != null) {
-                if (method.defuseDecided()) {
-                    addFields(primary, callNode, jcall, method);
-                } else {
-                    if (visited != null) {
-                        if (!visited.contains(method)) {
-                            visited.add(method);
-                            method.findDefUseFields(visited, true);
-                            addFields(primary, callNode, jcall, method);
-                        }
+        JReference ref = null;
+        if (curNode.getUseVariables().size() == 1) {
+            ref = curNode.getUseVariables().get(0);
+        } else if (curNode.getUseVariables().size() == 0 && jcall.isStatic()) {
+            ref = new JVirtualReference(primary, jcall.getDeclaringClassName(), jcall.getDeclaringClassName(), false);
+        }
+        jcall.setPrimary(ref);
+        if (ref == null) {
+            return;
+        }
+        
+        JMethod method = infoStore.getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
+        if (method != null) {
+            if (method.defuseDecided()) {
+                addFields(primary, callNode, jcall, method);
+            } else {
+                if (visited != null) {
+                    if (!visited.contains(method)) {
+                        visited.add(method);
+                        method.findDefUseFields(visited, true);
+                        addFields(primary, callNode, jcall, method);
                     }
                 }
             }
@@ -371,9 +376,6 @@ public class ExpressionVisitor extends ASTVisitor {
             } else {
                 var = new JFieldReference(primary, elem[0], elem[1], type, false, false);
             }
-            
-            System.out.println("ADD " + callNode.getQualifiedName());
-            
             callNode.addDefVariable(var);
         }
     }

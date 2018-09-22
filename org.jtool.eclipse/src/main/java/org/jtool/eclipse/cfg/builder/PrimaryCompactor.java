@@ -42,11 +42,11 @@ class PrimaryCompactor {
                     JReference primary = callNode.getPrimary();
                     if (primary != null) {
                         callNode.addDefVariable(primary);
+                        
+                        String type = callNode.getDeclaringClassName();
+                        JReference var = new JFieldReference(primary.getASTNode(), type, ExternalFieldAccess, type, false, false);
+                        callNode.addDefVariable(var);
                     }
-                    
-                    String type = callNode.getDeclaringClassName();
-                    JReference var = new JFieldReference(primary.getASTNode(), type, ExternalFieldAccess, type, false, false);
-                    callNode.addDefVariable(var);
                 }
             }
         }
