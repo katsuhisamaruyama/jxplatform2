@@ -14,6 +14,7 @@ import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.javamodel.JavaField;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -99,21 +100,51 @@ public class JMethodInternal extends JMethod {
     }
     
     @Override
-    protected void checkSideEffectsOnFields(Set<JMethod> visitedMethods) {
-        CFG cfg = cfgStore.getCFG(jmethod, visitedMethods);
+    protected void findDefUseFieldsInThisMethod(Set<JMethod> visited, boolean recursivelyCollect) {
+        Set<JMethod> current = new HashSet<JMethod>(visited);
+        
+        CFG cfg = cfgStore.getCFG(jmethod, visited);
         for (CFGNode node : cfg.getNodes()) {
             if (node instanceof CFGStatement) {
                 CFGStatement stNode = (CFGStatement)node;
-                for (JReference jv : stNode.getDefVariables()) {
-                    if (jv.isFieldAccess()) {
-                        sideEffects = SideEffectStatus.YES;
-                        return;
+                for (JReference var : stNode.getDefVariables()) {
+                    if (var.isFieldAccess()) {
+                        addDefField(var.getQualifiedName());
+                    }
+                }
+                for (JReference var : stNode.getUseVariables()) {
+                    if (var.isFieldAccess()) {
+                        addUseField(var.getQualifiedName());
                     }
                 }
             }
         }
-        if (sideEffects == SideEffectStatus.UNK) {
-            sideEffects = SideEffectStatus.NO;
+        
+        if (recursivelyCollect) {
+            for (JMethod method : visited) {
+                if (!current.contains(method)) {
+                    addDefFields(method.getDefFields());
+                    addUseFields(method.getUseFields());
+                }
+            }
+        }
+    }
+    
+    @Override
+    protected void findDefUseFieldsInAccessedMethods(Set<JMethod> visited, boolean recursivelyCollect) {
+        Set<JMethod> current = new HashSet<JMethod>(visited);
+        
+        for (JMethod method : getOverridingMethods()) {
+            if (!visited.contains(method)) {
+                method.findDefUseFields(visited);
+            }
+        }
+        
+        for (JMethod method : visited) {
+            if (!current.contains(method)) {
+                addDefFields(method.getDefFields());
+                addUseFields(method.getUseFields());
+            }
         }
     }
 }

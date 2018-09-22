@@ -35,7 +35,6 @@ public class JFieldReference extends JReference {
             declaringClassName = JavaClass.ArrayClassFqn;
         }
         declaringMethodName = "";
-        
         name = binding.getName();
         signature = declaringClassName + QualifiedNameSeparator + name;
         fqn = signature;
@@ -49,6 +48,25 @@ public class JFieldReference extends JReference {
         }
         isField = isField(binding);
         isEnumConstant = isEnumConstant(binding);
+    }
+    
+    public JFieldReference(ASTNode node, String className, String name, String type, boolean primitive, boolean inProject) {
+        super(node);
+        
+        enclosingClassName = findEnclosingClassName(node);
+        enclosingMethodName = findEnclosingMethodName(enclosingClassName, node);
+        declaringClassName = className;
+        declaringMethodName = "";
+        
+        this.name = name;
+        signature = declaringClassName + QualifiedNameSeparator + name;
+        fqn = signature;
+        this.type = type;
+        isPrimitiveType = primitive;
+        modifiers = 0;
+        this.inProject = inProject;
+        isField = true;
+        isEnumConstant = false;
     }
     
     @Override

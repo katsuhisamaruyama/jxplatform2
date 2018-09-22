@@ -121,19 +121,12 @@ public class JMethodReference extends JReference {
         return primary != null;
     }
     
-    public void setPrimary(JReference jvar) {
-        primary = jvar;
+    public void setPrimary(JReference primary) {
+        this.primary = primary;
     }
     
     public JReference getPrimary() {
         return primary;
-    }
-    
-    public String getPrimaryType() {
-        if (primary != null) {
-            primary.getType();
-        }
-        return "";
     }
     
     public boolean callSelfDirectly() {

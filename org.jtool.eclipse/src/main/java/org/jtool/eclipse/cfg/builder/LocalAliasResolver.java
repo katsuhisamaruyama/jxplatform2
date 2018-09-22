@@ -23,7 +23,7 @@ import java.util.HashSet;
  */
 class LocalAliasResolver {
     
-    public static void resolve(CFG cfg) {
+    static void resolve(CFG cfg) {
         for (CFGNode node : cfg.getNodes()) {
             Alias alias = getAliasRelation(node);
             if (alias != null) {

@@ -6,7 +6,7 @@
 
 package org.jtool.eclipse.cfg.builder;
 
-import org.jtool.eclipse.javamodel.JavaElement;
+import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
 import javassist.CtClass;
 import javassist.CtBehavior;
 import javassist.CtMethod;
@@ -21,6 +21,7 @@ import javassist.expr.FieldAccess;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.HashSet;
 
 /**
  * An object that represents a method outside the project.
@@ -35,7 +36,7 @@ public class JMethodExternal extends JMethod {
     JMethodExternal(CtMethod ctMethod, JClass declaringClass, CFGStore cfgStore) {
         super(declaringClass.getQualifiedName(), cfgStore, declaringClass.getQualifiedName(), getSignature(ctMethod),
               getModfifiers(ctMethod), findReturnType(ctMethod), checkPrimitiveReturnType(ctMethod));
-        fqn = fqn + JavaElement.QualifiedNameSeparator + signature;
+        fqn = fqn + QualifiedNameSeparator + signature;
         this.declaringClass = declaringClass;
         this.ctMethod = ctMethod;
     }
@@ -43,7 +44,7 @@ public class JMethodExternal extends JMethod {
     public JMethodExternal(CtConstructor ctMethod, JClass declaringClass, CFGStore cfgStore) {
         super(declaringClass.getQualifiedName(), cfgStore, declaringClass.getQualifiedName(), getSignature(ctMethod),
               getModfifiers(ctMethod), declaringClass.getQualifiedName(), false);
-        fqn = fqn + JavaElement.QualifiedNameSeparator + signature;
+        fqn = fqn + QualifiedNameSeparator + signature;
         this.declaringClass = declaringClass;
         this.ctMethod = ctMethod;
     }
@@ -173,25 +174,59 @@ public class JMethodExternal extends JMethod {
     }
     
     @Override
-    protected void checkSideEffectsOnFields(Set<JMethod> visitedMethods) {
+    protected void findDefUseFieldsInThisMethod(Set<JMethod> visited, boolean recursivelyCollect) {
         try {
             ctMethod.instrument(new ExprEditor() {
                 
                 @Override
                 public void edit(FieldAccess cf) throws CannotCompileException {
                     if (cf.isWriter()) {
-                        sideEffects = SideEffectStatus.YES;
-                        return;
+                        addDefField(cf.getClassName() + QualifiedNameSeparator + cf.getFieldName());
+                    }
+                    if (cf.isReader()) {
+                        addUseField(cf.getClassName() + QualifiedNameSeparator + cf.getFieldName());
                     }
                 }
             });
         } catch (CannotCompileException e) {
-            if (sideEffects == SideEffectStatus.UNK) {
-                sideEffects = SideEffectStatus.MAY;
+            addDefField(UNKNOWN_FIELD_NAME);
+            addDefField(UNKNOWN_FIELD_NAME);
+        }
+    }
+    
+    @Override
+    protected void findDefUseFieldsInAccessedMethods(Set<JMethod> visited, boolean recursivelyCollect) {
+        Set<JMethod> current = new HashSet<JMethod>(visited);
+        
+        for (JMethod method : getOverridingMethods()) {
+            if (!visited.contains(method)) {
+                visited.add(method);
+                method.findDefUseFields(visited);
             }
         }
-        if (sideEffects == SideEffectStatus.UNK) {
-            sideEffects = SideEffectStatus.NO;
+        
+        if (!recursivelyCollect) {
+            for (JMethod method : visited) {
+                if (!current.contains(method)) {
+                    addDefFields(method.getDefFields());
+                    addUseFields(method.getUseFields());
+                }
+            }
+            return;
+        }
+        
+        for (JMethod method : getAccessedMethods()) {
+            if (!visited.contains(method)) {
+                visited.add(method);
+                method.findDefUseFields(visited);
+            }
+        }
+        
+        for (JMethod method : visited) {
+            if (!current.contains(method)) {
+                addDefFields(method.getDefFields());
+                addUseFields(method.getUseFields());
+            }
         }
     }
 }

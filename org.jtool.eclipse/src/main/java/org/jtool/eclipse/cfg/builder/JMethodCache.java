@@ -6,8 +6,9 @@
 
 package org.jtool.eclipse.cfg.builder;
 
+import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * An object that represents the cached data of a method.
@@ -17,18 +18,32 @@ import java.util.Set;
  */
 class JMethodCache extends JMethod {
     
+    protected static final char QualifiedNameSeparatorChar = QualifiedNameSeparator.charAt(0);
+    
     protected JMethodCache(JClass declaringClass, CFGStore cfgStore, Map<String, String> cacheData) {
         super(cacheData.get(FqnAttr), cfgStore, cacheData.get(ClassNameAttr), cacheData.get(SignatureAttr), 0, "N/A", false);
         this.declaringClass = declaringClass;
         this.cacheData = cacheData;
         
-        sideEffects = SideEffectStatus.valueOf(cacheData.get(SideEffectsAttr));
+        defFields = new HashSet<String>();
+        for (String name : convert(cacheData.get(DefAttr))) {
+            if (name.indexOf(QualifiedNameSeparatorChar) != -1) {
+                defFields.add(name);
+            }
+        }
+        useFields = new HashSet<String>();
+        for (String name : convert(cacheData.get(UseAttr))) {
+            if (name.indexOf(QualifiedNameSeparatorChar) != -1) {
+                useFields.add(name);
+            }
+        }
     }
     
-    @Override
-    protected boolean hasSideEffects(Set<JMethod> visitedMethods) {
-        cfgStore.getJInfoStore().unregisterJClassCache(declaringClass.getQualifiedName());
-        return super.checkSideEffects(SideEffectCheckCount, visitedMethods);
+    protected String[] convert(String nameStr) {
+        if (nameStr.indexOf(';') == -1) {
+            return new String[0];
+        }
+        return nameStr.split(";", 0);
     }
     
     @Override
@@ -39,25 +54,5 @@ class JMethodCache extends JMethod {
     @Override
     protected boolean isInProject() {
         return false;
-    }
-    
-    @Override
-    protected JMethod[] findAccessedMethods() {
-        return emptyMethodArray;
-    }
-    
-    @Override
-    protected JField[] findAccessedFields() {
-        return emptyFieldArray;
-    }
-    
-    @Override
-    protected JMethod[] findOverridingMethods() {
-        return emptyMethodArray;
-    }
-    
-    @Override
-    protected JMethod[] findOverriddenMethods() {
-        return emptyMethodArray;
     }
 }

@@ -97,6 +97,14 @@ class JInfoStore {
         }
     }
     
+    JClass findInternalClass(String fqn) {
+        return internalClassStore.get(fqn);
+    }
+    
+    JClass findExternalClass(String fqn) {
+        return externalClassStore.get(fqn);
+    }
+    
     private JClass registerInternalClass(String fqn) {
         JavaClass jclass = jproject.getClass(fqn);
         if (jclass != null) {

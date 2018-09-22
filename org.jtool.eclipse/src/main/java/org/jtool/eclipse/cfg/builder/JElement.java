@@ -22,7 +22,8 @@ abstract class JElement {
     protected static final String SignatureAttr = "sig";
     protected static final String NameAttr = "name";
     
-    protected static final String SideEffectsAttr = "sideEffects";
+    protected static final String DefAttr = "def";
+    protected static final String UseAttr = "use";
     
     protected CFGStore cfgStore;
     protected String fqn;

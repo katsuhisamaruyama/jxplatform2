@@ -98,15 +98,16 @@ public class StatementVisitor extends ASTVisitor {
     
     private JInfoStore infoStore;
     
-    private Set<JMethod> visitedMethods;
+    private Set<JMethod> visited;
     
-    protected StatementVisitor(CFG cfg, CFGNode prevNode, CFGNode nextNode, JInfoStore infoStore, Set<JMethod> visitedMethods) {
+    protected StatementVisitor(CFG cfg, CFGNode prevNode, CFGNode nextNode, JInfoStore infoStore, Set<JMethod> visited) {
          this.cfg = cfg;
          this.infoStore = infoStore;
          
          this.prevNode = prevNode;
          this.nextNode = nextNode;
-         this.visitedMethods = visitedMethods;
+         
+         this.visited = visited;
     }
     
     protected CFGNode getNextCFGNode() {
@@ -156,7 +157,7 @@ public class StatementVisitor extends ASTVisitor {
         reconnect(expNode);
         
         Expression expression = node.getExpression();
-        ExpressionVisitor visitor = new ExpressionVisitor(cfg, expNode, infoStore, visitedMethods);
+        ExpressionVisitor visitor = new ExpressionVisitor(cfg, expNode, infoStore, visited);
         expression.accept(visitor);
         CFGNode curNode = visitor.getExitNode();
         
@@ -172,7 +173,7 @@ public class StatementVisitor extends ASTVisitor {
             CFGStatement declNode = new CFGStatement(node, CFGNode.Kind.assignment);
             reconnect(declNode);
             
-            ExpressionVisitor visitor = new ExpressionVisitor(cfg, declNode, infoStore, visitedMethods);
+            ExpressionVisitor visitor = new ExpressionVisitor(cfg, declNode, infoStore, visited);
             frag.accept(visitor);
             CFGNode curNode = visitor.getExitNode();
             
@@ -187,7 +188,7 @@ public class StatementVisitor extends ASTVisitor {
         CFGStatement invNode = new CFGStatement(node, CFGNode.Kind.assignment);
         reconnect(invNode);
         
-        ExpressionVisitor visitor = new ExpressionVisitor(cfg, invNode, infoStore, visitedMethods);
+        ExpressionVisitor visitor = new ExpressionVisitor(cfg, invNode, infoStore, visited);
         node.accept(visitor);
         CFGNode curNode = visitor.getExitNode();
         
@@ -201,7 +202,7 @@ public class StatementVisitor extends ASTVisitor {
         CFGStatement invNode = new CFGStatement(node, CFGNode.Kind.assignment);
         reconnect(invNode);
         
-        ExpressionVisitor visitor = new ExpressionVisitor(cfg, invNode, infoStore, visitedMethods);
+        ExpressionVisitor visitor = new ExpressionVisitor(cfg, invNode, infoStore, visited);
         node.accept(visitor);
         CFGNode curNode = visitor.getExitNode();
         
@@ -216,7 +217,7 @@ public class StatementVisitor extends ASTVisitor {
         reconnect(ifNode);
         
         Expression condition = node.getExpression();
-        ExpressionVisitor condVisitor = new ExpressionVisitor(cfg, ifNode, infoStore, visitedMethods);
+        ExpressionVisitor condVisitor = new ExpressionVisitor(cfg, ifNode, infoStore, visited);
         condition.accept(condVisitor);
         CFGNode curNode = condVisitor.getExitNode();
         ifNode.setKind(CFGNode.Kind.ifSt);
@@ -253,7 +254,7 @@ public class StatementVisitor extends ASTVisitor {
         reconnect(switchNode);
         
         Expression condition = node.getExpression();
-        ExpressionVisitor condVisitor = new ExpressionVisitor(cfg, switchNode, infoStore, visitedMethods);
+        ExpressionVisitor condVisitor = new ExpressionVisitor(cfg, switchNode, infoStore, visited);
         condition.accept(condVisitor);
         CFGNode curNode = condVisitor.getExitNode();
         
@@ -329,7 +330,7 @@ public class StatementVisitor extends ASTVisitor {
             reconnect(caseNode);
             
             Expression condition = node.getExpression();
-            ExpressionVisitor condVisitor = new ExpressionVisitor(cfg, caseNode, infoStore, visitedMethods);
+            ExpressionVisitor condVisitor = new ExpressionVisitor(cfg, caseNode, infoStore, visited);
             condition.accept(condVisitor);
             caseNode.addDefVariables(switchNode.getDefVariables());
             caseNode.addUseVariables(switchNode.getUseVariables());
@@ -365,7 +366,7 @@ public class StatementVisitor extends ASTVisitor {
         reconnect(whileNode);
         
         Expression condition = node.getExpression();
-        ExpressionVisitor condVisitor = new ExpressionVisitor(cfg, whileNode, infoStore, visitedMethods);
+        ExpressionVisitor condVisitor = new ExpressionVisitor(cfg, whileNode, infoStore, visited);
         condition.accept(condVisitor);
         CFGNode curNode = condVisitor.getExitNode();
         
@@ -411,7 +412,7 @@ public class StatementVisitor extends ASTVisitor {
         reconnect(doNode);
         
         Expression condition = node.getExpression();
-        ExpressionVisitor condVisitor = new ExpressionVisitor(cfg, doNode, infoStore, visitedMethods);
+        ExpressionVisitor condVisitor = new ExpressionVisitor(cfg, doNode, infoStore, visited);
         condition.accept(condVisitor);
         CFGNode curNode = condVisitor.getExitNode();
         
@@ -433,7 +434,7 @@ public class StatementVisitor extends ASTVisitor {
     public boolean visit(ForStatement node) {
         for (Expression initializer : (List<Expression>)node.initializers()) {
             CFGStatement initNode = new CFGStatement(node, CFGNode.Kind.assignment);
-            ExpressionVisitor initVisitor = new ExpressionVisitor(cfg, initNode, infoStore, visitedMethods);
+            ExpressionVisitor initVisitor = new ExpressionVisitor(cfg, initNode, infoStore, visited);
             initializer.accept(initVisitor);
             CFGNode curNode = initVisitor.getExitNode();
             reconnect(initNode);
@@ -446,7 +447,7 @@ public class StatementVisitor extends ASTVisitor {
         CFGNode entryNode;
         Expression condition = node.getExpression();
         if (condition != null) {
-            ExpressionVisitor condVisitor = new ExpressionVisitor(cfg, forNode, infoStore, visitedMethods);
+            ExpressionVisitor condVisitor = new ExpressionVisitor(cfg, forNode, infoStore, visited);
             condition.accept(condVisitor);
             CFGNode curNode = condVisitor.getExitNode();
             reconnect(forNode);
@@ -469,7 +470,7 @@ public class StatementVisitor extends ASTVisitor {
         body.accept(this);
         for (Expression update : (List<Expression>)node.updaters()) {
             CFGStatement updateNode = new CFGStatement(update, CFGNode.Kind.assignment);
-            ExpressionVisitor updateVisitor = new ExpressionVisitor(cfg, updateNode, infoStore, visitedMethods);
+            ExpressionVisitor updateVisitor = new ExpressionVisitor(cfg, updateNode, infoStore, visited);
             update.accept(updateVisitor);
             CFGNode curNode = updateVisitor.getExitNode();
             reconnect(updateNode);
@@ -500,10 +501,10 @@ public class StatementVisitor extends ASTVisitor {
         reconnect(forNode);
         
         SingleVariableDeclaration parameter = node.getParameter();
-        ExpressionVisitor paramVisitor = new ExpressionVisitor(cfg, forNode, infoStore, visitedMethods);
+        ExpressionVisitor paramVisitor = new ExpressionVisitor(cfg, forNode, infoStore, visited);
         parameter.accept(paramVisitor);
         Expression expression = node.getExpression();
-        ExpressionVisitor exprVisitor = new ExpressionVisitor(cfg, forNode, infoStore, visitedMethods);
+        ExpressionVisitor exprVisitor = new ExpressionVisitor(cfg, forNode, infoStore, visited);
         expression.accept(exprVisitor);
         CFGNode curNode = exprVisitor.getExitNode();
         
@@ -584,7 +585,7 @@ public class StatementVisitor extends ASTVisitor {
         CFGNode curNode = returnNode;
         Expression expression = node.getExpression();
         if (expression != null) {
-            ExpressionVisitor exprVisitor = new ExpressionVisitor(cfg, returnNode, infoStore, visitedMethods);
+            ExpressionVisitor exprVisitor = new ExpressionVisitor(cfg, returnNode, infoStore, visited);
             expression.accept(exprVisitor);
             
             CFGMethodEntry methodNode = (CFGMethodEntry)cfg.getStartNode();
@@ -610,12 +611,12 @@ public class StatementVisitor extends ASTVisitor {
         reconnect(assertNode);
         
         Expression expression = node.getExpression();
-        ExpressionVisitor exprVisitor = new ExpressionVisitor(cfg, assertNode, infoStore, visitedMethods);
+        ExpressionVisitor exprVisitor = new ExpressionVisitor(cfg, assertNode, infoStore, visited);
         expression.accept(exprVisitor);
         CFGNode curNode = exprVisitor.getExitNode();
         Expression message = node.getMessage();
         if (message != null) {
-            ExpressionVisitor mesgVisitor = new ExpressionVisitor(cfg, assertNode, infoStore, visitedMethods);
+            ExpressionVisitor mesgVisitor = new ExpressionVisitor(cfg, assertNode, infoStore, visited);
             message.accept(mesgVisitor);
             curNode = mesgVisitor.getExitNode();
         }
@@ -649,7 +650,7 @@ public class StatementVisitor extends ASTVisitor {
         reconnect(throwNode);
         
         Expression expression = node.getExpression();
-        ExpressionVisitor exprVisitor = new ExpressionVisitor(cfg, throwNode, infoStore, visitedMethods);
+        ExpressionVisitor exprVisitor = new ExpressionVisitor(cfg, throwNode, infoStore, visited);
         expression.accept(exprVisitor);
         CFGNode curNode = exprVisitor.getExitNode();
         
@@ -667,7 +668,7 @@ public class StatementVisitor extends ASTVisitor {
         reconnect(syncNode);
         
         Expression expression = node.getExpression();
-        ExpressionVisitor exprVisitor = new ExpressionVisitor(cfg, syncNode, infoStore, visitedMethods);
+        ExpressionVisitor exprVisitor = new ExpressionVisitor(cfg, syncNode, infoStore, visited);
         expression.accept(exprVisitor);
         CFGNode curNode = exprVisitor.getExitNode();
         

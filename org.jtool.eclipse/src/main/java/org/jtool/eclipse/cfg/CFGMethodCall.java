@@ -44,7 +44,7 @@ public class CFGMethodCall extends CFGStatement {
     }
     
     public String getPrimaryType() {
-        return jmethodCall.getPrimaryType();
+        return jmethodCall.getDeclaringClassName();
     }
     
     public String getName() {

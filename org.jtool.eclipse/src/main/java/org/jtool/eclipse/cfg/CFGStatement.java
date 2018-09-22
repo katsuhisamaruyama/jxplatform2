@@ -145,14 +145,6 @@ public class CFGStatement extends CFGNode {
         return getDefVariables().get(0);
     }
     
-    @Override
-    public CFGStatement clone() {
-        CFGStatement cloneNode = new CFGStatement(getASTNode(), getKind());
-        super.setClone(cloneNode);
-        setClone(cloneNode);
-        return cloneNode;
-    }
-    
     protected void setClone(CFGStatement cloneNode) {
         cloneNode.addDefVariables(this.getDefVariables());
         cloneNode.addUseVariables(this.getUseVariables());

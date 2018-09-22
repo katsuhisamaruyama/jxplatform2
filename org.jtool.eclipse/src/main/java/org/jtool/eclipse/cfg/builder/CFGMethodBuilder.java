@@ -131,6 +131,7 @@ public class CFGMethodBuilder {
             }
         }
         
+        PrimaryCompactor.compact(cfg);
         LocalAliasResolver.resolve(cfg);
         
         return cfg;

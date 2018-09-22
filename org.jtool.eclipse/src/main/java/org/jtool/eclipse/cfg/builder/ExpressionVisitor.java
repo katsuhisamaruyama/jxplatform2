@@ -6,6 +6,7 @@
 
 package org.jtool.eclipse.cfg.builder;
 
+import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGMethodCall;
 import org.jtool.eclipse.cfg.CFGNode;
@@ -111,12 +112,12 @@ public class ExpressionVisitor extends ASTVisitor {
     
     private JInfoStore infoStore;
     
-    private Set<JMethod> visitedMethods;
+    private Set<JMethod> visited;
     
-    protected ExpressionVisitor(CFG cfg, CFGStatement node, JInfoStore infoStore, Set<JMethod> visitedMethods) {
+    protected ExpressionVisitor(CFG cfg, CFGStatement node, JInfoStore infoStore, Set<JMethod> visited) {
         this.cfg = cfg;
         this.infoStore = infoStore;
-        this.visitedMethods = visitedMethods;
+        this.visited = visited;
         
         curNode = node;
         entryNode = node;
@@ -325,48 +326,56 @@ public class ExpressionVisitor extends ASTVisitor {
         setActualNodes(callNode, node, node.arguments());
         
         Expression primary = node.getExpression();
-        if (primary != null && !jcall.isStatic()) {
+        if (primary != null) {
             CFGStatement tmpNode = curNode;
-            curNode = callNode;
-            
+            curNode = new CFGStatement(primary, CFGNode.Kind.dummy);
             analysisMode.push(AnalysisMode.USE);
             primary.accept(this);
             analysisMode.pop();
-            
-            checkPrimary(jcall);
-            
+            checkPrimary(primary, callNode, jcall);
             curNode = tmpNode;
-    }
+        }
         return false;
     }
     
-    private void checkPrimary(JMethodReference jcall) {
-        JReference primary = null;
-        if (curNode.getUseVariables().size() == 1) {
-            primary = curNode.getUseVariables().get(0);
-            if (primary.isLocalAccess() || primary.isFieldAccess()) {
-                
-                JMethod method = infoStore.getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
-                if (method != null) {
-                    if (method.sideEffectsYes() || method.sideEffectsNo()) {
-                        if (method.sideEffectsYes()) {
-                            curNode.addDefVariable(primary);
-                        }
-                    } else {
-                        if (!visitedMethods.contains(method)) {
-                            visitedMethods.add(method);
-                            if (method.hasSideEffects(visitedMethods)) {
-                                curNode.addDefVariable(primary);
-                            }
+    private void checkPrimary(Expression primary, CFGMethodCall callNode, JMethodReference jcall) {
+        if (curNode.getUseVariables().size() == 1 || (curNode.getUseVariables().size() == 0 && jcall.isStatic())) {
+            if (curNode.getUseVariables().size() == 1) {
+                jcall.setPrimary(curNode.getUseVariables().get(0));
+            }
+            
+            JMethod method = infoStore.getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
+            if (method != null) {
+                if (method.defuseDecided()) {
+                    addFields(primary, callNode, jcall, method);
+                } else {
+                    if (visited != null) {
+                        if (!visited.contains(method)) {
+                            visited.add(method);
+                            method.findDefUseFields(visited, true);
+                            addFields(primary, callNode, jcall, method);
                         }
                     }
-                    
-                } else {
-                    curNode.addDefVariable(primary);
                 }
             }
         }
-        jcall.setPrimary(primary);
+    }
+    
+    private void addFields(Expression primary, CFGMethodCall callNode, JMethodReference jcall, JMethod method) {
+        for (String name : method.getDefFields()) {
+            String[] elem = name.split(QualifiedNameSeparator);
+            String type = jcall.getDeclaringClassName();
+            JReference var;
+            if (infoStore.findInternalClass(elem[0]) != null) {
+                var = new JFieldReference(primary, elem[0], elem[1], type, false, true);
+            } else {
+                var = new JFieldReference(primary, elem[0], elem[1], type, false, false);
+            }
+            
+            System.out.println("ADD " + callNode.getQualifiedName());
+            
+            callNode.addDefVariable(var);
+        }
     }
     
     @Override
@@ -398,13 +407,11 @@ public class ExpressionVisitor extends ASTVisitor {
         Expression primary = node.getExpression();
         if (primary != null) {
             CFGStatement tmpNode = curNode;
-            curNode = callNode;
-            
+            curNode = new CFGStatement(primary, CFGNode.Kind.dummy);
             analysisMode.push(AnalysisMode.USE);
             primary.accept(this);
             analysisMode.pop();
-            checkPrimary(jcall);
-            
+            checkPrimary(primary, callNode, jcall);
             curNode = tmpNode;
         }
         return false;
@@ -524,11 +531,15 @@ public class ExpressionVisitor extends ASTVisitor {
     
     private void createActualOutForReturnValue(CFGMethodCall callNode) {
         if (callNode.getMethodCall().isVoidType()) {
+            if (callNode.isConstructorCall()) {
+                mergeActualOut(callNode);
+                curNode.addUseVariable(callNode.getDefVariables().get(0));
+            }
             return;
         }
         
         CFGParameter returnNode = new CFGParameter(callNode.getASTNode(), CFGNode.Kind.actualOut, 0);
-        returnNode .setParent(callNode);
+        returnNode.setParent(callNode);
         callNode.addActualOut(returnNode );
         
         String type = callNode.getReturnType();
@@ -558,6 +569,9 @@ public class ExpressionVisitor extends ASTVisitor {
     
     private void mergeActualOut(CFGMethodCall callNode) {
         String type = callNode.getReturnType();
+        if (callNode.isConstructorCall()) {
+            type = callNode.getQualifiedName();
+        }
         boolean primitive = callNode.isPrimitiveType();
         String name = "$" + String.valueOf(paramNumber);
         JReference jvar = new JVirtualReference(callNode.getASTNode(), name, type, primitive);

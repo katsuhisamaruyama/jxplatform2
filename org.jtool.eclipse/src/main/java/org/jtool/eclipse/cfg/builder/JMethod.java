@@ -8,6 +8,7 @@ package org.jtool.eclipse.cfg.builder;
 
 import org.eclipse.jdt.core.dom.Modifier;
 import java.util.Set;
+import java.util.HashSet;
 import java.util.HashMap;
 
 /**
@@ -32,11 +33,11 @@ abstract class JMethod extends JElement {
     protected JMethod[] overrindingMethods = null;
     protected JMethod[] overriddenMethods = null;
     
-    protected enum SideEffectStatus {
-        YES, NO, MAY, UNK;
-    }
-    protected SideEffectStatus sideEffects = SideEffectStatus.UNK;
-    protected static final int SideEffectCheckCount = 5;
+    protected Set<String> defFields = null;
+    protected Set<String> useFields = null;
+    
+    private static int MaxNumberOfVisitedMethods = 1000000;
+    protected static final String UNKNOWN_FIELD_NAME = "*";
     
     protected JMethod(String fqn, CFGStore cfgStore, String className, String signature,
                       int modifiers, String returnType, boolean isPrimitive) {
@@ -52,7 +53,8 @@ abstract class JMethod extends JElement {
         cacheData.put(FqnAttr, fqn);
         cacheData.put(ClassNameAttr, className);
         cacheData.put(SignatureAttr, signature);
-        cacheData.put(SideEffectsAttr, sideEffects.toString());
+        cacheData.put(DefAttr, convert(defFields));
+        cacheData.put(UseAttr, convert(useFields));
     }
     
     protected String getClasName() {
@@ -123,66 +125,86 @@ abstract class JMethod extends JElement {
         return overriddenMethods;
     }
     
-    protected SideEffectStatus sideEffects() {
-        return sideEffects;
+    protected JMethod[] findAccessedMethods() {
+        return emptyMethodArray;
     }
     
-    protected boolean sideEffectsYes() {
-        return sideEffects == SideEffectStatus.YES || sideEffects == SideEffectStatus.MAY;
+    protected JField[] findAccessedFields() {
+        return emptyFieldArray;
     }
     
-    protected boolean sideEffectsNo() {
-        return sideEffects == SideEffectStatus.NO;
+    protected JMethod[] findOverridingMethods() {
+        return emptyMethodArray;
     }
     
-    protected boolean hasSideEffects(Set<JMethod> visitedMethods) {
-        return checkSideEffects(SideEffectCheckCount, visitedMethods);
+    protected JMethod[] findOverriddenMethods() {
+        return emptyMethodArray;
     }
     
-    protected boolean checkSideEffects(int count, Set<JMethod> visitedMethods) {
-        if (count == 0) {
-            sideEffects = SideEffectStatus.MAY;
+    protected String convert(Set<String> names) {
+        if (names == null) {
+            return "";
         }
-        if (sideEffects == SideEffectStatus.UNK) {
-            checkSideEffectsOnFields(visitedMethods);
-            checkSideEffectsOnMethods(count, visitedMethods);
+        StringBuilder buf = new StringBuilder();
+        for (String name : names) {
+            buf.append(name + ";");
         }
-        return sideEffectsYes();
+        return buf.toString();
     }
     
-    protected void checkSideEffectsOnFields(Set<JMethod> visitedMethods) {
+    protected boolean defuseDecided() {
+        return defFields != null;
     }
     
-    protected void checkSideEffectsOnMethods(int count, Set<JMethod> visitedMethods) {
-        for (JMethod method : getOverridingMethods()) {
-            if (method != null && !visitedMethods.contains(method) && method.checkSideEffects(count, visitedMethods)) {
-                sideEffects = SideEffectStatus.YES;
-                return;
-            }
+    protected void addDefField(String var) {
+        defFields.add(var);
+    }
+    
+    protected void addUseFields(Set<String> vars) {
+        useFields.addAll(vars);
+    }
+    
+    protected void addDefFields(Set<String> vars) {
+        defFields.addAll(vars);
+    }
+    
+    protected void addUseField(String var) {
+        useFields.add(var);
+    }
+    
+    protected Set<String> getDefFields() {
+        return defFields;
+    }
+    
+    protected Set<String> getUseFields() {
+        return useFields;
+    }
+    
+    protected void findDefUseFields(Set<JMethod> visited) {
+        findDefUseFields(visited, false);
+        
+    }
+    protected void findDefUseFields(Set<JMethod> visited, boolean recursivelyCollect) {
+        if (defFields == null) {
+            defFields = new HashSet<String>();
+            useFields = new HashSet<String>();
         }
         
-        for (JMethod method : getAccessedMethods()) {
-            if (method != null && !visitedMethods.contains(method) && method.checkSideEffects(count - 1, visitedMethods)) {
-                sideEffects = SideEffectStatus.YES;
-                return;
-            }
+        if (visited.size() > MaxNumberOfVisitedMethods) {
+            addDefField(UNKNOWN_FIELD_NAME);
+            addUseField(UNKNOWN_FIELD_NAME);
+            return;
         }
+        
+        findDefUseFieldsInThisMethod(visited, recursivelyCollect);
+        findDefUseFieldsInAccessedMethods(visited, recursivelyCollect);
     }
     
-    protected boolean equals(JMethod method) {
-        if (method == null) {
-            return false;
-        }
-        return this == method || getQualifiedName().equals(method.getQualifiedName());
+    protected void findDefUseFieldsInThisMethod(Set<JMethod> visited, boolean recursivelyCollect) {
     }
     
-    protected abstract JMethod[] findAccessedMethods();
-    
-    protected abstract JField[] findAccessedFields();
-    
-    protected abstract JMethod[] findOverridingMethods();
-    
-    protected abstract JMethod[] findOverriddenMethods();
+    protected void findDefUseFieldsInAccessedMethods(Set<JMethod> visited, boolean recursivelyCollect) {
+    }
     
     @Override
     public boolean equals(Object obj) {
@@ -190,6 +212,13 @@ abstract class JMethod extends JElement {
             return equals((JMethod)obj);
         }
         return false;
+    }
+    
+    protected boolean equals(JMethod method) {
+        if (method == null) {
+            return false;
+        }
+        return this == method || getQualifiedName().equals(method.getQualifiedName());
     }
     
     @Override
