@@ -75,6 +75,10 @@ public class CFGMethodCall extends CFGStatement {
         return jmethodCall.isVoidType();
     }
     
+    public boolean isConstructorCall() {
+        return jmethodCall.isConstructor();
+    }
+    
     public void addActualIn(CFGParameter node) {
         actualIns.add(node);
     }
