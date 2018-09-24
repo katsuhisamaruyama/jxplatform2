@@ -621,6 +621,11 @@ public class JavaClass extends JavaElement {
         return superInterfaces;
     }
     
+    public Set<JavaClass> getUsedClasses() {
+        collectInfo();
+        return usedClasses;
+    }
+    
     public List<JavaClass> getChildren() {
         collectInfo();
         List<JavaClass> jclasses = new ArrayList<JavaClass>(); 
