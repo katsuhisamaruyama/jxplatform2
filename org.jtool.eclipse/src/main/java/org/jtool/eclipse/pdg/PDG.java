@@ -132,7 +132,7 @@ public class PDG extends Graph<PDGNode, Dependence> {
         return buf.toString();
     }
     
-    public String getCDG() {
+    public String printCDG() {
         StringBuilder buf = new StringBuilder();
         buf.append("----- CDG (from here) -----\n");
         buf.append("Name = " + getName());
@@ -143,7 +143,7 @@ public class PDG extends Graph<PDGNode, Dependence> {
         return buf.toString();
     }
     
-    public String getDDG() {
+    public String printDDG() {
         StringBuilder buf = new StringBuilder();
         buf.append("----- DDG (from here) -----\n");
         buf.append("Name = " + getName());

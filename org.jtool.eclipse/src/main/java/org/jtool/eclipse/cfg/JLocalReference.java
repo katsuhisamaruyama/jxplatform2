@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 public class JLocalReference extends JReference {
     
     private boolean isParameter;
+    private int variableId;
     
     public JLocalReference(ASTNode node, IVariableBinding vbinding) {
         super(node);
@@ -35,6 +36,7 @@ public class JLocalReference extends JReference {
         modifiers = binding.getModifiers();
         inProject = true;
         isParameter = binding.isParameter();
+        variableId = binding.getVariableId();
     }
     
     @Override
@@ -44,6 +46,10 @@ public class JLocalReference extends JReference {
     
     public boolean isParameter() {
         return isParameter;
+    }
+    
+    public int getVariableId() {
+        return variableId;
     }
     
     @Override
