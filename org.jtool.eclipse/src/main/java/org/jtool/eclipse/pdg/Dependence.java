@@ -74,6 +74,14 @@ public class Dependence extends GraphEdge {
                kind == Kind.summary;
     }
     
+    public boolean isClassMember() {
+        return kind == Kind.classMember;
+    }
+    
+    public boolean isCall() {
+        return kind == Kind.call;
+    }
+    
     @Override
     public PDGNode getSrcNode() {
         return (PDGNode)src;
