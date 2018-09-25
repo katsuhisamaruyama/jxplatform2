@@ -286,18 +286,6 @@ public class ModelBuilderPlugin extends ModelBuilder {
         return compilationUnits;
     }
     
-    @SuppressWarnings("deprecation")
-    private ASTParser getParser() {
-        ASTParser parser = ASTParser.newParser(AST.JLS8);
-        Map<String, String> options = JavaCore.getOptions();
-        options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_8);
-        options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_1_8);
-        options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_8);
-        options.put(JavaCore.COMPILER_DOC_COMMENT_SUPPORT, JavaCore.ENABLED);
-        parser.setCompilerOptions(options);
-        return parser;
-    }
-    
     private boolean buildJavaModel(final Set<ICompilationUnit> cunits, JavaProject jproject) {
         try {
             final ASTParser parser = getParser();
@@ -360,19 +348,6 @@ public class ModelBuilderPlugin extends ModelBuilder {
                 jproject.addFile(jfile);
             }
         }
-    }
-    
-    private Set<IProblem> getParseErrors(CompilationUnit cu) {
-        Set<IProblem> errors = new HashSet<IProblem>();
-        IProblem[] problems = cu.getProblems();
-        if (problems.length > 0) {
-            for (IProblem problem : problems) {
-                if (problem.isError()) {
-                    errors.add(problem);
-                }
-            }
-        }
-        return errors;
     }
     
     public String getSource(ICompilationUnit icu) {

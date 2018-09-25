@@ -119,7 +119,6 @@ public class ModelBuilderBatch extends ModelBuilder {
         return build(currentProject.getName(), currentProject.getPath(), currentProject.getClassPath());
     }
     
-    
     private void run() {
         List<File> sourceFiles = collectAllJavaFiles(currentProject.getPath());
         if (sourceFiles.size() > 0) {
