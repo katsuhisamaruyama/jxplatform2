@@ -9,6 +9,7 @@ package org.jtool.eclipse.cfg.builder;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGMethodCall;
+import org.jtool.eclipse.cfg.CFGParameter;
 import org.jtool.eclipse.cfg.JFieldReference;
 import org.jtool.eclipse.cfg.JReference;
 import java.util.List;
@@ -46,6 +47,10 @@ class PrimaryCompactor {
                         String type = callNode.getDeclaringClassName();
                         JReference var = new JFieldReference(primary.getASTNode(), type, ExternalFieldAccess, type, false, false);
                         callNode.addDefVariable(var);
+                        
+                        for (CFGParameter param : callNode.getActualOuts()) {
+                            param.addDefVariable(primary);
+                        }
                     }
                 }
             }
