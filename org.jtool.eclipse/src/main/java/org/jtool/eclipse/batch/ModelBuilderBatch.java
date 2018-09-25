@@ -16,8 +16,6 @@ import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import org.jtool.eclipse.util.ConsoleProgressMonitor;
 import org.jtool.eclipse.util.DetectCharset;
 import org.jtool.eclipse.util.Logger;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.FileASTRequestor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -172,6 +170,7 @@ public class ModelBuilderBatch extends ModelBuilder {
         
         Logger.getInstance().printMessage("** Ready to parse " + size + " files");
         ASTParser parser = getParser();
+        parser.setEnvironment(currentProject.getClassPath(), null, null, true);
         parser.createASTs(paths, encodings, new String[]{ }, requestor, null);
         pm.done();
     }
@@ -190,23 +189,6 @@ public class ModelBuilderBatch extends ModelBuilder {
             Logger.getInstance().printLog("-Built " + jclass.getQualifiedName() + " (" + count + "/" + size + ")");
         }
         pm.done();
-    }
-    
-    @SuppressWarnings("deprecation")
-    private ASTParser getParser() {
-        ASTParser parser = ASTParser.newParser(AST.JLS8);
-        Map<String, String> options = JavaCore.getOptions();
-        options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_8);
-        options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_1_8);
-        options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_8);
-        options.put(JavaCore.COMPILER_DOC_COMMENT_SUPPORT, JavaCore.ENABLED);
-        parser.setCompilerOptions(options);
-        parser.setKind(ASTParser.K_COMPILATION_UNIT);
-        parser.setResolveBindings(true);
-        parser.setStatementsRecovery(true);
-        parser.setBindingsRecovery(true);
-        parser.setEnvironment(currentProject.getClassPath(), null, null, true);
-        return parser;
     }
     
     private static List<File> collectAllJavaFiles(String path) {

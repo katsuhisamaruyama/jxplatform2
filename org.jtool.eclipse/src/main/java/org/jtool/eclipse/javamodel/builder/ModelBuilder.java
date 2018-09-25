@@ -27,6 +27,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.io.File;
 
 /**
  * An interface for building a Java model.
@@ -80,11 +81,11 @@ public abstract class ModelBuilder {
     
     public JavaFile getUnregisteredJavaFile(String path, String code, JavaProject jproject) {
         ASTParser parser = getParser();
-        parser.setKind(ASTParser.K_COMPILATION_UNIT);
-        parser.setResolveBindings(true);
-        parser.setStatementsRecovery(true);
-        parser.setBindingsRecovery(true);
         
+        int index = path.lastIndexOf(File.separatorChar);
+        if (index != -1) {
+            path = path.substring(index + 1);
+        }
         parser.setUnitName(path);
         String[] encodings = new String[]{ JavaCore.getEncoding() };
         parser.setEnvironment(jproject.getClassPath(), jproject.getSourcePath(), encodings, true);
@@ -114,6 +115,11 @@ public abstract class ModelBuilder {
         options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_8);
         options.put(JavaCore.COMPILER_DOC_COMMENT_SUPPORT, JavaCore.ENABLED);
         parser.setCompilerOptions(options);
+        
+        parser.setKind(ASTParser.K_COMPILATION_UNIT);
+        parser.setResolveBindings(true);
+        parser.setStatementsRecovery(true);
+        parser.setBindingsRecovery(true);
         return parser;
     }
     
@@ -123,6 +129,7 @@ public abstract class ModelBuilder {
         if (problems.length > 0) {
             for (IProblem problem : problems) {
                 if (problem.isError()) {
+                    System.err.println("Error: " + problem.getMessage());
                     errors.add(problem);
                 }
             }
