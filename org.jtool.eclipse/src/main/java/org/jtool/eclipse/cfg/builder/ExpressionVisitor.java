@@ -339,6 +339,8 @@ public class ExpressionVisitor extends ASTVisitor {
     }
     
     private void checkPrimary(Expression primary, CFGMethodCall callNode, JMethodReference jcall) {
+        callNode.addUseVariables(curNode.getUseVariables());
+        
         JReference ref = null;
         if (curNode.getUseVariables().size() == 1) {
             ref = curNode.getUseVariables().get(0);
