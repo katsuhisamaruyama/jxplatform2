@@ -104,6 +104,10 @@ public abstract class JReference {
         return false;
     }
     
+    public boolean isVariableAccess() {
+        return isFieldAccess() || isLocalAccess();
+    }
+    
     public boolean isApparentAccess() {
         return false;
     }
