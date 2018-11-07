@@ -60,7 +60,7 @@ compileJava {
 
 shadowJar {
     manifest {
-        attributes('Main-Class' : 'org.jtool.eclipse.standalone.JavaModelBuilder')
+        attributes('Main-Class' : 'org.jtool.eclipse.batch.JavaModelBuilder')
         exclude '**/plugin/*'
     }
 }
