@@ -13,11 +13,12 @@ import org.jtool.eclipse.pdg.Dependence;
 import org.jtool.eclipse.pdg.PDGStatement;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
+import org.jtool.eclipse.cfg.CFGMethodCall;
 import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.cfg.StopConditionOnReachablePath;
 import org.jtool.eclipse.cfg.CFGStatement;
+import org.jtool.eclipse.cfg.JMethodReference;
 import org.jtool.eclipse.graph.GraphNode;
-import org.eclipse.jdt.core.dom.ASTNode;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -28,39 +29,30 @@ import java.util.HashSet;
  */
 public class Slice {
     
-    private PDG pdg;
     private CFG cfg;
-    private PDGNode criterionNode;
-    private Set<JReference> criterionVariables;
+    private SliceCriterion criterion;
     
-    private Set<PDGNode> nodesInSlice;
+    private Set<PDGNode> nodesInSlice = new HashSet<PDGNode>();
     
-    public Slice(PDG pdg, PDGNode node, JReference jv) {
-        this.pdg = pdg;
+    public Slice(PDG pdg, SliceCriterion criterion) {
         this.cfg = pdg.getCFG();
-        criterionNode = node;
-        criterionVariables = new HashSet<JReference>();
-        criterionVariables.add(jv);
+        this.criterion = criterion;
         
-        extract(node, jv);
-    }
-    
-    public Slice(PDG pdg, PDGNode node, Set<JReference> jvs) {
-        this.pdg = pdg;
-        criterionNode = node;
-        criterionVariables = jvs;
-        
-        for (JReference jv : jvs) {
-            extract(node, jv);
+        for (JReference var : criterion.getnVariables()) {
+            extract(criterion.getNode(), var);
         }
     }
     
     public PDGNode getCriterionNode() {
-        return criterionNode;
+        return criterion.getNode();
     }
     
     public Set<JReference> getCriterionVariables() {
-        return criterionVariables;
+        return criterion.getnVariables();
+    }
+    
+    public Set<PDGNode> getNodes() {
+        return nodesInSlice;
     }
     
     private void extract(PDGNode node, JReference jv) {
@@ -97,8 +89,31 @@ public class Slice {
         nodesInSlice.add(node);
         
         for (Dependence edge : node.getIncomingDependeceEdges()) {
-            PDGNode next = edge.getSrcNode();
-            traverseBackward(next);
+            if (edge.isCD() || edge.isDD2()) {
+                
+                PDGNode src = edge.getSrcNode();
+                traverseBackward(src);
+                
+                if (edge.isCall()) {
+                    CFGMethodCall call = (CFGMethodCall)src.getCFGNode();
+                    JReference var = getVariableReference(call.getPrimary());
+                    if (var != null) {
+                        extract(src, var);
+                    }
+                }
+            }
+        }
+    }
+    
+    private JReference getVariableReference(JReference ref) {
+        while (ref != null && ref.isMethodCall()) {
+            JMethodReference inv = (JMethodReference)ref;
+            ref = inv.getPrimary();
+        }
+        if (ref != null && ref.isVariableAccess()) {
+            return ref;
+        } else {
+            return null;
         }
     }
     
@@ -129,19 +144,11 @@ public class Slice {
         return pdgnodes;
     }
     
-    public ASTNode getSliceOnAST() {
-        CFG cfg = pdg.getCFG();
-        StatementExtractor extractor = new StatementExtractor(nodesInSlice);
-        ASTNode methodDeclNode = cfg.getStartNode().getASTNode();
-        methodDeclNode.accept(extractor);
-        return methodDeclNode;
-    }
-    
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("----- Slice (from here) -----\n");
-        buf.append("Node = " + criterionNode.getId() + "; Variable = " + getVariableNames(criterionVariables));
+        buf.append("Node = " + getCriterionNode().getId() + "; Variable = " + getVariableNames(getCriterionVariables()));
         buf.append("\n");
         buf.append(getNodeInfo());
         buf.append("----- Slice (to here) -----\n");

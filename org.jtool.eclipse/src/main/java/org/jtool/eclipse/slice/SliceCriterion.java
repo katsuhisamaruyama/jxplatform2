@@ -6,30 +6,30 @@
 
 package org.jtool.eclipse.slice;
 
-import org.jtool.eclipse.pdg.PDG;
 import org.jtool.eclipse.pdg.PDGNode;
 import org.jtool.eclipse.cfg.JReference;
 import java.util.Set;
+import java.util.HashSet;
 
 /**
- * An object that represents slicing criterion.
+ * An object that represents a slicing criterion.
  * 
  * @author Katsuhisa Maruyama
  */
 public class SliceCriterion {
     
-    private PDG pdg;
     private PDGNode node;
-    private Set<JReference> variables;
+    private Set<JReference> variables = new HashSet<JReference>();
     
-    public SliceCriterion(PDG pdg, PDGNode node, Set<JReference> vars) {
-        this.pdg = pdg;
+    public SliceCriterion(PDGNode node, Set<JReference> vars) {
         this.node = node;
+        for (JReference var : vars) {
+            if (var.isVariableAccess()) {
+                variables.add(var);
+            }
+        }
+        
         this.variables = vars;
-    }
-    
-    public PDG getPDG() {
-        return pdg;
     }
     
     public PDGNode getNode() {
@@ -45,7 +45,7 @@ public class SliceCriterion {
         StringBuilder buf = new StringBuilder();
         buf.append("Node = " + node.getId());
         buf.append(";");
-        buf.append("Variable = " + getVariableNames(variables));
+        buf.append(" Variable =" + getVariableNames(variables));
         buf.append("\n");
         return buf.toString();
     }
