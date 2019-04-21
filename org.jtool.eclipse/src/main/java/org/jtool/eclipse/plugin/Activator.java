@@ -27,10 +27,6 @@ public class Activator extends AbstractUIPlugin implements IStartup {
     public Activator() {
     }
     
-    public static Activator getDefault() {
-        return plugin;
-    }
-    
     @Override
     public void earlyStartup() {
     }
