@@ -6,6 +6,8 @@
 
 package org.jtool.eclipse.test;
 
+import java.io.File;
+
 import org.jtool.eclipse.batch.ModelBuilderBatch;
 import org.junit.Test;
 
@@ -17,27 +19,12 @@ import org.junit.Test;
  */
 public class JavaModelBuilderTest {
     
-    private final String TEST_PROECT_DIR = "/Users/maru/Desktop/TestSamples/";
+    
     
     @Test
     public void testSimple() {
-        String target = TEST_PROECT_DIR + "Simple/";
-        ModelBuilderBatch builder = new ModelBuilderBatch();
-        builder.build(target, target, target);
-        builder.unbuild();
-    }
-    
-    @Test
-    public void testJrb() {
-        String target = TEST_PROECT_DIR + "jrb-1.0.2/";
-        ModelBuilderBatch builder = new ModelBuilderBatch();
-        builder.build(target, target, target);
-        builder.unbuild();
-    }
-    
-    @Test
-    public void testTetris() {
-        String target = TEST_PROECT_DIR + "Tetris/";
+        String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
+        String target = dir + "Simple/";
         ModelBuilderBatch builder = new ModelBuilderBatch();
         builder.build(target, target, target);
         builder.unbuild();
@@ -45,7 +32,8 @@ public class JavaModelBuilderTest {
     
     @Test
     public void testDrawTool() {
-        String target = TEST_PROECT_DIR + "DrawTool/";
+        String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
+        String target = dir + "DrawTool/";
         ModelBuilderBatch builder = new ModelBuilderBatch();
         builder.build(target, target, target);
         builder.unbuild();
@@ -53,7 +41,26 @@ public class JavaModelBuilderTest {
     
     @Test
     public void testLambda() {
-        String target = TEST_PROECT_DIR + "Lambda/";
+        String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
+        String target = dir + "Lambda/";
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, target);
+        builder.unbuild();
+    }
+    
+    @Test
+    public void testJrb() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "jrb-1.0.2/";
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, target);
+        builder.unbuild();
+    }
+    
+    @Test
+    public void testTetris() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "Tetris/";
         ModelBuilderBatch builder = new ModelBuilderBatch();
         builder.build(target, target, target);
         builder.unbuild();
@@ -61,8 +68,9 @@ public class JavaModelBuilderTest {
     
     @Test
     public void testCSSample() {
-        String target = TEST_PROECT_DIR + "CS-Sample/";
-        String classpath = TEST_PROECT_DIR + "CS-Sample/lib/*";
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "CS-Sample/";
+        String classpath = dir + "CS-Sample/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch();
         builder.build(target, target, classpath);
         builder.unbuild();
@@ -70,8 +78,9 @@ public class JavaModelBuilderTest {
     
     @Test
     public void testFindbugs() {
-        String target = TEST_PROECT_DIR + "findbugs/";
-        String classpath = TEST_PROECT_DIR + "findbugs/lib/*";
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "findbugs/";
+        String classpath = dir + "findbugs/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch();
         builder.build(target, target, classpath);
         builder.unbuild();
@@ -79,16 +88,18 @@ public class JavaModelBuilderTest {
     
     @Test
     public void testApacheAnt() {
-        String target = TEST_PROECT_DIR + "apache-ant/";
-        String classpath = TEST_PROECT_DIR + "apache-ant/lib/*";
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "apache-ant/";
+        String classpath = dir + "apache-ant/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch();
         builder.build(target, target, classpath);
         builder.unbuild();
     }
     
     public void notestJdk8() {
-        String target = TEST_PROECT_DIR + "jdk1.8.0_131/";
-        String classpath = TEST_PROECT_DIR + "jdk1.8.0_131/lib/*";
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "jdk1.8.0_131/";
+        String classpath = dir + "jdk1.8.0_131/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch();
         builder.build(target, target, classpath);
         builder.unbuild();
@@ -96,11 +107,15 @@ public class JavaModelBuilderTest {
     
     public static void main(String[] args) {
         JavaModelBuilderTest tester = new JavaModelBuilderTest();
+        
+        String internalDir= new File(".").getAbsoluteFile().getParent() + "/test_target/";
+        System.out.println(internalDir);
         tester.testSimple();
-        tester.testJrb();
-        tester.testTetris();
         tester.testDrawTool();
         tester.testLambda();
+        
+        tester.testJrb();
+        tester.testTetris();
         tester.testCSSample();
         tester.testFindbugs();
         tester.testApacheAnt();
