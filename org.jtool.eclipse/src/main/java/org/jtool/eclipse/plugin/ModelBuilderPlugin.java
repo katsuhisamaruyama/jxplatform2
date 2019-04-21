@@ -287,7 +287,7 @@ public class ModelBuilderPlugin extends ModelBuilder {
     private boolean buildJavaModel(final Set<ICompilationUnit> cunits, JavaProject jproject) {
         try {
             final ASTParser parser = getParser();
-            IWorkbenchWindow workbenchWindow = Activator.getDefault().getWorkbenchWindow();
+            IWorkbenchWindow workbenchWindow = Activator.getPlugin().getWorkbenchWindow();
             workbenchWindow.run(true, true, new IRunnableWithProgress() {
                 
                 @Override
@@ -368,7 +368,7 @@ public class ModelBuilderPlugin extends ModelBuilder {
     @Override
     public void resisterBytecodeClasses(BytecodeClassStore bytecodeClassStore) {
         try {
-            IWorkbenchWindow workbenchWindow = Activator.getDefault().getWorkbenchWindow();
+            IWorkbenchWindow workbenchWindow = Activator.getPlugin().getWorkbenchWindow();
             workbenchWindow.run(true, true, new IRunnableWithProgress() {
                 
                 @Override
