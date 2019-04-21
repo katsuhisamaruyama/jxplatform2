@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -37,17 +37,17 @@ import java.io.File;
 public abstract class ModelBuilder {
     
     protected JavaProject currentProject;
-    
-    protected boolean analyzingBytecode;
     protected CFGStore cfgStore;
     protected PDGStore pdgStore;
+    
+    protected boolean analyzingBytecode;
     
     public abstract boolean isUnderPlugin();
     
     protected ModelBuilder(boolean analyzingBytecode) {
-        this.analyzingBytecode = analyzingBytecode;
         cfgStore = new CFGStore();
         pdgStore = new PDGStore(cfgStore);
+        this.analyzingBytecode = analyzingBytecode;
     }
     
     public JavaProject getCurrentProject() {
@@ -60,6 +60,14 @@ public abstract class ModelBuilder {
     
     public PDGStore getPDGStore() {
         return pdgStore;
+    }
+    
+    public void setAnalyzingBytecode(boolean analyzingBytecode) {
+        this.analyzingBytecode = analyzingBytecode;
+    }
+    
+    public boolean isAnalyzingBytecode() {
+        return analyzingBytecode;
     }
     
     public void setCreatingActualNodes(boolean creatingActualNodes) {

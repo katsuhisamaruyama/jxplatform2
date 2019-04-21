@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -24,8 +24,6 @@ public class Activator extends AbstractUIPlugin implements IStartup {
     
     private static Activator plugin;
     
-    private ModelBuilderPlugin modelBuilder;
-    
     public Activator() {
     }
     
@@ -41,16 +39,15 @@ public class Activator extends AbstractUIPlugin implements IStartup {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         plugin = this;
-        modelBuilder = new ModelBuilderPlugin(true);
-        modelBuilder.start();
     }
     
     @Override
     public void stop(BundleContext context) throws Exception {
-        modelBuilder.stop();
-        modelBuilder.unbuild();
-        plugin = null;
         super.stop(context);
+    }
+    
+    public static Activator getPlugin() {
+        return plugin;
     }
     
     public IWorkbenchWindow getWorkbenchWindow() {
