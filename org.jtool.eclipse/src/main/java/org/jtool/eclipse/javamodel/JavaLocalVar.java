@@ -16,19 +16,19 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
  * 
  * @author Katsuhisa Maruyama
  */
-public class JavaLocal extends JavaVariable {
+public class JavaLocalVar extends JavaVariable {
     
     protected IVariableBinding binding;
     protected long variableId;
     
-    protected JavaLocal() {
+    protected JavaLocalVar() {
     }
     
-    public JavaLocal(VariableDeclaration node, JavaMethod jmethod) {
+    public JavaLocalVar(VariableDeclaration node, JavaMethod jmethod) {
         this(node, node.resolveBinding().getVariableDeclaration(), jmethod);
     }
     
-    protected JavaLocal(ASTNode node, IVariableBinding vbinding, JavaMethod jmethod) {
+    protected JavaLocalVar(ASTNode node, IVariableBinding vbinding, JavaMethod jmethod) {
         super(node, jmethod.getFile());
         
         if (vbinding != null) {
@@ -50,7 +50,7 @@ public class JavaLocal extends JavaVariable {
         }
     }
     
-    protected JavaLocal(ITypeBinding tbinding, JavaMethod jmethod) {
+    protected JavaLocalVar(ITypeBinding tbinding, JavaMethod jmethod) {
         super(null, jmethod.getFile());
         
         tbinding = tbinding.getTypeDeclaration();
@@ -66,7 +66,7 @@ public class JavaLocal extends JavaVariable {
         declaringMethod = jmethod;
     }
     
-    public JavaLocal(JavaMethod jmethod, String name) {
+    public JavaLocalVar(JavaMethod jmethod, String name) {
         super(null, jmethod.getFile());
         
         declaringClass = jmethod.getDeclaringClass();
@@ -94,13 +94,13 @@ public class JavaLocal extends JavaVariable {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof JavaLocal) {
-            return equals((JavaLocal)obj);
+        if (obj instanceof JavaLocalVar) {
+            return equals((JavaLocalVar)obj);
         }
         return false;
     }
     
-    public boolean equals(JavaLocal jlocal) {
+    public boolean equals(JavaLocalVar jlocal) {
         if (jlocal == null || declaringMethod == null) {
             return false;
         }

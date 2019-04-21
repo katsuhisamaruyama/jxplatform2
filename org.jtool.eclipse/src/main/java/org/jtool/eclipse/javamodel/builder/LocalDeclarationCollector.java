@@ -6,8 +6,8 @@
 
 package org.jtool.eclipse.javamodel.builder;
 
-import org.jtool.eclipse.javamodel.JavaLocal;
 import org.jtool.eclipse.javamodel.JavaMethod;
+import org.jtool.eclipse.javamodel.JavaLocalVar;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
@@ -41,14 +41,14 @@ import java.util.HashSet;
 public class LocalDeclarationCollector extends ASTVisitor {
     
     private JavaMethod jmethod;
-    private Set<JavaLocal> localDeclarations = new HashSet<JavaLocal>();
+    private Set<JavaLocalVar> localDeclarations = new HashSet<JavaLocalVar>();
     private boolean bindingOk = true;
     
     public LocalDeclarationCollector(JavaMethod jmethod) {
         this.jmethod = jmethod;
     }
     
-    public Set<JavaLocal> getLocalDeclarations() {
+    public Set<JavaLocalVar> getLocalDeclarations() {
         return localDeclarations;
     }
     
@@ -70,7 +70,7 @@ public class LocalDeclarationCollector extends ASTVisitor {
     
     private void addVariableDeclaration(VariableDeclaration node) {
         if (isLocal(node.getName())) {
-            JavaLocal jlocal = new JavaLocal(node, jmethod);
+            JavaLocalVar jlocal = new JavaLocalVar(node, jmethod);
             localDeclarations.add(jlocal);
         }
     }

@@ -14,12 +14,12 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
  * 
  * @author Katsuhisa Maruyama
  */
-public class JLocalReference extends JReference {
+public class JLocalVarReference extends JReference {
     
     private boolean isParameter;
     private int variableId;
     
-    public JLocalReference(ASTNode node, IVariableBinding vbinding) {
+    public JLocalVarReference(ASTNode node, IVariableBinding vbinding) {
         super(node);
         
         IVariableBinding binding = vbinding.getVariableDeclaration();

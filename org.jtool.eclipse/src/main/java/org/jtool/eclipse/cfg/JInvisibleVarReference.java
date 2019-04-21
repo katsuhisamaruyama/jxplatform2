@@ -16,9 +16,9 @@ import org.eclipse.jdt.core.dom.Modifier;
  * 
  * @author Katsuhisa Maruyama
  */
-public class JVirtualReference extends JReference {
+public class JInvisibleVarReference extends JReference {
     
-    public JVirtualReference(ASTNode node, String name, IVariableBinding vbinding) {
+    public JInvisibleVarReference(ASTNode node, String name, IVariableBinding vbinding) {
         super(node);
         
         setProperties(node);
@@ -29,7 +29,7 @@ public class JVirtualReference extends JReference {
         modifiers = binding.getModifiers();
     }
     
-    public JVirtualReference(ASTNode node, String name, ITypeBinding tbinding) {
+    public JInvisibleVarReference(ASTNode node, String name, ITypeBinding tbinding) {
         super(node);
         
         this.name = name;
@@ -41,7 +41,7 @@ public class JVirtualReference extends JReference {
         setProperties(node);
     }
     
-    public JVirtualReference(ASTNode node, String name, String type, boolean primitive) {
+    public JInvisibleVarReference(ASTNode node, String name, String type, boolean primitive) {
         super(node);
         
         this.name = name;
@@ -51,7 +51,7 @@ public class JVirtualReference extends JReference {
         setProperties(node);
     }
     
-    public JVirtualReference(ASTNode node, String name, boolean primitive) {
+    public JInvisibleVarReference(ASTNode node, String name, boolean primitive) {
         super(node);
         
         ITypeBinding binding = findEnclosingClass(node).getTypeDeclaration();

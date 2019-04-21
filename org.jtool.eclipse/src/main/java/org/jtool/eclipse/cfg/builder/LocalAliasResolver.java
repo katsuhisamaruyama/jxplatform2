@@ -11,7 +11,7 @@ import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JReference;
-import org.jtool.eclipse.cfg.JLocalReference;
+import org.jtool.eclipse.cfg.JLocalVarReference;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -55,7 +55,7 @@ class LocalAliasResolver {
             return null;
         }
         
-        return new Alias((JLocalReference)def, use);
+        return new Alias((JLocalVarReference)def, use);
     }
     
     private static void walkForward(CFGNode node, Alias alias) {
@@ -96,10 +96,10 @@ class LocalAliasResolver {
 
 class Alias {
     
-    JLocalReference newName;
+    JLocalVarReference newName;
     JReference origName;
     
-    Alias(JLocalReference newName, JReference origName) {
+    Alias(JLocalVarReference newName, JReference origName) {
         this.newName = newName;
         this.origName = origName;
     }

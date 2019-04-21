@@ -50,9 +50,9 @@ public class JavaMethod extends JavaElement {
     
     protected JavaClass declaringClass = null;
     
-    protected List<JavaLocal> parameters = new ArrayList<JavaLocal>();
-    protected List<JavaLocal> localDecls = new ArrayList<JavaLocal>();
-    protected JavaLocal returnVariable = null;
+    protected List<JavaLocalVar> parameters = new ArrayList<JavaLocalVar>();
+    protected List<JavaLocalVar> localDecls = new ArrayList<JavaLocalVar>();
+    protected JavaLocalVar returnVariable = null;
     
     protected JavaMethod() {
     }
@@ -82,7 +82,7 @@ public class JavaMethod extends JavaElement {
             collectLocalVariables(node.getBody());
             collectLambdas(node.getBody());
             if (!isVoid(returnType)) {
-                returnVariable = new JavaLocal(this, "$" + name);
+                returnVariable = new JavaLocalVar(this, "$" + name);
             } else {
                 returnVariable = null;
             }
@@ -134,7 +134,7 @@ public class JavaMethod extends JavaElement {
             collectLocalVariables(node.getBody());
             collectLambdas(node.getBody());
             if (!isVoid(returnType)) {
-                returnVariable = new JavaLocal(this, "$" + name);
+                returnVariable = new JavaLocalVar(this, "$" + name);
             } else {
                 returnVariable = null;
             }
@@ -208,14 +208,14 @@ public class JavaMethod extends JavaElement {
     
     protected void collectParameters(List<VariableDeclaration> params) {
         for (VariableDeclaration decl : params) {
-            JavaLocal param = new JavaLocal(decl, this);
+            JavaLocalVar param = new JavaLocalVar(decl, this);
             parameters.add(param);
         }
     }
     
     protected void collectParameters(ITypeBinding[] types) {
         for (ITypeBinding tbinding : types) {
-            JavaLocal param = new JavaLocal(tbinding, this);
+            JavaLocalVar param = new JavaLocalVar(tbinding, this);
             parameters.add(param);
         }
     }
@@ -281,7 +281,7 @@ public class JavaMethod extends JavaElement {
         return JavaElement.isVoid(returnType);
     }
     
-    public List<JavaLocal> getLocalVariables() {
+    public List<JavaLocalVar> getLocalVariables() {
         return localDecls;
     }
     
@@ -293,7 +293,7 @@ public class JavaMethod extends JavaElement {
         return kind;
     }
     
-    public List<JavaLocal> getParameters() {
+    public List<JavaLocalVar> getParameters() {
         return parameters;
     }
     
@@ -301,14 +301,14 @@ public class JavaMethod extends JavaElement {
         return parameters.size();
     }
     
-    public JavaLocal getParameter(int index) {
+    public JavaLocalVar getParameter(int index) {
         if (index >= 0 && index < parameters.size()) {
             return parameters.get(index);
         }
         return null;
     }
     
-    public JavaLocal getParameter(String name) {
+    public JavaLocalVar getParameter(String name) {
         int index = getParameterOrdinal(name);
         if (index != -1) {
             return getParameter(index);
@@ -318,7 +318,7 @@ public class JavaMethod extends JavaElement {
     
     public int getParameterOrdinal(String name) {
         for (int ordinal = 0; ordinal < parameters.size(); ordinal++) {
-            JavaLocal param = getParameter(ordinal);
+            JavaLocalVar param = getParameter(ordinal);
             if (param.getName().equals(name)) {
                 return ordinal;
             }
@@ -326,12 +326,12 @@ public class JavaMethod extends JavaElement {
         return -1;
     }
     
-    public JavaLocal getReturnVariable() {
+    public JavaLocalVar getReturnVariable() {
         return returnVariable;
     }
     
-    public JavaLocal getLocal(String name, int id) {
-        for (JavaLocal jlocal : localDecls) {
+    public JavaLocalVar getLocal(String name, int id) {
+        for (JavaLocalVar jlocal : localDecls) {
             if (name.equals(jlocal.getName()) && id == jlocal.getVariableId()) {
                 return jlocal;
             }
@@ -425,7 +425,7 @@ public class JavaMethod extends JavaElement {
     
     public String getParameterInfo() {
         StringBuilder buf = new StringBuilder();
-        for (JavaLocal param : parameters) {
+        for (JavaLocalVar param : parameters) {
             buf.append("\n");
             buf.append(" PARAMETER : ");
             buf.append(param.getName());

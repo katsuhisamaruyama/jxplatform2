@@ -12,8 +12,8 @@ import org.jtool.eclipse.cfg.CFGMethodEntry;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGParameter;
 import org.jtool.eclipse.cfg.ControlFlow;
-import org.jtool.eclipse.cfg.JVirtualReference;
-import org.jtool.eclipse.cfg.JLocalReference;
+import org.jtool.eclipse.cfg.JInvisibleVarReference;
+import org.jtool.eclipse.cfg.JLocalVarReference;
 import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.graph.GraphEdge;
 import org.jtool.eclipse.javamodel.JavaMethod;
@@ -152,10 +152,10 @@ public class CFGMethodBuilder {
             entry.addFormalIn(formalInNode);
             cfg.add(formalInNode);
             
-            JReference jvout = new JLocalReference(param, param.resolveBinding());
+            JReference jvout = new JLocalVarReference(param, param.resolveBinding());
             formalInNode.setDefVariable(jvout);
             
-            JReference jvin = new JVirtualReference(param, "$" + String.valueOf(ExpressionVisitor.paramNumber), jvout.getType(), jvout.isPrimitiveType());
+            JReference jvin = new JInvisibleVarReference(param, "$" + String.valueOf(ExpressionVisitor.paramNumber), jvout.getType(), jvout.isPrimitiveType());
             formalInNode.setUseVariable(jvin);
             ExpressionVisitor.paramNumber++;
             
@@ -178,10 +178,10 @@ public class CFGMethodBuilder {
                 entry.addFormalOut(formalOutNode);
                 cfg.add(formalOutNode);
                 
-                JReference jvout = new JLocalReference(param, param.resolveBinding());
+                JReference jvout = new JLocalVarReference(param, param.resolveBinding());
                 formalOutNode.setUseVariable(jvout);
                 
-                JReference jvin = new JVirtualReference(param, "$" + String.valueOf(ExpressionVisitor.paramNumber), jvout.getType(), jvout.isPrimitiveType());
+                JReference jvin = new JInvisibleVarReference(param, "$" + String.valueOf(ExpressionVisitor.paramNumber), jvout.getType(), jvout.isPrimitiveType());
                 formalOutNode.setDefVariable(jvin);
                 ExpressionVisitor.paramNumber++;
                 
@@ -206,11 +206,11 @@ public class CFGMethodBuilder {
             String returnType = entry.getJavaMethod().getReturnType();
             boolean isPrimitiveType = entry.getJavaMethod().isPrimitiveReturnType();
             
-            JReference jvout = new JVirtualReference(node, "$" + String.valueOf(ExpressionVisitor.paramNumber), returnType, isPrimitiveType);
+            JReference jvout = new JInvisibleVarReference(node, "$" + String.valueOf(ExpressionVisitor.paramNumber), returnType, isPrimitiveType);
             formalOutNode.addDefVariable(jvout);
             ExpressionVisitor.paramNumber++;
             
-            JReference jvin = new JVirtualReference(node, "$_", returnType, isPrimitiveType);
+            JReference jvin = new JInvisibleVarReference(node, "$_", returnType, isPrimitiveType);
             formalOutNode.addUseVariable(jvin);
         }
         return formalOutNode;

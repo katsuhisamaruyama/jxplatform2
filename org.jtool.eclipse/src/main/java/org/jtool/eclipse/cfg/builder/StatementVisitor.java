@@ -13,9 +13,9 @@ import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGParameter;
 import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.ControlFlow;
-import org.jtool.eclipse.cfg.JVirtualReference;
-import org.jtool.eclipse.cfg.JLocalReference;
 import org.jtool.eclipse.cfg.JReference;
+import org.jtool.eclipse.cfg.JLocalVarReference;
+import org.jtool.eclipse.cfg.JInvisibleVarReference;
 import org.jtool.eclipse.graph.GraphEdge;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -591,7 +591,7 @@ public class StatementVisitor extends ASTVisitor {
             CFGMethodEntry methodNode = (CFGMethodEntry)cfg.getStartNode();
             String type = methodNode.getJavaMethod().getReturnType();
             boolean primitive = methodNode.getJavaMethod().isPrimitiveReturnType();
-            JReference jvar = new JVirtualReference(methodNode.getASTNode(), "$_", type, primitive);
+            JReference jvar = new JInvisibleVarReference(methodNode.getASTNode(), "$_", type, primitive);
             returnNode.addDefVariable(jvar);
             
             curNode = exprVisitor.getExitNode();
@@ -716,9 +716,9 @@ public class StatementVisitor extends ASTVisitor {
         reconnect(paramNode);
         
         IVariableBinding vbinding = node.getException().resolveBinding();
-        JReference jvar = new JLocalReference(node.getException(), vbinding);
+        JReference jvar = new JLocalVarReference(node.getException(), vbinding);
         paramNode.addDefVariable(jvar);
-        JReference jvin = new JVirtualReference(node.getException(), "$" + vbinding.getName(), vbinding);
+        JReference jvin = new JInvisibleVarReference(node.getException(), "$" + vbinding.getName(), vbinding);
         paramNode.addUseVariable(jvin);
         
         ControlFlow trueEdge = createFlow(paramNode, nextNode);

@@ -13,11 +13,11 @@ import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGParameter;
 import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.ControlFlow;
-import org.jtool.eclipse.cfg.JVirtualReference;
-import org.jtool.eclipse.cfg.JFieldReference;
-import org.jtool.eclipse.cfg.JLocalReference;
-import org.jtool.eclipse.cfg.JMethodReference;
 import org.jtool.eclipse.cfg.JReference;
+import org.jtool.eclipse.cfg.JMethodReference;
+import org.jtool.eclipse.cfg.JFieldReference;
+import org.jtool.eclipse.cfg.JLocalVarReference;
+import org.jtool.eclipse.cfg.JInvisibleVarReference;
 import org.jtool.eclipse.graph.GraphEdge;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -263,9 +263,9 @@ public class ExpressionVisitor extends ASTVisitor {
         Name name = node.getQualifier();
         JReference jvar;
         if (name != null) {
-            jvar = new JVirtualReference(node, "$this", name.resolveTypeBinding());
+            jvar = new JInvisibleVarReference(node, "$this", name.resolveTypeBinding());
         } else {
-            jvar = new JVirtualReference(node, "$this", false);
+            jvar = new JInvisibleVarReference(node, "$this", false);
         }
         curNode.addUseVariable(jvar);
         return false;
@@ -345,7 +345,7 @@ public class ExpressionVisitor extends ASTVisitor {
         if (curNode.getUseVariables().size() == 1) {
             ref = curNode.getUseVariables().get(0);
         } else if (curNode.getUseVariables().size() == 0 && jcall.isStatic()) {
-            ref = new JVirtualReference(primary, jcall.getDeclaringClassName(), jcall.getDeclaringClassName(), false);
+            ref = new JInvisibleVarReference(primary, jcall.getDeclaringClassName(), jcall.getDeclaringClassName(), false);
         }
         jcall.setPrimary(ref);
         if (ref == null) {
@@ -497,7 +497,7 @@ public class ExpressionVisitor extends ASTVisitor {
         
         String type = callNode.getMethodCall().getArgumentType(ordinal);
         boolean primitive = callNode.getMethodCall().getArgumentPrimitiveType(ordinal);
-        JReference actualIn = new JVirtualReference(node, "$" + String.valueOf(paramNumber), type, primitive);
+        JReference actualIn = new JInvisibleVarReference(node, "$" + String.valueOf(paramNumber), type, primitive);
         actualInNode.addDefVariable(actualIn);
         paramNumber++;
         
@@ -548,8 +548,8 @@ public class ExpressionVisitor extends ASTVisitor {
         
         String type = callNode.getReturnType();
         boolean primitive = callNode.isPrimitiveType();
-        JReference actualIn = new JVirtualReference(callNode.getASTNode(), "$" + String.valueOf(paramNumber), type, primitive);
-        JReference actualOut = new JVirtualReference(callNode.getASTNode(), "$" + String.valueOf(paramNumber), type, primitive);
+        JReference actualIn = new JInvisibleVarReference(callNode.getASTNode(), "$" + String.valueOf(paramNumber), type, primitive);
+        JReference actualOut = new JInvisibleVarReference(callNode.getASTNode(), "$" + String.valueOf(paramNumber), type, primitive);
         returnNode.addDefVariable(actualIn);
         returnNode.addUseVariable(actualOut);
         paramNumber++;
@@ -578,7 +578,7 @@ public class ExpressionVisitor extends ASTVisitor {
         }
         boolean primitive = callNode.isPrimitiveType();
         String name = "$" + String.valueOf(paramNumber);
-        JReference jvar = new JVirtualReference(callNode.getASTNode(), name, type, primitive);
+        JReference jvar = new JInvisibleVarReference(callNode.getASTNode(), name, type, primitive);
         
         callNode.addDefVariable(jvar);
         paramNumber++;
@@ -603,7 +603,7 @@ public class ExpressionVisitor extends ASTVisitor {
             if (vbinding.isField()) {
                 jvar = new JFieldReference(node, vbinding);
             } else {
-                jvar = new JLocalReference(node, vbinding);
+                jvar = new JLocalVarReference(node, vbinding);
             }
             if (analysisMode.peek() == AnalysisMode.DEF) {
                 curNode.addDefVariable(jvar);
