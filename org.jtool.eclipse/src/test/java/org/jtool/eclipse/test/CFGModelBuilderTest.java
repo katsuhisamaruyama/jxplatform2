@@ -17,7 +17,6 @@ import org.junit.Test;
 
 /**
  * Tests a class that builds a CFG.
- * Change the constant value of TEST_PROECT_DIR according to your environment.
  * 
  * @author Katsuhisa Maruyama
  */

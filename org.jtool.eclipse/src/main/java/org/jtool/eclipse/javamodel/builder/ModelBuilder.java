@@ -217,7 +217,7 @@ public abstract class ModelBuilder {
         return pdgStore.getSDG();
     }
     
-    public void setVisible(boolean visible) {
+    public void setLogVisible(boolean visible) {
         Logger.getInstance().setVisible(visible);
     }
     

@@ -13,13 +13,10 @@ import org.junit.Test;
 
 /**
  * Tests a class that builds a Java Model.
- * Change the constant value of TEST_PROECT_DIR according to your environment.
  * 
  * @author Katsuhisa Maruyama
  */
 public class JavaModelBuilderTest {
-    
-    
     
     @Test
     public void testSimple() {

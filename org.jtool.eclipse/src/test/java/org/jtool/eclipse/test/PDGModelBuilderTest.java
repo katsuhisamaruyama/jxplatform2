@@ -18,7 +18,6 @@ import org.junit.Test;
 
 /**
  * Tests a class that builds a PDG.
- * Please change the constant value of TEST_PROECT_DIR according to your environment.
  * 
  * @author Katsuhisa Maruyama
  */
