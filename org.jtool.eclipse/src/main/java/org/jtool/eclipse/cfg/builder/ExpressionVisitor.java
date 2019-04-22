@@ -328,7 +328,7 @@ public class ExpressionVisitor extends ASTVisitor {
         Expression primary = node.getExpression();
         if (primary != null) {
             CFGStatement tmpNode = curNode;
-            curNode = new CFGStatement(primary, CFGNode.Kind.dummy);
+            curNode = callNode;
             analysisMode.push(AnalysisMode.USE);
             primary.accept(this);
             analysisMode.pop();
