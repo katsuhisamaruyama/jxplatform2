@@ -74,8 +74,8 @@ public abstract class ModelBuilder {
         cfgStore.setCreatingActualNodes(creatingActualNodes);
     }
     
-    public void setIgnoringJumpEdge(boolean ignoringJumpEdge) {
-        pdgStore.setIgnoringJumpEdge(ignoringJumpEdge);
+    public void setContainingFallThroughEdge(boolean containingFallThroughEdge) {
+        pdgStore.setContainingFallThroughEdge(containingFallThroughEdge);
     }
     
     public void unbuild() {

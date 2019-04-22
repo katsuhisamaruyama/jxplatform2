@@ -42,10 +42,10 @@ import java.util.List;
  */
 public class PDGBuilder {
     
-    public static PDG buildPDG(CFG cfg, boolean ignoringJumpEdge) {
+    public static PDG buildPDG(CFG cfg, boolean containingFallThroughEdge) {
         PDG pdg = new PDG();
         createNodes(pdg, cfg);
-        CDFinder.find(pdg, cfg, ignoringJumpEdge);
+        CDFinder.find(pdg, cfg, containingFallThroughEdge);
         DDFinder.find(pdg, cfg);
         return pdg;
     }
@@ -78,14 +78,14 @@ public class PDGBuilder {
         return null;
     }
     
-    public static ClDG buildClDG(CCFG ccfg, boolean ignoringJumpEdge) {
+    public static ClDG buildClDG(CCFG ccfg, boolean containingFallThroughEdge) {
         ClDG cldg = new ClDG();
         PDGClassEntry entry = new PDGClassEntry(ccfg.getStartNode());
         cldg.setEntryNode(entry);
         cldg.add(entry);
         
         for (CFG cfg : ccfg.getCFGs()) {
-            PDG pdg = buildPDG(cfg, ignoringJumpEdge);
+            PDG pdg = buildPDG(cfg, containingFallThroughEdge);
             cldg.add(pdg);
             
             ClassMemberEdge edge = new ClassMemberEdge(entry, pdg.getEntryNode());

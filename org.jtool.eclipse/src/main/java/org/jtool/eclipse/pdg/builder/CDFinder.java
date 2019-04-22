@@ -25,27 +25,27 @@ import java.util.HashSet;
  */
 public class CDFinder {
     
-    public static void find(PDG pdg, CFG cfg, boolean ignoringJumpEdge) {
-        findCDs(pdg, cfg, ignoringJumpEdge);
+    public static void find(PDG pdg, CFG cfg, boolean containingFallThroughEdge) {
+        findCDs(pdg, cfg, containingFallThroughEdge);
         findCDsFromEntry(pdg, cfg);
         addCDsFromEntry(pdg);
     }
     
-    private static void findCDs(PDG pdg, CFG cfg, boolean ignoringJumpEdge) {
+    private static void findCDs(PDG pdg, CFG cfg, boolean containingFallThroughEdge) {
         for (CFGNode cfgnode : cfg.getNodes()) {
             if (cfgnode.isBranch()) {
-                findCDs(pdg, cfg, cfgnode, ignoringJumpEdge);
+                findCDs(pdg, cfg, cfgnode, containingFallThroughEdge);
             } else if (cfgnode.isMethodCall()) {
                 findCDsOnParameters(pdg, (CFGMethodCall)cfgnode);
             }
         }
     }
     
-    private static void findCDs(PDG pdg, CFG cfg, CFGNode branchNode, boolean ignoringJumpEdge) {
-        Set<CFGNode> postDominator = postDominator(cfg, branchNode, ignoringJumpEdge);
+    private static void findCDs(PDG pdg, CFG cfg, CFGNode branchNode, boolean containingFallThroughEdge) {
+        Set<CFGNode> postDominator = postDominator(cfg, branchNode, containingFallThroughEdge);
         for (ControlFlow branch : branchNode.getOutgoingFlows()) {
             CFGNode branchDstNode = branch.getDstNode();
-            Set<CFGNode> postDominatorForBranch = postDominator(cfg, branchDstNode, ignoringJumpEdge);
+            Set<CFGNode> postDominatorForBranch = postDominator(cfg, branchDstNode, containingFallThroughEdge);
             postDominatorForBranch.add(branchDstNode);
             
             for (CFGNode cfgnode : postDominatorForBranch) {
@@ -64,11 +64,11 @@ public class CDFinder {
         }
     }
     
-    public static Set<CFGNode> postDominator(CFG cfg, CFGNode anchor, boolean ignoringJumpEdge) {
+    public static Set<CFGNode> postDominator(CFG cfg, CFGNode anchor, boolean containingFallThroughEdge) {
         Set<CFGNode> postDominator = new HashSet<CFGNode>();
         for (CFGNode node : cfg.getNodes()) {
             if (!anchor.equals(node)) {
-                Set<CFGNode> track = forwardReachableNodes(anchor, node, ignoringJumpEdge);
+                Set<CFGNode> track = forwardReachableNodes(anchor, node, containingFallThroughEdge);
                 if (track.contains(node) && !track.contains(cfg.getEndNode())) {
                     postDominator.add(node);
                 }
@@ -77,24 +77,24 @@ public class CDFinder {
         return postDominator;
     }
     
-    private static Set<CFGNode> forwardReachableNodes(CFGNode anchor, CFGNode to, boolean ignoringJumpEdge) {
+    private static Set<CFGNode> forwardReachableNodes(CFGNode anchor, CFGNode to, boolean containingFallThroughEdge) {
         Set<CFGNode> track = new HashSet<CFGNode>();
-        walkForward(anchor, to, ignoringJumpEdge, track);
+        walkForward(anchor, to, containingFallThroughEdge, track);
         track.add(to);
         return track;
     }
     
-    private static void walkForward(CFGNode node, CFGNode to, boolean ignoringFallThrough, Set<CFGNode> track) {
+    private static void walkForward(CFGNode node, CFGNode to, boolean containingFallThroughEdge, Set<CFGNode> track) {
         if (node.equals(to)) {
             return;
         }
         track.add(node);
         
         for (ControlFlow flow : node.getOutgoingFlows()) {
-            if (!ignoringFallThrough || !flow.isJump()) {
+            if (containingFallThroughEdge || !flow.isJump()) {
                 CFGNode succ = flow.getDstNode();
                 if (!track.contains(succ)) {
-                    walkForward(succ, to, ignoringFallThrough, track);
+                    walkForward(succ, to, containingFallThroughEdge, track);
                 }
             }
         }

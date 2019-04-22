@@ -33,7 +33,7 @@ public class PDGStore {
     private CFGStore cfgStore;
     
     private Map<String, PDG> pdgMap = new HashMap<String, PDG>();
-    private boolean ignoringJumpEdge = false;
+    boolean containingFallThroughEdge = true;
     
     private SDG currentSDG;
     
@@ -46,12 +46,12 @@ public class PDGStore {
         cfgStore = null;
     }
     
-    public void setIgnoringJumpEdge(boolean ignoringJumpEdge) {
-        this.ignoringJumpEdge = ignoringJumpEdge;
+    public void setContainingFallThroughEdge(boolean containingFallThroughEdge) {
+        this.containingFallThroughEdge = containingFallThroughEdge;
     }
     
-    public boolean ignoringJumpEdge() {
-        return ignoringJumpEdge;
+    public boolean isContainingFallThroughEdge() {
+        return containingFallThroughEdge;
     }
     
     public int size() {
@@ -67,7 +67,7 @@ public class PDGStore {
     }
     
     public PDG getPDG(CFG cfg) {
-        PDG pdg = PDGBuilder.buildPDG(cfg, ignoringJumpEdge);
+        PDG pdg = PDGBuilder.buildPDG(cfg, containingFallThroughEdge);
         addPDG(pdg);
         if (cfgStore.creatingActualNodes()) {
             PDGBuilder.connectParametersConservatively(pdg);
@@ -121,7 +121,7 @@ public class PDGStore {
         }
         
         CCFG ccfg = CCFGBuilder.build(jclass, cfgStore.getJInfoStore());
-        ClDG cldg = PDGBuilder.buildClDG(ccfg, ignoringJumpEdge);
+        ClDG cldg = PDGBuilder.buildClDG(ccfg, containingFallThroughEdge);
         if (cfgStore.creatingActualNodes()) {
             PDGBuilder.connectParameters(cldg);
         }
@@ -195,7 +195,7 @@ public class PDGStore {
         SDG sdg = new SDG();
         for (JavaClass jclass : classes) {
             CCFG ccfg = CCFGBuilder.build(jclass, cfgStore.getJInfoStore());
-            ClDG cldg = PDGBuilder.buildClDG(ccfg, ignoringJumpEdge);
+            ClDG cldg = PDGBuilder.buildClDG(ccfg, containingFallThroughEdge);
             sdg.add(cldg);
         }
         return sdg;
