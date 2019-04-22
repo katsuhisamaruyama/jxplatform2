@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -11,6 +11,8 @@ import org.jtool.eclipse.pdg.PDG;
 import org.jtool.eclipse.pdg.ClDG;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaProject;
+
+import java.io.File;
 import java.util.List;
 import org.junit.Test;
 
@@ -22,7 +24,6 @@ import org.junit.Test;
  */
 public class PDGModelBuilderTest {
     
-    private final String TEST_PROECT_DIR = "/Users/maru/Desktop/TestSamples/";
     
     private ClDG[] buildPDGsForTest(ModelBuilderBatch builder, List<JavaClass> classes) {
         int size = classes.size();
@@ -54,7 +55,8 @@ public class PDGModelBuilderTest {
     
     @Test
     public void testSimple() {
-        String target = TEST_PROECT_DIR + "Simple/";
+        String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
+        String target = dir + "Simple/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, target);
         
@@ -64,30 +66,10 @@ public class PDGModelBuilderTest {
         builder.unbuild();
     }
     
-    public void notestJrb() {
-        String target = TEST_PROECT_DIR +  "jrb-1.0.2/src/";
-        ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, target);
-        
-        builder.setCreatingActualNodes(false);
-        buildPDGsForTest(builder, jproject.getClasses());
-        builder.unbuild();
-    }
-    
-    @Test
-    public void testTetris() {
-        String target = TEST_PROECT_DIR + "Tetris/src/";
-        ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, target);
-        
-        builder.setCreatingActualNodes(false);
-        buildPDGsForTest(builder, jproject.getClasses());
-        builder.unbuild();
-    }
-    
     @Test
     public void testDrawTool() {
-        String target = TEST_PROECT_DIR +  "DrawTool/src/";
+        String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
+        String target = dir +  "DrawTool/src/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, target);
         
@@ -98,7 +80,31 @@ public class PDGModelBuilderTest {
     
     @Test
     public void testLambda() {
-        String target = TEST_PROECT_DIR +  "Lambda/";
+        String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
+        String target = dir +  "Lambda/";
+        ModelBuilderBatch builder = new ModelBuilderBatch(false);
+        JavaProject jproject = builder.build(target, target, target);
+        
+        builder.setCreatingActualNodes(false);
+        buildPDGsForTest(builder, jproject.getClasses());
+        builder.unbuild();
+    }
+    
+    public void testJrb() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir +  "jrb-1.0.2/src/";
+        ModelBuilderBatch builder = new ModelBuilderBatch(false);
+        JavaProject jproject = builder.build(target, target, target);
+        
+        builder.setCreatingActualNodes(false);
+        buildPDGsForTest(builder, jproject.getClasses());
+        builder.unbuild();
+    }
+    
+    @Test
+    public void testTetris() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "Tetris/src/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, target);
         
@@ -109,8 +115,9 @@ public class PDGModelBuilderTest {
     
     @Test
     public void testCSSample() {
-        String target = TEST_PROECT_DIR + "CS-Sample/";
-        String classpath = TEST_PROECT_DIR + "CS-Sample/lib/*";
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "CS-Sample/";
+        String classpath = dir + "CS-Sample/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, classpath);
         
@@ -119,9 +126,10 @@ public class PDGModelBuilderTest {
         builder.unbuild();
     }
     
-    public void notestFindbugs() {
-        String target = TEST_PROECT_DIR + "findbugs/";
-        String classpath = TEST_PROECT_DIR + "findbugs/lib/*";
+    public void testFindbugs() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "findbugs/";
+        String classpath = dir + "findbugs/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, classpath);
         
@@ -132,8 +140,9 @@ public class PDGModelBuilderTest {
     
     @Test
     public void testApacheAnt() {
-        String target = TEST_PROECT_DIR + "apache-ant/";
-        String classpath = TEST_PROECT_DIR + "apache-ant/lib/*";
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "apache-ant/";
+        String classpath = dir + "apache-ant/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, classpath);
         
@@ -143,8 +152,9 @@ public class PDGModelBuilderTest {
     }
     
     public void notestJdk8() {
-        String target = TEST_PROECT_DIR + "jdk1.8.0_131/";
-        String classpath = TEST_PROECT_DIR + "jdk1.8.0_131/lib/*";
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "jdk1.8.0_131/";
+        String classpath = dir + "jdk1.8.0_131/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, classpath);
         
@@ -155,14 +165,16 @@ public class PDGModelBuilderTest {
     
     public static void main(String[] args) {
         PDGModelBuilderTest tester = new PDGModelBuilderTest();
+        
         tester.testSimple();
-        // tester.notestJrb();
-        tester.testTetris();
         tester.testDrawTool();
         tester.testLambda();
+        
+        tester.testJrb();
+        tester.testTetris();
         tester.testCSSample();
-        //tester.notestFindbugs();
+        tester.testFindbugs();
         tester.testApacheAnt();
-        //tester.notestJdk8();
+        // tester.notestJdk8();
     }
 }

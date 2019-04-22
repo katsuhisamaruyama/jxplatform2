@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -108,17 +108,15 @@ public class JavaModelBuilderTest {
     public static void main(String[] args) {
         JavaModelBuilderTest tester = new JavaModelBuilderTest();
         
-        String internalDir= new File(".").getAbsoluteFile().getParent() + "/test_target/";
-        System.out.println(internalDir);
         tester.testSimple();
         tester.testDrawTool();
         tester.testLambda();
         
-        tester.testJrb();
-        tester.testTetris();
-        tester.testCSSample();
-        tester.testFindbugs();
-        tester.testApacheAnt();
-        tester.notestJdk8();
+        // tester.testJrb();
+        // tester.testTetris();
+        // tester.testCSSample();
+        // tester.testFindbugs();
+        // tester.testApacheAnt();
+        // tester.notestJdk8();
     }
 }

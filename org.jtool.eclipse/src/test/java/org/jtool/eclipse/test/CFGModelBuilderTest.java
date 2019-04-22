@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -7,10 +7,11 @@
 package org.jtool.eclipse.test;
 
 import org.jtool.eclipse.batch.ModelBuilderBatch;
+import org.jtool.eclipse.javamodel.JavaProject;
+import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.cfg.CCFG;
 import org.jtool.eclipse.cfg.CFG;
-import org.jtool.eclipse.javamodel.JavaClass;
-import org.jtool.eclipse.javamodel.JavaProject;
+import java.io.File;
 import java.util.List;
 import org.junit.Test;
 
@@ -21,8 +22,6 @@ import org.junit.Test;
  * @author Katsuhisa Maruyama
  */
 public class CFGModelBuilderTest {
-    
-    private final String TEST_PROECT_DIR = "/Users/maru/Desktop/TestSamples/";
     
     private CCFG[] buildCFGsForTest(ModelBuilderBatch builder, List<JavaClass> classes) {
         int size = classes.size();
@@ -54,7 +53,8 @@ public class CFGModelBuilderTest {
     
     @Test
     public void testSimple() {
-        String target = TEST_PROECT_DIR + "Simple/";
+        String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
+        String target = dir + "Simple/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);  // without byte-code analysis
         JavaProject jproject = builder.build(target, target, target);
         
@@ -65,8 +65,9 @@ public class CFGModelBuilderTest {
     }
     
     @Test
-    public void testSimple1() {
-        String target = TEST_PROECT_DIR + "Simple/";
+    public void testSimpleBytecode() {
+        String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
+        String target = dir + "Simple/";
         ModelBuilderBatch builder = new ModelBuilderBatch(true);  // with byte-code analysis
         JavaProject jproject = builder.build(target, target, target);
         
@@ -76,30 +77,9 @@ public class CFGModelBuilderTest {
     }
     
     @Test
-    public void testJrb() {
-        String target = TEST_PROECT_DIR + "jrb-1.0.2/src/";
-        ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, target);
-        
-        builder.setCreatingActualNodes(false);
-        buildCFGsForTest(builder, jproject.getClasses());
-        builder.unbuild();
-    }
-    
-    @Test
-    public void testTetris() {
-        String target = TEST_PROECT_DIR + "Tetris/src/";
-        ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, target);
-        
-        builder.setCreatingActualNodes(false);
-        buildCFGsForTest(builder, jproject.getClasses());
-        builder.unbuild();
-    }
-    
-    @Test
     public void testDrawTool() {
-        String target = TEST_PROECT_DIR + "DrawTool/src/";
+        String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
+        String target = dir + "DrawTool/src/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, target);
         
@@ -110,7 +90,32 @@ public class CFGModelBuilderTest {
     
     @Test
     public void testLambda() {
-        String target = TEST_PROECT_DIR + "Lambda/";
+        String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
+        String target = dir + "Lambda/";
+        ModelBuilderBatch builder = new ModelBuilderBatch(false);
+        JavaProject jproject = builder.build(target, target, target);
+        
+        builder.setCreatingActualNodes(false);
+        buildCFGsForTest(builder, jproject.getClasses());
+        builder.unbuild();
+    }
+    
+    @Test
+    public void testJrb() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "jrb-1.0.2/src/";
+        ModelBuilderBatch builder = new ModelBuilderBatch(false);
+        JavaProject jproject = builder.build(target, target, target);
+        
+        builder.setCreatingActualNodes(false);
+        buildCFGsForTest(builder, jproject.getClasses());
+        builder.unbuild();
+    }
+    
+    @Test
+    public void testTetris() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "Tetris/src/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, target);
         
@@ -121,8 +126,9 @@ public class CFGModelBuilderTest {
     
     @Test
     public void testCSSample() {
-        String target = TEST_PROECT_DIR + "CS-Sample/";
-        String classpath = TEST_PROECT_DIR + "CS-Sample/lib/*";
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "CS-Sample/";
+        String classpath = dir + "CS-Sample/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, classpath);
         
@@ -133,8 +139,9 @@ public class CFGModelBuilderTest {
     
     @Test
     public void testFindbugs() {
-        String target = TEST_PROECT_DIR + "findbugs/";
-        String classpath = TEST_PROECT_DIR + "findbugs/lib/*";
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "findbugs/";
+        String classpath = dir + "findbugs/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, classpath);
         
@@ -145,8 +152,9 @@ public class CFGModelBuilderTest {
     
     @Test
     public void testApacheAnt() {
-        String target = TEST_PROECT_DIR + "apache-ant/";
-        String classpath = TEST_PROECT_DIR + "apache-ant/lib/*";
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "apache-ant/";
+        String classpath = dir + "apache-ant/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, classpath);
         
@@ -156,8 +164,9 @@ public class CFGModelBuilderTest {
     }
     
     public void notestJdk8() {
-        String target = TEST_PROECT_DIR + "jdk1.8.0_131/";
-        String classpath = TEST_PROECT_DIR + "jdk1.8.0_131/lib/*";
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "jdk1.8.0_131/";
+        String classpath = dir + "jdk1.8.0_131/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, classpath);
         
@@ -168,15 +177,17 @@ public class CFGModelBuilderTest {
     
     public static void main(String[] args) {
         CFGModelBuilderTest tester = new CFGModelBuilderTest();
+        
         tester.testSimple();
-        tester.testSimple1();
-        tester.testJrb();
-        tester.testTetris();
+        tester.testSimpleBytecode();
         tester.testDrawTool();
         tester.testLambda();
-        tester.testCSSample();
-        tester.testFindbugs();
-        tester.testApacheAnt();
-        //tester.notestJdk8();
+        
+        // tester.testJrb();
+        // tester.testTetris();
+        // tester.testCSSample();
+        // tester.testFindbugs();
+        // tester.testApacheAnt();
+        // tester.notestJdk8();
     }
 }
