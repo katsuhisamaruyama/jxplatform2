@@ -11,10 +11,10 @@ import org.jtool.eclipse.pdg.PDG;
 import org.jtool.eclipse.pdg.ClDG;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaProject;
-
 import java.io.File;
 import java.util.List;
 import org.junit.Test;
+import org.junit.Ignore;
 
 /**
  * Tests a class that builds a PDG.
@@ -89,8 +89,9 @@ public class PDGModelBuilderTest {
         builder.unbuild();
     }
     
+    @Test
     public void testJrb() {
-        String dir = "/Users/maru/Desktop/TestSamples/";
+        String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
         String target = dir +  "jrb-1.0.2/src/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, target);
@@ -100,7 +101,7 @@ public class PDGModelBuilderTest {
         builder.unbuild();
     }
     
-    @Test
+    @Ignore
     public void testTetris() {
         String dir = "/Users/maru/Desktop/TestSamples/";
         String target = dir + "Tetris/src/";
@@ -112,7 +113,7 @@ public class PDGModelBuilderTest {
         builder.unbuild();
     }
     
-    @Test
+    @Ignore
     public void testCSSample() {
         String dir = "/Users/maru/Desktop/TestSamples/";
         String target = dir + "CS-Sample/";
@@ -125,6 +126,7 @@ public class PDGModelBuilderTest {
         builder.unbuild();
     }
     
+    @Ignore
     public void testFindbugs() {
         String dir = "/Users/maru/Desktop/TestSamples/";
         String target = dir + "findbugs/";
@@ -137,7 +139,7 @@ public class PDGModelBuilderTest {
         builder.unbuild();
     }
     
-    @Test
+    @Ignore
     public void testApacheAnt() {
         String dir = "/Users/maru/Desktop/TestSamples/";
         String target = dir + "apache-ant/";
@@ -150,7 +152,8 @@ public class PDGModelBuilderTest {
         builder.unbuild();
     }
     
-    public void notestJdk8() {
+    @Ignore
+    public void testJdk8() {
         String dir = "/Users/maru/Desktop/TestSamples/";
         String target = dir + "jdk1.8.0_131/";
         String classpath = dir + "jdk1.8.0_131/lib/*";
@@ -168,12 +171,12 @@ public class PDGModelBuilderTest {
         tester.testSimple();
         tester.testDrawTool();
         tester.testLambda();
-        
         tester.testJrb();
-        tester.testTetris();
-        tester.testCSSample();
-        tester.testFindbugs();
-        tester.testApacheAnt();
-        // tester.notestJdk8();
+        
+        // tester.testTetris();
+        // tester.testCSSample();
+        // tester.testFindbugs();
+        // tester.testApacheAnt();
+        // tester.testJdk8()
     }
 }

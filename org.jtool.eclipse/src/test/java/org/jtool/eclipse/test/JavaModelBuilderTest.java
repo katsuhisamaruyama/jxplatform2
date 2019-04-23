@@ -6,10 +6,10 @@
 
 package org.jtool.eclipse.test;
 
-import java.io.File;
-
 import org.jtool.eclipse.batch.ModelBuilderBatch;
+import java.io.File;
 import org.junit.Test;
+import org.junit.Ignore;
 
 /**
  * Tests a class that builds a Java Model.
@@ -47,14 +47,14 @@ public class JavaModelBuilderTest {
     
     @Test
     public void testJrb() {
-        String dir = "/Users/maru/Desktop/TestSamples/";
+        String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
         String target = dir + "jrb-1.0.2/";
         ModelBuilderBatch builder = new ModelBuilderBatch();
         builder.build(target, target, target);
         builder.unbuild();
     }
     
-    @Test
+    @Ignore
     public void testTetris() {
         String dir = "/Users/maru/Desktop/TestSamples/";
         String target = dir + "Tetris/";
@@ -63,7 +63,7 @@ public class JavaModelBuilderTest {
         builder.unbuild();
     }
     
-    @Test
+    @Ignore
     public void testCSSample() {
         String dir = "/Users/maru/Desktop/TestSamples/";
         String target = dir + "CS-Sample/";
@@ -73,7 +73,7 @@ public class JavaModelBuilderTest {
         builder.unbuild();
     }
     
-    @Test
+    @Ignore
     public void testFindbugs() {
         String dir = "/Users/maru/Desktop/TestSamples/";
         String target = dir + "findbugs/";
@@ -83,7 +83,7 @@ public class JavaModelBuilderTest {
         builder.unbuild();
     }
     
-    @Test
+    @Ignore
     public void testApacheAnt() {
         String dir = "/Users/maru/Desktop/TestSamples/";
         String target = dir + "apache-ant/";
@@ -93,7 +93,8 @@ public class JavaModelBuilderTest {
         builder.unbuild();
     }
     
-    public void notestJdk8() {
+    @Ignore
+    public void testJdk8() {
         String dir = "/Users/maru/Desktop/TestSamples/";
         String target = dir + "jdk1.8.0_131/";
         String classpath = dir + "jdk1.8.0_131/lib/*";
@@ -108,12 +109,12 @@ public class JavaModelBuilderTest {
         tester.testSimple();
         tester.testDrawTool();
         tester.testLambda();
+        tester.testJrb();
         
-        // tester.testJrb();
         // tester.testTetris();
         // tester.testCSSample();
         // tester.testFindbugs();
         // tester.testApacheAnt();
-        // tester.notestJdk8();
+        // tester.testJdk8();
     }
 }
