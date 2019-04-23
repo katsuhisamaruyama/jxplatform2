@@ -1,0 +1,71 @@
+<!--
+
+  Ant build file for JRB 
+
+  Author: Katsuhisa Maruyama <maru@cs.ritsumei.ac.jp>
+  (C) Ritsumeikan University, July 31, 2001
+
+  Usage: ant compile: compile all java files
+         ant jar: jar all classe files 
+         ant clean: remove all class files
+-->
+
+<project name="JRT" default="compile" basedir=".">
+  <property name="name" value="jrb"/>
+  <property name="version" value="1.0"/>
+
+  <property name="src.dir" value="src"/>
+  <property name="classes.dir" value="classes"/>
+  <property name="jars.dir" value="jar"/>
+  <property name="images.dir" value="jp/ac/ritsumei/cs/fse/jrt/gui/images"/>
+
+  <path id="build.classpath">
+    <pathelement location="${java.class.path}"/>
+    <pathelement location="${src.dir}"/>
+    <pathelement location="${classes.dir}"/>
+  </path>
+
+  <target name="compile" depends="prepare">
+    <javac srcdir="${src.dir}"
+	   destdir="${classes.dir}"
+	   debug="off"
+           optimize="off"
+           deprecation="on"
+           excludes="**/test,
+                     **/testcases,
+                     **/parser/jjt">
+      <classpath refid="build.classpath"/>
+    </javac>
+  </target>
+
+  <target name="prepare">
+    <mkdir dir="${classes.dir}"/>
+    <mkdir dir="${jars.dir}"/>
+    <copy todir="${classes.dir}/${images.dir}">
+      <fileset dir="src/${images.dir}"/>
+    </copy>
+  </target>
+
+  <target name="jar" depends="compile">
+    <mkdir dir="${jars.dir}"/>
+    <jar jarfile="${jars.dir}/${name}.jar"
+	 basedir="${classes.dir}"
+         manifest="${src.dir}/meta-inf/manifest.mf">
+    </jar>
+  </target>
+
+  <target name="clean">
+    <delete dir="${jars.dir}"/>
+    <delete dir="${classes.dir}"/>
+  </target>
+
+  <target name="veryclean" depends="clean">
+    <delete>
+      <fileset dir="${src.dir}">
+        <include name="**/*.bak"/>
+        <include name="**/*~"/> 
+      </fileset>
+    </delete>
+  </target>
+
+</project>

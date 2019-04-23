@@ -1,0 +1,51 @@
+<!--
+
+  Ant build file for Java Refactoring Tool 
+
+  Author: Katsuhisa Maruyama <maru@cs.ritsumei.ac.jp>
+  (C) Ritsumeikan University, Aug 6, 2001
+
+-->
+
+<project name="parser" default="compile" basedir="../../../../../../../../..">
+  <property name="parser"/>
+  <property name="version" value="1.0"/>
+  <property name="src.dir" value="src"/>
+
+  <path id="build.classpath">
+    <pathelement location="${java.class.path}"/>
+    <pathelement location="${src.dir}"/>
+  </path>
+
+  <target name="compile">
+    <javac srcdir="${src.dir}"
+           destdir="${src.dir}"
+	   debug="off"
+           optimize="off"
+           deprecation="on"
+           includes="**/jrt/parser/summary/**"
+           excludes="**/jrt/**/test">
+      <classpath refid="build.classpath"/>
+    </javac>
+  </target>
+
+  <target name="all" depends="javacc,compile">
+  </target>
+
+  <target name="javacc">
+    <execon executable="javacc" dir = "src/jp/ac/ritsumei/cs/fse/jrt/parser/summary">
+      <fileset dir="${src.dir}">
+        <include name="**/jrt/parser/summary/SummaryJava1.2.jj"/>
+      </fileset>
+    </execon>
+  </target>
+
+  <target name="clean">
+    <delete>
+      <fileset dir=".">
+        <include name="**/jrt/parser/summary/*.class"/>
+      </fileset>
+    </delete>
+  </target>
+
+</project>

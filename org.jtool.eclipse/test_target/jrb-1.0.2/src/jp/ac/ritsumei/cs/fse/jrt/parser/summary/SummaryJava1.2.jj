@@ -1,0 +1,1012 @@
+/*
+ *     SummaryJava1.2.jj  Nov 12, 2001
+ *
+ *     Katsuhisa Maruyama (maru@fse.cs.ritsumei.ac.jp)
+ *
+ * This file is a modified version of the file "Java1.2-b.jjt" which
+ * is originally found in the JavaGrammars Examples directory.
+ *
+ * ===================================================================
+ *
+ * Copyright (C) 1996, 1997 Sun Microsystems Inc.
+ *
+ * Use of this file and the system it is part of is constrained by the
+ * file COPYRIGHT in the root directory of this system.  You may, however,
+ * make any modifications you wish to this file.
+ *
+ */
+
+options {
+  JAVA_UNICODE_ESCAPE = true;
+  STATIC=true;
+}
+
+PARSER_BEGIN(SummaryJavaParser)
+
+package jp.ac.ritsumei.cs.fse.jrt.parser.summary;
+import jp.ac.ritsumei.cs.fse.jrt.model.JavaModifier;
+import java.util.ArrayList;
+import java.util.Stack;
+import java.util.Iterator;
+import java.io.FileInputStream;
+
+public class SummaryJavaParser {
+    private static SummaryJavaFile jfile;
+    private static Stack classes = new Stack();     // SummaryJavaClass
+
+    public static SummaryJavaFile run(String fileName) throws ParseException {
+        jfile = new SummaryJavaFile(fileName);
+        classes.clear();
+        CompilationUnit();
+        return jfile;
+    }
+}
+
+PARSER_END(SummaryJavaParser)
+
+// WHITE SPACE
+SPECIAL_TOKEN :
+{
+    " "
+  | "\t"
+  | "\f"
+  | "\r\n"
+  | "\n"
+  | "\r"
+}
+
+// COMMENTS
+MORE :
+{
+    "//" : IN_SINGLE_LINE_COMMENT
+  | <"/**" ~["/"]> { input_stream.backup(1); } : IN_FORMAL_COMMENT
+  | "/*" : IN_MULTI_LINE_COMMENT
+}
+
+<IN_SINGLE_LINE_COMMENT>
+SPECIAL_TOKEN :
+{
+    <SINGLE_LINE_COMMENT: "\n" | "\r" | "\r\n" > : DEFAULT
+}
+
+<IN_FORMAL_COMMENT>
+SPECIAL_TOKEN :
+{
+    <FORMAL_COMMENT: "*/" > : DEFAULT
+}
+
+<IN_MULTI_LINE_COMMENT>
+SPECIAL_TOKEN :
+{
+    <MULTI_LINE_COMMENT: "*/" > : DEFAULT
+}
+
+<IN_SINGLE_LINE_COMMENT, IN_FORMAL_COMMENT, IN_MULTI_LINE_COMMENT>
+MORE :
+{
+    < ~[] >
+}
+
+// RESERVED WORDS AND LITERALS
+TOKEN :
+{
+    < ABSTRACT: "abstract" >
+  | < BOOLEAN: "boolean" >
+  | < BREAK: "break" >
+  | < BYTE: "byte" >
+  | < CASE: "case" >
+  | < CATCH: "catch" >
+  | < CHAR: "char" >
+  | < CLASS: "class" >
+  | < CONST: "const" >
+  | < CONTINUE: "continue" >
+  | < _DEFAULT: "default" >
+  | < DO: "do" >
+  | < DOUBLE: "double" >
+  | < ELSE: "else" >
+  | < EXTENDS: "extends" >
+  | < FALSE: "false" >
+  | < FINAL: "final" >
+  | < FINALLY: "finally" >
+  | < FLOAT: "float" >
+  | < FOR: "for" >
+  | < GOTO: "goto" >
+  | < IF: "if" >
+  | < IMPLEMENTS: "implements" >
+  | < IMPORT: "import" >
+  | < INSTANCEOF: "instanceof" >
+  | < INT: "int" >
+  | < INTERFACE: "interface" >
+  | < LONG: "long" >
+  | < NATIVE: "native" >
+  | < NEW: "new" >
+  | < NULL: "null" >
+  | < PACKAGE: "package">
+  | < PRIVATE: "private" >
+  | < PROTECTED: "protected" >
+  | < PUBLIC: "public" >
+  | < RETURN: "return" >
+  | < SHORT: "short" >
+  | < STATIC: "static" >
+  | < SUPER: "super" >
+  | < SWITCH: "switch" >
+  | < SYNCHRONIZED: "synchronized" >
+  | < THIS: "this" >
+  | < THROW: "throw" >
+  | < THROWS: "throws" >
+  | < TRANSIENT: "transient" >
+  | < TRUE: "true" >
+  | < TRY: "try" >
+  | < VOID: "void" >
+  | < VOLATILE: "volatile" >
+  | < WHILE: "while" >
+  | < STRICTFP: "strictfp" >
+}
+
+// LITERALS
+TOKEN :
+{
+    < INTEGER_LITERAL:
+        <DECIMAL_LITERAL> (["l","L"])?
+      | <HEX_LITERAL> (["l","L"])?
+      | <OCTAL_LITERAL> (["l","L"])?
+    >
+  | < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
+  | < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
+  | < #OCTAL_LITERAL: "0" (["0"-"7"])* >
+  | < FLOATING_POINT_LITERAL:
+        (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? (["f","F","d","D"])?
+      | "." (["0"-"9"])+ (<EXPONENT>)? (["f","F","d","D"])?
+      | (["0"-"9"])+ <EXPONENT> (["f","F","d","D"])?
+      | (["0"-"9"])+ (<EXPONENT>)? ["f","F","d","D"]
+    >
+  | < #EXPONENT: ["e","E"] (["+","-"])? (["0"-"9"])+ >
+  | < CHARACTER_LITERAL:
+      "'"
+      (   (~["'","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )
+      "'"
+    >
+  | < STRING_LITERAL:
+      "\""
+      (   (~["\"","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )*
+      "\""
+    >
+}
+
+// IDENTIFIERS
+TOKEN :
+{
+    < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
+  | < #LETTER:
+      [
+       "\u0024",
+       "\u0041"-"\u005a",
+       "\u005f",
+       "\u0061"-"\u007a",
+       "\u00c0"-"\u00d6",
+       "\u00d8"-"\u00f6",
+       "\u00f8"-"\u00ff",
+       "\u0100"-"\u1fff",
+       "\u3040"-"\u318f",
+       "\u3300"-"\u337f",
+       "\u3400"-"\u3d2d",
+       "\u4e00"-"\u9fff",
+       "\uf900"-"\ufaff"
+      ]
+    >
+  | < #DIGIT:
+      [
+       "\u0030"-"\u0039",
+       "\u0660"-"\u0669",
+       "\u06f0"-"\u06f9",
+       "\u0966"-"\u096f",
+       "\u09e6"-"\u09ef",
+       "\u0a66"-"\u0a6f",
+       "\u0ae6"-"\u0aef",
+       "\u0b66"-"\u0b6f",
+       "\u0be7"-"\u0bef",
+       "\u0c66"-"\u0c6f",
+       "\u0ce6"-"\u0cef",
+       "\u0d66"-"\u0d6f",
+       "\u0e50"-"\u0e59",
+       "\u0ed0"-"\u0ed9",
+       "\u1040"-"\u1049"
+      ]
+    >
+}
+
+// SEPARATORS
+TOKEN :
+{
+    < LPAREN: "(" >
+  | < RPAREN: ")" >
+  | < LBRACE: "{" >
+  | < RBRACE: "}" >
+  | < LBRACKET: "[" >
+  | < RBRACKET: "]" >
+  | < SEMICOLON: ";" >
+  | < COMMA: "," >
+  | < DOT: "." >
+}
+
+// OPERATORS
+TOKEN :
+{
+    < ASSIGN: "=" >
+  | < GT: ">" >
+  | < LT: "<" >
+  | < BANG: "!" >
+  | < TILDE: "~" >
+  | < HOOK: "?" >
+  | < COLON: ":" >
+  | < EQ: "==" >
+  | < LE: "<=" >
+  | < GE: ">=" >
+  | < NE: "!=" >
+  | < SC_OR: "||" >
+  | < SC_AND: "&&" >
+  | < INCR: "++" >
+  | < DECR: "--" >
+  | < PLUS: "+" >
+  | < MINUS: "-" >
+  | < STAR: "*" >
+  | < SLASH: "/" >
+  | < BIT_AND: "&" >
+  | < BIT_OR: "|" >
+  | < XOR: "^" >
+  | < REM: "%" >
+  | < LSHIFT: "<<" >
+  | < RSIGNEDSHIFT: ">>" >
+  | < RUNSIGNEDSHIFT: ">>>" >
+  | < PLUSASSIGN: "+=" >
+  | < MINUSASSIGN: "-=" >
+  | < STARASSIGN: "*=" >
+  | < SLASHASSIGN: "/=" >
+  | < ANDASSIGN: "&=" >
+  | < ORASSIGN: "|=" >
+  | < XORASSIGN: "^=" >
+  | < REMASSIGN: "%=" >
+  | < LSHIFTASSIGN: "<<=" >
+  | < RSIGNEDSHIFTASSIGN: ">>=" >
+  | < RUNSIGNEDSHIFTASSIGN: ">>>=" >
+}
+
+
+/*****************************************
+ * THE JAVA LANGUAGE GRAMMAR STARTS HERE *
+ *****************************************/
+
+void CompilationUnit() :
+{}
+{
+    [ PackageDeclaration() ] { jfile.addImportFile("java.lang.*"); }
+    ( ImportDeclaration() )*
+    ( TypeDeclaration() )*
+    <EOF>
+}
+
+void PackageDeclaration() :
+{ String name; }
+{
+    "package" name = Name() { jfile.setPackageName(name); } ";"
+}
+
+void ImportDeclaration() :
+{ String name; }
+{
+    "import" name = Name() [ "." "*" { name = name + ".*"; } ]
+    { jfile.addImportFile(name); } ";"
+}
+
+void TypeDeclaration() :
+{}
+{
+      LOOKAHEAD( ( "abstract" | "final" | "public" | "strictfp" )* "class" )
+      ClassDeclaration()
+    | InterfaceDeclaration()
+    | ";"
+}
+
+void ClassDeclaration() :
+{ JavaModifier modifier = new JavaModifier(); }
+{
+    ( "abstract" { modifier.add("abstract"); }
+    | "final"    { modifier.add("final"); }
+    | "public"   { modifier.add("public"); }
+    | "strictfp" { modifier.add("strictfp"); }
+    )*
+    UnmodifiedClassDeclaration(modifier)
+}
+
+void UnmodifiedClassDeclaration(JavaModifier modifier) :
+{ String name; }
+{
+    "class" <IDENTIFIER> {
+        name = token.image;
+        if (!classes.empty()) {
+            SummaryJavaClass jc = (SummaryJavaClass)classes.peek();
+            name = jc.getName() + "#" + name;
+        }
+        SummaryJavaClass jclass = new SummaryJavaClass(name);
+        jclass.setJavaFile(jfile);
+        jclass.setInterface(false);
+        jfile.addJavaClass(jclass);
+        classes.push(jclass);
+    }
+    { name = "java.lang.Object"; }
+    [ "extends" name = Name() ] { jclass.setSuperClassName(name); }
+    [ "implements" name = NameList() { jclass.setSuperClassNameList(name); } ]
+    ClassBody() { classes.pop(); }
+}
+
+void ClassBody() :
+{}
+{
+    "{" ( ClassBodyDeclaration() )* "}"
+}
+
+void NestedClassDeclaration() :
+{ JavaModifier modifier = new JavaModifier(); }
+{
+    ( "static"    { modifier.add("static"); }
+    | "abstract"  { modifier.add("abstract"); }
+    | "final"     { modifier.add("final"); }
+    | "public"    { modifier.add("public"); }
+    | "protected" { modifier.add("protected"); }
+    | "private"   { modifier.add("private"); }
+    | "strictfp"  { modifier.add("strictfp"); }
+    )*
+    UnmodifiedClassDeclaration(modifier)
+}
+
+void ClassBodyDeclaration() :
+{}
+{
+      LOOKAHEAD(2)
+      Initializer()
+    | LOOKAHEAD( ( "static" | "abstract" | "final" | "public"
+      | "protected" | "private" | "strictfp")* "class" )
+      NestedClassDeclaration()
+    | LOOKAHEAD( ( "static" | "abstract" | "final" | "public"
+    | "protected" | "private" | "strictfp")* "interface" )
+      NestedInterfaceDeclaration()
+    | LOOKAHEAD( [ "public" | "protected" | "private" ] Name() "(" )
+      ConstructorDeclaration()
+    | LOOKAHEAD( MethodDeclarationLookahead() )
+      MethodDeclaration()
+    | FieldDeclaration()
+}
+
+void MethodDeclarationLookahead() :
+{}
+{
+    ( "public" | "protected" | "private" | "static" | "abstract"
+      | "final" | "native" | "synchronized" | "strictfp")*
+    ResultType() <IDENTIFIER> "("
+}
+
+void InterfaceDeclaration() :
+{ JavaModifier modifier = new JavaModifier(); }
+{
+    ( "abstract" { modifier.add("abstract"); }
+    | "public"   { modifier.add("public"); }
+    | "strictfp" { modifier.add("strictfp"); }
+    )*
+    UnmodifiedInterfaceDeclaration(modifier)
+}
+
+void NestedInterfaceDeclaration() :
+{ JavaModifier modifier = new JavaModifier(); }
+{
+    ( "static"    { modifier.add("static"); }
+    | "abstract"  { modifier.add("abstract"); }
+    | "final"     { modifier.add("final"); }
+    | "public"    { modifier.add("public"); }
+    | "protected" { modifier.add("protected"); }
+    | "private"   { modifier.add("private"); }
+    | "strictfp"  { modifier.add("strictfp"); }
+    )*
+    UnmodifiedInterfaceDeclaration(modifier)
+}
+
+void UnmodifiedInterfaceDeclaration(JavaModifier modifier) :
+{ String name; }
+{
+    "interface" <IDENTIFIER> {
+        name = token.image;
+        if (!classes.empty()) {
+            SummaryJavaClass jc = (SummaryJavaClass)classes.peek();
+            name = jc.getName() + "#" + name;
+        }	
+        SummaryJavaClass jclass = new SummaryJavaClass(name);
+        jclass.setJavaFile(jfile);
+        jclass.setInterface(true);
+	jfile.addJavaClass(jclass);
+        classes.push(jclass);
+    }
+    [ "extends" name = NameList() { jclass.setSuperClassNameList(name); } ]
+    "{" ( InterfaceMemberDeclaration() )* "}" { classes.pop(); }
+}
+
+void InterfaceMemberDeclaration() :
+{}
+{
+      LOOKAHEAD( ( "static" | "abstract" | "final" | "public"
+        | "protected" | "private" | "strictfp")* "class" )
+      NestedClassDeclaration()
+    | LOOKAHEAD( ( "static" | "abstract" | "final" | "public"
+        | "protected" | "private" | "strictfp")* "interface" )
+      NestedInterfaceDeclaration()
+    | LOOKAHEAD( MethodDeclarationLookahead() )
+      MethodDeclaration()
+    | FieldDeclaration()
+}
+
+void FieldDeclaration() :
+{ JavaModifier modifier = new JavaModifier();
+  String type;
+}
+{
+    ( "public"    { modifier.add("public"); }
+    | "protected" { modifier.add("protected"); }
+    | "private"   { modifier.add("private"); }
+    | "static"    { modifier.add("static"); }
+    | "final"     { modifier.add("final"); }
+    | "transient" { modifier.add("transient"); }
+    | "volatile"  { modifier.add("volatile"); }
+    )*
+    type = Type() VariableDeclarator(modifier, type)
+    ( "," VariableDeclarator(modifier, type) )* ";"
+}
+
+void VariableDeclarator(JavaModifier modifier, String type) :
+{}
+{
+    VariableDeclaratorId(modifier, type) [ "=" VariableInitializer() ]
+}
+
+void VariableDeclaratorId(JavaModifier modifier, String type) :
+{ String name;
+  String array = "";
+}
+{
+    <IDENTIFIER> { name = token.image; } ( "[" "]" { array = array + "[]"; } )* {
+        if (type != null) {
+            SummaryJavaClass jclass = (SummaryJavaClass)classes.peek();
+            SummaryJavaField jfield
+              = new SummaryJavaField(jclass.getName() + "." + name, type + array);
+            jfield.setModifier(modifier);
+	    jfield.setJavaClass(jclass);
+	    jclass.addJavaField(jfield);
+        }
+    }
+}
+
+void VariableInitializer() :
+{}
+{
+      ArrayInitializer()
+    | Expression()
+}
+
+void ArrayInitializer() :
+{}
+{
+    "{" [ VariableInitializer() ( LOOKAHEAD(2) "," VariableInitializer() )* ]
+    [ "," ] "}"
+}
+
+void MethodDeclaration() :
+{ JavaModifier modifier = new JavaModifier();
+  String type;
+}
+{
+    ( "public"       { modifier.add("public"); }
+    | "protected"    { modifier.add("protected"); }
+    | "private"      { modifier.add("private"); }
+    | "static"       { modifier.add("static"); }
+    | "abstract"     { modifier.add("abstract"); }
+    | "final"        { modifier.add("final"); }
+    | "native"       { modifier.add("native"); }
+    | "synchronized" { modifier.add("synchronized"); }
+    | "strictfp"     { modifier.add("strictfp"); }
+    )*
+    type = ResultType() MethodDeclarator(modifier, type)
+    [ "throws" NameList() ] ( Block() | ";" )
+}
+
+void MethodDeclarator(JavaModifier modifier, String type) :
+{ SummaryJavaMethod jmethod; }
+{
+    <IDENTIFIER> {
+        jmethod = new SummaryJavaMethod(token.image);
+        SummaryJavaClass jclass = (SummaryJavaClass)classes.peek();
+        jmethod.setModifier(modifier);
+	jmethod.setJavaClass(jclass);
+	jclass.addJavaMethod(jmethod);
+    }
+    FormalParameters(jmethod) ( "[" "]" { type = type + "[]"; } )*
+    { jmethod.setType(type); }
+}
+
+void FormalParameters(SummaryJavaMethod jmethod) :
+{}
+{
+    "(" [ FormalParameter(jmethod) ( "," FormalParameter(jmethod) )* ] ")"
+}
+
+void FormalParameter(SummaryJavaMethod jmethod) :
+{ String type; }
+{
+    [ "final" ] type = Type() {
+        if (jmethod != null) {
+            jmethod.addParameter(type);
+        }
+    }
+    VariableDeclaratorId(null, null)
+}
+
+void ConstructorDeclaration() :
+{ JavaModifier modifier = new JavaModifier();
+  SummaryJavaMethod jmethod;
+}
+{
+    [ "public"    { modifier.add("public"); }
+    | "protected" { modifier.add("protected"); }
+    | "private"   { modifier.add("private"); }
+    ]
+    <IDENTIFIER> {
+        jmethod = new SummaryJavaMethod(token.image);
+        jmethod.setType(token.image);
+        SummaryJavaClass jclass = (SummaryJavaClass)classes.peek();
+        jmethod.setModifier(modifier);
+        jmethod.setJavaClass(jclass);
+	jclass.addJavaMethod(jmethod);
+    }
+    FormalParameters(jmethod) [ "throws" NameList() ]
+    "{"
+    [ LOOKAHEAD(ExplicitConstructorInvocation()) ExplicitConstructorInvocation() ]
+    ( BlockStatement() )*
+    "}"
+}
+
+void ExplicitConstructorInvocation() :
+{}
+{
+      LOOKAHEAD("this" Arguments() ";") "this" Arguments() ";"
+    | [ LOOKAHEAD(2) PrimaryExpression() "." ] "super" Arguments() ";"
+}
+
+void Initializer() :
+{}
+{
+    [ "static" ] Block()
+}
+
+String Type() :
+{ String type;
+  String array = "";
+}
+{
+    ( type = PrimitiveType() | type = Name() )
+    ( "[" "]" { array = array + "[]"; } )*
+    { return type + array; }
+}
+
+String PrimitiveType() :
+{}
+{
+      "boolean" { return "!boolean"; }
+    | "char"    { return "!char"; }
+    | "byte"    { return "!byte"; }
+    | "short"   { return "!short"; }
+    | "int"     { return "!int"; }
+    | "long"    { return "!long"; }
+    | "float"   { return "!float"; }
+    | "double"  { return "!double"; }
+}
+
+String ResultType() :
+{ String type; }
+{
+      "void" { return "void"; }
+    | type = Type() { return type; }
+}
+
+String Name() :
+{ String name; }
+{
+    <IDENTIFIER> { name = token.image; }
+    ( LOOKAHEAD(2) "." <IDENTIFIER> { name = name + "." + token.image; } )*
+    { return name; }
+}
+
+String NameList() :
+{ String name, nameList; }
+{
+    nameList = Name()
+    ( "," name = Name() { nameList = nameList + "," + name; } )*
+    { return nameList; }
+}
+
+void Expression() :
+{}
+{
+    ConditionalExpression() [ AssignmentOperator() Expression() ]
+}
+
+void AssignmentOperator() :
+{}
+{
+    "=" | "*=" | "/=" | "%=" | "+=" | "-="
+    | "<<=" | ">>=" | ">>>=" | "&=" | "^=" | "|="
+}
+
+void ConditionalExpression() :
+{}
+{
+    ConditionalOrExpression() [ "?" Expression() ":" ConditionalExpression() ]
+}
+
+void ConditionalOrExpression() :
+{}
+{
+    ConditionalAndExpression() ( "||" ConditionalAndExpression() )*
+}
+
+void ConditionalAndExpression() :
+{}
+{
+    InclusiveOrExpression() ( "&&" InclusiveOrExpression() )*
+}
+
+void InclusiveOrExpression() :
+{}
+{
+    ExclusiveOrExpression() ( "|" ExclusiveOrExpression() )*
+}
+
+void ExclusiveOrExpression() :
+{}
+{
+    AndExpression() ( "^" AndExpression() )*
+}
+
+void AndExpression() :
+{}
+{
+    EqualityExpression() ( "&" EqualityExpression() )*
+}
+
+void EqualityExpression() :
+{}
+{
+    InstanceOfExpression() ( ( "==" | "!=" ) InstanceOfExpression() )*
+}
+
+void InstanceOfExpression() :
+{}
+{
+    RelationalExpression() [ "instanceof" Type() ]
+}
+
+void RelationalExpression() :
+{}
+{
+    ShiftExpression() ( ( "<" | ">" | "<=" | ">=" ) ShiftExpression() )*
+}
+
+void ShiftExpression() :
+{}
+{
+    AdditiveExpression() ( ( "<<" | ">>" | ">>>" ) AdditiveExpression() )*
+}
+
+void AdditiveExpression() :
+{}
+{
+    MultiplicativeExpression() ( ( "+" | "-" ) MultiplicativeExpression() )*
+}
+
+void MultiplicativeExpression() :
+{}
+{
+    UnaryExpression() ( ( "*" | "/" | "%" ) UnaryExpression() )*
+}
+
+void UnaryExpression() :
+{}
+{
+      ( "+" | "-" ) UnaryExpression()
+    | PreIncrementExpression()
+    | PreDecrementExpression()
+    | UnaryExpressionNotPlusMinus()
+}
+
+void PreIncrementExpression() :
+{}
+{
+    "++" PrimaryExpression()
+}
+
+void PreDecrementExpression() :
+{}
+{
+    "--" PrimaryExpression()
+}
+
+void UnaryExpressionNotPlusMinus() :
+{}
+{
+      ( "~" | "!" ) UnaryExpression()
+    | LOOKAHEAD( CastLookahead() ) CastExpression()
+    | PostfixExpression()
+}
+
+void CastLookahead() :
+{}
+{
+      LOOKAHEAD(2) "(" PrimitiveType()
+    | LOOKAHEAD("(" Name() "[") "(" Name() "[" "]"
+    | "(" Name() ")" ( "~" | "!" | "(" | <IDENTIFIER>
+      | "this" | "super" | "new" | Literal() )
+}
+
+void PostfixExpression() :
+{}
+{
+    PrimaryExpression() [ "++" | "--" ]
+}
+
+void CastExpression() :
+{}
+{
+      LOOKAHEAD("(" PrimitiveType()) "(" Type() ")" UnaryExpression()
+    | "(" Type() ")" UnaryExpressionNotPlusMinus()
+}
+
+void PrimaryExpression() :
+{}
+{
+    PrimaryPrefix() ( LOOKAHEAD(2) PrimarySuffix() )*
+}
+
+void PrimaryPrefix() :
+{}
+{
+      Literal()
+    | "this"
+    | "super" "." <IDENTIFIER>
+    | "(" Expression() ")"
+    | AllocationExpression()
+    | LOOKAHEAD( ResultType() "." "class" ) ResultType() "." "class"
+    | Name()
+}
+
+void PrimarySuffix() :
+{}
+{
+      LOOKAHEAD(2) "." "this"
+    | LOOKAHEAD(2) "." AllocationExpression()
+    | "[" Expression() "]"
+    | "." <IDENTIFIER>
+    | Arguments()
+}
+
+void Literal() :
+{}
+{
+      <INTEGER_LITERAL>
+    | <FLOATING_POINT_LITERAL>
+    | <CHARACTER_LITERAL>
+    | <STRING_LITERAL>
+    | BooleanLiteral()
+    | NullLiteral()
+}
+
+void BooleanLiteral() :
+{}
+{
+    "true" | "false"
+}
+
+void NullLiteral() :
+{}
+{
+    "null"
+}
+
+void Arguments() :
+{}
+{
+    "(" [ ArgumentList() ] ")"
+}
+
+void ArgumentList() :
+{}
+{
+    Expression() ( "," Expression() )*
+}
+
+void AllocationExpression() :
+{}
+{
+      LOOKAHEAD(2) "new" PrimitiveType() ArrayDimsAndInits()
+    | "new" Name() ( ArrayDimsAndInits() | Arguments() [ ClassBody() ] )
+}
+
+void ArrayDimsAndInits() :
+{}
+{
+      LOOKAHEAD(2) ( LOOKAHEAD(2) "[" Expression() "]" )+ ( LOOKAHEAD(2) "[" "]" )*
+   | ( "[" "]" )+ ArrayInitializer()
+}
+
+void Statement() :
+{}
+{
+      LOOKAHEAD(2) LabeledStatement()
+    | Block()
+    | EmptyStatement()
+    | StatementExpression() ";"
+    | SwitchStatement()
+    | IfStatement()
+    | WhileStatement()
+    | DoStatement()
+    | ForStatement()
+    | BreakStatement()
+    | ContinueStatement()
+    | ReturnStatement()
+    | ThrowStatement()
+    | SynchronizedStatement()
+    | TryStatement()
+}
+
+void LabeledStatement() :
+{}
+{
+    <IDENTIFIER> ":" Statement()
+}
+
+void Block() :
+{}
+{
+    "{" ( BlockStatement() )* "}"
+}
+
+void BlockStatement() :
+{}
+{
+      LOOKAHEAD([ "final" ] Type() <IDENTIFIER>) LocalVariableDeclaration() ";"
+    | Statement()
+    | UnmodifiedClassDeclaration(new JavaModifier())
+    | UnmodifiedInterfaceDeclaration(new JavaModifier())
+}
+
+void LocalVariableDeclaration() :
+{}
+{
+    [ "final" ] Type() VariableDeclarator(null, null)
+    ( "," VariableDeclarator(null, null) )*
+}
+
+void EmptyStatement() :
+{}
+{
+    ";"
+}
+
+void StatementExpression() :
+{}
+{
+      PreIncrementExpression()
+    | PreDecrementExpression()
+    | PrimaryExpression() [ "++" | "--" | AssignmentOperator() Expression() ]
+}
+
+void SwitchStatement() :
+{}
+{
+    "switch" "(" Expression() ")" "{" ( SwitchLabel() ( BlockStatement() )* )* "}"
+}
+
+void SwitchLabel() :
+{}
+{
+      "case" Expression() ":"
+    | "default" ":"
+}
+
+void IfStatement() :
+{}
+{
+    "if" "(" Expression() ")" Statement() [ LOOKAHEAD(1) "else" Statement() ]
+}
+
+void WhileStatement() :
+{}
+{
+    "while" "(" Expression() ")" Statement()
+}
+
+void DoStatement() :
+{}
+{
+   "do" Statement() "while" "(" Expression() ")" ";"
+}
+
+void ForStatement() :
+{}
+{
+    "for" "(" [ ForInit() ] ";" [ Expression() ] ";" [ ForUpdate() ] ")" Statement()
+}
+
+void ForInit() :
+{}
+{
+      LOOKAHEAD( [ "final" ] Type() <IDENTIFIER> ) LocalVariableDeclaration()
+    | StatementExpressionList()
+}
+
+void StatementExpressionList() :
+{}
+{
+    StatementExpression() ( "," StatementExpression() )*
+}
+
+void ForUpdate() :
+{}
+{
+    StatementExpressionList()
+}
+
+void BreakStatement() :
+{}
+{
+    "break" [ <IDENTIFIER> ] ";"
+}
+
+void ContinueStatement() :
+{}
+{
+    "continue" [ <IDENTIFIER> ] ";"
+}
+
+void ReturnStatement() :
+{}
+{
+    "return" [ Expression() ] ";"
+}
+
+void ThrowStatement() :
+{}
+{
+    "throw" Expression() ";"
+}
+
+void SynchronizedStatement() :
+{}
+{
+    "synchronized" "(" Expression() ")" Block()
+}
+
+void TryStatement() :
+{}
+{
+    "try" Block() ( "catch" "(" FormalParameter(null) ")" Block() )*
+    [ "finally" Block() ]
+}

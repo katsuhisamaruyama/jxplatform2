@@ -1,0 +1,67 @@
+<!--
+
+  Ant build file for Java Refactoring Tool 
+
+  Author: Katsuhisa Maruyama <maru@cs.ritsumei.ac.jp>
+  (C) Ritsumeikan University, Aug 6, 2001
+
+-->
+
+<project name="parser" default="compile" basedir="../../../../../../../..">
+  <property name="parser"/>
+  <property name="version" value="1.0"/>
+  <property name="src.dir" value="src"/>
+
+  <path id="build.classpath">
+    <pathelement location="${java.class.path}"/>
+    <pathelement location="${src.dir}"/>
+  </path>
+
+  <target name="compile">
+    <javac srcdir="${src.dir}"
+           destdir="${src.dir}"
+	   debug="off"
+           optimize="off"
+           deprecation="on"
+           includes="**/jrt/parser/**"
+           excludes="**/jrt/parser/jjt,
+                     **/jrt/parser/summary,
+                     **/jrt/**/test">
+      <classpath refid="build.classpath"/>
+    </javac>
+  </target>
+
+  <target name="all" depends="javacc,compile">
+  </target>
+
+  <target name="javacc" depends="jjtree">
+    <execon executable="javacc" dir = "src/jp/ac/ritsumei/cs/fse/jrt/parser">
+      <fileset dir="${src.dir}">
+        <include name="**/jrt/parser/Java1.2.jj"/>
+      </fileset>
+    </execon>
+  </target>
+
+  <target name="jjtree">
+    <execon executable="jjtree" dir="src/jp/ac/ritsumei/cs/fse/jrt/parser/jjt">
+      <fileset dir="${src.dir}">
+        <include name="**/jrt/parser/jjt/Java1.2.jjt"/> 
+      </fileset>
+    </execon>
+    <copy todir="src/jp/ac/ritsumei/cs/fse/jrt/parser">
+      <fileset dir="src/jp/ac/ritsumei/cs/fse/jrt/parser/jjt"
+        includes="Java1.2.jj,
+                  JavaParserTreeConstants.java,
+                  JJTJavaParserState.java"/>
+    </copy>
+  </target>
+
+  <target name="clean">
+    <delete>
+      <fileset dir=".">
+        <include name="**/jrt/parser/*.class"/>
+      </fileset>
+    </delete>
+  </target>
+
+</project>
