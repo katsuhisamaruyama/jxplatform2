@@ -192,6 +192,12 @@ A CFG can be created from an object of JavaMethod or JavaField as described belo
     CFG cfg = builder.getCFG(jmethod);
     CFG cfg = builder.getCFG(jfield);
 
+A call graph can be created within a project, a class, or a method as described below..
+
+    CallGraph callGraph = build.getCallGraph(JavaProject jproject);
+    CallGraph callGraph = build.getCallGraph(JavaClass jclass);
+    CallGraph callGraph = build.getCallGraph(JavaMethod jmethod);
+
 
 ### Building PDGs
 
@@ -221,20 +227,20 @@ The following code builds ClDGs for all classes and PDGs for all methods and fie
 
 A PDG, ClDG, and SDG can be created from an object of JavaMethod, JavaField, or JavaClass as described below.
 
-    public PDG pdg = getPDG(jmethod);
-    public PDG pdg = getPDG(jfield);
-    public PDG pdg = getPDGWithinSDG(jmethod);
-    public PDG pdg = getPDGWithinSDG(jfield);
+    public PDG pdg = builder.getPDG(jmethod);
+    public PDG pdg = builder.getPDG(jfield);
+    public PDG pdg = builder.getPDGWithinSDG(jmethod);
+    public PDG pdg = builder.getPDGWithinSDG(jfield);
 
-    public ClDG cldg = getClDG(jclass);
-    public ClDG cldg = getClDGWithinSDG(jclass);
-    public ClDG cldg = getClDG(jmethod);
-    public ClDG cldg = getClDGWithinSDG(jmethod);
-    public ClDG cldg = getClDG(jfield);
-    public ClDG cldg = getClDGWithinSDG(jfield);
+    public ClDG cldg = builder.getClDG(jclass);
+    public ClDG cldg = builder.getClDGWithinSDG(jclass);
+    public ClDG cldg = builder.getClDG(jmethod);
+    public ClDG cldg = builder.getClDGWithinSDG(jmethod);
+    public ClDG cldg = builder.getClDG(jfield);
+    public ClDG cldg = builder.getClDGWithinSDG(jfield);
 
-    public SDG sdg = getSDG(jclass);
-    public SDG sdg = getSDG();
+    public SDG sdg = builder.getSDG(jclass);
+    public SDG sdg = builder.getSDG();
 
 
 ## Author

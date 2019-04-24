@@ -9,6 +9,8 @@ package org.jtool.eclipse.cfg.builder;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGMethodCall;
+import org.jtool.eclipse.cfg.CFGStatement;
+import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.CallGraph;
 import org.jtool.eclipse.javamodel.JavaProject;
@@ -55,6 +57,26 @@ public class CallGraphBuilder {
                 if (callee != null) {
                     ControlFlow flow = new ControlFlow(cfg.getStartNode(), callee.getStartNode());
                     callGraph.add(flow);
+                }
+            } else if (cfgNode.isStatement()) {
+                CFGStatement statement = (CFGStatement)cfgNode;
+                for (JReference def : statement.getDefVariables()) {
+                    if (def.isFieldAccess()) {
+                        CFG field = cfgStore.getCFG(def.getQualifiedName());
+                        if (field != null) {
+                            ControlFlow flow = new ControlFlow(cfg.getStartNode(), field.getStartNode());
+                            callGraph.add(flow);
+                        }
+                    }
+                }
+                for (JReference use : statement.getUseVariables()) {
+                    if (use.isFieldAccess()) {
+                        CFG field = cfgStore.getCFG(use.getQualifiedName());
+                        if (field != null) {
+                            ControlFlow flow = new ControlFlow(cfg.getStartNode(), field.getStartNode());
+                            callGraph.add(flow);
+                        }
+                    }
                 }
             }
         }
