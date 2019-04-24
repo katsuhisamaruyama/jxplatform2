@@ -81,6 +81,14 @@ public class ControlFlow extends GraphEdge {
         return kind == Kind.jumpFlow;
     }
     
+    public void setMethodCall() {
+        kind = Kind.methodCall;
+    }
+    
+    public boolean isMethodCall() {
+        return kind == Kind.methodCall;
+    }
+    
     public void setParameter() {
         kind = Kind.parameterFlow;
     }

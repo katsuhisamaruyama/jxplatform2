@@ -13,7 +13,9 @@ import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.cfg.CCFG;
 import org.jtool.eclipse.cfg.CFG;
+import org.jtool.eclipse.cfg.CallGraph;
 import org.jtool.eclipse.cfg.builder.CFGStore;
+import org.jtool.eclipse.cfg.builder.CallGraphBuilder;
 import org.jtool.eclipse.pdg.ClDG;
 import org.jtool.eclipse.pdg.PDG;
 import org.jtool.eclipse.pdg.SDG;
@@ -159,6 +161,18 @@ public abstract class ModelBuilder {
     
     public CFG getCFG(JavaField jfield) {
         return cfgStore.getCFG(jfield);
+    }
+    
+    public CallGraph getCallGraph(JavaProject jproject) {
+        return CallGraphBuilder.getCallGraph(jproject, cfgStore);
+    }
+    
+    public CallGraph getCallGraph(JavaClass jclass) {
+        return CallGraphBuilder.getCallGraph(jclass, cfgStore);
+    }
+    
+    public CallGraph getCallGraph(JavaMethod jmethod) {
+        return CallGraphBuilder.getCallGraph(jmethod, cfgStore);
     }
     
     public PDG getPDG(String fqn) {
