@@ -108,8 +108,8 @@ public abstract class JReference {
         return isFieldAccess() || isLocalAccess();
     }
     
-    public boolean isApparentAccess() {
-        return false;
+    public boolean isVisible() {
+        return true;
     }
     
     public boolean isMethodCall() {

@@ -75,8 +75,8 @@ public class JInvisibleVarReference extends JReference {
     }
     
     @Override
-    public boolean isApparentAccess() {
-        return true;
+    public boolean isVisible() {
+        return false;
     }
     
     @Override
