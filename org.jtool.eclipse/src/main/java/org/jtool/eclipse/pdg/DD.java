@@ -76,10 +76,6 @@ public class DD extends Dependence {
         return kind == Kind.loopCarriedDefUseDependence;
     }
     
-    public boolean isFieldAccess() {
-        return kind == Kind.fieldAccess;
-    }
-    
     public void setDefOrder() {
         kind = Kind.defOrderDependence;
     }
@@ -122,6 +118,10 @@ public class DD extends Dependence {
     
     public void setFieldAccess() {
         kind = Kind.fieldAccess;
+    }
+    
+    public boolean isFieldAccess() {
+        return kind == Kind.fieldAccess;
     }
     
     public void setSummary() {

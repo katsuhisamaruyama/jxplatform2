@@ -8,8 +8,9 @@ package org.jtool.eclipse.slice;
 
 import org.jtool.eclipse.pdg.PDG;
 import org.jtool.eclipse.pdg.PDGNode;
-import org.jtool.eclipse.pdg.DD;
 import org.jtool.eclipse.pdg.Dependence;
+import org.jtool.eclipse.pdg.DD;
+import org.jtool.eclipse.pdg.CD;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGMethodCall;
@@ -66,24 +67,95 @@ public class Slice {
         }
     }
     
+    private boolean breakDDOnFieldAccess(PDGNode node, PDGNode anchor) {
+        if (anchor.getCFGNode().isFieldEntry()) {
+            for (DD edge : node.getOutgoingDDEdges()) {
+                if (edge.isOutput()) {
+                    PDGNode dst = edge.getDstNode();
+                    for (DD edge2 : dst.getOutgoingDDEdges()) {
+                        if (edge2.isDD2()) {
+                            PDGNode anchor2 = edge2.getDstNode();
+                            if (anchor2.equals(anchor)) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    private PDGNode getCDSrcNode(PDGNode node) {
+        for (CD edge : node.getIncomingCDEdges()) {
+            return edge.getSrcNode();
+        }
+        return null;
+    }
+    
+    private PDGNode getCDDstNode(PDGNode node) {
+        for (CD edge : node.getOutgoingCDEdges()) {
+            return edge.getDstNode();
+        }
+        return null;
+    }
+    
+    private boolean breakDDOnParameterIn(PDGNode node, PDGNode anchor) {
+        if (anchor.getCFGNode().isFormalIn()) {
+            PDGNode src = getCDSrcNode(node);
+            if (src != null)  {
+                for (DD edge : src.getOutgoingDDEdges()) {
+                    if (edge.isOutput()) {
+                        PDGNode dst = edge.getDstNode();
+                        PDGNode node2 = getCDDstNode(dst);
+                        if (node2 != null) {
+                            for (DD edge2 : node2.getOutgoingDDEdges()) {
+                                if (edge2.isDD2()) {
+                                    PDGNode anchor2 = edge2.getDstNode();
+                                    if (anchor2.equals(anchor)) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
     private void traverseBackward(PDGNode node) {
         if (nodesInSlice.contains(node)) {
             return;
         }
+        
         nodesInSlice.add(node);
         
         for (Dependence edge : node.getIncomingDependeceEdges()) {
-            if (edge.isCD() || edge.isDD2()) {
-                
+            if (edge.isCD()) {
                 PDGNode src = edge.getSrcNode();
                 traverseBackward(src);
-                
-                if (edge.isCall()) {
-                    CFGMethodCall call = (CFGMethodCall)src.getCFGNode();
-                    JReference var = getVariableReference(call.getPrimary());
-                    if (var != null) {
-                        extract(src, var);
+            } else if (edge.isDD2()) {
+                PDGNode src = edge.getSrcNode();
+                DD dd = (DD)edge;
+                if (dd.isFieldAccess()) {
+                    if (!breakDDOnFieldAccess(src, node)) {
+                        traverseBackward(src);
                     }
+                } else if (dd.isParameterIn()) {
+                    if (!breakDDOnParameterIn(src, node)) {
+                        traverseBackward(src);
+                    }
+                } else {
+                    traverseBackward(src);
+                }
+            } else if (edge.isCall()) {
+                PDGNode src = edge.getSrcNode();
+                CFGMethodCall call = (CFGMethodCall)src.getCFGNode();
+                JReference var = getVariableReference(call.getPrimary());
+                if (var != null) {
+                    extract(src, var);
                 }
             }
         }
@@ -108,6 +180,7 @@ public class Slice {
                 pdgnodes.add(edge.getSrcNode());
             }
         }
+        
         if (pdgnodes.size() > 0) {
             return pdgnodes;
         }
@@ -126,9 +199,6 @@ public class Slice {
                 return false;
             }
         });
-        
-        
-        
         return pdgnodes;
     }
     

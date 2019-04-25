@@ -88,13 +88,6 @@ public class ClDG extends PDG {
         buf.append("\n");
         buf.append(getNodeInfo());
         buf.append(getEdgeInfo());
-        
-        for (PDG pdg : pdgs.values()) {
-            buf.append(pdg.getNodeInfo());
-        }
-        for (PDG pdg : pdgs.values()) {
-            buf.append(pdg.getEdgeInfo());
-        }
         buf.append("----- ClDG (to here) -----\n");
         return buf.toString();
     }
