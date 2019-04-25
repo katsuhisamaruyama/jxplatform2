@@ -20,8 +20,8 @@ import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * An object that stores information on PDGs in the project.
@@ -155,22 +155,28 @@ public class PDGStore {
     }
     
     public SDG getSDG(JavaClass jclass) {
-        List<JavaClass> classes = new ArrayList<JavaClass>();
-        collectEfferentClasses(jclass, classes);
-        collectDescendantClasses(classes);
+        return getSDG(new ArrayList
         
-        SDG sdg = getSDG(classes);
+    
+    public SDG getSDG(Set<JavaClass> classes) {
+        Set<JavaClass> allClasses = new HashSet<JavaClass>();
+        for (JavaClass jc : classes) {
+            collectEfferentClasses(jc, allClasses);
+            collectDescendantClasses(allClasses);
+        }
+        
+        SDG sdg = getSDGForClasses(allClasses);
         for (PDG pdg : sdg.getPDGs()) {
             addPDG(pdg);
         }
         if (cfgStore.creatingActualNodes()) {
-            PDGBuilder.connectParameters(classes, sdg);
+            PDGBuilder.connectParameters(allClasses, sdg);
             PDGBuilder.connectFieldAccesses(sdg);
         }
         return sdg;
     }
     
-    private void collectEfferentClasses(JavaClass jclass, List<JavaClass> classes) {
+    private void collectEfferentClasses(JavaClass jclass, Set<JavaClass> classes) {
         if (classes.contains(jclass)) {
             return;
         }
@@ -181,8 +187,8 @@ public class PDGStore {
         }
     }
     
-    private void collectDescendantClasses(List<JavaClass> jclasses) {
-        for (JavaClass jc : new ArrayList<JavaClass>(jclasses)) {
+    private void collectDescendantClasses(Set<JavaClass> jclasses) {
+        for (JavaClass jc : new HashSet<JavaClass>(jclasses)) {
             for (JavaClass descendant : jc.getDescendants()) {
                 if (descendant.isInProject() && !jclasses.contains(descendant)) {
                     jclasses.add(descendant);
@@ -191,7 +197,7 @@ public class PDGStore {
         }
     }
     
-    private SDG getSDG(List<JavaClass> classes) {
+    private SDG getSDGForClasses(Set<JavaClass> classes) {
         SDG sdg = new SDG();
         for (JavaClass jclass : classes) {
             CCFG ccfg = CCFGBuilder.build(jclass, cfgStore.getJInfoStore());
@@ -203,12 +209,12 @@ public class PDGStore {
     
     public SDG getSDG() {
         if (currentSDG == null) {
-            currentSDG = getSDG(cfgStore.getJavaProject().getClasses());
+            currentSDG = getSDG(new HashSet<JavaClass>(cfgStore.getJavaProject().getClasses()));
             for (PDG pdg : currentSDG.getPDGs()) {
                 addPDG(pdg);
             }
             if (cfgStore.creatingActualNodes()) {
-                PDGBuilder.connectParameters(cfgStore.getJavaProject().getClasses(), currentSDG);
+                PDGBuilder.connectParameters(new HashSet<JavaClass>(cfgStore.getJavaProject().getClasses()), currentSDG);
             }
         }
         return currentSDG;

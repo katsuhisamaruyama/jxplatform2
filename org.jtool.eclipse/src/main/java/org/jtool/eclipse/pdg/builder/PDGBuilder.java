@@ -33,7 +33,6 @@ import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.List;
 
 /**
  * Builds a PDG for a class member (a method, constructor, initializer, or field).
@@ -155,7 +154,7 @@ public class PDGBuilder {
         }
     }
     
-    public static void connectParameters(List<JavaClass> classes, SDG sdg) {
+    public static void connectParameters(Set<JavaClass> classes, SDG sdg) {
         for (PDG pdg : sdg.getPDGs()) {
             CFG cfg = pdg.getCFG();
             for (CFGNode node : cfg.getNodes()) {
@@ -185,7 +184,7 @@ public class PDGBuilder {
         }
     }
     
-    private static Set<JavaMethod> findOverrindingMethods(List<JavaClass> classes, CFGMethodCall callnode) {
+    private static Set<JavaMethod> findOverrindingMethods(Set<JavaClass> classes, CFGMethodCall callnode) {
         String className = callnode.getMethodCall().getDeclaringClassName();
         for (JavaClass jclass : classes) {
             if (jclass.getQualifiedName().endsWith(className)) {
