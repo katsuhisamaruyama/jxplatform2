@@ -592,8 +592,7 @@ public class ExpressionVisitor extends ASTVisitor {
     
     @Override
     public boolean visit(QualifiedName node) {
-        registVariable(node);
-        return false;
+        return true;
     }
     
     private void registVariable(Name node) {
