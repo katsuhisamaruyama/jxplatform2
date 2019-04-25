@@ -63,6 +63,24 @@ public class ClDG extends PDG {
     }
     
     @Override
+    public Set<PDGNode> getNodes() {
+        Set<PDGNode> nodes = new HashSet<PDGNode>();
+        for (PDG pdg : pdgs.values()) {
+            nodes.addAll(pdg.getNodes());
+        }
+        return nodes;
+    }
+    
+    @Override
+    public Set<Dependence> getEdges() {
+        Set<Dependence> edges = new HashSet<Dependence>();
+        for (PDG pdg : pdgs.values()) {
+            edges.addAll(pdg.getEdges());
+        }
+        return edges;
+    }
+    
+    @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("----- ClDG (from here) -----\n");

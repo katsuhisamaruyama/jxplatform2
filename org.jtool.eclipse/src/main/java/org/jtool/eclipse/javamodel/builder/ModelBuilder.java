@@ -147,6 +147,74 @@ public abstract class ModelBuilder {
         return errors;
     }
     
+    public Set<JavaClass> getAllClassesForward(JavaClass jclass) {
+        Set<JavaClass> classes = new HashSet<JavaClass>();
+        collectAllClassesForward(jclass, classes);
+        return classes;
+    }
+    
+    private void collectAllClassesForward(JavaClass jclass, Set<JavaClass> classes) {
+        if (classes.contains(jclass)) {
+            return;
+        }
+        classes.add(jclass);
+        
+        for (JavaClass jc : jclass.getEfferentClassesInProject()) {
+            collectAllClassesForward(jc, classes);
+        }
+    }
+    
+    public Set<JavaClass> getAllClassesBackward(JavaClass jclass) {
+        Set<JavaClass> classes = new HashSet<JavaClass>();
+        collectAllClassesBackward(jclass, classes);
+        return classes;
+    }
+    
+    private void collectAllClassesBackward(JavaClass jclass, Set<JavaClass> classes) {
+        if (classes.contains(jclass)) {
+            return;
+        }
+        classes.add(jclass);
+        
+        for (JavaClass jc : jclass.getAfferentClassesInProject()) {
+            collectAllClassesBackward(jc, classes);
+        }
+    }
+    
+    public Set<JavaMethod> getAllMethodsForward(JavaMethod jmethod) {
+        Set<JavaMethod> methods = new HashSet<JavaMethod>();
+        collectAllMethodsForward(jmethod, methods);
+        return methods;
+    }
+    
+    private void collectAllMethodsForward(JavaMethod jmethod, Set<JavaMethod> methods) {
+        if (methods.contains(jmethod)) {
+            return;
+        }
+        methods.add(jmethod);
+        
+        for (JavaMethod jm : jmethod.getCalledMethods()) {
+            collectAllMethodsForward(jm, methods);
+        }
+    }
+    
+    public Set<JavaMethod> getAllMethodsBackward(JavaMethod jmethod) {
+        Set<JavaMethod> methods = new HashSet<JavaMethod>();
+        collectAllMethodsBackward(jmethod, methods);
+        return methods;
+    }
+    
+    private void collectAllMethodsBackward(JavaMethod jmethod, Set<JavaMethod> methods) {
+        if (methods.contains(jmethod)) {
+            return;
+        }
+        methods.add(jmethod);
+        
+        for (JavaMethod jm : jmethod.getCallingMethods()) {
+            collectAllMethodsBackward(jm, methods);
+        }
+    }
+    
     public CFG getCFG(String fqn) {
         return cfgStore.getCFG(fqn);
     }
@@ -225,6 +293,10 @@ public abstract class ModelBuilder {
     
     public SDG getSDG(JavaClass jclass) {
         return pdgStore.getSDG(jclass);
+    }
+    
+    public SDG getSDG(Set<JavaClass> classes) {
+        return pdgStore.getSDG(classes);
     }
     
     public SDG getSDG() {

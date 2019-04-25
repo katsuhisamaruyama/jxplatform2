@@ -155,8 +155,10 @@ public class PDGStore {
     }
     
     public SDG getSDG(JavaClass jclass) {
-        return getSDG(new ArrayList
-        
+        Set<JavaClass> classes = new HashSet<JavaClass>();
+        classes.add(jclass);
+        return getSDG(classes);
+    }
     
     public SDG getSDG(Set<JavaClass> classes) {
         Set<JavaClass> allClasses = new HashSet<JavaClass>();

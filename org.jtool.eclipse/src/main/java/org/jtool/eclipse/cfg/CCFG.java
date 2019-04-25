@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -47,6 +47,24 @@ public class CCFG extends CFG {
     
     public CFG getCFG(String fqn) {
         return cfgs.get(fqn);
+    }
+    
+    @Override
+    public Set<CFGNode> getNodes() {
+        Set<CFGNode> nodes = new HashSet<CFGNode>();
+        for (CFG cfg : cfgs.values()) {
+            nodes.addAll(cfg.getNodes());
+        }
+        return nodes;
+    }
+    
+    @Override
+    public Set<ControlFlow> getEdges() {
+        Set<ControlFlow> edges = new HashSet<ControlFlow>();
+        for (CFG cfg : cfgs.values()) {
+            edges.addAll(cfg.getEdges());
+        }
+        return edges;
     }
     
     @Override
