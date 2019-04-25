@@ -1,7 +1,6 @@
+public class Test10 {
 
-class Test10 {
-
-    public static void main(String argv[]) {
+    public void m() {
         int a = 0;
         while (a < 3) {
             switch(a) {

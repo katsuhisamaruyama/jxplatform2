@@ -1,8 +1,6 @@
-import java.io.*;
-
 public class Test05 {
 
-    public void test() {
+    public void m() {
         int a = 0;
         int b = 0;
         int c = 0;

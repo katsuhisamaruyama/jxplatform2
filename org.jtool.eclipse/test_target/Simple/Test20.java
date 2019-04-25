@@ -2,7 +2,7 @@ public class Test20 {
     private int priVar;
     private int priVar2 = 4;
 
-    public Test20(int i){
+    public Test20(int i) {
         priVar = i;
     }
 

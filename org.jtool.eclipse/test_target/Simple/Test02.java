@@ -1,6 +1,6 @@
 public class Test02 {
 
-    public static void main(String argv[]) {
+    public void m() {
         int a = 0;
         int b = 0;
         int c = 0;

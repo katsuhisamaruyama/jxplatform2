@@ -1,6 +1,6 @@
-class Test06 {
+public class Test06 {
 
-    public static void main (String argv[]) {
+    public void m() {
         int a = 0;
         int b = 1;
 
@@ -19,7 +19,7 @@ class Test06 {
                 break;
             case 1: a++;
                 break;
-            case 2: a++;
+                case 2: a++;
                 break;
             }
         }

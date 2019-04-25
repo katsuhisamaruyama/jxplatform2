@@ -1,6 +1,6 @@
-class Test21 {
+public class Test21 {
 
-    public static void main(String argv[]) {
+    public void m() {
         int a = 0;
         for (int i = 0; i < 10; i++) {
             a++;

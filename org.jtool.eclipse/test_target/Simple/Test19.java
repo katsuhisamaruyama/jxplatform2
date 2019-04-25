@@ -1,6 +1,6 @@
 public class Test19{
 
-    public static void main(String[] args) {
+    public void m() {
         int i = 0;
         int a = 0;
         int d = 3;

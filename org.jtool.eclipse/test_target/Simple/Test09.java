@@ -1,9 +1,6 @@
-
-import java.io.*;
-
 public class Test09 {
 
-    public void test(){
+    public void m(){
         int c = 1;
         int d = 1;
 
@@ -17,7 +14,7 @@ public class Test09 {
         while (b < 10) {
             inB = inA;
             d=1;
-            while (a < 10){
+            while (a < 10) {
                 a = a + 1;
                 c = a + d;
             }

@@ -1,12 +1,12 @@
-class Test13 {
+public class Test13 {
 
-    public static void main (String argv[]) {
+    public void m() {
         int a = 2;
-        int out = Test13.doReturn(a);
+        int out = doReturn(a);
         System.out.println(out);
     }
 
-    public static int doReturn(int in) {
+    public int doReturn(int in) {
         while (in < 3) {
             in++;
             return in;

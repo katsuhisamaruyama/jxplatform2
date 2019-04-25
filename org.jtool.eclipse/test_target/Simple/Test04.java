@@ -1,12 +1,12 @@
-class Test04 {
+public class Test04 {
 
-    public static void main(String argv[]) {
+    public void m() {
         int a = 0;
-        int out = Test04.doReturn(a);
+        int out = doReturn(a);
         System.out.println(out);
     }
     
-   static public int doReturn(int in) {
+    public int doReturn(int in) {
        in++;
        return in;
     }
