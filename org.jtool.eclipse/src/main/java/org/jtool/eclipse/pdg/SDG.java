@@ -87,9 +87,6 @@ public class SDG extends PDG {
         for (ClDG cldg : cldgs.values()) {
             buf.append(cldg.toString());
         }
-        for (ClDG cldg : cldgs.values()) {
-            buf.append(cldg.toString());
-        }
         buf.append("----- SDG (to here) -----\n");
         return buf.toString();
     }
