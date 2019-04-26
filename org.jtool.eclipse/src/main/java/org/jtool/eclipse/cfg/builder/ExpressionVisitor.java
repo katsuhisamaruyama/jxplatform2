@@ -154,6 +154,8 @@ public class ExpressionVisitor extends ASTVisitor {
         analysisMode.push(AnalysisMode.USE);
         index.accept(this);
         analysisMode.pop();
+        
+        curNode.setASTNode(node);
         return false;
     }
     
