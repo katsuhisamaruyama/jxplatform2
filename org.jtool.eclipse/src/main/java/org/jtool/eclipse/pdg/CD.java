@@ -33,6 +33,10 @@ public class CD extends Dependence {
         kind = Kind.fallThroughControlDependence;
     }
     
+    public void setDeclaration() {
+        kind = Kind.declarationDepence;
+    }
+    
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
@@ -43,6 +47,8 @@ public class CD extends Dependence {
             buf.append(" F");
         } else if (kind == Kind.fallThroughControlDependence) {
             buf.append(" Fall:");
+        } else if (kind == Kind.declarationDepence) {
+            buf.append(" Decl:");
         }
         return buf.toString();
     }

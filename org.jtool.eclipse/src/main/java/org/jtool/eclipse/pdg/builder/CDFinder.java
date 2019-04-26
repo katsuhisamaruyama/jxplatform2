@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -13,7 +13,11 @@ import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGMethodCall;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGParameter;
+import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.ControlFlow;
+import org.jtool.eclipse.cfg.JReference;
+import org.jtool.eclipse.cfg.StopConditionOnReachablePath;
+
 import java.util.Set;
 import java.util.HashSet;
 
@@ -29,6 +33,7 @@ public class CDFinder {
         findCDs(pdg, cfg, containingFallThroughEdge);
         findCDsFromEntry(pdg, cfg);
         addCDsFromEntry(pdg);
+        findCDsOnDeclarations(pdg, cfg);
     }
     
     private static void findCDs(PDG pdg, CFG cfg, boolean containingFallThroughEdge) {
@@ -133,6 +138,37 @@ public class CDFinder {
                 edge.setTrue();
                 pdg.add(edge);
             }
+        }
+    }
+    
+    private static void findCDsOnDeclarations(PDG pdg, CFG cfg) {
+        for (CFGNode cfgnode : cfg.getNodes()) {
+            if (cfgnode.isStatement()) {
+                findCDsOnDeclarations(pdg,cfg, (CFGStatement)cfgnode);
+            }
+        }
+    }
+    
+    private static void findCDsOnDeclarations(PDG pdg, CFG cfg, CFGStatement cfgnode) {
+        Set<JReference> vars = new HashSet<JReference>();
+        vars.addAll(cfgnode.getDefVariables());
+        vars.addAll(cfgnode.getUseVariables());
+        for (JReference jv : vars) {
+            cfg.backwardReachableNodes(cfgnode, true, new StopConditionOnReachablePath() {
+                @Override
+                public boolean isStop(CFGNode node) {
+                    if (node.isLocalDeclaration()) {
+                        CFGStatement decnode = (CFGStatement)node;
+                        if (decnode.defineVariable(jv)) {
+                            CD edge = new CD(decnode.getPDGNode(), cfgnode.getPDGNode());
+                            edge.setDeclaration();
+                            pdg.add(edge);
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            });
         }
     }
 }
