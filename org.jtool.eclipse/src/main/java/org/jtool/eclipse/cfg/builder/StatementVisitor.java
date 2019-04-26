@@ -300,9 +300,7 @@ public class StatementVisitor extends ASTVisitor {
             }
             for (GraphEdge edge : outgoingEdges) {
                 ControlFlow flow = (ControlFlow)edge;
-                if (flow.isFalse()) {
-                    cfg.remove(flow);
-                } else {
+                if (!flow.isFalse()) {
                     flow.setDstNode(nextNode);
                 } 
             }
