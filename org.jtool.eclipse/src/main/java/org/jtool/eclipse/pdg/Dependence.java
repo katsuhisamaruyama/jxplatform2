@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -81,6 +81,54 @@ public class Dependence extends GraphEdge {
                kind == Kind.parameterOut ||
                kind == Kind.fieldAccess ||
                kind == Kind.summary;
+    }
+    
+    public boolean isTrue() {
+        return kind == Kind.trueControlDependence;
+    }
+    
+    public boolean isFalse() {
+        return kind == Kind.falseControlDependence;
+    }
+    
+    public boolean isFallThrough() {
+        return kind == Kind.fallThroughControlDependence;
+    }
+    
+    public boolean isLIDD() {
+        return kind == Kind.loopIndependentDefUseDependence;
+    }
+    
+    public boolean isLCDD() {
+        return kind == Kind.loopCarriedDefUseDependence;
+    }
+    
+    public boolean isDefOrder() {
+        return kind == Kind.defOrderDependence;
+    }
+    
+    public boolean isOutput() {
+        return kind == Kind.outputDependence;
+    }
+    
+    public boolean isAnti() {
+        return kind == Kind.antiDependence;
+    }
+    
+    public boolean isParameterIn() {
+        return kind == Kind.parameterIn;
+    }
+    
+    public boolean isParameterOut() {
+        return kind == Kind.parameterOut;
+    }
+    
+    public boolean isFieldAccess() {
+        return kind == Kind.fieldAccess;
+    }
+    
+    public boolean isSummary() {
+        return kind == Kind.summary;
     }
     
     public boolean isClassMember() {

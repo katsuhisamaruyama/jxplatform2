@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -64,72 +64,36 @@ public class DD extends Dependence {
         kind = Kind.loopIndependentDefUseDependence;
     }
     
-    public boolean isLIDD() {
-        return kind == Kind.loopIndependentDefUseDependence;
-    }
-    
     public void setLCDD() {
         kind = Kind.loopCarriedDefUseDependence;
-    }
-    
-    public boolean isLCDD() {
-        return kind == Kind.loopCarriedDefUseDependence;
     }
     
     public void setDefOrder() {
         kind = Kind.defOrderDependence;
     }
     
-    public boolean isDefOrder() {
-        return kind == Kind.defOrderDependence;
-    }
-    
     public void setOutput() {
         kind = Kind.outputDependence;
-    }
-    
-    public boolean isOutput() {
-        return kind == Kind.outputDependence;
     }
     
     public void setAnti() {
         kind = Kind.antiDependence;
     }
     
-    public boolean isAnti() {
-        return kind == Kind.antiDependence;
-    }
-    
     public void setParameterIn() {
         kind = Kind.parameterIn;
-    }
-    
-    public boolean isParameterIn() {
-        return kind == Kind.parameterIn;
     }
     
     public void setParameterOut() {
         kind = Kind.parameterOut;
     }
     
-    public boolean isParameterOut() {
-        return kind == Kind.parameterOut;
-    }
-    
     public void setFieldAccess() {
         kind = Kind.fieldAccess;
     }
     
-    public boolean isFieldAccess() {
-        return kind == Kind.fieldAccess;
-    }
-    
     public void setSummary() {
         kind = Kind.summary;
-    }
-    
-    public boolean isSummary() {
-        return kind == Kind.summary;
     }
     
     @Override

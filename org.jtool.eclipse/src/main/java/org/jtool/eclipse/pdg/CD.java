@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -25,24 +25,12 @@ public class CD extends Dependence {
         kind = Kind.trueControlDependence;
     }
     
-    public boolean isTrue() {
-        return kind == Kind.trueControlDependence;
-    }
-    
     public void setFalse() {
         kind = Kind.falseControlDependence;
     }
     
-    public boolean isFalse() {
-        return kind == Kind.falseControlDependence;
-    }
-    
     public void setFallThrough() {
         kind = Kind.fallThroughControlDependence;
-    }
-    
-    public boolean isFallThrough() {
-        return kind == Kind.fallThroughControlDependence;
     }
     
     @Override
