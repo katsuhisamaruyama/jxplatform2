@@ -541,7 +541,7 @@ public class StatementVisitor extends ASTVisitor {
             String name = node.getLabel().getFullyQualifiedName();
             jumpNode = getLabel(name).getNode();
         } else {
-            jumpNode = (CFGNode)blockEntries.peek();
+            jumpNode = (CFGNode)blockExits.peek();
             // Goes to the entry point and moves its false-successor immediately.
             // Not go to the exit point directly according to the Java specification.
         }
