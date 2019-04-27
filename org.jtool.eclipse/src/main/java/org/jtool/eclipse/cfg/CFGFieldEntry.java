@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -17,6 +17,7 @@ import java.util.List;
 public class CFGFieldEntry extends CFGEntry {
     
     private JavaField jfield;
+    private CFGStatement declNode;
     
     public CFGFieldEntry(JavaField jfield, CFGNode.Kind kind) {
         super(jfield.getASTNode(), kind, jfield.getName(), jfield.getQualifiedName(), jfield.getQualifiedName());
@@ -27,16 +28,20 @@ public class CFGFieldEntry extends CFGEntry {
         return jfield;
     }
     
+    public void setDeclarationNode(CFGStatement declNode) {
+        this.declNode = declNode;
+    }
+    
+    public CFGStatement getDeclarationNode() {
+        return declNode;
+    }
+    
     public JReference getDefField() {
-        CFGNode[] nodes = toArray(getDstNodes());
-        CFGStatement decl = (CFGStatement)nodes[0];
-        return decl.getFirst();
+        return declNode.getFirst();
     }
     
     public List<JReference> getUsedFields() {
-        CFGNode[] nodes = toArray(getDstNodes());
-        CFGStatement decl = (CFGStatement)nodes[0];
-        return decl.getUseVariables();
+        return declNode.getUseVariables();
     }
     
     @Override

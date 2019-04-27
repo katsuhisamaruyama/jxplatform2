@@ -55,6 +55,7 @@ public class CFGFieldBuilder {
         JReference jvar = new JFieldReference(jfield.getASTNode(), vbinding);
         declNode.addDefVariable(jvar);
         declNode.addUseVariable(jvar);
+        entry.setDeclarationNode(declNode);
         cfg.add(declNode);
         
         ControlFlow edge = new ControlFlow(entry, declNode);

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -24,6 +24,7 @@ import org.jtool.eclipse.cfg.CFGEntry;
 import org.jtool.eclipse.cfg.CFGClassEntry;
 import org.jtool.eclipse.cfg.CFGMethodCall;
 import org.jtool.eclipse.cfg.CFGMethodEntry;
+import org.jtool.eclipse.cfg.CFGFieldEntry;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGParameter;
 import org.jtool.eclipse.cfg.CFGStatement;
@@ -107,7 +108,8 @@ public class PDGBuilder {
                             for (PDG graph : sdg.getPDGs()) {
                                 PDGEntry entry = graph.getEntryNode();
                                 if (entry.getQualifiedName().equals(fvar.getQualifiedName())) {
-                                    DD edge = new DD(node.getPDGNode(), entry, fvar);
+                                    CFGFieldEntry fieldEntry = (CFGFieldEntry)entry.getCFGEntry();
+                                    DD edge = new DD(node.getPDGNode(), fieldEntry.getDeclarationNode().getPDGNode(), fvar);
                                     edge.setFieldAccess();
                                     pdg.add(edge);
                                 }
@@ -121,7 +123,8 @@ public class PDGBuilder {
                             for (PDG graph : sdg.getPDGs()) {
                                 PDGEntry entry = graph.getEntryNode();
                                 if (entry.getQualifiedName().equals(fvar.getQualifiedName())) {
-                                    DD edge = new DD(entry, node.getPDGNode(), fvar);
+                                    CFGFieldEntry fieldEntry = (CFGFieldEntry)entry.getCFGEntry();
+                                    DD edge = new DD(fieldEntry.getDeclarationNode().getPDGNode(), node.getPDGNode(), fvar);
                                     edge.setFieldAccess();
                                     pdg.add(edge);
                                 }
