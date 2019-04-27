@@ -34,7 +34,7 @@ public class CD extends Dependence {
     }
     
     public void setDeclaration() {
-        kind = Kind.declarationDepence;
+        kind = Kind.declarationDependence;
     }
     
     @Override
@@ -47,7 +47,7 @@ public class CD extends Dependence {
             buf.append(" F");
         } else if (kind == Kind.fallThroughControlDependence) {
             buf.append(" Fall:");
-        } else if (kind == Kind.declarationDepence) {
+        } else if (kind == Kind.declarationDependence) {
             buf.append(" Decl:");
         }
         return buf.toString();

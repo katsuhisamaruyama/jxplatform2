@@ -28,7 +28,7 @@ public class Dependence extends GraphEdge {
         trueControlDependence,           // Control dependence with respect to a true-branch flow
         falseControlDependence,          // Control dependence with respect to a false-branch flow
         fallThroughControlDependence,    // Control dependence with respect to a fall-through flow
-        declarationDepence,              // Control dependence with respect to a declaration-reference flow
+        declarationDependence,           // Control dependence with respect to a declaration-reference flow
         
         dataDependence,                  // Data dependence in general
         loopIndependentDefUseDependence, // Data dependence with respect to a loop-independent variable
@@ -61,7 +61,7 @@ public class Dependence extends GraphEdge {
         return kind == Kind.trueControlDependence ||
                kind == Kind.falseControlDependence ||
                kind == Kind.fallThroughControlDependence ||
-               kind == Kind.declarationDepence;
+               kind == Kind.declarationDependence;
     }
     
     public boolean isDD() {
@@ -98,7 +98,7 @@ public class Dependence extends GraphEdge {
     }
     
     public boolean isDeclaration() {
-        return kind == Kind.declarationDepence;
+        return kind == Kind.declarationDependence;
     }
     
     public boolean isLIDD() {
