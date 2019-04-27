@@ -87,7 +87,7 @@ public class DDFinder {
         
         if (node.hasDefVariable()) {
             CFGStatement candidate = (CFGStatement)node;
-            if (candidate.defineVariable(jvar)) {
+            if (candidate.defineVariable(jvar) && !candidate.useVariable(jvar)) {
                 DD edge = new DD(anchor.getPDGNode(), candidate.getPDGNode(), jvar);
                 edge.setOutput();
                 pdg.add(edge);
