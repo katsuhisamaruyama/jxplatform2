@@ -65,7 +65,8 @@ import java.util.Stack;
  *   FieldAccess
  *   SuperFieldAccess
  *   ThisExpression
- *   VariableDeclarationExpression (SingleVariableDeclaration/VariableDeclarationFragment)
+ *   SingleVariableDeclaration
+ *   VariableDeclarationFragment
  *   MethodInvocation
  *   SuperMethodInvocation
  *   ClassInstanceCreation

@@ -18,7 +18,9 @@ import org.jtool.eclipse.cfg.JLocalVarReference;
 import org.jtool.eclipse.cfg.JInvisibleVarReference;
 import org.jtool.eclipse.graph.GraphEdge;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Expression;
@@ -65,6 +67,7 @@ import java.util.Stack;
  *   TypeDeclarationStatement (not needed to visit because it was already visited under model creation)
  *   ExpressionStatement
  *   VariableDeclarationStatement
+ *   VariableDeclarationExpression (is not a subclass of Statement but Expression)
  *   ConstructorInvocation
  *   SuperConstructorInvocation
  *   IfStatement
@@ -169,7 +172,19 @@ public class StatementVisitor extends ASTVisitor {
     @Override
     @SuppressWarnings("unchecked")
     public boolean visit(VariableDeclarationStatement node) {
-        for (VariableDeclarationFragment frag : (List<VariableDeclarationFragment>)node.fragments()) {
+        visitVariableDeclaration(node, node.fragments());
+        return false;
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean visit(VariableDeclarationExpression node) {
+        visitVariableDeclaration(node, node.fragments());
+        return false;
+    }
+    
+    private void visitVariableDeclaration(ASTNode node, List<VariableDeclarationFragment> fragments) {
+        for (VariableDeclarationFragment frag : fragments) {
             CFGStatement declNode = new CFGStatement(node, CFGNode.Kind.assignment);
             reconnect(declNode);
             
@@ -180,7 +195,6 @@ public class StatementVisitor extends ASTVisitor {
             ControlFlow edge = createFlow(curNode, nextNode);
             edge.setTrue();
         }
-        return false;
     }
     
     @Override
@@ -431,14 +445,18 @@ public class StatementVisitor extends ASTVisitor {
     @SuppressWarnings("unchecked")
     public boolean visit(ForStatement node) {
         for (Expression initializer : (List<Expression>)node.initializers()) {
-            CFGStatement initNode = new CFGStatement(node, CFGNode.Kind.assignment);
-            ExpressionVisitor initVisitor = new ExpressionVisitor(cfg, initNode, infoStore, visited);
-            initializer.accept(initVisitor);
-            CFGNode curNode = initVisitor.getExitNode();
-            reconnect(initNode);
-            
-            ControlFlow edge = createFlow(curNode, nextNode);
-            edge.setTrue();
+            if (initializer instanceof VariableDeclarationExpression) {
+                initializer.accept(this);
+            } else {
+                CFGStatement initNode = new CFGStatement(node, CFGNode.Kind.assignment);
+                ExpressionVisitor initVisitor = new ExpressionVisitor(cfg, initNode, infoStore, visited);
+                initializer.accept(initVisitor);
+                CFGNode curNode = initVisitor.getExitNode();
+                reconnect(initNode);
+                
+                ControlFlow edge = createFlow(curNode, nextNode);
+                edge.setTrue();
+            }
         }
         
         CFGStatement forNode = new CFGStatement(node, CFGNode.Kind.forSt);
