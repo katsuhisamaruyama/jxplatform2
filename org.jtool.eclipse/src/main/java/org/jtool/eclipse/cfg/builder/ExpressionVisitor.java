@@ -621,13 +621,12 @@ public class ExpressionVisitor extends ASTVisitor {
     
     public static boolean isCFGNode(ASTNode node) {
         return (
-                node instanceof ArrayAccess ||
                 node instanceof Assignment ||
                 node instanceof ClassInstanceCreation ||
                 node instanceof MethodInvocation ||
                 node instanceof SuperMethodInvocation ||
-                node instanceof PostfixExpression ||
-                node instanceof PrefixExpression ||
+                //node instanceof PostfixExpression ||
+                //node instanceof PrefixExpression ||
                 node instanceof SingleVariableDeclaration ||
                 node instanceof VariableDeclarationFragment
             );
