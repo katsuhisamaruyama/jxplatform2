@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -617,5 +617,19 @@ public class ExpressionVisitor extends ASTVisitor {
             return (IVariableBinding)binding;
         }
         return null;
+    }
+    
+    public static boolean isCFGNode(ASTNode node) {
+        return (
+                node instanceof ArrayAccess ||
+                node instanceof Assignment ||
+                node instanceof ClassInstanceCreation ||
+                node instanceof MethodInvocation ||
+                node instanceof SuperMethodInvocation ||
+                node instanceof PostfixExpression ||
+                node instanceof PrefixExpression ||
+                node instanceof SingleVariableDeclaration ||
+                node instanceof VariableDeclarationFragment
+            );
     }
 }

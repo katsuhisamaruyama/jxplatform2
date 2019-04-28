@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -35,6 +35,7 @@ import org.eclipse.jdt.core.dom.EmptyStatement;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
+import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.LabeledStatement;
 import org.eclipse.jdt.core.dom.ReturnStatement;
@@ -778,5 +779,36 @@ public class StatementVisitor extends ASTVisitor {
             }
         }
         return null;
+    }
+    
+    public static boolean isCFGNode(ASTNode node) {
+        return (
+                node instanceof VariableDeclarationStatement ||
+                node instanceof VariableDeclarationExpression ||
+                node instanceof AssertStatement ||
+                node instanceof BreakStatement ||
+                node instanceof ContinueStatement ||
+                node instanceof DoStatement ||
+                node instanceof EmptyStatement ||
+                node instanceof ExpressionStatement ||
+                node instanceof ForStatement ||
+                node instanceof EnhancedForStatement ||
+                node instanceof IfStatement ||
+                node instanceof LabeledStatement ||
+                node instanceof IfStatement ||
+                node instanceof ReturnStatement ||
+                node instanceof SwitchCase ||
+                node instanceof SwitchStatement ||
+                node instanceof SingleVariableDeclaration ||
+                node instanceof SynchronizedStatement ||
+                node instanceof ThrowStatement ||
+                node instanceof TryStatement ||
+                node instanceof CatchClause ||
+                node instanceof TypeDeclarationStatement ||
+                node instanceof WhileStatement ||
+                node instanceof ConstructorInvocation ||
+                node instanceof SuperConstructorInvocation ||
+                node instanceof EnumConstantDeclaration
+            );
     }
 }
