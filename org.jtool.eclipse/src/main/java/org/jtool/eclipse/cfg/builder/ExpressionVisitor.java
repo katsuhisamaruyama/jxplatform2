@@ -154,8 +154,6 @@ public class ExpressionVisitor extends ASTVisitor {
         analysisMode.push(AnalysisMode.USE);
         index.accept(this);
         analysisMode.pop();
-        
-        curNode.setASTNode(node);
         return false;
     }
     
@@ -184,7 +182,6 @@ public class ExpressionVisitor extends ASTVisitor {
     
     @Override
     public boolean visit(PrefixExpression node) {
-        curNode.setASTNode(node);
         curNode.setKind(CFGNode.Kind.assignment);
         
         Expression expr = node.getOperand();
@@ -203,7 +200,6 @@ public class ExpressionVisitor extends ASTVisitor {
     
     @Override
     public boolean visit(PostfixExpression node) {
-        curNode.setASTNode(node);
         curNode.setKind(CFGNode.Kind.assignment);
         
         Expression expr = node.getOperand();
