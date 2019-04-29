@@ -76,15 +76,6 @@ public class Dependence extends GraphEdge {
                kind == Kind.summary;
     }
     
-    public boolean isDD2() {
-        return kind == Kind.loopIndependentDefUseDependence ||
-               kind == Kind.loopCarriedDefUseDependence ||
-               kind == Kind.parameterIn ||
-               kind == Kind.parameterOut ||
-               kind == Kind.fieldAccess ||
-               kind == Kind.summary;
-    }
-    
     public boolean isTrue() {
         return kind == Kind.trueControlDependence;
     }
