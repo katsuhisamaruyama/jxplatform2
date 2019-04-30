@@ -1,0 +1,22 @@
+
+PROGRAM = Customer
+JUNIT_RUNNER = org.junit.runner.JUnitCore
+JUNIT_CP = ../junit-4.12.jar:../hamcrest-core-1.3.jar
+LOG4J_CP = ./log4j-1.2-api-2.9.0.jar:./log4j-core-2.9.0.jar:./log4j-api-2.9.0.jar
+CLASSPATH = $(JUNIT_CP):$(LOG4J_CP):.
+
+all:	compile run
+
+compile: $(PROGRAM).class $(TEST_PROGRAM).class
+
+run: $(PROGRAM).class
+	java -cp $(CLASSPATH) $(JUNIT_RUNNER) $(TEST_PROGRAM)
+
+clean:
+	rm -f *.class *.java~
+
+$(PROGRAM).class: $(PROGRAM).java
+	javac -cp $(CLASSPATH) $<
+
+$(TEST_PROGRAM).class: $(TEST_PROGRAM).java
+	javac -cp $(CLASSPATH) $<
