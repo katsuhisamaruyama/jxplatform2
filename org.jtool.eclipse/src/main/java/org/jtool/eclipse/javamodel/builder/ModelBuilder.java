@@ -307,6 +307,10 @@ public abstract class ModelBuilder {
         Logger.getInstance().setVisible(visible);
     }
     
+    public boolean isLogVisible() {
+        return Logger.getInstance().isVisible();
+    }
+    
     public abstract JavaProject update();
     
     public abstract void resisterBytecodeClasses(BytecodeClassStore bytecodeClassStore);
