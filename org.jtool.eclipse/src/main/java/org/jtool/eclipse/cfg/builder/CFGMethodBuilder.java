@@ -131,15 +131,6 @@ public class CFGMethodBuilder {
         return cfg;
     }
     
-    private static void replace2(CFG cfg, CFGNode tmpNode, CFGNode node) {
-        Set<GraphEdge> edges = new HashSet<GraphEdge>(tmpNode.getIncomingEdges());
-        for (GraphEdge edge : edges) {
-            System.out.println(edge.toString());
-            
-            edge.setDstNode(node);
-        }
-    }
-    
     private static void replace(CFG cfg, CFGNode tmpNode, CFGNode node) {
         Set<GraphEdge> edges = new HashSet<GraphEdge>(tmpNode.getIncomingEdges());
         for (GraphEdge edge : edges) {
