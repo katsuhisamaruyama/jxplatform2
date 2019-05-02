@@ -90,28 +90,27 @@ public abstract class ModelBuilder {
     }
     
     public JavaFile copyJavaFile(JavaFile jfile) {
-        return getUnregisteredJavaFile(jfile.getPath(), jfile.getCode(), jfile.getProject());
+        return getUnregisteredJavaFile(jfile.getPath(), jfile.getCode(), jfile.getProject(), jfile.getCharset());
     }
     
     public JavaFile getUnregisteredJavaFile(String path, String code, JavaProject jproject) {
+        return getUnregisteredJavaFile(path, code, jproject, JavaCore.getEncoding());
+    }
+    
+    public JavaFile getUnregisteredJavaFile(String path, String code, JavaProject jproject, String charset) {
         ASTParser parser = getParser();
         
         int index = path.lastIndexOf(File.separatorChar);
         if (index != -1) {
             path = path.substring(index + 1);
         }
-        
-        String[] encodings = new String[jproject.getSourcePath().length];
-        for (int num = 0; num < jproject.getSourcePath().length; num++) {
-            encodings[num] = JavaCore.getEncoding();
-        }
         parser.setUnitName(path);
-        parser.setEnvironment(jproject.getClassPath(), jproject.getSourcePath(), encodings, true);
+        parser.setEnvironment(jproject.getClassPath(), null, null, true);
         parser.setSource(code.toCharArray());
         
         CompilationUnit cu = (CompilationUnit)parser.createAST(null);
         if (cu != null) {
-            JavaFile jfile = new JavaFile(cu, path, code, JavaCore.getEncoding(), jproject);
+            JavaFile jfile = new JavaFile(cu, path, code, charset, jproject);
             if (getParseErrors(cu).size() != 0) {
                 System.err.println("Incomplete parse: " + path);
             }
