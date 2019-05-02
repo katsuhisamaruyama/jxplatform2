@@ -57,6 +57,8 @@ public class ModelBuilderBatch extends ModelBuilder {
             currentProject = new JavaProject(name, dir.getCanonicalPath());
             currentProject.setModelBuilder(this);
             currentProject.setClassPath(classPath);
+            currentProject.setSourceBinaryPaths(dir.getCanonicalPath(), dir.getCanonicalPath());
+            
             ProjectStore.getInstance().addProject(currentProject);
             ProjectStore.getInstance().setModelBuilder(this);
             

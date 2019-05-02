@@ -226,6 +226,12 @@ public class JavaProject {
         this.classPath = classPath;
     }
     
+    public void setSourceBinaryPaths(String sourcePath, String binaryPath) {
+        String[] path = new String[1];
+        path[0] = sourcePath;
+        setSourceBinaryPaths(path, binaryPath);
+    }
+    
     public void setSourceBinaryPaths(String[] sourcePath, String binaryPath) {
         this.sourcePath = sourcePath;
         this.binaryPath = binaryPath;

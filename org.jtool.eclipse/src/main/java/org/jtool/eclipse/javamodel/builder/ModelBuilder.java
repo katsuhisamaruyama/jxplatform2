@@ -89,6 +89,10 @@ public abstract class ModelBuilder {
         }
     }
     
+    public JavaFile copyJavaFile(JavaFile jfile) {
+        return getUnregisteredJavaFile(jfile.getPath(), jfile.getCode(), jfile.getProject());
+    }
+    
     public JavaFile getUnregisteredJavaFile(String path, String code, JavaProject jproject) {
         ASTParser parser = getParser();
         
@@ -96,8 +100,12 @@ public abstract class ModelBuilder {
         if (index != -1) {
             path = path.substring(index + 1);
         }
+        
+        String[] encodings = new String[jproject.getSourcePath().length];
+        for (int num = 0; num < jproject.getSourcePath().length; num++) {
+            encodings[num] = JavaCore.getEncoding();
+        }
         parser.setUnitName(path);
-        String[] encodings = new String[]{ JavaCore.getEncoding() };
         parser.setEnvironment(jproject.getClassPath(), jproject.getSourcePath(), encodings, true);
         parser.setSource(code.toCharArray());
         
