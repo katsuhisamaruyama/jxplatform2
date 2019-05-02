@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -21,6 +21,7 @@ import java.io.File;
  */
 public class JavaFile {
     
+    protected CompilationUnit compilationUnit;
     protected JavaProject jproject;
     protected String path;
     protected String code;
@@ -35,6 +36,7 @@ public class JavaFile {
     }
     
     public JavaFile(CompilationUnit cu, String path, String code, String charset, JavaProject jproject) {
+        this.compilationUnit = cu;
         this.jproject = jproject;
         this.path = path;
         this.code = code;
@@ -50,6 +52,10 @@ public class JavaFile {
         jpackage = null;
         classes.clear();
         classes = null;
+    }
+    
+    public CompilationUnit getCompilationUnit() {
+        return compilationUnit;
     }
     
     public JavaProject getProject() {
