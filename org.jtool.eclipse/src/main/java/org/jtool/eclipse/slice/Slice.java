@@ -8,16 +8,15 @@ package org.jtool.eclipse.slice;
 
 import org.jtool.eclipse.pdg.PDG;
 import org.jtool.eclipse.pdg.PDGNode;
+import org.jtool.eclipse.pdg.PDGStatement;
 import org.jtool.eclipse.pdg.Dependence;
 import org.jtool.eclipse.pdg.DD;
 import org.jtool.eclipse.pdg.CD;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
-import org.jtool.eclipse.cfg.CFGMethodCall;
 import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.cfg.StopConditionOnReachablePath;
 import org.jtool.eclipse.cfg.CFGStatement;
-import org.jtool.eclipse.cfg.JMethodReference;
 import org.jtool.eclipse.graph.GraphNode;
 import java.util.Set;
 import java.util.HashSet;
@@ -30,11 +29,16 @@ import java.util.HashSet;
 public class Slice {
     
     private SliceCriterion criterion;
+    private Set<CFGNode> reachablePathToCriterion;
     
     private Set<PDGNode> nodesInSlice = new HashSet<PDGNode>();
     
+    private Set<PDGNode> visitCallNodes = new HashSet<PDGNode>();
+    
     public Slice(SliceCriterion criterion) {
         this.criterion = criterion;
+        CFG cfg = criterion.getPDG().getCFG();
+        reachablePathToCriterion = cfg.backwardReachableNodes(criterion.getNode().getCFGNode(), true);
         
         for (JReference var : criterion.getnVariables()) {
             extract(criterion.getNode(), var);
@@ -62,125 +66,143 @@ public class Slice {
             traverseBackward(start);
         }
         
-        for (Dependence edge : node.getIncomingCDEdges()) {
-            traverseBackward(edge.getSrcNode());
-        }
-    }
-    
-    private boolean breakDDOnFieldAccess(PDGNode node, PDGNode anchor) {
-        if (anchor.getCFGNode().isFieldEntry()) {
-            for (DD edge : node.getOutgoingDDEdges()) {
-                if (edge.isOutput()) {
-                    PDGNode dst = edge.getDstNode();
-                    for (DD edge2 : dst.getOutgoingDDEdges()) {
-                        if (edge2.isDD2()) {
-                            PDGNode anchor2 = edge2.getDstNode();
-                            if (anchor2.equals(anchor)) {
-                                return true;
-                            }
-                        }
+        if (node.getCFGNode().isActual()) {
+            for (CD call : node.getIncomingCDEdges()) {
+                for (CD edge : call.getSrcNode().getIncomingCDEdges()) {
+                    if (edge.isTrue() || edge.isFalse() || edge.isFallThrough()) {
+                        traverseBackward(edge.getSrcNode());
                     }
                 }
             }
+        } else {
+            for (CD edge : node.getIncomingCDEdges()) {
+                if (edge.isTrue() || edge.isFalse() || edge.isFallThrough()) {
+                    traverseBackward(edge.getSrcNode());
+                }
+            }
         }
-        return false;
+        
+        for (PDGNode start : findStartNode(node, jv)) {
+            for (CD edge : start.getIncomingCDEdges()) {
+                traverseBackward(edge.getSrcNode());
+            }
+        }
     }
     
-    private PDGNode getCDSrcNode(PDGNode node) {
+    private PDGNode getDominantNode(PDGNode node) {
         for (CD edge : node.getIncomingCDEdges()) {
-            return edge.getSrcNode();
-        }
-        return null;
-    }
-    
-    private PDGNode getCDDstNode(PDGNode node) {
-        for (CD edge : node.getOutgoingCDEdges()) {
-            return edge.getDstNode();
-        }
-        return null;
-    }
-    
-    private boolean breakDDOnParameterIn(PDGNode node, PDGNode anchor) {
-        if (anchor.getCFGNode().isFormalIn()) {
-            PDGNode src = getCDSrcNode(node);
-            if (src != null)  {
-                for (DD edge : src.getOutgoingDDEdges()) {
-                    if (edge.isOutput()) {
-                        PDGNode dst = edge.getDstNode();
-                        PDGNode node2 = getCDDstNode(dst);
-                        if (node2 != null) {
-                            for (DD edge2 : node2.getOutgoingDDEdges()) {
-                                if (edge2.isDD2()) {
-                                    PDGNode anchor2 = edge2.getDstNode();
-                                    if (anchor2.equals(anchor)) {
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            if (edge.isTrue()) {
+                return edge.getSrcNode();
             }
         }
-        return false;
+        return null;
+    }
+    
+    private PDGNode getMethodEntry(PDGNode node) {
+        while (node != null && !node.getCFGNode().isMethodEntry()) {
+            node = getDominantNode(node);
+        }
+        return node;
+    }
+    
+    private Set<PDGNode> getMethodCall(PDGNode node) {
+        Set<PDGNode> nodes = new HashSet<PDGNode>();
+        for (Dependence edge : node.getIncomingDependeceEdges()) {
+            if (edge.isCall()) {
+                nodes.add(edge.getSrcNode());
+            }
+        }
+        return nodes;
+    }
+    
+    private PDGNode getOutgoingOD(PDGNode node, JReference jv) {
+        for (DD edge : node.getOutgoingDDEdges()) {
+            if (edge.isOutput() && jv.equals(edge.getVariable())) {
+                return edge.getDstNode();
+            }
+        }
+        return null;
+    }
+    
+    private Set<PDGNode> getCallNodes(PDGNode node, JReference jv) {
+        Set<PDGNode> nodes = new HashSet<PDGNode>();
+        PDGNode methodEntry = getMethodEntry(node);
+        if (methodEntry == null) {
+            return nodes;
+        }
+        
+        for (PDGNode callnode : getMethodCall(methodEntry)) {
+            if (getOutgoingOD(callnode, jv) == null && reachablePathToCriterion.contains(callnode.getCFGNode())) {
+                nodes.add(callnode);
+            }
+        }
+        return nodes;
     }
     
     private void traverseBackward(PDGNode node) {
         if (nodesInSlice.contains(node)) {
             return;
         }
-        
         nodesInSlice.add(node);
         
         for (Dependence edge : node.getIncomingDependeceEdges()) {
+            PDGNode src = edge.getSrcNode();
+            
             if (edge.isCD()) {
-                PDGNode src = edge.getSrcNode();
                 traverseBackward(src);
-            } else if (edge.isDD2()) {
-                PDGNode src = edge.getSrcNode();
-                DD dd = (DD)edge;
-                if (dd.isFieldAccess()) {
-                    if (!breakDDOnFieldAccess(src, node)) {
+                
+            } else if (edge.isLIDD() || edge.isLCDD()) {
+                traverseBackward(src);
+                
+            } else if (edge.isFieldAccess()) {
+                if (!src.getCFGNode().isMethodCall()) {
+                    PDGNode entry = getDominantNode(src);
+                    if (entry.getCFGNode().isFieldEntry()) {
                         traverseBackward(src);
+                    } else {
+                        DD fedge = (DD)edge;
+                        visitCallNodes.addAll(getCallNodes(src, fedge.getVariable()));
+                        for (PDGNode callnode : getMethodCall(entry)) {
+                            if (visitCallNodes.contains(callnode)) {
+                                traverseBackward(src);
+                            }
+                        }
                     }
-                } else if (dd.isParameterIn()) {
-                    if (!breakDDOnParameterIn(src, node)) {
-                        traverseBackward(src);
-                    }
-                } else {
+                }
+                
+            } else if (edge.isParameterIn()) {
+                if (visitCallNodes.contains(getDominantNode(src))) {
                     traverseBackward(src);
                 }
-            } else if (edge.isCall()) {
-                PDGNode src = edge.getSrcNode();
-                CFGMethodCall call = (CFGMethodCall)src.getCFGNode();
-                JReference var = getVariableReference(call.getPrimary());
-                if (var != null) {
-                    extract(src, var);
+            } else if (edge.isParameterOut()) {
+                visitCallNodes.add(getDominantNode(node));
+                traverseBackward(src);
+                
+            } else if (edge.isSummary()) {
+                PDGNode ainOn = getDominantNode(src);
+                PDGNode aoutOn = getDominantNode(node);
+                if (ainOn.equals(aoutOn)) {
+                    traverseBackward(src);
                 }
             }
-        }
-    }
-    
-    private JReference getVariableReference(JReference ref) {
-        while (ref != null && ref.isMethodCall()) {
-            JMethodReference inv = (JMethodReference)ref;
-            ref = inv.getPrimary();
-        }
-        if (ref != null && ref.isVariableAccess()) {
-            return ref;
-        } else {
-            return null;
         }
     }
     
     private Set<PDGNode> findStartNode(PDGNode node, JReference jv) {
         Set<PDGNode> pdgnodes = new HashSet<PDGNode>();
+        if (node.isStatement()) {
+            PDGStatement pdgnode = (PDGStatement)node;
+            if (pdgnode.definesVariable(jv)) {
+                pdgnodes.add(node);
+                return pdgnodes;
+            }
+        }
+        
         for (DD edge : node.getIncomingDDEdges()) {
             if (edge.getVariable().equals(jv)) {
                 pdgnodes.add(edge.getSrcNode());
             }
         }
-        
         if (pdgnodes.size() > 0) {
             return pdgnodes;
         }
@@ -216,7 +238,8 @@ public class Slice {
     private String getNodeInfo() {
         StringBuilder buf = new StringBuilder();
         for (GraphNode node : GraphNode.sortGraphNode(nodesInSlice)) {
-            buf.append(node.toString());
+            PDGNode pdgnode = (PDGNode)node;
+            buf.append(node.toString() + "@" + pdgnode.getCFGNode().getASTNode().getStartPosition());
             buf.append("\n");
         }
         return buf.toString();
