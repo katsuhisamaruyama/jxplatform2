@@ -56,7 +56,7 @@ JxPlatform2 creates a PDG from a CFG for each method existing in Java source cod
 Each PDG consists of nodes and edges between two nodes. 
 
 * PDGNode - Represents a node of a PDG 
-* PDGEntry- Represents an entry node of a PDG for a method, a constructor, a field declaration, or an enum-constant 
+* PDGEntry-  Represents an entry node of a PDG for a method, a constructor, a field declaration, or an enum-constant 
 * PDGClassEntry - Represents an entry node of a ClDG for a class or an interface 
 * PDGStatement - Represents a statement node of a PDG 
 * DependenceEdge - Represents dependence between PDG nodes 
@@ -65,10 +65,19 @@ Each PDG consists of nodes and edges between two nodes.
 * CallEdge - Represents a call edge in a ClDG 
 * ClassMemberEdge - Represents a class member edge in a ClDG 
 
+### Program slice 
+
+Each slice consists PDG nodes that may affect the value of a variable of interest (called a slice criterion).
+
+* Slice - Stores information about a program slice 
+* SliceCriterion - Represents a slicing criterion 
+
+
 ## Requirement
 
 JDK 1.8 
 [Eclipse](https://www.eclipse.org/) 4.7 (Oxygen) and later  
+
 
 ## License 
 
@@ -88,6 +97,7 @@ Alternatively, you can build the batch-process versions of JxPlatform2 with the 
 
 Jar files of JxPlatform2 can be found in the 'build/libs' folder. 
 
+
 ### From an Eclipse
 
 When using the Eclipse update site, select menu items: "Help" -> "Install New Software..." ->  
@@ -96,6 +106,7 @@ Input `https://katsuhisamaruyama.github.io/jxplatform2/org.jtool.eclipse.site/si
 If you prefer to manually install the plug-in, download the latest release of the jar file in the [plug-in directory]
 (<https://github.com/katsuhisamaruyama/jxplatform2/tree/master/org.jtool.eclipse.site/plugins>)
 and put it in the 'plug-ins' directory under the Eclipse installation. Eclipse needs to be restarted. 
+
 
 ## Usage
 
@@ -242,6 +253,25 @@ A PDG, ClDG, and SDG can be created from an object of JavaMethod, JavaField, or 
     public SDG sdg = builder.getSDG(jclass);
     public SDG sdg = builder.getSDG();
 
+
+### Extracting program slices
+
+A program slice can be created from an object of PDG as described below.
+
+    Set<JavaClass> classes = builder.getAllClassesBackward(jclass);
+    SDG sdg = builder.getSDG(classes);
+    ClDG cldg = sdg.getClDG(fqn);
+    String code = jclass.getFile().getCode();
+    SliceCriterion criterion = new SliceCriterion(cldg, node, var);
+    Slice slice = new Slice(criterion);
+
+The following code snippet generates Java source code from a program slice.
+
+    ModelBuilderPlugin builder;
+    JavaClass jclass;  // target class
+    Slice slice;       // slice
+    SliceExtractor extractor = new SliceExtractor(builder, slice, jclass);
+    String code = extractor.extract();
 
 ## Author
 
