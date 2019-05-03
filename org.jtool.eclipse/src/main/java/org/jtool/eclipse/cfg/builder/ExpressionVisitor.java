@@ -45,6 +45,12 @@ import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.BooleanLiteral;
+import org.eclipse.jdt.core.dom.CharacterLiteral;
+import org.eclipse.jdt.core.dom.NullLiteral;
+import org.eclipse.jdt.core.dom.NumberLiteral;
+import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.jdt.core.dom.TypeLiteral;
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
@@ -629,6 +635,18 @@ public class ExpressionVisitor extends ASTVisitor {
                 //node instanceof PrefixExpression ||
                 node instanceof SingleVariableDeclaration ||
                 node instanceof VariableDeclarationFragment
+            );
+    }
+    
+    public static boolean isCFGNodeOnLiteral(ASTNode node) {
+        return (
+                node instanceof BooleanLiteral ||
+                node instanceof CharacterLiteral ||
+                node instanceof NullLiteral ||
+                node instanceof NumberLiteral ||
+                node instanceof StringLiteral ||
+                node instanceof TypeLiteral ||
+                node instanceof Name
             );
     }
 }
