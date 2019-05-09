@@ -91,7 +91,7 @@ public class Slice {
     
     private PDGNode getDominantNode(PDGNode node) {
         for (CD edge : node.getIncomingCDEdges()) {
-            if (edge.isTrue()) {
+            if (edge.isTrue() || edge.isFalse()) {
                 return edge.getSrcNode();
             }
         }
