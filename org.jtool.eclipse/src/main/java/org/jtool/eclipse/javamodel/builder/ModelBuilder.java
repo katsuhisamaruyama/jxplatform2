@@ -29,7 +29,6 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
-import java.io.File;
 
 /**
  * An interface for building a Java model.
@@ -93,26 +92,24 @@ public abstract class ModelBuilder {
         return getUnregisteredJavaFile(jfile.getPath(), jfile.getCode(), jfile.getProject(), jfile.getCharset());
     }
     
-    public JavaFile getUnregisteredJavaFile(String path, String code, JavaProject jproject) {
-        return getUnregisteredJavaFile(path, code, jproject, JavaCore.getEncoding());
+    public JavaFile getUnregisteredJavaFile(String filepath, String code, JavaProject jproject) {
+        return getUnregisteredJavaFile(filepath, code, jproject, JavaCore.getEncoding());
     }
     
-    public JavaFile getUnregisteredJavaFile(String path, String code, JavaProject jproject, String charset) {
+    public JavaFile getUnregisteredJavaFile(String filepath, String code, JavaProject jproject, String charset) {
         ASTParser parser = getParser();
         
-        int index = path.lastIndexOf(File.separatorChar);
-        if (index != -1) {
-            path = path.substring(index + 1);
-        }
-        parser.setUnitName(path);
-        parser.setEnvironment(jproject.getClassPath(), null, null, true);
+        
+        String[] sourcepaths = jproject.getSourcePath();
+        parser.setUnitName(filepath);
+        parser.setEnvironment(jproject.getClassPath(), sourcepaths, null, true);
         parser.setSource(code.toCharArray());
         
         CompilationUnit cu = (CompilationUnit)parser.createAST(null);
         if (cu != null) {
-            JavaFile jfile = new JavaFile(cu, path, code, charset, jproject);
+            JavaFile jfile = new JavaFile(cu, filepath, code, charset, jproject);
             if (getParseErrors(cu).size() != 0) {
-                System.err.println("Incomplete parse: " + path);
+                System.err.println("Incomplete parse: " + filepath);
             }
             
             JavaASTVisitor visitor = new JavaASTVisitor(jfile);
