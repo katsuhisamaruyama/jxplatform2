@@ -8,12 +8,12 @@ package org.jtool.eclipse.slice;
 
 import org.jtool.eclipse.pdg.PDGNode;
 import org.jtool.eclipse.javamodel.JavaFile;
-import org.jtool.eclipse.batch.ModelBuilderBatch;
-import org.jtool.eclipse.codemanipulation.ASTNodeOnCFGCollector;
-import org.jtool.eclipse.codemanipulation.CodeGenerator;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.javamodel.JavaField;
+import org.jtool.eclipse.javamodel.builder.ModelBuilder;
+import org.jtool.eclipse.codemanipulation.ASTNodeOnCFGCollector;
+import org.jtool.eclipse.codemanipulation.CodeGenerator;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -66,49 +66,61 @@ public class SliceExtractor extends ASTVisitor {
     private Set<ASTNode> sliceNodes = new HashSet<ASTNode>();
     private ASTNode astNode;
     
-    public SliceExtractor(ModelBuilderBatch builder, Slice slice, JavaClass jclass) {
+    public SliceExtractor(ModelBuilder builder, Slice slice, JavaClass jclass) {
+        this(builder, slice.getNodes(), jclass);
+    }
+    
+    public SliceExtractor(ModelBuilder builder, Set<PDGNode> nodes, JavaClass jclass) {
         JavaFile jfile = builder.copyJavaFile(jclass.getFile());
         for (JavaClass jc : jfile.getClasses()) {
             if (jc.getQualifiedName().equals(jclass.getQualifiedName())) {
-                createSliceExtractor(slice, jfile, jc.getASTNode());
+                createSliceExtractor(nodes, jfile, jc.getASTNode());
             }
         }
     }
     
-    public SliceExtractor(ModelBuilderBatch builder, Slice slice, JavaMethod jmethod) {
+    public SliceExtractor(ModelBuilder builder, Slice slice, JavaMethod jmethod) {
+        this(builder, slice.getNodes(), jmethod);
+    }
+    
+    public SliceExtractor(ModelBuilder builder, Set<PDGNode> nodes, JavaMethod jmethod) {
         JavaFile jfile = builder.copyJavaFile(jmethod.getDeclaringClass().getFile());
         for (JavaClass jc : jfile.getClasses()) {
             if (jc.getQualifiedName().equals(jmethod.getDeclaringClass().getQualifiedName())) {
                 for (JavaMethod jm : jc.getMethods()) {
                     if (jm.getQualifiedName().equals(jmethod.getQualifiedName())) {
-                        createSliceExtractor(slice, jfile, jm.getASTNode());
+                        createSliceExtractor(nodes, jfile, jm.getASTNode());
                     }
                 }
             }
         }
     }
     
-    public SliceExtractor(ModelBuilderBatch builder, Slice slice, JavaField jfield) {
+    public SliceExtractor(ModelBuilder builder, Slice slice, JavaField jfield) {
+        this(builder, slice.getNodes(), jfield);
+    }
+    
+    public SliceExtractor(ModelBuilder builder, Set<PDGNode> nodes, JavaField jfield) {
         JavaFile jfile = builder.copyJavaFile(jfield.getDeclaringClass().getFile());
         for (JavaClass jc : jfile.getClasses()) {
             if (jc.getQualifiedName().equals(jfield.getDeclaringClass().getQualifiedName())) {
                 for (JavaField jf : jc.getFields()) {
                     if (jf.getQualifiedName().equals(jfield.getQualifiedName())) {
-                        createSliceExtractor(slice, jfile, jf.getASTNode());
+                        createSliceExtractor(nodes, jfile, jf.getASTNode());
                     }
                 }
             }
         }
     }
     
-    private void createSliceExtractor(Slice slice, JavaFile jfile, ASTNode astNode) {
+    private void createSliceExtractor(Set<PDGNode> nodes, JavaFile jfile, ASTNode astNode) {
         ASTNodeOnCFGCollector collector = new ASTNodeOnCFGCollector();
         Map<Integer, ASTNode> astNodeMap = new HashMap<Integer, ASTNode>();
         for (ASTNode node : collector.collect(jfile.getCompilationUnit())) {
             astNodeMap.put(node.getStartPosition(), node);
         }
         sliceNodes.add(astNode);
-        for (PDGNode pdfnode : slice.getNodes()) {
+        for (PDGNode pdfnode : nodes) {
             int pos = pdfnode.getCFGNode().getASTNode().getStartPosition();
             ASTNode node = astNodeMap.get(pos);
             if (node != null) {
