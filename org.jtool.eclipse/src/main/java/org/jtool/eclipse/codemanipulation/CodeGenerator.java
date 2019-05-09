@@ -197,10 +197,6 @@ public class CodeGenerator {
                 int start = comment.getStartPosition();
                 int end = start + comment.getLength();
                 
-                //System.out.println(contents.substring(start, end));
-                //System.out.println("POS = " + pos + " " + start + " " + end);
-                
-                
                 if (pos <= start && end < node.getStartPosition()) {
                     String fragment = contents.substring(start, end) + "\n";
                     buffer.append(fragment);

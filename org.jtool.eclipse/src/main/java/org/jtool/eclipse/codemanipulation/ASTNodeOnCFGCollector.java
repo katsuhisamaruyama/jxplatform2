@@ -11,6 +11,8 @@ import org.jtool.eclipse.cfg.builder.StatementVisitor;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -21,20 +23,24 @@ import java.util.HashSet;
  */
 public class ASTNodeOnCFGCollector extends ASTVisitor {
     
-    private Set<ASTNode> nodes = new HashSet<ASTNode>();
+    private Map<Integer, ASTNode> nodeMap = new HashMap<Integer, ASTNode>();
     
-    public ASTNodeOnCFGCollector() {
+    public ASTNodeOnCFGCollector(ASTNode node) {
+        node.accept(this);
     }
     
-    public Set<ASTNode> collect(ASTNode node) {
-        node.accept(this);
-        return nodes;
+    public Set<ASTNode> getNodeSet() {
+        return new HashSet<ASTNode>(nodeMap.values());
+    }
+    
+    public Map<Integer, ASTNode> getNodeMap() {
+        return nodeMap;
     }
     
     @Override
     public void preVisit(ASTNode node) {
-        if (!nodes.contains(node) && isCFGNode(node)) {
-            nodes.add(node);
+        if (isCFGNode(node)) {
+            nodeMap.put(node.getStartPosition(), node);
         }
     }
     

@@ -53,7 +53,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  * Extracts a slice and returns Java source code corresponding to the slice.
@@ -114,11 +113,8 @@ public class SliceExtractor extends ASTVisitor {
     }
     
     private void createSliceExtractor(Set<PDGNode> nodes, JavaFile jfile, ASTNode astNode) {
-        ASTNodeOnCFGCollector collector = new ASTNodeOnCFGCollector();
-        Map<Integer, ASTNode> astNodeMap = new HashMap<Integer, ASTNode>();
-        for (ASTNode node : collector.collect(jfile.getCompilationUnit())) {
-            astNodeMap.put(node.getStartPosition(), node);
-        }
+        ASTNodeOnCFGCollector collector = new ASTNodeOnCFGCollector(jfile.getCompilationUnit());
+        Map<Integer, ASTNode> astNodeMap = collector.getNodeMap();
         sliceNodes.add(astNode);
         for (PDGNode pdfnode : nodes) {
             int pos = pdfnode.getCFGNode().getASTNode().getStartPosition();
@@ -129,6 +125,11 @@ public class SliceExtractor extends ASTVisitor {
         }
         this.astNode = astNode;
         this.jfile = jfile;
+    }
+    
+    public ASTNode extractAST() {
+        astNode.accept(this);
+        return astNode;
     }
     
     public String extract() {
@@ -150,8 +151,8 @@ public class SliceExtractor extends ASTVisitor {
     }
     
     private boolean containsAnyInSubTree(ASTNode astnode) {
-        ASTNodeOnCFGCollector collector = new ASTNodeOnCFGCollector();
-        for (ASTNode node : collector.collect(astnode)) {
+        ASTNodeOnCFGCollector collector = new ASTNodeOnCFGCollector(astnode);
+        for (ASTNode node : collector.getNodeSet()) {
             if (contains(node)) {
                 return true;
             }
@@ -260,6 +261,7 @@ public class SliceExtractor extends ASTVisitor {
             ASTNode parent = getEnclosingStatement(astnode.getParent()).getParent();
             if (parent instanceof Block) {
                 Expression newExpression = (Expression)ASTNode.copySubtree(expr.getAST(), expr);
+                
                 ExpressionStatement newStatement = (ExpressionStatement)expr.getAST().newExpressionStatement(newExpression);
                 Block block = (Block)parent;
                 for (int index = 0; index < block.statements().size(); index++) {
@@ -289,6 +291,7 @@ public class SliceExtractor extends ASTVisitor {
         if (containsAnyInSubTree(expr)) {
             if (statement instanceof ExpressionStatement) {
                 Expression newExpression = (Expression)ASTNode.copySubtree(expr.getAST(), expr);
+                
                 ExpressionStatement parentExpression = (ExpressionStatement)statement;
                 parentExpression.setExpression(newExpression);
             }
