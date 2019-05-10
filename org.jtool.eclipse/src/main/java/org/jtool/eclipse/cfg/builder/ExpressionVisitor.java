@@ -328,18 +328,22 @@ public class ExpressionVisitor extends ASTVisitor {
         
         JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.methodCall);
-        setActualNodes(callNode, node, node.arguments());
         
         Expression primary = node.getExpression();
         if (primary != null) {
             CFGStatement tmpNode = curNode;
             curNode = callNode;
+            
             analysisMode.push(AnalysisMode.USE);
             primary.accept(this);
             analysisMode.pop();
+            
             checkPrimary(primary, callNode, jcall);
             curNode = tmpNode;
         }
+        
+        setActualNodes(callNode, node, node.arguments());
+        
         return false;
     }
     
