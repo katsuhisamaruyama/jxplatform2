@@ -13,6 +13,7 @@ import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
@@ -90,6 +91,22 @@ public abstract class JReference {
     
     public int getModifiers() {
         return modifiers;
+    }
+    
+    public boolean isPublic() {
+        return Modifier.isPublic(modifiers);
+    }
+    
+    public boolean isProtected() {
+        return Modifier.isProtected(modifiers);
+    }
+    
+    public boolean isDefault() {
+        return Modifier.isDefault(modifiers);
+    }
+    
+    public boolean isPrivate() {
+        return Modifier.isPrivate(modifiers);
     }
     
     public boolean isInProject() {
