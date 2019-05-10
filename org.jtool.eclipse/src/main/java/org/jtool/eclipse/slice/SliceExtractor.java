@@ -7,6 +7,8 @@
 package org.jtool.eclipse.slice;
 
 import org.jtool.eclipse.pdg.PDGNode;
+import org.jtool.eclipse.pdg.PDGStatement;
+import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.javamodel.JavaFile;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaMethod;
@@ -117,14 +119,25 @@ public class SliceExtractor extends ASTVisitor {
         Map<Integer, ASTNode> astNodeMap = collector.getNodeMap();
         sliceNodes.add(astNode);
         for (PDGNode pdfnode : nodes) {
-            int pos = pdfnode.getCFGNode().getASTNode().getStartPosition();
-            ASTNode node = astNodeMap.get(pos);
-            if (node != null) {
-                sliceNodes.add(node);
+            registerASTNode(pdfnode.getCFGNode().getASTNode(), astNodeMap);
+            
+            if (pdfnode.isStatement()) {
+                PDGStatement stnode = (PDGStatement)pdfnode;
+                for (JReference var : stnode.getDefVariables()) {
+                    registerASTNode(var.getASTNode(), astNodeMap);
+                }
             }
         }
         this.astNode = astNode;
         this.jfile = jfile;
+    }
+    
+    private void registerASTNode(ASTNode astNode, Map<Integer, ASTNode> astNodeMap) {
+        int pos = astNode.getStartPosition();
+        ASTNode node = astNodeMap.get(pos);
+        if (node != null) {
+            sliceNodes.add(node);
+        }
     }
     
     public ASTNode extractAST() {
@@ -370,13 +383,28 @@ public class SliceExtractor extends ASTVisitor {
     private void checkMethodCallArguments(List<Expression> arguments) {
         List<Expression> removeNodes = new ArrayList<Expression>();
         for (Expression expr : arguments) {
-            if (!contains(expr)) {
+            
+            System.out.println("EXP = " + expr.toString());
+            
+            if (!containsAnyInSubTree2(expr)) {
                 removeNodes.add(expr);
             }
         }
         for (Expression n : removeNodes) {
             n.delete();
         }
+    }
+    
+    private boolean containsAnyInSubTree2(ASTNode astnode) {
+        ASTNodeOnCFGCollector collector = new ASTNodeOnCFGCollector(astnode);
+        for (ASTNode node : collector.getNodeSet()) {
+            System.out.println("   " + node.toString());
+            
+            if (contains(node)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     @Override
