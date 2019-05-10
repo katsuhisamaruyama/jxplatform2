@@ -415,7 +415,7 @@ public class ExpressionVisitor extends ASTVisitor {
         
         JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.instanceCreation);
-        setActualNodes(callNode, node, node.arguments());
+        
         
         Expression primary = node.getExpression();
         if (primary != null) {
@@ -427,6 +427,13 @@ public class ExpressionVisitor extends ASTVisitor {
             checkPrimary(primary, callNode, jcall);
             curNode = tmpNode;
         }
+        
+        setActualNodes(callNode, node, node.arguments());
+        
+        for (CFGParameter ain : callNode.getActualIns()) {
+            callNode.addDefVariables(ain.getDefVariables());
+        }
+        
         return false;
     }
     
@@ -455,6 +462,11 @@ public class ExpressionVisitor extends ASTVisitor {
         JMethodReference jcall = new JMethodReference(node, binding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
         setActualNodes(callNode, node, node.arguments());
+        
+        for (CFGParameter ain : callNode.getActualIns()) {
+            callNode.addDefVariables(ain.getDefVariables());
+        }
+        
         return false;
     }
     
@@ -469,6 +481,11 @@ public class ExpressionVisitor extends ASTVisitor {
         JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
         setActualNodes(callNode, node, node.arguments());
+        
+        for (CFGParameter ain : callNode.getActualIns()) {
+            callNode.addDefVariables(ain.getDefVariables());
+        }
+        
         return false;
     }
     
@@ -507,6 +524,7 @@ public class ExpressionVisitor extends ASTVisitor {
         String type = callNode.getMethodCall().getArgumentType(ordinal);
         boolean primitive = callNode.getMethodCall().getArgumentPrimitiveType(ordinal);
         JReference actualIn = new JInvisibleVarReference(node, "$" + String.valueOf(paramNumber), type, primitive);
+        
         actualInNode.addDefVariable(actualIn);
         paramNumber++;
         
@@ -601,7 +619,11 @@ public class ExpressionVisitor extends ASTVisitor {
     
     @Override
     public boolean visit(QualifiedName node) {
-        return true;
+        node.getName().accept(this);
+        analysisMode.push(AnalysisMode.USE);
+        node.getQualifier().accept(this);
+        analysisMode.pop();
+        return false;
     }
     
     private void registVariable(Name node) {
