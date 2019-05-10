@@ -631,8 +631,8 @@ public class ExpressionVisitor extends ASTVisitor {
                 node instanceof ClassInstanceCreation ||
                 node instanceof MethodInvocation ||
                 node instanceof SuperMethodInvocation ||
-                //node instanceof PostfixExpression ||
-                //node instanceof PrefixExpression ||
+                node instanceof PostfixExpression ||
+                node instanceof PrefixExpression ||
                 node instanceof SingleVariableDeclaration ||
                 node instanceof VariableDeclarationFragment
             );
