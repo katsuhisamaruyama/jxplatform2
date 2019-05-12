@@ -6,7 +6,7 @@
 
 package org.jtool.eclipse.slice;
 
-import org.jtool.eclipse.pdg.PDG;
+import org.jtool.eclipse.pdg.CommonPDG;
 import org.jtool.eclipse.pdg.PDGNode;
 import org.jtool.eclipse.pdg.PDGStatement;
 import org.jtool.eclipse.cfg.JReference;
@@ -21,17 +21,17 @@ import java.util.HashSet;
  */
 public class SliceCriterion {
     
-    private PDG pdg;
+    private CommonPDG pdg;
     private PDGNode node;
     private Set<JReference> variables = new HashSet<JReference>();
     
-    public SliceCriterion(PDG pdg, PDGNode node, JReference var) {
+    public SliceCriterion(CommonPDG pdg, PDGNode node, JReference var) {
         this.pdg = pdg;
         this.node = node;
         variables.add(var);
     }
     
-    public SliceCriterion(PDG pdg, PDGNode node, Set<JReference> vars) {
+    public SliceCriterion(CommonPDG pdg, PDGNode node, Set<JReference> vars) {
         this.pdg = pdg;
         this.node = node;
         for (JReference var : vars) {
@@ -41,7 +41,7 @@ public class SliceCriterion {
         }
     }
     
-    public PDG getPDG() {
+    public CommonPDG getPDG() {
         return pdg;
     }
     
@@ -53,31 +53,31 @@ public class SliceCriterion {
         return variables;
     }
     
-    public static SliceCriterion find(PDG pdg, String code, int lineNumber, int offset) {
+    public static SliceCriterion find(CommonPDG pdg, String code, int lineNumber, int columnNumber) {
         String[] lines = code.split(System.getProperty("line.separator"));
         int index = 0;
         for (int line = 0; line < lineNumber - 1; line++) {
             index = index + lines[line].length() + 1;
         }
-        index = index + offset;
+        index = index + columnNumber;
         return find(pdg, index);
     }
     
-    public static SliceCriterion find(PDG pdg, ASTNode node) {
+    public static SliceCriterion find(CommonPDG pdg, ASTNode node) {
         return find(pdg, node.getStartPosition());
     }
     
-    public static SliceCriterion find(PDG pdg, int offset) {
+    public static SliceCriterion find(CommonPDG pdg, int columnNumber) {
         for (PDGNode node : pdg.getNodes()) {
             if (node.isStatement()) {
                 PDGStatement stnode = (PDGStatement)node;
                 for (JReference def : stnode.getDefVariables()) {
-                    if (def.isVisible() && offset == def.getASTNode().getStartPosition()) {
+                    if (def.isVisible() && columnNumber == def.getASTNode().getStartPosition()) {
                         return new SliceCriterion(pdg, stnode, def);
                     }
                 }
                 for (JReference use : stnode.getUseVariables()) {
-                    if (use.isVisible() && offset == use.getASTNode().getStartPosition()) {
+                    if (use.isVisible() && columnNumber == use.getASTNode().getStartPosition()) {
                         return new SliceCriterion(pdg, stnode, use);
                     }
                 }

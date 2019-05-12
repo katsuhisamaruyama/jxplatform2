@@ -43,7 +43,7 @@ public class SliceTest {
         builder.unbuild();
     }
     
-    private Slice slice(String fqn, int lineNumber, int offset) {
+    private Slice slice(String fqn, int lineNumber, int columnNumber) {
         JavaClass jclass = jproject.getClass(fqn);
         if (jclass == null) {
             return null;
@@ -52,11 +52,11 @@ public class SliceTest {
         Set<JavaClass> classes = builder.getAllClassesBackward(jclass);
         SDG sdg = builder.getSDG(classes);
         ClDG cldg = sdg.getClDG(fqn);
-        cldg.print();
+        //cldg.print();
         //cldg.getCFG().print();
         
         String code = jclass.getFile().getCode();
-        SliceCriterion criterion = SliceCriterion.find(cldg, code, lineNumber, offset);
+        SliceCriterion criterion = SliceCriterion.find(cldg, code, lineNumber, columnNumber);
         if (criterion != null) {
             return new Slice(criterion);
         }
@@ -460,11 +460,23 @@ public class SliceTest {
         System.out.println(slice.toString());
     }
     
+    public static void print() {
+        JavaClass jclass = jproject.getClass("Customer");
+        Set<JavaClass> classes = builder.getAllClassesBackward(jclass);
+        SDG sdg = builder.getSDG(classes);
+        ClDG cldg = sdg.getClDG(jclass);
+        
+        SliceCriterion tmp = SliceCriterion.find(cldg, jclass.getFile().getCode(), 22, 31);
+        
+        SliceCriterion criterion = new SliceCriterion(cldg, tmp.getNode(), tmp.getnVariables().iterator().next());
+        Slice slice = new Slice(criterion);
+        slice.print();
+    }
+    
     public static void main(String[] args) {
         build();
         
         SliceTest tester = new SliceTest();
-        
         tester.testSlice101_1();
         tester.testSlice101_2();
         tester.testSlice101_3();
@@ -551,6 +563,8 @@ public class SliceTest {
         tester.testCustomer2();
         tester.testCustomer3();
         tester.testCustomer4();
+        
+        // print();
         
         unbuild();
     }

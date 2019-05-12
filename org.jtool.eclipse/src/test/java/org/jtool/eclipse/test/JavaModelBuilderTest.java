@@ -7,6 +7,10 @@
 package org.jtool.eclipse.test;
 
 import org.jtool.eclipse.batch.ModelBuilderBatch;
+import org.jtool.eclipse.javamodel.JavaProject;
+import org.jtool.eclipse.javamodel.JavaClass;
+import org.jtool.eclipse.javamodel.JavaMethod;
+import org.jtool.eclipse.javamodel.JavaField;
 import java.io.File;
 import org.junit.Test;
 import org.junit.Ignore;
@@ -103,6 +107,29 @@ public class JavaModelBuilderTest {
         builder.unbuild();
     }
     
+    public static void print() {
+        String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
+        String name = "Simple/";
+        String target = dir + name;
+        String classpath = target;
+        
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.setLogVisible(true);
+        JavaProject jproject = builder.build(name, target, classpath);
+        
+        for (JavaClass jclass : jproject.getClasses()) {
+            jclass.print();
+            for (JavaMethod jmethod : jclass.getMethods()) {
+                jmethod.print();
+            }
+            for (JavaField jfield : jclass.getFields()) {
+                jfield.print();
+            }
+        }
+        
+        builder.unbuild();
+    }
+    
     public static void main(String[] args) {
         JavaModelBuilderTest tester = new JavaModelBuilderTest();
         
@@ -116,5 +143,7 @@ public class JavaModelBuilderTest {
         // tester.testFindbugs();
         // tester.testApacheAnt();
         // tester.testJdk8();
+        
+        // print();
     }
 }

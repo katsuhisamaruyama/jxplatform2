@@ -11,6 +11,7 @@ import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaFile;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.javamodel.JavaProject;
+import org.jtool.eclipse.cfg.CommonCFG;
 import org.jtool.eclipse.cfg.CCFG;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CallGraph;
@@ -219,8 +220,8 @@ public abstract class ModelBuilder {
         }
     }
     
-    public CFG getCFG(String fqn) {
-        return cfgStore.getCFG(fqn);
+    public CommonCFG getControlFlowGraph(String fqn) {
+        return cfgStore.getControlFlowGraph(fqn);
     }
     
     public CCFG getCCFG(JavaClass jclass) {

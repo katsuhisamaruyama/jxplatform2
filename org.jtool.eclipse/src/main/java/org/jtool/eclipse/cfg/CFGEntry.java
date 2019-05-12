@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -18,7 +18,7 @@ public abstract class CFGEntry extends CFGNode {
     private String name;
     private String signature;
     private String fqn;
-    private CFG cfg = null;
+    private CommonCFG cfg = null;
     
     protected CFGEntry() {
     }
@@ -30,11 +30,11 @@ public abstract class CFGEntry extends CFGNode {
         this.fqn = fqn;
     }
     
-    public void setCFG(CFG g) {
-        cfg = g;
+    public void setCFG(CommonCFG cfg) {
+        this.cfg = cfg;
     }
     
-    public CFG getCFG() {
+    public CommonCFG getCFG() {
         return cfg;
     }
     

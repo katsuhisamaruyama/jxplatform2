@@ -6,6 +6,7 @@
 
 package org.jtool.eclipse.cfg.builder;
 
+import org.jtool.eclipse.cfg.CommonCFG;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGMethodCall;
@@ -53,8 +54,8 @@ public class CallGraphBuilder {
         for (CFGNode cfgNode : cfg.getNodes()) {
             if (cfgNode.isMethodCall()) {
                 CFGMethodCall call = (CFGMethodCall)cfgNode;
-                CFG callee = cfgStore.getCFG(call.getQualifiedName());
-                if (callee != null) {
+                CommonCFG callee = cfgStore.getControlFlowGraph(call.getQualifiedName());
+                if (callee != null && callee instanceof CFG) {
                     ControlFlow flow = new ControlFlow(cfg.getStartNode(), callee.getStartNode());
                     callGraph.add(flow);
                 }
@@ -62,8 +63,8 @@ public class CallGraphBuilder {
                 CFGStatement statement = (CFGStatement)cfgNode;
                 for (JReference def : statement.getDefVariables()) {
                     if (def.isFieldAccess()) {
-                        CFG field = cfgStore.getCFG(def.getQualifiedName());
-                        if (field != null) {
+                        CommonCFG field = cfgStore.getControlFlowGraph(def.getQualifiedName());
+                        if (field != null && field instanceof CFG) {
                             ControlFlow flow = new ControlFlow(cfg.getStartNode(), field.getStartNode());
                             callGraph.add(flow);
                         }
@@ -71,8 +72,8 @@ public class CallGraphBuilder {
                 }
                 for (JReference use : statement.getUseVariables()) {
                     if (use.isFieldAccess()) {
-                        CFG field = cfgStore.getCFG(use.getQualifiedName());
-                        if (field != null) {
+                        CommonCFG field = cfgStore.getControlFlowGraph(use.getQualifiedName());
+                        if (field != null && field instanceof CFG) {
                             ControlFlow flow = new ControlFlow(cfg.getStartNode(), field.getStartNode());
                             callGraph.add(flow);
                         }

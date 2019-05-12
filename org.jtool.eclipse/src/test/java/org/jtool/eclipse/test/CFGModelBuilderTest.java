@@ -176,6 +176,27 @@ public class CFGModelBuilderTest {
         builder.unbuild();
     }
     
+    public static void print() {
+        String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
+        String name = "Simple/";
+        String target = dir + name;
+        String classpath = target;
+        
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.setLogVisible(true);
+        builder.setCreatingActualNodes(true);
+        JavaProject jproject = builder.build(name, target, classpath);
+        
+        for (JavaClass jclass : jproject.getClasses()) {
+            CCFG ccfg = builder.getCCFG(jclass);
+            for (CFG cfg : ccfg.getCFGs()) {
+                cfg.print();
+            }
+        }
+        
+        builder.unbuild();
+    }
+    
     public static void main(String[] args) {
         CFGModelBuilderTest tester = new CFGModelBuilderTest();
         
@@ -190,5 +211,7 @@ public class CFGModelBuilderTest {
         // tester.testFindbugs();
         // tester.testApacheAnt();
         // tester.testJdk8();
+        
+        // print();
     }
 }

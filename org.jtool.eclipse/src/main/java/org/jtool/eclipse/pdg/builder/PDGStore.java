@@ -1,11 +1,12 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
 
 package org.jtool.eclipse.pdg.builder;
 
+import org.jtool.eclipse.pdg.CommonPDG;
 import org.jtool.eclipse.pdg.ClDG;
 import org.jtool.eclipse.pdg.PDG;
 import org.jtool.eclipse.pdg.SDG;
@@ -108,14 +109,13 @@ public class PDGStore {
         if (cfgStore.creatingActualNodes()) {
             SDG sdg = getSDG(jfield.getDeclaringClass());
             return sdg.getPDG(jfield.getQualifiedName());
-            
         } else {
             return getPDG(jfield);
         }
     }
     
     public ClDG getClDG(JavaClass jclass) {
-        PDG pdg = getPDG(jclass.getQualifiedName());
+        CommonPDG pdg = getPDG(jclass.getQualifiedName());
         if (pdg != null && pdg instanceof ClDG) {
             return (ClDG)pdg;
         }
@@ -132,7 +132,6 @@ public class PDGStore {
         if (cfgStore.creatingActualNodes()) {
             SDG sdg = getSDG(jclass);
             return sdg.getClDG(jclass.getQualifiedName());
-            
         } else {
             return getClDG(jclass);
         }

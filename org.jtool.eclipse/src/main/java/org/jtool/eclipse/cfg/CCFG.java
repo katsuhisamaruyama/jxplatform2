@@ -16,7 +16,7 @@ import java.util.HashSet;
  * 
  * @author Katsuhisa Maruyama
  */
-public class CCFG extends CFG {
+public class CCFG extends CommonCFG {
     
     protected Map<String, CFG> cfgs = new HashMap<String, CFG>();
     

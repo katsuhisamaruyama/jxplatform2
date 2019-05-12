@@ -33,6 +33,10 @@ public abstract class JavaElement {
     protected JavaElement() {
     }
     
+    public void print() {
+        System.out.println(toString());
+    }
+    
     public JavaFile getFile() {
         return jfile;
     }

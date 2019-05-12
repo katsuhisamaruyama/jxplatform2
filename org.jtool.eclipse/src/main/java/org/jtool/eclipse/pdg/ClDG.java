@@ -1,11 +1,14 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
 
 package org.jtool.eclipse.pdg;
 
+import org.jtool.eclipse.cfg.CCFG;
+import org.jtool.eclipse.cfg.CFGEntry;
+import org.jtool.eclipse.cfg.CommonCFG;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -16,7 +19,7 @@ import java.util.HashSet;
  * 
  * @author Katsuhisa Maruyama
  */
-public class ClDG extends PDG {
+public class ClDG extends CommonPDG {
     
     protected Map<String, PDG> pdgs = new HashMap<String, PDG>();
     
@@ -24,28 +27,18 @@ public class ClDG extends PDG {
         super();
     }
     
-    public void setEntryNode(PDGClassEntry node) {
-        entry = node;
-    }
-    
     @Override
     public PDGClassEntry getEntryNode() {
         return (PDGClassEntry)entry;
     }
     
-    @Override
-    public long getId() {
-        return entry.getId();
-    }
-    
-    @Override
-    public String getName() {
-        return entry.getName();
-    }
-    
-    @Override
-    public String getQualifiedName() {
-        return entry.getQualifiedName();
+    public CCFG getCFG() {
+        CFGEntry node = (CFGEntry)entry.getCFGNode();
+        CommonCFG cfg = node.getCFG();
+        if (cfg instanceof CCFG) {
+            return (CCFG)cfg;
+        }
+        return null;
     }
     
     public void add(PDG pdg) {

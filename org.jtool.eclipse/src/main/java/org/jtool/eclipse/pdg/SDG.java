@@ -1,12 +1,14 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
 
 package org.jtool.eclipse.pdg;
 
-import org.jtool.eclipse.cfg.CFG;
+import org.jtool.eclipse.cfg.CommonCFG;
+import org.jtool.eclipse.javamodel.JavaClass;
+
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -17,7 +19,7 @@ import java.util.HashSet;
  * 
  * @author Katsuhisa Maruyama
  */
-public class SDG extends PDG {
+public class SDG extends CommonPDG {
     
     protected Map<String, ClDG> cldgs = new HashMap<String, ClDG>();
     protected Map<String, PDG> pdgs = new HashMap<String, PDG>();
@@ -37,7 +39,7 @@ public class SDG extends PDG {
     }
     
     @Override
-    public CFG getCFG() {
+    public CommonCFG getCFG() {
         return null;
     }
     
@@ -67,6 +69,10 @@ public class SDG extends PDG {
     
     public ClDG getClDG(String fqn) {
         return cldgs.get(fqn);
+    }
+    
+    public ClDG getClDG(JavaClass jclass) {
+        return cldgs.get(jclass.getQualifiedName());
     }
     
     public Set<PDG> getPDGs() {

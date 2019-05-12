@@ -165,6 +165,28 @@ public class PDGModelBuilderTest {
         builder.unbuild();
     }
     
+    public static void print() {
+        String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
+        String name = "Simple/";
+        String target = dir + name;
+        String classpath = target;
+        
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.setLogVisible(true);
+        builder.setCreatingActualNodes(true);
+        builder.setContainingFallThroughEdge(true); 
+        JavaProject jproject = builder.build(name, target, classpath);
+        
+        for (JavaClass jclass : jproject.getClasses()) {
+            ClDG cldg = builder.getClDG(jclass);
+            for (PDG pdg : cldg.getPDGs()) {
+                pdg.print();
+            }
+        }
+        
+        builder.unbuild();
+    }
+    
     public static void main(String[] args) {
         PDGModelBuilderTest tester = new PDGModelBuilderTest();
         
@@ -177,6 +199,8 @@ public class PDGModelBuilderTest {
         // tester.testCSSample();
         // tester.testFindbugs();
         // tester.testApacheAnt();
-        // tester.testJdk8()
+        // tester.testJdk8();
+        
+        // print();
     }
 }

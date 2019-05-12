@@ -6,13 +6,13 @@
 
 package org.jtool.eclipse.slice;
 
-import org.jtool.eclipse.pdg.PDG;
+import org.jtool.eclipse.pdg.CommonPDG;
 import org.jtool.eclipse.pdg.PDGNode;
 import org.jtool.eclipse.pdg.PDGStatement;
 import org.jtool.eclipse.pdg.Dependence;
 import org.jtool.eclipse.pdg.DD;
 import org.jtool.eclipse.pdg.CD;
-import org.jtool.eclipse.cfg.CFG;
+import org.jtool.eclipse.cfg.CommonCFG;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.cfg.StopConditionOnReachablePath;
@@ -37,7 +37,7 @@ public class Slice {
     
     public Slice(SliceCriterion criterion) {
         this.criterion = criterion;
-        CFG cfg = criterion.getPDG().getCFG();
+        CommonCFG cfg = criterion.getPDG().getCFG();
         reachablePathToCriterion = cfg.backwardReachableNodes(criterion.getNode().getCFGNode(), true);
         
         for (JReference var : criterion.getnVariables()) {
@@ -45,7 +45,7 @@ public class Slice {
         }
     }
     
-    public PDG getPDG() {
+    public CommonPDG getPDG() {
         return criterion.getPDG();
     }
     
@@ -207,7 +207,7 @@ public class Slice {
             return pdgnodes;
         }
         
-        CFG cfg = criterion.getPDG().getCFG();
+        CommonCFG cfg = criterion.getPDG().getCFG();
         cfg.backwardReachableNodes(node.getCFGNode(), true, new StopConditionOnReachablePath() {
             @Override
             public boolean isStop(CFGNode node) {
@@ -222,6 +222,10 @@ public class Slice {
             }
         });
         return pdgnodes;
+    }
+    
+    public void print() {
+        System.out.println(toString());
     }
     
     @Override

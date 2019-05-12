@@ -73,9 +73,8 @@ public class CCFGBuilder {
         }
         
         for (JavaClass jc : jclass.getInnerClasses()) {
-            CFG cfg = build(jc, infoStore);
-            ccfg.add(cfg);
-            entry.addType(cfg);
+            CCFG ccfg2 = build(jc, infoStore);
+            entry.addType(ccfg2);
         }
     }
     

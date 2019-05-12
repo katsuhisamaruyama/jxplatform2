@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -7,6 +7,7 @@
 package org.jtool.eclipse.cfg.builder;
 
 import org.jtool.eclipse.javamodel.JavaProject;
+import org.jtool.eclipse.cfg.CommonCFG;
 import org.jtool.eclipse.cfg.CCFG;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
@@ -28,7 +29,7 @@ public class CFGStore {
     
     private JInfoStore infoStore;
     
-    private Map<String, CFG> cfgMap = new HashMap<String, CFG>();
+    private Map<String, CommonCFG> cfgMap = new HashMap<String, CommonCFG>();
     private boolean creatingActualNodes = false;
     
     public CFGStore() {
@@ -61,11 +62,11 @@ public class CFGStore {
         return creatingActualNodes;
     }
     
-    private void addCFG(CFG cfg) {
-        cfgMap.put(cfg.getQualifiedName(), cfg);
+    private void addCFG(CommonCFG graph) {
+        cfgMap.put(graph.getQualifiedName(), graph);
     }
     
-    public CFG getCFG(String fqn) {
+    public CommonCFG getControlFlowGraph(String fqn) {
         return cfgMap.get(fqn);
     }
     
@@ -78,9 +79,9 @@ public class CFGStore {
     }
     
     public CCFG getCCFG(JavaClass jclass) {
-        CFG cfg = getCFG(jclass.getQualifiedName());
-        if (cfg != null && cfg instanceof CCFG) {
-            return (CCFG)cfg;
+        CommonCFG graph = getControlFlowGraph(jclass.getQualifiedName());
+        if (graph != null && graph instanceof CCFG) {
+            return (CCFG)graph;
         }
         CCFG ccfg = build(jclass);
         return ccfg;
@@ -96,21 +97,22 @@ public class CFGStore {
         for (CFG cfg : ccfg.getStartNode().getFields()) {
             addCFG(cfg);
         }
-        for (CFG cfg : ccfg.getStartNode().getFields()) {
-            addCFG(cfg);
-        }
-        for (CFG cfg : ccfg.getStartNode().getTypes()) {
-            addCFG(cfg);
+        for (CCFG ccfg2 : ccfg.getStartNode().getTypes()) {
+            addCFG(ccfg2);
+            for (CFG cfg : ccfg2.getCFGs()) {
+                addCFG(cfg);
+            }
         }
         return ccfg;
     }
     
     public CFG getCFG(JavaMethod jmethod) {
-        CFG cfg = getCFG(jmethod.getQualifiedName());
-        if (cfg == null) {
-            cfg = CFGMethodBuilder.build(jmethod, infoStore, new HashSet<JMethod>());
-            addCFG(cfg);
+        CommonCFG graph = getControlFlowGraph(jmethod.getQualifiedName());
+        if (graph != null && graph instanceof CFG) {
+            return (CFG)graph;
         }
+        CFG cfg = CFGMethodBuilder.build(jmethod, infoStore, new HashSet<JMethod>());
+        addCFG(cfg);
         return cfg;
     }
     
@@ -119,20 +121,22 @@ public class CFGStore {
     }
     
     CFG getCFG(JavaMethod jmethod, Set<JMethod> visited) {
-        CFG cfg = getCFG(jmethod.getQualifiedName());
-        if (cfg == null) {
-            cfg = CFGMethodBuilder.build(jmethod, infoStore, visited);
-            addCFG(cfg);
+        CommonCFG graph = getControlFlowGraph(jmethod.getQualifiedName());
+        if (graph != null && graph instanceof CFG) {
+            return (CFG)graph;
         }
+        CFG cfg = CFGMethodBuilder.build(jmethod, infoStore, visited);
+        addCFG(cfg);
         return cfg;
     }
     
     CFG getCFG(JavaField jfield, Set<JMethod> visited) {
-        CFG cfg = getCFG(jfield.getQualifiedName());
-        if (cfg == null) {
-            cfg = CFGFieldBuilder.build(jfield, infoStore, visited);
-            addCFG(cfg);
+        CommonCFG graph = getControlFlowGraph(jfield.getQualifiedName());
+        if (graph != null && graph instanceof CFG) {
+            return (CFG)graph;
         }
+        CFG cfg = CFGFieldBuilder.build(jfield, infoStore, visited);
+        addCFG(cfg);
         return cfg;
     }
 }
