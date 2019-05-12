@@ -100,7 +100,6 @@ public abstract class ModelBuilder {
     public JavaFile getUnregisteredJavaFile(String filepath, String code, JavaProject jproject, String charset) {
         ASTParser parser = getParser();
         
-        
         String[] sourcepaths = jproject.getSourcePath();
         parser.setUnitName(filepath);
         parser.setEnvironment(jproject.getClassPath(), sourcepaths, null, true);

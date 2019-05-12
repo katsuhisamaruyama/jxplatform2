@@ -19,8 +19,8 @@ JxPlatform2 builds a Java source code model consisting of the following elements
 JxPlatform2 creates a CFG for each method existing in Java source code. 
 
 * CFGStore - Provides APIs to create CFGs from Java source code and stores them 
-* CFG - Provides information about a CFG 
-* CCFG - Provides information about a class control flow graph (CCFG) 
+* CFG (extends CommonCFG) - Provides information about a CFG of a method or a field 
+* CCFG (extends CommonCFG) - Provides information about a class control flow graph (CCFG) of a class 
 * BasicBlock - Provides information about a basic block of a CFG 
 * CallGraph - Provides information about a call graph
 
@@ -49,9 +49,9 @@ Each CFGStatement node holds a define-set and a use-set of references to fields,
 JxPlatform2 creates a PDG from a CFG for each method existing in Java source code. 
 
 * PDGStore - Stores a collection of PDGs created from CFGs 
-* PDG - Provides information about a PDG 
-* ClDG - Provides information about a class dependence graph (ClDG) 
-* SDG - Provides information about a system dependence graph (SDG) 
+* PDG (extends CommonCFG) - Provides information about a PDG of a method or a field 
+* ClDG (extends CommonCFG)- Provides information about a class dependence graph (ClDG) a PDG of a method or a class 
+* SDG (extends CommonCFG) - Provides information about a system dependence graph (SDG) the whole source code
 
 Each PDG consists of nodes and edges between two nodes. 
 
@@ -72,6 +72,7 @@ Each slice consists PDG nodes that may affect the value of a variable of interes
 * Slice - Stores information about a program slice 
 * SliceCriterion - Represents a slicing criterion 
 
+A slice is constructed based on flow-sensitive dependency analysis. It traverses PDG nodes that reach a node given as a slice criterion. 
 
 ## Requirement
 
@@ -136,14 +137,29 @@ If your batch-process application employs JxPlatform2 as a library, you should u
 
 The code building a Java model is describe below. 
 
-    import org.jtool.eclipse.batch.ModelBuilderBatch;
-    import org.jtool.eclipse.javamodel.JavaProject;
+    // import org.jtool.eclipse.batch.ModelBuilderBatch;
+    // import org.jtool.eclipse.javamodel.JavaProject;
+    // import org.jtool.eclipse.javamodel.JavaClass;
+    // import org.jtool.eclipse.javamodel.JavaMethod;
+    // import org.jtool.eclipse.javamodel.JavaField;
+    
+    String name;       // an arbitrary project name
+    String target;     // the path of the top directory that contains Java source files in the project
+    String classpath;  // the path of the top directory that contains Java class files and/or jar files
     
     ModelBuilderBatch builder = new ModelBuilderBatch();
     builder.setLogVisible(true);
-    
     JavaProject jproject = builder.build(name, target, classpath);
-    ...
+    
+    for (JavaClass jclass : jproject.getClasses()) {
+        jclass.print();
+        for (JavaMethod jmethod : jclass.getMethods()) {
+            jmethod.print();
+        }
+        for (JavaField jfield : jclass.getFields()) {
+            jfield.print();
+        }
+    }
     
     builder.unbuild();
 
@@ -151,14 +167,16 @@ The code building a Java model is describe below.
 
 The following is the typical code for building a Java model for the source code within the Eclipse project.
 
-    import org.eclipse.jdt.core.IJavaProject;
-    import org.jtool.eclipse.plugin.ModelBuilderPlugin;
-    import org.jtool.eclipse.javamodel.JavaProject;
+    // import org.eclipse.jdt.core.IJavaProject;
+    // import org.jtool.eclipse.plugin.ModelBuilderPlugin;
+    // import org.jtool.eclipse.javamodel.JavaProject;
+    
+    IJavaProject project;  // a Java project resource in Eclipse
     
     ModelBuilderPlugin builder = new ModelBuilderPlugin();
     builder.setLogVisible(true);
-    
     JavaProject jproject = builder.build(project);
+    
     ...
     
     builder.unbuild();
@@ -167,39 +185,38 @@ The plug-in automatically collects source files that was modified after the prev
 Thus, the dirty source files will be analyzed if your code will perform build.
 Use the `buildWhole(project)` method for clean re-build.  
 
+
 ### Building CFGs
 
 The following code builds CCFGs for all classes and CFGs for all methods and fields within a project.
 
-    import org.jtool.eclipse.batch.ModelBuilderBatch;
-    import org.jtool.eclipse.javamodel.JavaProject;
-    import org.jtool.eclipse.javamodel.JavaClass;
-    import org.jtool.eclipse.cfg.CCFG;
-    import org.jtool.eclipse.cfg.CFG;
+    // import org.jtool.eclipse.cfg.CCFG;
+    // import org.jtool.eclipse.cfg.CFG;
     
     ModelBuilderBatch builder = new ModelBuilderBatch();
-    // ModelBuilderPlugin builder = new ModelBuilderPlugin();
     builder.setLogVisible(true);
     builder.setCreatingActualNodes(true);  // creating actual nodes of a CFG
-    
     JavaProject jproject = builder.build(name, target, classpath);
+    
     for (JavaClass jclass : jproject.getClasses()) {
         CCFG ccfg = builder.getCCFG(jclass);
         for (CFG cfg : ccfg.getCFGs()) {
-            ...
+            cfg.print();
         }
     }
     
     builder.unbuild();
-
 
 To build a normal CFG, only the source code within the project is analyzed. If high-precision of dependency analysis is needed, the bytecode of library classes can be additionally analyzed using the following code:
 
     ModelBuilderBatch builder = new ModelBuilderBatch(true);
     // ModelBuilderPlugin builder = new ModelBuilderPlugin(true);
 
+
 A CFG can be created from an object of JavaMethod or JavaField as described below.
 
+    JavaMethod jmethod;  // a representation of a method
+    JavaField jfield;    // a representation of a field
     CFG cfg = builder.getCFG(jmethod);
     CFG cfg = builder.getCFG(jfield);
 
@@ -214,22 +231,19 @@ A call graph can be created within a project, a class, or a method as described 
 
 The following code builds ClDGs for all classes and PDGs for all methods and fields within a project.
 
-    import org.jtool.eclipse.batch.ModelBuilderBatch;
-    import org.jtool.eclipse.javamodel.JavaProject;
-    import org.jtool.eclipse.javamodel.JavaClass;
-    import org.jtool.eclipse.cfg.CCFG;
-    import org.jtool.eclipse.cfg.CFG;
+    // import org.jtool.eclipse.pdg.ClDG;
+    // import org.jtool.eclipse.pdg.PDG;
     
     ModelBuilderBatch builder = new ModelBuilderBatch();
-    // ModelBuilderPlugin builder = new ModelBuilderPlugin();
     builder.setLogVisible(true);
+    builder.setCreatingActualNodes(true);
     builder.setContainingFallThroughEdge(true);  // contains fall-through edges in the constructing a PDG
-    
     JavaProject jproject = builder.build(name, target, classpath);
+    
     for (JavaClass jclass : jproject.getClasses()) {
-        CCFG ccfg = builder.getClDG(jclass);
+        ClDG cldg = builder.getClDG(jclass);
         for (PDG pdg : cldg.getPDGs()) {
-            ...
+            pdg.print();
         }
     }
     
@@ -238,39 +252,70 @@ The following code builds ClDGs for all classes and PDGs for all methods and fie
 
 A PDG, ClDG, and SDG can be created from an object of JavaMethod, JavaField, or JavaClass as described below.
 
-    public PDG pdg = builder.getPDG(jmethod);
-    public PDG pdg = builder.getPDG(jfield);
-    public PDG pdg = builder.getPDGWithinSDG(jmethod);
-    public PDG pdg = builder.getPDGWithinSDG(jfield);
+    PDG pdg = builder.getPDG(jmethod);
+    PDG pdg = builder.getPDG(jfield);
+    PDG pdg = builder.getPDGWithinSDG(jmethod);
+    PDG pdg = builder.getPDGWithinSDG(jfield);
 
-    public ClDG cldg = builder.getClDG(jclass);
-    public ClDG cldg = builder.getClDGWithinSDG(jclass);
-    public ClDG cldg = builder.getClDG(jmethod);
-    public ClDG cldg = builder.getClDGWithinSDG(jmethod);
-    public ClDG cldg = builder.getClDG(jfield);
-    public ClDG cldg = builder.getClDGWithinSDG(jfield);
+    ClDG cldg = builder.getClDG(jclass);
+    ClDG cldg = builder.getClDGWithinSDG(jclass);
+    ClDG cldg = builder.getClDG(jmethod);
+    ClDG cldg = builder.getClDGWithinSDG(jmethod);
+    ClDG cldg = builder.getClDG(jfield);
+    ClDG cldg = builder.getClDGWithinSDG(jfield);
 
-    public SDG sdg = builder.getSDG(jclass);
-    public SDG sdg = builder.getSDG();
+    SDG sdg = builder.getSDG(jclass);
+    SDG sdg = builder.getSDG(classes);  // classes: Set<JavaClass>
+    SDG sdg = builder.getSDG();
 
 
 ### Extracting program slices
 
 A program slice can be created from an object of PDG as described below.
 
+    // import org.jtool.eclipse.pdg.PDGNode;
+    // import org.jtool.eclipse.pdg.PDGStatement;
+    // import org.jtool.eclipse.cfg.JReference;
+    // import org.jtool.eclipse.slice.Slice;
+    // import org.jtool.eclipse.slice.SliceCriterion;
+    
+    JavaClass jclass;  // a class to be sliced
+    PDGNode node;      // a node given as a slice criterion
+    JReference var;    // a variable of interest given as a slice criterion
+    
+    ModelBuilderBatch builder = new ModelBuilderBatch();
+    builder.setLogVisible(true);
+    builder.setCreatingActualNodes(true);  // creating actual nodes of a CFG
+    JavaProject jproject = builder.build(name, target, classpath);
+    
     Set<JavaClass> classes = builder.getAllClassesBackward(jclass);
     SDG sdg = builder.getSDG(classes);
-    ClDG cldg = sdg.getClDG(fqn);
-    String code = jclass.getFile().getCode();
+    ClDG cldg = sdg.getClDG(jclass);
+    
     SliceCriterion criterion = new SliceCriterion(cldg, node, var);
     Slice slice = new Slice(criterion);
+    slice.print();
+    
+    builder.unbuild();
+
+A convenient static method is also provided.
+ 
+    CommonPDG pdg;   // a PDG or ClDG
+    String code;     // the source code text of a class or a method corresponding to common PDG
+    int lineNumber:    // the line number corresponding to a variable of interest
+    int columnNumber:  // column number corresponding to the variable on the line
+    
+    SliceCriterion criterion = SliceCriterion.find(pdg, code, lineNumber, int columnNumber) {
 
 The following code snippet generates Java source code from a program slice.
 
-    ModelBuilderPlugin builder;
-    JavaClass jclass;  // target class
-    Slice slice;       // slice
-    SliceExtractor extractor = new SliceExtractor(builder, slice, jclass);
+    ModelBuilderPlugin builder;  // model builder
+    JavaClass jclass;            // a class to be sliced
+    JavaMethod jmethod;          // a class to be sliced
+    Slice slice;                 // slice
+    
+    SliceExtractor extractor = new SliceExtractor(builder, slice.getNodes(), jclass);
+    // SliceExtractor extractor = new SliceExtractor(builder, slice.getNodes(), jmethods);
     String code = extractor.extract();
 
 ## Author
