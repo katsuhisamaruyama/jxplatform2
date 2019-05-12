@@ -16,16 +16,16 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Compacts accesses to fields outside the project.
+ * Collects accesses to fields outside the project.
  * All methods of this class are not intended to be directly called by clients.
  * 
  * @author Katsuhisa Maruyama
  */
-class PrimaryCompactor {
+class PrimaryCollector {
     
     protected static final String ExternalFieldAccess = "$";
     
-    static void compact(CFG cfg) {
+    static void collect(CFG cfg) {
         for (CFGNode node : cfg.getNodes()) {
             if (node.isMethodCall()) {
                 CFGMethodCall callNode = (CFGMethodCall)node;
@@ -40,8 +40,7 @@ class PrimaryCompactor {
                 }
                 
                 if (count > 0) {
-                    JReference primary = callNode.getPrimary();
-                    if (primary != null) {
+                    for (JReference primary : callNode.getPrimary().getUseVariables()) {
                         callNode.addDefVariable(primary);
                         
                         String type = callNode.getDeclaringClassName();

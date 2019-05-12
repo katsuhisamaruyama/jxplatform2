@@ -125,7 +125,7 @@ public class CFGMethodBuilder {
             cfg.add(exitEdge);
         }
         
-        PrimaryCompactor.compact(cfg);
+        PrimaryCollector.compact(cfg);
         LocalAliasResolver.resolve(cfg);
         
         return cfg;

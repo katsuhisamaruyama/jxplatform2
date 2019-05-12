@@ -39,12 +39,8 @@ public class CFGMethodCall extends CFGStatement {
         return jmethodCall.hasPrimary();
     }
     
-    public JReference getPrimary() {
+    public CFGStatement getPrimary() {
         return jmethodCall.getPrimary();
-    }
-    
-    public String getPrimaryType() {
-        return jmethodCall.getDeclaringClassName();
     }
     
     public String getName() {

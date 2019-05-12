@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -31,7 +31,7 @@ public class JMethodReference extends JReference {
     private List<String> argumentTypes = new ArrayList<String>();
     private List<Boolean> argumentPrimitiveTypes = new ArrayList<Boolean>();
     
-    private JReference primary = null;
+    private CFGStatement primary = null;
     
     public JMethodReference(ASTNode node, IMethodBinding mbinding, List<Expression> args) {
         super(node);
@@ -121,11 +121,11 @@ public class JMethodReference extends JReference {
         return primary != null;
     }
     
-    public void setPrimary(JReference primary) {
+    public void setPrimary(CFGStatement primary) {
         this.primary = primary;
     }
     
-    public JReference getPrimary() {
+    public CFGStatement getPrimary() {
         return primary;
     }
     

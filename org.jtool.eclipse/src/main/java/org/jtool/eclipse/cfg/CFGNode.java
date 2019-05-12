@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -56,6 +56,7 @@ public class CFGNode extends GraphNode {
         methodCall,                 // CFGMethodInvocation (MethodInvocation/SuperMethodInvocation)
         constructorCall,            // CFGMethodInvocation (ConstructorInvocation/SuperConstructorInvocation)
         instanceCreation,           // CFGMethodInvocation (InstanceCreation)
+        
         fieldDeclaration,           // CFGStatement (VariableDeclarationFragment)
         enumConstantDeclaration,    // CFGStatement (VariableDeclarationFragment)
         localDeclaration,           // CFGStatement (VariableDeclarationFragment)
@@ -84,6 +85,7 @@ public class CFGNode extends GraphNode {
         formalOut,                  // CFGParameter
         actualIn,                   // CFGParameter
         actualOut,                  // CFGParameter
+        methodCallPrimary,          // CFGStatement
         
         merge,                      // CFGMerge (for merge)
         dummy;                      // CFGDummy (for dummy)
