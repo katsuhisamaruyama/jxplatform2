@@ -17,9 +17,16 @@ import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.cfg.StopConditionOnReachablePath;
-
+import org.jtool.eclipse.graph.GraphNode;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Finds control dependences in a PDG.
@@ -29,7 +36,13 @@ import java.util.HashSet;
  */
 public class CDFinder {
     
+    private static List<CFGNode> checkedNodes = new ArrayList<CFGNode>();
+    private static Map<CFGNode, Set<CFGNode>> postDominatorCache = new HashMap<CFGNode, Set<CFGNode>>();
+    
     public static void find(PDG pdg, CFG cfg, boolean containingFallThroughEdge) {
+        checkedNodes = reverseSortGraphNode(cfg.getNodes());
+        postDominatorCache.clear();
+        
         findCDs(pdg, cfg, containingFallThroughEdge);
         findCDsFromEntry(pdg, cfg);
         addCDsFromEntry(pdg);
@@ -52,8 +65,8 @@ public class CDFinder {
             CFGNode branchDstNode = branch.getDstNode();
             Set<CFGNode> postDominatorForBranch = postDominator(cfg, branchDstNode, containingFallThroughEdge);
             postDominatorForBranch.add(branchDstNode);
-            
             for (CFGNode cfgnode : postDominatorForBranch) {
+                
                 if (cfgnode.isStatementNotParameter() && !branchNode.equals(cfgnode) && !postDominator.contains(cfgnode)) {
                     CD edge = new CD(branchNode.getPDGNode(), cfgnode.getPDGNode());
                     if (branch.isTrue()) {
@@ -64,14 +77,21 @@ public class CDFinder {
                         edge.setFallThrough();
                     }
                     pdg.add(edge);
+                    
+                    checkedNodes.remove(cfgnode);
                 }
             }
         }
     }
     
     public static Set<CFGNode> postDominator(CFG cfg, CFGNode anchor, boolean containingFallThroughEdge) {
-        Set<CFGNode> postDominator = new HashSet<CFGNode>();
-        for (CFGNode node : cfg.getNodes()) {
+        Set<CFGNode> postDominator = postDominatorCache.get(anchor);
+        if (postDominator != null) {
+            return postDominator;
+        }
+        
+        postDominator = new HashSet<CFGNode>();
+        for (CFGNode node : checkedNodes) {
             if (!anchor.equals(node)) {
                 Set<CFGNode> track = forwardReachableNodes(anchor, node, containingFallThroughEdge);
                 if (track.contains(node) && !track.contains(cfg.getEndNode())) {
@@ -79,6 +99,7 @@ public class CDFinder {
                 }
             }
         }
+        postDominatorCache.put(anchor, postDominator);
         return postDominator;
     }
     
@@ -170,5 +191,21 @@ public class CDFinder {
                 }
             });
         }
+    }
+    
+    private static List<CFGNode> reverseSortGraphNode(Collection<CFGNode> co) {
+        List<CFGNode> nodes = new ArrayList<CFGNode>(co);
+        Collections.sort(nodes, new Comparator<GraphNode>() {
+            public int compare(GraphNode node1, GraphNode node2) {
+                if (node2.getId() == node1.getId()) {
+                    return 0;
+                } else if (node1.getId() < node2.getId()) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        });
+        return nodes;
     }
 }
