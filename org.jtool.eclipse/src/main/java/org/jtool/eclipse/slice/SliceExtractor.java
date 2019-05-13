@@ -537,6 +537,8 @@ public class SliceExtractor extends ASTVisitor {
                     newExpression = node.getAST().newBooleanLiteral(false);
                 } else if (type.toString().equals("char")) {
                     newExpression = node.getAST().newCharacterLiteral();
+                } else if (type.toString().equals("void")) {
+                    newExpression = null;
                 } else {
                     newExpression = node.getAST().newNumberLiteral();
                 }
