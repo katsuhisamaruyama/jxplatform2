@@ -72,7 +72,7 @@ Each slice consists PDG nodes that may affect the value of a variable of interes
 * Slice - Stores information about a program slice 
 * SliceCriterion - Represents a slicing criterion 
 
-A slice is constructed based on flow-sensitive dependency analysis. It traverses PDG nodes that reach a node given as a slice criterion. 
+A slice is constructed based on flow-sensitive dependency analysis. It traverses only the PDG nodes that reach a node given as a slice criterion. 
 
 ## Requirement
 
