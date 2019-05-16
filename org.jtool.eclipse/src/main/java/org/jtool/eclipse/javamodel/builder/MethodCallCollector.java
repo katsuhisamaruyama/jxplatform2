@@ -124,7 +124,7 @@ public class MethodCallCollector extends ASTVisitor {
     private void addMethodCall(Type type) {
         if (type != null) {
             JavaClass jc = JavaElement.findDeclaringClass(type.resolveBinding());
-            if (jc.isInProject()) {
+            if (jc != null && jc.isInProject()) {
                 bindingOk = false;
                 Logger.getInstance().printUnresolvedError("$ClassInstanceCreation" + " of " + jc.getQualifiedName());
             }

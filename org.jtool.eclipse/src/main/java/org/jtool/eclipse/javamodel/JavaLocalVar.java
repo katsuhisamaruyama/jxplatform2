@@ -31,7 +31,7 @@ public class JavaLocalVar extends JavaVariable {
     protected JavaLocalVar(ASTNode node, IVariableBinding vbinding, JavaMethod jmethod) {
         super(node, jmethod.getFile());
         
-        if (vbinding != null) {
+        if (vbinding != null && vbinding.getType() != null) {
             binding = vbinding.getVariableDeclaration();
             name = vbinding.getName();
             fqn = name;

@@ -208,8 +208,10 @@ public class JavaMethod extends JavaElement {
     
     protected void collectParameters(List<VariableDeclaration> params) {
         for (VariableDeclaration decl : params) {
-            JavaLocalVar param = new JavaLocalVar(decl, this);
-            parameters.add(param);
+            if (decl.resolveBinding() != null) {
+                JavaLocalVar param = new JavaLocalVar(decl, this);
+                parameters.add(param);
+            }
         }
     }
     

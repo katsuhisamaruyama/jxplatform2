@@ -107,6 +107,26 @@ public class JavaModelBuilderTest {
         builder.unbuild();
     }
     
+    @Ignore
+    public void testElasticsearch() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "elasticsearch-6.7.2/";
+        String classpath = dir + "elasticsearch-6.7.2/lib/*";
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, classpath);
+        builder.unbuild();
+    }
+    
+    @Ignore
+    public void testSpring() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "spring-framework-5.2.0m2/";
+        String classpath = dir + "spring-framework-5.2.0m2/lib/*";
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, classpath);
+        builder.unbuild();
+    }
+    
     public static void print() {
         String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
         String name = "Simple/";
@@ -133,16 +153,18 @@ public class JavaModelBuilderTest {
     public static void main(String[] args) {
         JavaModelBuilderTest tester = new JavaModelBuilderTest();
         
-        tester.testSimple();
-        tester.testDrawTool();
-        tester.testLambda();
-        tester.testJrb();
+        //tester.testSimple();
+        //tester.testDrawTool();
+        //tester.testLambda();
+        //tester.testJrb();
         
         // tester.testTetris();
         // tester.testCSSample();
         // tester.testFindbugs();
         // tester.testApacheAnt();
         // tester.testJdk8();
+        // tester.testElasticsearch();
+        tester.testSpring();  // ERROR: NullPointerException in MethodCallCollector.java:127
         
         // print();
     }
