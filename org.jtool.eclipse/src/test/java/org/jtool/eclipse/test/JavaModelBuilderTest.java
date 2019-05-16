@@ -153,18 +153,18 @@ public class JavaModelBuilderTest {
     public static void main(String[] args) {
         JavaModelBuilderTest tester = new JavaModelBuilderTest();
         
-        //tester.testSimple();
-        //tester.testDrawTool();
-        //tester.testLambda();
-        //tester.testJrb();
+        tester.testSimple();
+        tester.testDrawTool();
+        tester.testLambda();
+        tester.testJrb();
         
-        // tester.testTetris();
-        // tester.testCSSample();
-        // tester.testFindbugs();
-        // tester.testApacheAnt();
-        // tester.testJdk8();
-        // tester.testElasticsearch();
-        tester.testSpring();  // ERROR: NullPointerException in MethodCallCollector.java:127
+        //tester.testTetris();
+        //tester.testCSSample();
+        //tester.testFindbugs();
+        //tester.testApacheAnt();
+        //tester.testJdk8();
+        //tester.testElasticsearch();
+        //tester.testSpring();
         
         // print();
     }
