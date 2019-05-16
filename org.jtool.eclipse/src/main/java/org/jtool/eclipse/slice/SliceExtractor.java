@@ -15,6 +15,7 @@ import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.builder.ModelBuilder;
 import org.jtool.eclipse.codemanipulation.ASTNodeOnCFGCollector;
+import org.jtool.eclipse.codemanipulation.MethodInvocationCollector;
 import org.jtool.eclipse.codemanipulation.CodeGenerator;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -31,6 +32,7 @@ import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.AssertStatement;
@@ -155,6 +157,10 @@ public class SliceExtractor extends ASTVisitor {
     }
     
     private boolean contains(ASTNode astnode) {
+        if (astnode == null) {
+            return false;
+        }
+        
         for (ASTNode node : sliceNodes) {
             if (astnode.getStartPosition() == node.getStartPosition()) {
                 return true;
@@ -164,6 +170,10 @@ public class SliceExtractor extends ASTVisitor {
     }
     
     private boolean containsAnyInSubTree(ASTNode astnode) {
+        if (astnode == null) {
+            return false;
+        }
+        
         ASTNodeOnCFGCollector collector = new ASTNodeOnCFGCollector(astnode);
         for (ASTNode node : collector.getNodeSet()) {
             if (contains(node)) {
@@ -260,7 +270,7 @@ public class SliceExtractor extends ASTVisitor {
             if (!containsAnyInSubTree(frag)) {
                 removeNodes.add(frag);
             } else if (!contains(frag) && fragments.size() == 1) {
-                pullUpExpression(frag, frag.getInitializer());
+                pullUpExpressionInVariableDeclaration(frag, frag.getInitializer());
             }
         }
         for (VariableDeclarationFragment n : removeNodes) {
@@ -269,12 +279,12 @@ public class SliceExtractor extends ASTVisitor {
     }
     
     @SuppressWarnings("unchecked")
-    private void pullUpExpression(ASTNode astnode, Expression expr) {
+    private void pullUpExpressionInVariableDeclaration(ASTNode astnode, Expression expr) {
         if (expr != null && containsAnyInSubTree(expr)) {
             ASTNode parent = getEnclosingStatement(astnode.getParent()).getParent();
+            
             if (parent instanceof Block) {
                 Expression newExpression = (Expression)ASTNode.copySubtree(expr.getAST(), expr);
-                
                 ExpressionStatement newStatement = (ExpressionStatement)expr.getAST().newExpressionStatement(newExpression);
                 Block block = (Block)parent;
                 for (int index = 0; index < block.statements().size(); index++) {
@@ -285,6 +295,52 @@ public class SliceExtractor extends ASTVisitor {
                         return;
                     }
                 }
+            }
+        }
+    }
+    
+    private void pullUpMethodInvocationsInCondition(Statement statement, Expression expr) {
+        List<Expression> exprs = new ArrayList<Expression>();
+        exprs.add(expr);
+        pullUpMethodInvocationsInCondition(statement, exprs);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void pullUpMethodInvocationsInCondition(Statement statement, List<Expression> exprs) {
+        List<MethodInvocation> invocations = new ArrayList<MethodInvocation>();
+        for (Expression expr : exprs) {
+            MethodInvocationCollector collector = new MethodInvocationCollector(expr);
+            for (ASTNode astnode : collector.getNodes()) {
+                if (astnode instanceof MethodInvocation) {
+                    invocations.add((MethodInvocation)astnode);
+                }
+            }
+        }
+        
+        if (invocations.size() == 1) {
+            Expression newExpression = (Expression)ASTNode.copySubtree(statement.getAST(), invocations.get(0));
+            ExpressionStatement newStatement = (ExpressionStatement)statement.getAST().newExpressionStatement(newExpression);
+            repalceStatement(statement, newStatement);
+        } else if (invocations.size() > 1) {
+            Block newBlock = (Block)statement.getAST().newBlock();
+            repalceStatement(statement, newBlock);
+            for (int index = 0; index < invocations.size(); index++) {
+                Expression newExpression = (Expression)ASTNode.copySubtree(statement.getAST(), invocations.get(index));
+                ExpressionStatement newStatement = (ExpressionStatement)statement.getAST().newExpressionStatement(newExpression);
+                newBlock.statements().add(newStatement);
+            }
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void repalceStatement(Statement statement, Statement newStatement) {
+        StructuralPropertyDescriptor location = statement.getLocationInParent();
+        if (location != null) {
+            if (location.isChildProperty()) {
+                statement.getParent().setStructuralProperty(location, newStatement);
+            } else if (location.isChildListProperty()) {
+                List<ASTNode> property = (List<ASTNode>)statement.getParent().getStructuralProperty(location);
+                property.set(property.indexOf(statement), newStatement);
             }
         }
     }
@@ -422,6 +478,12 @@ public class SliceExtractor extends ASTVisitor {
         if (removeWholeElement(node)) {
             return false;
         }
+        
+        if (!containsAnyInSubTree(node.getBody())) {
+            pullUpMethodInvocationsInCondition(node, node.getExpression());
+            node.delete();
+        }
+        
         return true;
     }
     
@@ -430,6 +492,12 @@ public class SliceExtractor extends ASTVisitor {
         if (removeWholeElement(node)) {
             return false;
         }
+        
+        if (!containsAnyInSubTree(node.getBody())) {
+            pullUpMethodInvocationsInCondition(node, node.getExpression());
+            node.delete();
+        }
+        
         return true;
     }
     
@@ -448,6 +516,15 @@ public class SliceExtractor extends ASTVisitor {
             return false;
         }
         
+        if (!containsAnyInSubTree(node.getBody()) && node.updaters().size() == 0) {
+            List<Expression> exprs = new ArrayList<Expression>();
+            exprs.addAll((List<Expression>)node.initializers());
+            exprs.add(node.getExpression());
+            exprs.addAll((List<Expression>)node.updaters());
+            pullUpMethodInvocationsInCondition(node, exprs);
+            node.delete();
+        }
+        
         List<Expression> removeNodes = new ArrayList<Expression>();
         for (Expression expr : (List<Expression>)node.updaters()) {
             if (!contains(expr)) {
@@ -460,9 +537,17 @@ public class SliceExtractor extends ASTVisitor {
         return true;
     }
     
+    
+    
     @Override
     public boolean visit(IfStatement node) {
         if (removeWholeElement(node)) {
+            return false;
+        }
+        
+        if (!containsAnyInSubTree(node.getThenStatement()) && !containsAnyInSubTree(node.getElseStatement())) {
+            pullUpMethodInvocationsInCondition(node, node.getExpression());
+            node.delete();
             return false;
         }
         
@@ -500,6 +585,12 @@ public class SliceExtractor extends ASTVisitor {
         if (removeWholeElement(node)) {
             return false;
         }
+        
+        if (!containsAnyInSubTree(node.getBody())) {
+            pullUpMethodInvocationsInCondition(node, node.getExpression());
+            node.delete();
+        }
+        
         return true;
     }
     
