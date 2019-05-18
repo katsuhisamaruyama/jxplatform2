@@ -41,10 +41,6 @@ public class JavaProject {
     
     private ModelBuilder modelBuilder;
     
-    public JavaProject(String name, String path) {
-        this(name, path, path);
-    }
-    
     public JavaProject(String name, String path, String dir) {
         this.name = name;
         this.path = path;

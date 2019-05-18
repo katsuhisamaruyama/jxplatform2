@@ -56,7 +56,7 @@ public class CFGModelBuilderTest {
         String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
         String target = dir + "Simple/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);  // without byte-code analysis
-        JavaProject jproject = builder.build(target, target, target);
+        JavaProject jproject = builder.build(target, target, target, target, target);
         
         builder.setCreatingActualNodes(false);
         CCFG[] ccfgs = buildCFGsForTest(builder, jproject.getClasses());
@@ -69,7 +69,7 @@ public class CFGModelBuilderTest {
         String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
         String target = dir + "Simple/";
         ModelBuilderBatch builder = new ModelBuilderBatch(true);  // with byte-code analysis
-        JavaProject jproject = builder.build(target, target, target);
+        JavaProject jproject = builder.build(target, target, target, target, target);
         
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
@@ -79,9 +79,9 @@ public class CFGModelBuilderTest {
     @Test
     public void testDrawTool() {
         String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
-        String target = dir + "DrawTool/src/";
+        String target = dir + "DrawTool/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, target);
+        JavaProject jproject = builder.build(target, target, target, target + "/src", target);
         
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
@@ -93,7 +93,7 @@ public class CFGModelBuilderTest {
         String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
         String target = dir + "Lambda/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, target);
+        JavaProject jproject = builder.build(target, target, target, target, target);
         
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
@@ -103,9 +103,9 @@ public class CFGModelBuilderTest {
     @Test
     public void testJrb() {
         String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
-        String target = dir + "jrb-1.0.2/src/";
+        String target = dir + "jrb-1.0.2/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, target);
+        JavaProject jproject = builder.build(target, target, target, target + "/src", target);
         
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
@@ -115,9 +115,9 @@ public class CFGModelBuilderTest {
     @Ignore
     public void testTetris() {
         String dir = "/Users/maru/Desktop/TestSamples/";
-        String target = dir + "Tetris/src/";
+        String target = dir + "Tetris/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, target);
+        JavaProject jproject = builder.build(target, target, target, target + "/src", target);
         
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
@@ -130,7 +130,7 @@ public class CFGModelBuilderTest {
         String target = dir + "CS-Sample/";
         String classpath = dir + "CS-Sample/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, classpath);
+        JavaProject jproject = builder.build(target, target, classpath, target + "/src", target);
         
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
@@ -143,7 +143,7 @@ public class CFGModelBuilderTest {
         String target = dir + "findbugs/";
         String classpath = dir + "findbugs/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, classpath);
+        JavaProject jproject = builder.build(target, target, classpath, target + "/src", target);
         
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
@@ -156,7 +156,7 @@ public class CFGModelBuilderTest {
         String target = dir + "apache-ant/";
         String classpath = dir + "apache-ant/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, classpath);
+        JavaProject jproject = builder.build(target, target, classpath, target + "/src", target);
         
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
@@ -169,7 +169,7 @@ public class CFGModelBuilderTest {
         String target = dir + "jdk1.8.0_131/";
         String classpath = dir + "jdk1.8.0_131/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, classpath);
+        JavaProject jproject = builder.build(target, target, classpath, target + "/src", target);
         
         builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
@@ -206,11 +206,11 @@ public class CFGModelBuilderTest {
         tester.testLambda();
         tester.testJrb();
         
-        // tester.testTetris();
-        // tester.testCSSample();
-        // tester.testFindbugs();
-        // tester.testApacheAnt();
-        // tester.testJdk8();
+        //tester.testTetris();
+        //tester.testCSSample();
+        //tester.testFindbugs();
+        //tester.testApacheAnt();
+        //tester.testJdk8();
         
         // print();
     }

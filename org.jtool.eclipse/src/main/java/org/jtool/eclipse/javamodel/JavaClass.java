@@ -670,16 +670,20 @@ public class JavaClass extends JavaElement {
     
     private void getAllSuperInterfaces(JavaClass jclass, List<JavaClass> jclasses) {
         for (JavaClass parent : jclass.getSuperInterfaces()) {
-            jclasses.add(parent);
-            getAllSuperInterfaces(parent, jclasses);
+            if (!jclasses.contains(parent)) {
+                jclasses.add(parent);
+                getAllSuperInterfaces(parent, jclasses);
+            }
         }
     }
     
     private void getAllChildren(JavaClass jclass, List<JavaClass> jclasses) {
         for (JavaClass child : jclass.getChildren()) {
             if (child != null) {
-                jclasses.add(child);
-                getAllChildren(child, jclasses);
+                if (!jclasses.contains(child)) {
+                    jclasses.add(child);
+                    getAllChildren(child, jclasses);
+                }
             }
         }
     }

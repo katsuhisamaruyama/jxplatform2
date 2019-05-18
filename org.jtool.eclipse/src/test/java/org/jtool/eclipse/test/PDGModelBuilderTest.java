@@ -57,7 +57,7 @@ public class PDGModelBuilderTest {
         String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
         String target = dir + "Simple/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, target);
+        JavaProject jproject = builder.build(target, target, target, target, target);
         
         builder.setCreatingActualNodes(false);
         ClDG[] cldgs = buildPDGsForTest(builder, jproject.getClasses());
@@ -68,9 +68,9 @@ public class PDGModelBuilderTest {
     @Test
     public void testDrawTool() {
         String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
-        String target = dir +  "DrawTool/src/";
+        String target = dir +  "DrawTool/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, target);
+        JavaProject jproject = builder.build(target, target, target, target + "/src", target);
         
         builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
@@ -82,7 +82,7 @@ public class PDGModelBuilderTest {
         String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
         String target = dir +  "Lambda/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, target);
+        JavaProject jproject = builder.build(target, target, target, target, target);
         
         builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
@@ -92,9 +92,9 @@ public class PDGModelBuilderTest {
     @Test
     public void testJrb() {
         String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
-        String target = dir +  "jrb-1.0.2/src/";
+        String target = dir +  "jrb-1.0.2/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, target);
+        JavaProject jproject = builder.build(target, target, target, target + "/src", target);
         
         builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
@@ -104,9 +104,9 @@ public class PDGModelBuilderTest {
     @Ignore
     public void testTetris() {
         String dir = "/Users/maru/Desktop/TestSamples/";
-        String target = dir + "Tetris/src/";
+        String target = dir + "Tetris/";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, target);
+        JavaProject jproject = builder.build(target, target, target, target + "/src", target);
         
         builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
@@ -119,7 +119,7 @@ public class PDGModelBuilderTest {
         String target = dir + "CS-Sample/";
         String classpath = dir + "CS-Sample/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, classpath);
+        JavaProject jproject = builder.build(target, target, classpath, target + "/src", target);
         
         builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
@@ -132,7 +132,7 @@ public class PDGModelBuilderTest {
         String target = dir + "findbugs/";
         String classpath = dir + "findbugs/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, classpath);
+        JavaProject jproject = builder.build(target, target, classpath, target + "/src", target);
         
         builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
@@ -145,7 +145,7 @@ public class PDGModelBuilderTest {
         String target = dir + "apache-ant/";
         String classpath = dir + "apache-ant/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, classpath);
+        JavaProject jproject = builder.build(target, target, classpath, target + "/src", target);
         
         builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
@@ -158,7 +158,7 @@ public class PDGModelBuilderTest {
         String target = dir + "jdk1.8.0_131/";
         String classpath = dir + "jdk1.8.0_131/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
-        JavaProject jproject = builder.build(target, target, classpath);
+        JavaProject jproject = builder.build(target, target, classpath, target + "/src", target);
         
         builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
@@ -195,11 +195,11 @@ public class PDGModelBuilderTest {
         tester.testLambda();
         tester.testJrb();
         
-        // tester.testTetris();
-        // tester.testCSSample();
-        // tester.testFindbugs();
-        // tester.testApacheAnt();
-        // tester.testJdk8();
+        //tester.testTetris();
+        //tester.testCSSample();
+        //tester.testFindbugs();
+        //tester.testApacheAnt();
+        //tester.testJdk8();
         
         // print();
     }

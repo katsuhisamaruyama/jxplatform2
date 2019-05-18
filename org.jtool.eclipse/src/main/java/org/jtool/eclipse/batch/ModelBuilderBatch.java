@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -53,21 +53,56 @@ public class ModelBuilderBatch extends ModelBuilder {
     
     public JavaProject build(String name, String target, String[] classPath) {
         try {
-            File dir = new File(target);
-            currentProject = new JavaProject(name, dir.getCanonicalPath());
-            currentProject.setModelBuilder(this);
-            currentProject.setClassPath(classPath);
-            
-            ProjectStore.getInstance().addProject(currentProject);
-            ProjectStore.getInstance().setModelBuilder(this);
-            
-            cfgStore.create(currentProject, analyzingBytecode);
-            
-            run();
-            Logger.getInstance().writeLog();
+            File file = new File(target);
+            String dir = file.getCanonicalPath();
+            String[] sourcePath = new String[1];
+            sourcePath[0] = dir + File.separatorChar + "src";
+            String binaryPath = dir + File.separatorChar + "bin";
+            return build(name, target, classPath, sourcePath, binaryPath);
         } catch (IOException e) {
             currentProject = null;
+            return null;
         }
+    }
+    
+    public JavaProject build(String name, String target, String classPath, String sourcePath, String binaryPath) {
+        return build(name, target, getClassPath(classPath), sourcePath, binaryPath);
+    }
+    
+    public JavaProject build(String name, String target, String classPath, String[] sourcePaths, String binaryPath) {
+        return build(name, target, getClassPath(classPath), sourcePaths, binaryPath);
+    }
+    
+    public JavaProject build(String name, String target, String[] classPath, String sourcePath, String binaryPath) {
+        String[] sourcePaths = new String[1];
+        sourcePaths[0] = sourcePath;
+        return build(name, target, classPath, sourcePaths, binaryPath);
+    }
+    
+    public JavaProject build(String name, String target, String[] classPath, String[] sourcePaths, String binaryPath) {
+        try {
+            File file = new File(target);
+            String path = file.getCanonicalPath();
+            return build(name, target, path, classPath, sourcePaths, binaryPath);
+        } catch (IOException e) {
+            currentProject = null;
+            return null;
+        }
+    }
+    
+    public JavaProject build(String name, String target, String path, String[] classPath, String[] sourcePaths, String binaryPath) {
+        currentProject = new JavaProject(name, path, path);
+        currentProject.setModelBuilder(this);
+        currentProject.setClassPath(classPath);
+        currentProject.setSourceBinaryPaths(sourcePaths, binaryPath);
+        
+        ProjectStore.getInstance().addProject(currentProject);
+        ProjectStore.getInstance().setModelBuilder(this);
+        
+        cfgStore.create(currentProject, analyzingBytecode);
+        
+        run();
+        Logger.getInstance().writeLog();
         return currentProject;
     }
     
@@ -119,7 +154,7 @@ public class ModelBuilderBatch extends ModelBuilder {
     }
     
     private void run() {
-        List<File> sourceFiles = collectAllJavaFiles(currentProject.getPath());
+        List<File> sourceFiles = collectAllJavaFiles(currentProject.getSourcePath());
         if (sourceFiles.size() > 0) {
             String[] paths = new String[sourceFiles.size()];
             String[] encodings = new String[sourceFiles.size()];
@@ -190,6 +225,14 @@ public class ModelBuilderBatch extends ModelBuilder {
             Logger.getInstance().printLog("-Built " + jclass.getQualifiedName() + " (" + count + "/" + size + ")");
         }
         pm.done();
+    }
+    
+    private static List<File> collectAllJavaFiles(String[] paths) {
+        List<File> files = new ArrayList<File>();
+        for (String path : paths) {
+            files.addAll(collectAllJavaFiles(path));
+        }
+        return files;
     }
     
     private static List<File> collectAllJavaFiles(String path) {

@@ -35,7 +35,7 @@ public class SliceTest {
         String target = dir +  "Slice/";
         builder = new ModelBuilderBatch(true);
         builder.setCreatingActualNodes(true);
-        jproject = builder.build(target, target, target);
+        jproject = builder.build(target, target, target, target, target);
     }
     
     @AfterClass
