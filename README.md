@@ -195,7 +195,6 @@ The following code builds CCFGs for all classes and CFGs for all methods and fie
     
     ModelBuilderBatch builder = new ModelBuilderBatch();
     builder.setLogVisible(true);
-    builder.setCreatingActualNodes(true);  // creating actual nodes of a CFG
     JavaProject jproject = builder.build(name, target, classpath);
     
     for (JavaClass jclass : jproject.getClasses()) {
@@ -217,14 +216,16 @@ A CFG can be created from an object of JavaMethod or JavaField as described belo
 
     JavaMethod jmethod;  // a representation of a method
     JavaField jfield;    // a representation of a field
-    CFG cfg = builder.getCFG(jmethod);
-    CFG cfg = builder.getCFG(jfield);
+    boolean force;       // whether the analyzer forces to create CFGs PDGs or allows to reuse them
+    CFG cfg = builder.getCFG(jmethod, force);
+    CFG cfg = builder.getCFG(jfield, force);
 
 A call graph can be created within a project, a class, or a method as described below..
 
-    CallGraph callGraph = build.getCallGraph(JavaProject jproject);
-    CallGraph callGraph = build.getCallGraph(JavaClass jclass);
-    CallGraph callGraph = build.getCallGraph(JavaMethod jmethod);
+    CallGraph callGraph;
+    callGraph = build.getCallGraph(JavaProject jproject);
+    callGraph = build.getCallGraph(JavaClass jclass);
+    callGraph = build.getCallGraph(JavaMethod jmethod);
 
 
 ### Building PDGs
@@ -236,7 +237,6 @@ The following code builds ClDGs for all classes and PDGs for all methods and fie
     
     ModelBuilderBatch builder = new ModelBuilderBatch();
     builder.setLogVisible(true);
-    builder.setCreatingActualNodes(true);
     builder.setContainingFallThroughEdge(true);  // contains fall-through edges in the constructing a PDG
     JavaProject jproject = builder.build(name, target, classpath);
     
@@ -251,22 +251,23 @@ The following code builds ClDGs for all classes and PDGs for all methods and fie
 
 
 A PDG, ClDG, and SDG can be created from an object of JavaMethod, JavaField, or JavaClass as described below.
-
-    PDG pdg = builder.getPDG(jmethod);
-    PDG pdg = builder.getPDG(jfield);
-    PDG pdg = builder.getPDGWithinSDG(jmethod);
-    PDG pdg = builder.getPDGWithinSDG(jfield);
-
-    ClDG cldg = builder.getClDG(jclass);
-    ClDG cldg = builder.getClDGWithinSDG(jclass);
-    ClDG cldg = builder.getClDG(jmethod);
-    ClDG cldg = builder.getClDGWithinSDG(jmethod);
-    ClDG cldg = builder.getClDG(jfield);
-    ClDG cldg = builder.getClDGWithinSDG(jfield);
-
-    SDG sdg = builder.getSDG(jclass);
-    SDG sdg = builder.getSDG(classes);  // classes: Set<JavaClass>
-    SDG sdg = builder.getSDG();
+    
+    PDG pdg;
+    pdg = getPDG(cfg, force);
+    pdg = builder.getPDG(jmethod, force);
+    pdg = builder.getPDG(jfield, force);
+    pdg = builder.getPDGWithinSDG(jmethod, force);
+    pdg = builder.getPDGWithinSDG(jfield, force);
+    
+    ClDG cldg;
+    cldg = getClDG(ccfg, force);
+    cldg = builder.getClDG(jclass, force);
+    cldg = builder.getClDGWithinSDG(jclass, force);
+    
+    SDG sdg;
+    sdg = builder.getSDG(jclass, force);
+    sdg = builder.getSDG(classes, force);  // classes: Set<JavaClass>
+    sdg = builder.getSDG();
 
 
 ### Extracting program slices
@@ -285,7 +286,6 @@ A program slice can be created from an object of PDG as described below.
     
     ModelBuilderBatch builder = new ModelBuilderBatch();
     builder.setLogVisible(true);
-    builder.setCreatingActualNodes(true);  // creating actual nodes of a CFG
     JavaProject jproject = builder.build(name, target, classpath);
     
     Set<JavaClass> classes = builder.getAllClassesBackward(jclass);
