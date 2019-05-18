@@ -73,10 +73,6 @@ class JInfoStore {
         return analysisLevel;
     }
     
-    boolean creatingActualNodes() {
-        return cfgStore.creatingActualNodes();
-    }
-    
     void writeCache() {
         if (analysisLevel > 0) {
             List<JClass> classes = new ArrayList<JClass>();

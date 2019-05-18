@@ -26,23 +26,23 @@ import org.jtool.eclipse.javamodel.JavaMethod;
  */
 public class CCFGBuilder {
     
-    public static CCFG build(JavaProject jproject, JInfoStore infoStore) {
+    public static CCFG build(JavaProject jproject, boolean force, JInfoStore infoStore) {
         CCFG ccfg = new CCFG();
         for (JavaClass jclass : jproject.getClasses()) {
-            build(ccfg, jclass, infoStore);
+            build(ccfg, jclass, force, infoStore);
         }
         addFiledAccesses(ccfg);
         return ccfg;
     }
     
-    public static CCFG build(JavaClass jclass, JInfoStore infoStore) {
+    public static CCFG build(JavaClass jclass, boolean force, JInfoStore infoStore) {
         CCFG ccfg = new CCFG();
-        build(ccfg, jclass, infoStore);
+        build(ccfg, jclass, force, infoStore);
         addFiledAccesses(ccfg);
         return ccfg;
     }
     
-    private static void build(CCFG ccfg, JavaClass jclass, JInfoStore infoStore) {
+    private static void build(CCFG ccfg, JavaClass jclass, boolean force, JInfoStore infoStore) {
         CFGClassEntry entry;
         if (jclass.isEnum()) {
             entry = new CFGClassEntry(jclass, CFGNode.Kind.enumEntry);
@@ -55,7 +55,7 @@ public class CCFGBuilder {
         ccfg.add(entry);
         
         for (JavaMethod jmethod : jclass.getMethods()) {
-            CFG cfg = infoStore.getCFGStore().getCFG(jmethod);
+            CFG cfg = infoStore.getCFGStore().getCFG(jmethod, force);
             if (cfg == null) {
                 cfg = CFGMethodBuilder.build(jmethod, infoStore);
             }
@@ -64,7 +64,7 @@ public class CCFGBuilder {
         }
         
         for (JavaField jfild : jclass.getFields()) {
-            CFG cfg = infoStore.getCFGStore().getCFG(jfild);
+            CFG cfg = infoStore.getCFGStore().getCFG(jfild, force);
             if (cfg == null) {
                 cfg = CFGFieldBuilder.build(jfild, infoStore);
             }
@@ -73,7 +73,7 @@ public class CCFGBuilder {
         }
         
         for (JavaClass jc : jclass.getInnerClasses()) {
-            CCFG ccfg2 = build(jc, infoStore);
+            CCFG ccfg2 = build(jc, force, infoStore);
             entry.addType(ccfg2);
         }
     }

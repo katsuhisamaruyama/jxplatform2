@@ -352,21 +352,6 @@ public class ExpressionVisitor extends ASTVisitor {
     }
     
     private void checkDefUseFieldsInCalledMethod(CFGMethodCall callNode, JMethodReference jcall) {
-        
-        
-        /*
-        JReference ref = null;
-        if (curNode.getUseVariables().size() == 1) {
-            ref = curNode.getUseVariables().get(0);
-        } else if (curNode.getUseVariables().size() == 0 && jcall.isStatic()) {
-            ref = new JInvisibleVarReference(primary, jcall.getDeclaringClassName(), jcall.getDeclaringClassName(), false);
-        }
-        jcall.setPrimary(ref);
-        if (ref == null) {
-            return;
-        }
-        */
-        
         JMethod method = infoStore.getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
         if (method != null) {
             if (method.defuseDecided()) {
@@ -501,9 +486,7 @@ public class ExpressionVisitor extends ASTVisitor {
     }
     
     private void setActualNodes(CFGMethodCall callNode, CFGStatement primaryNode, ASTNode node, List<Expression> arguments) {
-        boolean actual = infoStore.creatingActualNodes() &&
-                callNode.getMethodCall().isInProject() &&
-                !callNode.getMethodCall().callSelfDirectly();
+        boolean actual = callNode.getMethodCall().isInProject() && !callNode.getMethodCall().callSelfDirectly();
         if (actual) {
             createActualIns(callNode, arguments);
         } else {

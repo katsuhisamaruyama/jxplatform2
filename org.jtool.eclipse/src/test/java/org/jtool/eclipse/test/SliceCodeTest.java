@@ -37,7 +37,6 @@ public class SliceCodeTest {
         String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
         String target = dir +  "Slice/";
         builder = new ModelBuilderBatch(true);
-        builder.setCreatingActualNodes(true);
         jproject = builder.build(target, target, target, target, target);
     }
     
@@ -54,7 +53,7 @@ public class SliceCodeTest {
         Set<JavaClass> classes = builder.getAllClassesBackward(jclass);
         SDG sdg = builder.getSDG(classes);
         ClDG cldg = sdg.getClDG(jclass.getQualifiedName());
-        // pdg.print();
+        // cldg.print();
         
         String code = jclass.getFile().getCode();
         SliceCriterion criterion = SliceCriterion.find(cldg, code, lineNumber, offset);
@@ -1063,7 +1062,7 @@ public class SliceCodeTest {
                 "class Test119 {\n" + 
                 "    public void m() {\n" + 
                 "        A a = new A();\n" + 
-                "        a.setX();\n" + 
+                "        a.setX(2);\n" + 
                 "    }\n" + 
                 "}\n";
         assertEquals(expected, code);
@@ -1077,6 +1076,7 @@ public class SliceCodeTest {
                 "class Test119 {\n" + 
                 "    public void m() {\n" + 
                 "        A a = new A();\n" + 
+                "        a.setX(2);\n" +
                 "        int b = a.getX();\n" + 
                 "    }\n" + 
                 "}\n";
@@ -1093,7 +1093,7 @@ public class SliceCodeTest {
                 "    public void m() {\n" + 
                 "        p = 10;\n" + 
                 "        A a = new A();\n" + 
-                "        a.setX();\n" + 
+                "        a.setX(2);\n" + 
                 "        int c = a.x + p;\n" + 
                 "    }\n" + 
                 "}\n";

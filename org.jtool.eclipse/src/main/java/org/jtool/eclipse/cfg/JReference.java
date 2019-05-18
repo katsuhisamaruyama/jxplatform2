@@ -199,7 +199,7 @@ public abstract class JReference {
             return qname;
         }
         qname = tbinding.getBinaryName();
-        if (qname.length() != 0) {
+        if (qname != null && qname.length() != 0) {
             return qname;
         }
         

@@ -6,7 +6,6 @@
 
 package org.jtool.eclipse.cfg.builder;
 
-import org.jtool.eclipse.cfg.CommonCFG;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGMethodCall;
@@ -46,7 +45,7 @@ public class CallGraphBuilder {
     
     public static CallGraph getCallGraph(JavaMethod jmethod, CFGStore cfgStore) {
         CallGraph callGraph = new CallGraph(jmethod.getQualifiedName());
-        CFG cfg = cfgStore.getCFG(jmethod);
+        CFG cfg = cfgStore.findCFG(jmethod.getQualifiedName());
         if (cfg == null) {
             return null;
         }
@@ -54,27 +53,27 @@ public class CallGraphBuilder {
         for (CFGNode cfgNode : cfg.getNodes()) {
             if (cfgNode.isMethodCall()) {
                 CFGMethodCall call = (CFGMethodCall)cfgNode;
-                CommonCFG callee = cfgStore.getControlFlowGraph(call.getQualifiedName());
-                if (callee != null && callee instanceof CFG) {
-                    ControlFlow flow = new ControlFlow(cfg.getStartNode(), callee.getStartNode());
+                CFG methodCFG = cfgStore.findCFG(call.getQualifiedName());
+                if (methodCFG != null) {
+                    ControlFlow flow = new ControlFlow(cfg.getStartNode(), methodCFG.getStartNode());
                     callGraph.add(flow);
                 }
             } else if (cfgNode.isStatement()) {
                 CFGStatement statement = (CFGStatement)cfgNode;
                 for (JReference def : statement.getDefVariables()) {
                     if (def.isFieldAccess()) {
-                        CommonCFG field = cfgStore.getControlFlowGraph(def.getQualifiedName());
-                        if (field != null && field instanceof CFG) {
-                            ControlFlow flow = new ControlFlow(cfg.getStartNode(), field.getStartNode());
+                        CFG fieldCFG = cfgStore.findCFG(def.getQualifiedName());
+                        if (fieldCFG != null) {
+                            ControlFlow flow = new ControlFlow(cfg.getStartNode(), fieldCFG.getStartNode());
                             callGraph.add(flow);
                         }
                     }
                 }
                 for (JReference use : statement.getUseVariables()) {
                     if (use.isFieldAccess()) {
-                        CommonCFG field = cfgStore.getControlFlowGraph(use.getQualifiedName());
-                        if (field != null && field instanceof CFG) {
-                            ControlFlow flow = new ControlFlow(cfg.getStartNode(), field.getStartNode());
+                        CFG fieldCFG = cfgStore.findCFG(use.getQualifiedName());
+                        if (fieldCFG != null) {
+                            ControlFlow flow = new ControlFlow(cfg.getStartNode(), fieldCFG.getStartNode());
                             callGraph.add(flow);
                         }
                     }

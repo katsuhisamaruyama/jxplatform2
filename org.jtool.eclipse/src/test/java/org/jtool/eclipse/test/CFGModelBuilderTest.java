@@ -58,7 +58,6 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);  // without byte-code analysis
         JavaProject jproject = builder.build(target, target, target, target, target);
         
-        builder.setCreatingActualNodes(false);
         CCFG[] ccfgs = buildCFGsForTest(builder, jproject.getClasses());
         checkDetails(ccfgs);
         builder.unbuild();
@@ -71,7 +70,6 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(true);  // with byte-code analysis
         JavaProject jproject = builder.build(target, target, target, target, target);
         
-        builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -83,7 +81,6 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, target, target + "/src", target);
         
-        builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -95,7 +92,6 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, target, target, target);
         
-        builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -107,7 +103,6 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, target, target + "/src", target);
         
-        builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -119,7 +114,6 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, target, target + "/src", target);
         
-        builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -132,7 +126,6 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, classpath, target + "/src", target);
         
-        builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -145,7 +138,6 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, classpath, target + "/src", target);
         
-        builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -158,7 +150,6 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, classpath, target + "/src", target);
         
-        builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -171,7 +162,6 @@ public class CFGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, classpath, target + "/src", target);
         
-        builder.setCreatingActualNodes(false);
         buildCFGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -184,7 +174,6 @@ public class CFGModelBuilderTest {
         
         ModelBuilderBatch builder = new ModelBuilderBatch();
         builder.setLogVisible(true);
-        builder.setCreatingActualNodes(true);
         JavaProject jproject = builder.build(name, target, classpath);
         
         for (JavaClass jclass : jproject.getClasses()) {

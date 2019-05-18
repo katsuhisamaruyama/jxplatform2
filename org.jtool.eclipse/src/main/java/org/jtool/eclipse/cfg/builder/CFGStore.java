@@ -7,7 +7,6 @@
 package org.jtool.eclipse.cfg.builder;
 
 import org.jtool.eclipse.javamodel.JavaProject;
-import org.jtool.eclipse.cfg.CommonCFG;
 import org.jtool.eclipse.cfg.CCFG;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
@@ -29,8 +28,8 @@ public class CFGStore {
     
     private JInfoStore infoStore;
     
-    private Map<String, CommonCFG> cfgMap = new HashMap<String, CommonCFG>();
-    private boolean creatingActualNodes = false;
+    private Map<String, CFG> cfgMap = new HashMap<String, CFG>();
+    private Map<String, CCFG> ccfgMap = new HashMap<String, CCFG>();
     
     public CFGStore() {
         infoStore = new JInfoStore();
@@ -54,42 +53,44 @@ public class CFGStore {
         return infoStore;
     }
     
-    public void setCreatingActualNodes(boolean creatingActualNodes) {
-        this.creatingActualNodes = creatingActualNodes;
-    }
-    
-    public boolean creatingActualNodes() {
-        return creatingActualNodes;
-    }
-    
-    private void addCFG(CommonCFG graph) {
-        cfgMap.put(graph.getQualifiedName(), graph);
-    }
-    
-    public CommonCFG getControlFlowGraph(String fqn) {
-        return cfgMap.get(fqn);
-    }
-    
-    public int size() {
-        return cfgMap.size();
-    }
-    
     public JavaProject getJavaProject() {
         return infoStore.getJavaProject();
     }
     
-    public CCFG getCCFG(JavaClass jclass) {
-        CommonCFG graph = getControlFlowGraph(jclass.getQualifiedName());
-        if (graph != null && graph instanceof CCFG) {
-            return (CCFG)graph;
-        }
-        CCFG ccfg = build(jclass);
-        return ccfg;
+    private void addCFG(CFG cfg) {
+        cfgMap.put(cfg.getQualifiedName(), cfg);
     }
     
-    private CCFG build(JavaClass jclass) {
-        CCFG ccfg = CCFGBuilder.build(jclass, infoStore);
-        addCFG(ccfg);
+    private void addCCFG(CCFG ccfg) {
+        ccfgMap.put(ccfg.getQualifiedName(), ccfg);
+    }
+    
+    public CFG findCFG(String fqn) {
+        return cfgMap.get(fqn);
+    }
+    
+    public CCFG findCCFG(String fqn) {
+        return ccfgMap.get(fqn);
+    }
+    
+    public CFG getCFG(JavaMethod jmethod, boolean force) {
+        return getCFG(jmethod, new HashSet<JMethod>(), force);
+    }
+    
+    public CFG getCFG(JavaField jfield, boolean force) {
+        return  getCFG(jfield, new HashSet<JMethod>(), force);
+    }
+    
+    public CCFG getCCFG(JavaClass jclass, boolean force) {
+        if (!force) {
+            CCFG ccfg = ccfgMap.get(jclass.getQualifiedName());
+            if (ccfg != null) {
+                return ccfg;
+            }
+        }
+        
+        CCFG ccfg = CCFGBuilder.build(jclass, force, infoStore);
+        addCCFG(ccfg);
         
         for (CFG cfg : ccfg.getStartNode().getMethods()) {
             addCFG(cfg);
@@ -98,7 +99,7 @@ public class CFGStore {
             addCFG(cfg);
         }
         for (CCFG ccfg2 : ccfg.getStartNode().getTypes()) {
-            addCFG(ccfg2);
+            addCCFG(ccfg2);
             for (CFG cfg : ccfg2.getCFGs()) {
                 addCFG(cfg);
             }
@@ -106,35 +107,26 @@ public class CFGStore {
         return ccfg;
     }
     
-    public CFG getCFG(JavaMethod jmethod) {
-        CommonCFG graph = getControlFlowGraph(jmethod.getQualifiedName());
-        if (graph != null && graph instanceof CFG) {
-            return (CFG)graph;
-        }
-        CFG cfg = CFGMethodBuilder.build(jmethod, infoStore, new HashSet<JMethod>());
-        addCFG(cfg);
-        return cfg;
-    }
-    
-    public CFG getCFG(JavaField jfield) {
-        return getCFG(jfield, new HashSet<JMethod>());
-    }
-    
-    CFG getCFG(JavaMethod jmethod, Set<JMethod> visited) {
-        CommonCFG graph = getControlFlowGraph(jmethod.getQualifiedName());
-        if (graph != null && graph instanceof CFG) {
-            return (CFG)graph;
+    CFG getCFG(JavaMethod jmethod, Set<JMethod> visited, boolean force) {
+        if (!force) {
+            CFG cfg = cfgMap.get(jmethod.getQualifiedName());
+            if (cfg != null) {
+                return cfg;
+            }
         }
         CFG cfg = CFGMethodBuilder.build(jmethod, infoStore, visited);
         addCFG(cfg);
         return cfg;
     }
     
-    CFG getCFG(JavaField jfield, Set<JMethod> visited) {
-        CommonCFG graph = getControlFlowGraph(jfield.getQualifiedName());
-        if (graph != null && graph instanceof CFG) {
-            return (CFG)graph;
+    CFG getCFG(JavaField jfield, Set<JMethod> visited, boolean force) {
+        if (!force) {
+            CFG cfg = cfgMap.get(jfield.getQualifiedName());
+            if (cfg != null) {
+                return cfg;
+            }
         }
+        
         CFG cfg = CFGFieldBuilder.build(jfield, infoStore, visited);
         addCFG(cfg);
         return cfg;

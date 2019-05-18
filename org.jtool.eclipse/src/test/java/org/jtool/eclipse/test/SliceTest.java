@@ -34,7 +34,6 @@ public class SliceTest {
         String dir = new File(".").getAbsoluteFile().getParent() + "/test_target/";
         String target = dir +  "Slice/";
         builder = new ModelBuilderBatch(true);
-        builder.setCreatingActualNodes(true);
         jproject = builder.build(target, target, target, target, target);
     }
     

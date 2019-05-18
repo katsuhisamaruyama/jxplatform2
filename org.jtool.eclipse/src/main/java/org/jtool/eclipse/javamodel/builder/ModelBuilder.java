@@ -11,7 +11,6 @@ import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaFile;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.javamodel.JavaProject;
-import org.jtool.eclipse.cfg.CommonCFG;
 import org.jtool.eclipse.cfg.CCFG;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CallGraph;
@@ -70,10 +69,6 @@ public abstract class ModelBuilder {
     
     public boolean isAnalyzingBytecode() {
         return analyzingBytecode;
-    }
-    
-    public void setCreatingActualNodes(boolean creatingActualNodes) {
-        cfgStore.setCreatingActualNodes(creatingActualNodes);
     }
     
     public void setContainingFallThroughEdge(boolean containingFallThroughEdge) {
@@ -219,20 +214,36 @@ public abstract class ModelBuilder {
         }
     }
     
-    public CommonCFG getControlFlowGraph(String fqn) {
-        return cfgStore.getControlFlowGraph(fqn);
+    public CFG findCFG(String fqn) {
+        return cfgStore.findCFG(fqn);
     }
     
-    public CCFG getCCFG(JavaClass jclass) {
-        return cfgStore.getCCFG(jclass);
+    public CCFG findCCFG(String fqn) {
+        return cfgStore.findCCFG(fqn);
+    }
+    
+    public CFG getCFG(JavaMethod jmethod, boolean force) {
+        return cfgStore.getCFG(jmethod, force);
     }
     
     public CFG getCFG(JavaMethod jmethod) {
-        return cfgStore.getCFG(jmethod);
+        return cfgStore.getCFG(jmethod, false);
+    }
+    
+    public CFG getCFG(JavaField jfield, boolean force) {
+        return cfgStore.getCFG(jfield, force);
     }
     
     public CFG getCFG(JavaField jfield) {
-        return cfgStore.getCFG(jfield);
+        return cfgStore.getCFG(jfield, false);
+    }
+    
+    public CCFG getCCFG(JavaClass jclass, boolean force) {
+        return cfgStore.getCCFG(jclass, force);
+    }
+    
+    public CCFG getCCFG(JavaClass jclass) {
+        return cfgStore.getCCFG(jclass, false);
     }
     
     public CallGraph getCallGraph(JavaProject jproject) {
@@ -247,64 +258,105 @@ public abstract class ModelBuilder {
         return CallGraphBuilder.getCallGraph(jmethod, cfgStore);
     }
     
-    public PDG getPDG(String fqn) {
-        return pdgStore.getPDG(fqn);
+    public PDG findPDG(String fqn) {
+        return pdgStore.findPDG(fqn);
+    }
+    
+    public ClDG findClDG(String fqn) {
+        return pdgStore.findClDG(fqn);
+    }
+    
+    public SDG findSDG() {
+        return pdgStore.findSDG();
+    }
+    
+    public PDG getPDG(CFG cfg, boolean force) {
+        return pdgStore.getPDG(cfg, force);
     }
     
     public PDG getPDG(CFG cfg) {
-        return pdgStore.getPDG(cfg);
+        return pdgStore.getPDG(cfg, false);
+    }
+    
+    public PDG getPDG(JavaMethod jmethod, boolean force) {
+        return pdgStore.getPDG(jmethod, force);
     }
     
     public PDG getPDG(JavaMethod jmethod) {
-        return pdgStore.getPDG(jmethod);
+        return pdgStore.getPDG(jmethod, false);
+    }
+    
+    public PDG getPDG(JavaField jfield, boolean force) {
+        return pdgStore.getPDG(jfield, force);
     }
     
     public PDG getPDG(JavaField jfield) {
-        return pdgStore.getPDG(jfield);
+        return pdgStore.getPDG(jfield, false);
+    }
+    
+    public PDG getPDGWithinSDG(JavaMethod jmethod, boolean force) {
+        return pdgStore.getPDGWithinSDG(jmethod, force);
     }
     
     public PDG getPDGWithinSDG(JavaMethod jmethod) {
-        return pdgStore.getPDGWithinSDG(jmethod);
+        return pdgStore.getPDGWithinSDG(jmethod, false);
+    }
+    
+    public PDG getPDGWithinSDG(JavaField jfield, boolean force) {
+        return pdgStore.getPDGWithinSDG(jfield, force);
     }
     
     public PDG getPDGWithinSDG(JavaField jfield) {
-        return pdgStore.getPDGWithinSDG(jfield);
+        return pdgStore.getPDGWithinSDG(jfield, false);
+    }
+    
+    public ClDG getClDG(CCFG ccfg, boolean force) {
+        return pdgStore.getClDG(ccfg, force);
+    }
+    
+    public ClDG getClDG(CCFG ccfg) {
+        return pdgStore.getClDG(ccfg, false);
+    }
+    
+    public ClDG getClDG(JavaClass jclass, boolean force) {
+        return pdgStore.getClDG(jclass, force);
     }
     
     public ClDG getClDG(JavaClass jclass) {
-        return pdgStore.getClDG(jclass);
+        return pdgStore.getClDG(jclass, false);
+    }
+    
+    public ClDG getClDGWithinSDG(JavaClass jclass, boolean force) {
+        return pdgStore.getClDGWithinSDG(jclass, force);
     }
     
     public ClDG getClDGWithinSDG(JavaClass jclass) {
-        return pdgStore.getClDGWithinSDG(jclass);
+        return pdgStore.getClDGWithinSDG(jclass, false);
     }
     
-    public ClDG getClDG(JavaMethod jmethod) {
-        return pdgStore.getClDG(jmethod);
-    }
-    
-    public ClDG getClDGWithinSDG(JavaMethod jmethod) {
-        return pdgStore.getClDGWithinSDG(jmethod);
-    }
-    
-    public ClDG getClDG(JavaField jfield) {
-        return pdgStore.getClDG(jfield);
-    }
-    
-    public ClDG getClDGWithinSDG(JavaField jfield) {
-        return pdgStore.getClDGWithinSDG(jfield);
+    public SDG getSDG(JavaClass jclass, boolean force) {
+        return pdgStore.getSDG(jclass, force);
     }
     
     public SDG getSDG(JavaClass jclass) {
-        return pdgStore.getSDG(jclass);
+        return pdgStore.getSDG(jclass, false);
+    }
+    
+    public SDG getSDG(Set<JavaClass> classes, boolean force) {
+        return pdgStore.getSDG(classes, force);
     }
     
     public SDG getSDG(Set<JavaClass> classes) {
-        return pdgStore.getSDG(classes);
+        return pdgStore.getSDG(classes, false);
+    }
+    
+    public SDG getSDG(boolean force) {
+        
+        return pdgStore.getSDG(force);
     }
     
     public SDG getSDG() {
-        return pdgStore.getSDG();
+        return pdgStore.getSDG(false);
     }
     
     public void setLogVisible(boolean visible) {

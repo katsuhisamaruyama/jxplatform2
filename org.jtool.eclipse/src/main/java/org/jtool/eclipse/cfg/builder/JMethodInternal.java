@@ -103,7 +103,7 @@ public class JMethodInternal extends JMethod {
     protected void findDefUseFieldsInThisMethod(Set<JMethod> visited, boolean recursivelyCollect) {
         Set<JMethod> current = new HashSet<JMethod>(visited);
         
-        CFG cfg = cfgStore.getCFG(jmethod, visited);
+        CFG cfg = cfgStore.getCFG(jmethod, visited, false);
         for (CFGNode node : cfg.getNodes()) {
             if (node instanceof CFGStatement) {
                 CFGStatement stNode = (CFGStatement)node;

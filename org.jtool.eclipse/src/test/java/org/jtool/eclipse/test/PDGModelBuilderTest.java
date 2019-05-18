@@ -59,7 +59,6 @@ public class PDGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, target, target, target);
         
-        builder.setCreatingActualNodes(false);
         ClDG[] cldgs = buildPDGsForTest(builder, jproject.getClasses());
         checkDetails(cldgs);
         builder.unbuild();
@@ -72,7 +71,6 @@ public class PDGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, target, target + "/src", target);
         
-        builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -84,7 +82,6 @@ public class PDGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, target, target, target);
         
-        builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -96,7 +93,6 @@ public class PDGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, target, target + "/src", target);
         
-        builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -108,7 +104,6 @@ public class PDGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, target, target + "/src", target);
         
-        builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -121,7 +116,6 @@ public class PDGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, classpath, target + "/src", target);
         
-        builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -134,7 +128,6 @@ public class PDGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, classpath, target + "/src", target);
         
-        builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -147,7 +140,6 @@ public class PDGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, classpath, target + "/src", target);
         
-        builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -160,7 +152,6 @@ public class PDGModelBuilderTest {
         ModelBuilderBatch builder = new ModelBuilderBatch(false);
         JavaProject jproject = builder.build(target, target, classpath, target + "/src", target);
         
-        builder.setCreatingActualNodes(false);
         buildPDGsForTest(builder, jproject.getClasses());
         builder.unbuild();
     }
@@ -173,7 +164,6 @@ public class PDGModelBuilderTest {
         
         ModelBuilderBatch builder = new ModelBuilderBatch();
         builder.setLogVisible(true);
-        builder.setCreatingActualNodes(true);
         builder.setContainingFallThroughEdge(true); 
         JavaProject jproject = builder.build(name, target, classpath);
         
