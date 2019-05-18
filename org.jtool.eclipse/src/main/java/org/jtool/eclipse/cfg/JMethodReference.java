@@ -102,7 +102,7 @@ public class JMethodReference extends JReference {
     }
     
     public String getArgumentType(int ordinal) {
-        if (ordinal >= 0 && ordinal < arguments.size()) {
+        if (ordinal >= 0 && ordinal < argumentTypes.size()) {
             return argumentTypes.get(ordinal);
         } else {
             return "";
@@ -110,7 +110,7 @@ public class JMethodReference extends JReference {
     }
     
     public boolean getArgumentPrimitiveType(int ordinal) {
-        if (ordinal >= 0 && ordinal < arguments.size()) {
+        if (ordinal >= 0 && ordinal < argumentPrimitiveTypes.size()) {
             return argumentPrimitiveTypes.get(ordinal);
         } else {
             return false;
