@@ -69,8 +69,8 @@ public class ModelBuilderBatch extends ModelBuilder {
         return build(name, target, getClassPath(classPath), sourcePath, binaryPath);
     }
     
-    public JavaProject build(String name, String target, String classPath, String[] sourcePaths, String binaryPath) {
-        return build(name, target, getClassPath(classPath), sourcePaths, binaryPath);
+    public JavaProject build(String name, String target, String classPath, String[] sourcePath, String binaryPath) {
+        return build(name, target, getClassPath(classPath), sourcePath, binaryPath);
     }
     
     public JavaProject build(String name, String target, String[] classPath, String sourcePath, String binaryPath) {
@@ -79,22 +79,22 @@ public class ModelBuilderBatch extends ModelBuilder {
         return build(name, target, classPath, sourcePaths, binaryPath);
     }
     
-    public JavaProject build(String name, String target, String[] classPath, String[] sourcePaths, String binaryPath) {
+    public JavaProject build(String name, String target, String[] classPath, String[] sourcePath, String binaryPath) {
         try {
             File file = new File(target);
             String path = file.getCanonicalPath();
-            return build(name, target, path, classPath, sourcePaths, binaryPath);
+            return build(name, target, path, classPath, sourcePath, binaryPath);
         } catch (IOException e) {
             currentProject = null;
             return null;
         }
     }
     
-    public JavaProject build(String name, String target, String path, String[] classPath, String[] sourcePaths, String binaryPath) {
+    public JavaProject build(String name, String target, String path, String[] classPath, String[] sourcePath, String binaryPath) {
         currentProject = new JavaProject(name, path, path);
         currentProject.setModelBuilder(this);
         currentProject.setClassPath(classPath);
-        currentProject.setSourceBinaryPaths(sourcePaths, binaryPath);
+        currentProject.setSourceBinaryPaths(sourcePath, binaryPath);
         
         ProjectStore.getInstance().addProject(currentProject);
         ProjectStore.getInstance().setModelBuilder(this);
