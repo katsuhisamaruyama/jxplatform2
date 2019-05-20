@@ -204,19 +204,23 @@ public class PDGBuilder {
         for (int ordinal = 0; ordinal < caller.getActualIns().size(); ordinal++) {
             CFGParameter actualIn = caller.getActualIn(ordinal);
             CFGParameter formalIn = callee.getFormalIn(ordinal);
-            JReference jvar = formalIn.getUseVariables().get(0);
-            ParameterEdge edge = new ParameterEdge(actualIn.getPDGNode(), formalIn.getPDGNode(), jvar);
-            edge.setParameterIn();
-            pdg.add(edge);
+            if (formalIn != null) {
+                JReference jvar = formalIn.getUseVariables().get(0);
+                ParameterEdge edge = new ParameterEdge(actualIn.getPDGNode(), formalIn.getPDGNode(), jvar);
+                edge.setParameterIn();
+                pdg.add(edge);
+            }
         }
         
         for (int ordinal = 0; ordinal < caller.getActualOuts().size(); ordinal++) {
             CFGParameter actualOut = caller.getActualOut(ordinal);
             CFGParameter formalOut = callee.getFormalOut(ordinal);
-            JReference jvar = formalOut.getUseVariables().get(0);
-            ParameterEdge edge = new ParameterEdge(formalOut.getPDGNode(), actualOut.getPDGNode(), jvar);
-            edge.setParameterOut();
-            pdg.add(edge);
+            if (formalOut != null) {
+                JReference jvar = formalOut.getUseVariables().get(0);
+                ParameterEdge edge = new ParameterEdge(formalOut.getPDGNode(), actualOut.getPDGNode(), jvar);
+                edge.setParameterOut();
+                pdg.add(edge);
+            }
         }
     }
     

@@ -67,11 +67,19 @@ public class CFGMethodEntry extends CFGEntry {
     }
     
     public CFGParameter getFormalIn(int ordinal) {
-        return formalIns.get(ordinal);
+        if (ordinal < formalIns.size()) {
+            return formalIns.get(ordinal);
+        } else {
+            return null;
+        }
     }
     
     public CFGParameter getFormalOut(int ordinal) {
-        return formalOuts.get(ordinal);
+        if (ordinal < formalOuts.size()) {
+            return formalOuts.get(ordinal);
+        } else {
+            return null;
+        }
     }
     
     public boolean hasParameters() {
