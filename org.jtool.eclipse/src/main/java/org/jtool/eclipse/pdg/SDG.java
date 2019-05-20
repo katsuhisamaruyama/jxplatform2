@@ -54,12 +54,10 @@ public class SDG extends CommonPDG {
     }
     
     public void add(ClDG cldg) {
-        if (!cldgs.values().contains(cldg)) {
-            cldgs.put(cldg.getQualifiedName(), cldg);
-            
-            for (PDG pdg : cldg.getPDGs()) {
-                pdgs.put(pdg.getQualifiedName(), pdg);
-            }
+        cldgs.put(cldg.getQualifiedName(), cldg);
+        
+        for (PDG pdg : cldg.getPDGs()) {
+            pdgs.put(pdg.getQualifiedName(), pdg);
         }
     }
     

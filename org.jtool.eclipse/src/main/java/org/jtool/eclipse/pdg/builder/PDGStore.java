@@ -133,6 +133,7 @@ public class PDGStore {
         for (JavaClass jc : classes) {
             collectEfferentClasses(jc, allClasses);
         }
+        
         SDG sdg = getSDGForClasses(allClasses, force);
         for (PDG pdg : sdg.getPDGs()) {
             addPDG(pdg);
@@ -147,6 +148,7 @@ public class PDGStore {
         for (JavaClass jc : classes) {
             CCFG ccfg = cfgStore.getCCFG(jc, force);
             ClDG cldg = getClDG(ccfg, force);
+            
             sdg.add(cldg);
             addClDG(cldg);
         }
