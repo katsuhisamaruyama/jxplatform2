@@ -162,6 +162,17 @@ public class TypeCollector extends ASTVisitor {
                 bindingOk = false;
                 Logger.getInstance().printUnresolvedError(tbinding.getQualifiedName());
             }
+        } else if (tbinding.isWildcardType()) {
+            ITypeBinding b = tbinding.getBound();
+            if (b != null && b.isRawType()) {
+                JavaClass jc2 = JavaElement.findDeclaringClass(tbinding.getBound());
+                if (jc2 != null) {
+                    jc.addUsedClass(jc2);
+                } else {
+                    bindingOk = false;
+                    Logger.getInstance().printUnresolvedError(b.getQualifiedName());
+                }
+            }
         }
     }
     
