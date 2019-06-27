@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -13,6 +13,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
+import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -92,6 +93,18 @@ public class JavaASTVisitor extends ASTVisitor {
     
     @Override
     public void endVisit(EnumDeclaration node) {
+        endVisitClass();
+    }
+    
+    @Override
+    public boolean visit(AnnotationTypeDeclaration node) {
+        JavaClass jclass = new JavaClass(node, jfile);
+        visitClass(jclass);
+        return true;
+    }
+    
+    @Override
+    public void endVisit(AnnotationTypeDeclaration node) {
         endVisitClass();
     }
     

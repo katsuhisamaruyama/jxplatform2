@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -12,6 +12,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
+import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.Modifier;
@@ -65,6 +66,10 @@ public class JavaClass extends JavaElement {
     }
     
     public JavaClass(EnumDeclaration node, JavaFile jfile) {
+        this(node, node.resolveBinding(), jfile);
+    }
+    
+    public JavaClass(AnnotationTypeDeclaration node, JavaFile jfile) {
         this(node, node.resolveBinding(), jfile);
     }
     
