@@ -120,6 +120,7 @@ public abstract class JavaElement {
         if (tbinding != null) {
             tbinding = tbinding.getTypeDeclaration();
             String fqn = retrieveQualifiedName(tbinding);
+            
             if (fqn != null && fqn.length() != 0) {
                 if (tbinding.isFromSource()) {
                     return jproject.getClass(fqn);
@@ -135,7 +136,6 @@ public abstract class JavaElement {
         }
         return null;
     }
-    
     
     public static JavaMethod findDeclaringMethod(IMethodBinding mbinding) {
         if (mbinding != null) { 
