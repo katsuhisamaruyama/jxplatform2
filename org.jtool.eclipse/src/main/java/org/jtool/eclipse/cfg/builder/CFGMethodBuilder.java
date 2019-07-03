@@ -59,7 +59,6 @@ public class CFGMethodBuilder {
     private static CFG build(JavaMethod jmethod, IMethodBinding mbinding, List<VariableDeclaration> params,
                              JInfoStore infoStore, Set<JMethod> visited) {
         CFG cfg = new CFG();
-        ExpressionVisitor.paramNumber = 1;
         
         CFGMethodEntry entry;
         if (mbinding == null) {

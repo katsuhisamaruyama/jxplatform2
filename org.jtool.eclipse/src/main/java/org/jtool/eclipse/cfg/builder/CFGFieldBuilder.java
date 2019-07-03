@@ -40,7 +40,6 @@ public class CFGFieldBuilder {
     
     private static CFG build(JavaField jfield, IVariableBinding vbinding, JInfoStore infoStore, Set<JMethod> visited) {
         CFG cfg = new CFG();
-        ExpressionVisitor.paramNumber = 1;
         
         CFGFieldEntry entry;
         if (vbinding.isEnumConstant()) {
