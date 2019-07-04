@@ -210,7 +210,7 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
         return track;
     }
     
-    public Set<CFGNode> reachableNodes(CFGNode from, final CFGNode to, boolean loopbackOk) {
+    public Set<CFGNode> reachableNodes(CFGNode from, CFGNode to, boolean loopbackOk) {
         Set<CFGNode> ftrack = forwardReachableNodes(from, to, loopbackOk);
         Set<CFGNode> btrack = backwardReachableNodes(to, from, loopbackOk);
         Set<CFGNode> track = GraphElement.intersection(ftrack, btrack);
