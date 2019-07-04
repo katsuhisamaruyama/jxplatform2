@@ -174,7 +174,7 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
         });
     }
     
-    public Set<CFGNode> forwardReachableNodes(CFGNode from, final CFGNode to, boolean loopbackOk) {
+    public Set<CFGNode> forwardReachableNodes(CFGNode from, CFGNode to, boolean loopbackOk) {
         Set<CFGNode> track = new HashSet<CFGNode>();
         if (from.equals(to)) {
             track.add(from);
@@ -192,7 +192,7 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
         return track;
     }
     
-    public Set<CFGNode> backwardReachableNodes(CFGNode from, final CFGNode to, boolean loopbackOk) {
+    public Set<CFGNode> backwardReachableNodes(CFGNode from, CFGNode to, boolean loopbackOk) {
         Set<CFGNode> track = new HashSet<CFGNode>();
         if (from.equals(to)) {
             track.add(from);
