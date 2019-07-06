@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -17,7 +17,9 @@ import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JReference;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -30,7 +32,11 @@ import java.util.HashSet;
  */
 public class DDFinder {
     
+    private static Map<PDGNode, List<PDGNode>> dominatorMap = new HashMap<PDGNode, List<PDGNode>>();
+    
     public static void find(PDG pdg, CFG cfg) {
+        dominatorMap.clear();
+        
         findDDs(pdg, cfg);
         findDefOrderDDs(pdg, cfg);
     }
@@ -98,21 +104,20 @@ public class DDFinder {
         for (ControlFlow flow : node.getOutgoingFlows()) {
             if (!flow.isFallThrough()) {
                 CFGNode succ = (CFGNode)flow.getDstNode();
-                if (!track.contains(succ))
+                if (!track.contains(succ)) {
                     findDD(pdg, cfg, anchor, succ, jvar, track);
+                }
             }
         } 
     }
     
     private static PDGNode getLoopCarried(PDG pdg, CFG cfg, CFGNode def, CFGNode use) {
-        List<PDGNode> dtrack = new ArrayList<PDGNode>();
-        findDominators(def.getPDGNode(), dtrack);
+        List<PDGNode> dtrack = findDominators(def.getPDGNode());
         if (dtrack.isEmpty()) {
             return null;
         }
         
-        List<PDGNode> utrack = new ArrayList<PDGNode>();
-        findDominators(use.getPDGNode(), utrack);
+        List<PDGNode> utrack = findDominators(use.getPDGNode());
         if (utrack.isEmpty()) {
             return null;
         }
@@ -127,23 +132,33 @@ public class DDFinder {
         return null;
     }
     
-    private static void findDominators(PDGNode pdgnode, List<PDGNode> dominators) {
-        Set<PDGNode> atrack = new HashSet<PDGNode>();
-        findDominators(pdgnode, dominators, atrack);
+    private static List<PDGNode> findDominators(PDGNode pdgnode) {
+        Set<PDGNode> track = new HashSet<PDGNode>();
+        List<PDGNode> dominators = new ArrayList<PDGNode>();
+        findDominators(pdgnode, dominators, track);
+        return dominators;
     }
     
-    private static void findDominators(PDGNode pdgnode, List<PDGNode> dominators, Set<PDGNode> atrack) {
-        atrack.add(pdgnode);
+    private static void findDominators(PDGNode pdgnode, List<PDGNode> dominators, Set<PDGNode> track) {
+        List<PDGNode> nodes = dominatorMap.get(pdgnode);
+        if (nodes != null) {
+            dominators.addAll(nodes);
+            return;
+        }
+        
+        track.add(pdgnode);
         if (pdgnode.isLoop()) {
             dominators.add(pdgnode);
         }
         
         for (CD edge : pdgnode.getIncomingCDEdges()) {
             PDGNode src = edge.getSrcNode();
-            if (!atrack.contains(src)) {
-                findDominators(src, dominators, atrack);
+            if (!track.contains(src)) {
+                findDominators(src, dominators, track);
             }
         }
+        
+        dominatorMap.put(pdgnode, dominators);
     }
     
     private static void findDefOrderDDs(PDG pdg, CFG cfg) {
