@@ -53,7 +53,8 @@ public class SliceCodeTest {
         Set<JavaClass> classes = builder.getAllClassesBackward(jclass);
         SDG sdg = builder.getSDG(classes);
         ClDG cldg = sdg.getClDG(jclass.getQualifiedName());
-        // cldg.print();
+        //cldg.getCFG().print();
+        //cldg.print();
         
         String code = jclass.getFile().getCode();
         SliceCriterion criterion = SliceCriterion.find(cldg, code, lineNumber, offset);
