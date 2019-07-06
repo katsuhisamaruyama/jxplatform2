@@ -53,8 +53,6 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
         return start.getQualifiedName();
     }
     
-    
-    
     public boolean isBranch(CFGNode node) {
         return node.isBranch();
     }
