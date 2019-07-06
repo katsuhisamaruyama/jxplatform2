@@ -46,8 +46,6 @@ public class CDFinder {
         findCDsOnDeclarations(pdg, cfg);
     }
     
-    
-    
     private static void findReachableNodes(CFG cfg, boolean containingFallThroughEdge) {
         List<CFGNode> cfgNodeList = CFGNode.sortCFGNode(cfg.getNodes());
         
