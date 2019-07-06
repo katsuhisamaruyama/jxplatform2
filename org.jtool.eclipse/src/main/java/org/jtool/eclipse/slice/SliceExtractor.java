@@ -385,7 +385,7 @@ public class SliceExtractor extends ASTVisitor {
     @SuppressWarnings("unchecked")
     public boolean visit(MethodInvocation node) {
         Statement statement = getEnclosingStatement(node);
-        if (removeWholeElement(statement)) {
+        if (statement == null || removeWholeElement(statement)) {
             return false;
         }
         
