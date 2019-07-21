@@ -263,6 +263,7 @@ public class JavaMethod extends JavaElement {
        return name;
     }
     
+    @Override
     public String getQualifiedName() {
         return fqn;
     }

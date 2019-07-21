@@ -223,6 +223,7 @@ public class JavaClass extends JavaElement {
         return name;
     }
     
+    @Override
     public String getQualifiedName() {
         return fqn;
     }

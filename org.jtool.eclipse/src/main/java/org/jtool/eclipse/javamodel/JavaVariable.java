@@ -74,6 +74,7 @@ public class JavaVariable extends JavaElement {
         return name;
     }
     
+    @Override
     public String getQualifiedName() {
         return fqn;
     }

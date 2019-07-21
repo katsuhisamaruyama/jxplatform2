@@ -33,6 +33,8 @@ public abstract class JavaElement {
     protected JavaElement() {
     }
     
+    public abstract String getQualifiedName();
+    
     public void print() {
         System.out.println(toString());
     }

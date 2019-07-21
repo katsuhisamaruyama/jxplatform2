@@ -69,6 +69,11 @@ public class JavaPackage extends JavaElement {
         return name;
     }
     
+    @Override
+    public String getQualifiedName() {
+        return name;
+    }
+    
     public boolean isDefault() {
         return name.equals(DEFAUL_PACKAGE_NAME);
     }
