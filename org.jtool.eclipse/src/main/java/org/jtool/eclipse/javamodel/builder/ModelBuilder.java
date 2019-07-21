@@ -351,8 +351,11 @@ public abstract class ModelBuilder {
     }
     
     public SDG getSDG(boolean force) {
-        
         return pdgStore.getSDG(force);
+    }
+    
+    public SDG getSDGForClasses(Set<JavaClass> classes) {
+        return pdgStore.getSDGForClasses(classes, false);
     }
     
     public SDG getSDG() {

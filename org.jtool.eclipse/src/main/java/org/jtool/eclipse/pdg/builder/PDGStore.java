@@ -135,15 +135,10 @@ public class PDGStore {
         }
         
         SDG sdg = getSDGForClasses(allClasses, force);
-        for (PDG pdg : sdg.getPDGs()) {
-            addPDG(pdg);
-        }
-        PDGBuilder.connectParameters(allClasses, sdg);
-        PDGBuilder.connectFieldAccesses(sdg);
         return sdg;
     }
     
-    private SDG getSDGForClasses(Set<JavaClass> classes, boolean force) {
+    public SDG getSDGForClasses(Set<JavaClass> classes, boolean force) {
         SDG sdg = new SDG();
         for (JavaClass jc : classes) {
             CCFG ccfg = cfgStore.getCCFG(jc, force);
@@ -152,6 +147,11 @@ public class PDGStore {
             sdg.add(cldg);
             addClDG(cldg);
         }
+        for (PDG pdg : sdg.getPDGs()) {
+            addPDG(pdg);
+        }
+        PDGBuilder.connectParameters(classes, sdg);
+        PDGBuilder.connectFieldAccesses(sdg);
         return sdg;
     }
     
