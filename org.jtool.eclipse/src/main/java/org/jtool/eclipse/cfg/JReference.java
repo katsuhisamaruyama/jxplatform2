@@ -6,6 +6,7 @@
 
 package org.jtool.eclipse.cfg;
 
+import org.jtool.eclipse.javamodel.CodeRange;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -37,6 +38,8 @@ public abstract class JReference {
     protected boolean isPrimitiveType;
     protected int modifiers;
     protected boolean inProject;
+    
+    protected CodeRange codeRange = null;
     
     protected JReference() {
     }
@@ -131,6 +134,13 @@ public abstract class JReference {
     
     public boolean isMethodCall() {
         return false;
+    }
+    
+    public CodeRange getCodeRange() {
+        if (codeRange == null) {
+            codeRange = new CodeRange(astNode);
+        }
+        return codeRange;
     }
     
     @Override
