@@ -408,7 +408,6 @@ public class SliceExtractor extends ASTVisitor {
         }
         
         checkMethodCallArguments((List<Expression>)node.arguments());
-        System.out.println("CALL = " + node.toString());
         return true;
     }
     
@@ -459,7 +458,7 @@ public class SliceExtractor extends ASTVisitor {
     private void checkMethodCallArguments(List<Expression> arguments) {
         List<Expression> removeNodes = new ArrayList<Expression>();
         for (Expression expr : arguments) {
-            if (!containsAnyInSubTree2(expr)) {
+            if (!containsAnyInSubTree(expr)) {
                 removeNodes.add(expr);
             }
         }
@@ -467,20 +466,6 @@ public class SliceExtractor extends ASTVisitor {
         for (Expression n : removeNodes) {
             n.delete();
         }
-    }
-    
-    private boolean containsAnyInSubTree2(ASTNode astnode) {
-        if (astnode == null) {
-            return false;
-        }
-        
-        ASTNodeOnCFGCollector collector = new ASTNodeOnCFGCollector(astnode);
-        for (ASTNode node : collector.getNodeSet()) {
-            if (contains(node)) {
-                return true;
-            }
-        }
-        return false;
     }
     
     @Override
