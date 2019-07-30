@@ -1187,6 +1187,52 @@ public class SliceCodeTest {
     }
     
     @Test
+    public void testSlice121_1() {
+        String code = getSlicedCode("Test121", 10, 12);
+        //System.out.println(code);
+        String expected = 
+                "class Test121 {\n" + 
+                "    public int m(int x) {\n" + 
+                "        int p = x + 1;\n" +
+                "        return 0;\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
+    public void testSlice121_2() {
+        String code = getSlicedCode("Test121", 11, 12);
+        //System.out.println(code);
+        String expected = 
+                "class Test121 {\n" + 
+                "    public int m(int y) {\n" + 
+                "        int q = y + 1;\n" +
+                "        return 0;\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
+    public void testSlice121_3() {
+        String code = getSlicedCode("Test121", 6, 12);
+        //System.out.println(code);
+        String expected = 
+                "class Test121 {\n" + 
+                "    public void m() {\n" + 
+                "        int b = 2;\n" +
+                "        int c = m(b);\n" + 
+                "    }\n" + 
+                "    public int m(int y) {\n" + 
+                "        int q = y + 1;\n" +
+                "        return q;\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
     public void testCustomer1() {
         String code = getSlicedCode("Customer", 22, 12);
         //System.out.println(code);
@@ -1409,6 +1455,10 @@ public class SliceCodeTest {
         tester.testSlice120_2();
         tester.testSlice120_3();
         tester.testSlice120_4();
+        
+        tester.testSlice121_1();
+        tester.testSlice121_2();
+        tester.testSlice121_3();
         
         tester.testCustomer1();
         tester.testCustomer2();
