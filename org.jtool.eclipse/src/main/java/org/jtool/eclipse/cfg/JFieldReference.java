@@ -10,6 +10,7 @@ import org.jtool.eclipse.javamodel.JavaClass;
 import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
 /**
@@ -80,6 +81,22 @@ public class JFieldReference extends JReference {
     
     public boolean isEnumConstant() {
         return isEnumConstant;
+    }
+    
+    public boolean isFinal() {
+        return Modifier.isFinal(modifiers);
+    }
+    
+    public boolean isStatic() {
+        return Modifier.isStatic(modifiers);
+    }
+    
+    public boolean isVolatile() {
+        return Modifier.isVolatile(modifiers);
+    }
+    
+    public boolean isTransient() {
+        return Modifier.isTransient(modifiers);
     }
     
     @Override

@@ -72,8 +72,28 @@ public class JMethodReference extends JReference {
         return isLocalCall;
     }
     
+    public boolean isFinal() {
+        return Modifier.isFinal(modifiers);
+    }
+    
+    public boolean isAbstract() {
+        return Modifier.isAbstract(modifiers);
+    }
+    
     public boolean isStatic() {
         return Modifier.isStatic(modifiers);
+    }
+    
+    public boolean isSynchronized() {
+        return Modifier.isSynchronized(modifiers);
+    }
+    
+    public boolean isNative() {
+        return Modifier.isNative(modifiers);
+    }
+    
+    public boolean isStrictfp() {
+        return Modifier.isStrictfp(modifiers);
     }
     
     public List<Expression> getArguments() {
