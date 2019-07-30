@@ -49,6 +49,8 @@ import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
+import org.eclipse.jdt.core.dom.SynchronizedStatement;
+import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.Type;
@@ -556,8 +558,6 @@ public class SliceExtractor extends ASTVisitor {
         return true;
     }
     
-    
-    
     @Override
     public boolean visit(IfStatement node) {
         if (removeWholeElement(node)) {
@@ -656,6 +656,23 @@ public class SliceExtractor extends ASTVisitor {
                 newExpression = node.getAST().newNullLiteral();
             }
             node.setExpression(newExpression);
+        }
+        return true;
+    }
+    
+    @Override
+    public boolean visit(SynchronizedStatement node) {
+        if (removeWholeElement(node)) {
+            return false;
+        }
+
+        return true;
+    }
+    
+    @Override
+    public boolean visit(TryStatement node) {
+        if (removeWholeElement(node)) {
+            return false;
         }
         return true;
     }
