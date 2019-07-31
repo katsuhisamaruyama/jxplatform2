@@ -714,7 +714,6 @@ public class SliceExtractor extends ASTVisitor {
         if (removeWholeElement(node)) {
             return false;
         }
-
         return true;
     }
     
