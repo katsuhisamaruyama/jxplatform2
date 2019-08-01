@@ -150,11 +150,16 @@ public class SliceExtractor extends ASTVisitor {
     }
     
     public String extract() {
+        return extract(null);
+    }
+    
+    public String extract(Map<String, String> options) {
         astNode.accept(this);
         
         CodeGenerator codeGenerator = new CodeGenerator();
-        String code = codeGenerator.generate(astNode, jfile.getCode(), sliceNodes);
+        codeGenerator.setOptions(options);
         
+        String code = codeGenerator.generate(astNode, jfile.getCode(), sliceNodes);
         return code;
     }
     

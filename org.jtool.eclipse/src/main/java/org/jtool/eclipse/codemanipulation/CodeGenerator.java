@@ -41,7 +41,13 @@ import java.util.Map;
 @SuppressWarnings("restriction")
 public class CodeGenerator {
     
+    private Map<String, String> options = null;
+    
     public CodeGenerator() {
+    }
+    
+    public void setOptions(Map<String, String> options) {
+        this.options = options;
     }
     
     public String generate(ASTNode node, String contents) {
@@ -78,15 +84,25 @@ public class CodeGenerator {
     private String format(String code, int kind) {
         try {
             IDocument document = new Document(code);
-            Map<String, String> options = new HashMap<String, String>();
-            options.put(DefaultCodeFormatterConstants.FORMATTER_TAB_CHAR, JavaCore.SPACE);
+            if (options == null) {
+                options = new HashMap<String, String>();
+                options.put(DefaultCodeFormatterConstants.FORMATTER_TAB_CHAR, JavaCore.SPACE);
+                options.put(DefaultCodeFormatterConstants.FORMATTER_INDENTATION_SIZE, "4");
+                options.put(DefaultCodeFormatterConstants.FORMATTER_BLANK_LINES_AFTER_PACKAGE, "1");
+                options.put(DefaultCodeFormatterConstants.FORMATTER_BLANK_LINES_AFTER_IMPORTS, "1");
+                options.put(DefaultCodeFormatterConstants.FORMATTER_BLANK_LINES_BEFORE_MEMBER_TYPE, "1");
+                options.put(DefaultCodeFormatterConstants.FORMATTER_BLANK_LINES_BEFORE_FIRST_CLASS_BODY_DECLARATION, "1");
+                options.put(DefaultCodeFormatterConstants.FORMATTER_BLANK_LINES_BEFORE_METHOD, "1");
+                options.put(DefaultCodeFormatterConstants.FORMATTER_BLANK_LINES_BEFORE_FIELD, "1");
+            }
+            
             CodeFormatter codeFormatter = ToolFactory.createCodeFormatter(options, ToolFactory.M_FORMAT_NEW);
             TextEdit edit = codeFormatter.format(kind | CodeFormatter.F_INCLUDE_COMMENTS, code, 0, code.length(), 0, null);
             edit.apply(document);
             return document.get();
         } catch (MalformedTreeException | BadLocationException e) {
-            e.printStackTrace();
-            /* empty*/ }
+            // e.printStackTrace();
+        }
         return code;
     }
     
