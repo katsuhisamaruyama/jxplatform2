@@ -6,6 +6,8 @@
 
 package org.jtool.eclipse.test;
 
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants;
 import org.jtool.eclipse.batch.ModelBuilderBatch;
 import org.jtool.eclipse.pdg.ClDG;
 import org.jtool.eclipse.pdg.SDG;
@@ -16,6 +18,8 @@ import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import java.io.File;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import org.junit.BeforeClass;
@@ -71,8 +75,12 @@ public class SliceCodeTest {
             if (slice != null) {
                 System.out.println(slice.toString());
                 
+                Map<String, String> options = new HashMap<String, String>();
+                options.put(DefaultCodeFormatterConstants.FORMATTER_TAB_CHAR, JavaCore.SPACE);
+                options.put(DefaultCodeFormatterConstants.FORMATTER_INDENTATION_SIZE, "4");
+                
                 SliceExtractor extractor = new SliceExtractor(builder, slice, jclass);
-                String code = extractor.extract();
+                String code = extractor.extract(options);
                 return code;
             }
         }
@@ -114,6 +122,7 @@ public class SliceCodeTest {
         String code = getSlicedCode("Test101", "m( )", 5, 12);
         //System.out.println(code);
         String expected = 
+                "\n" +
                 "public void m() {\n" + 
                 "    int x = 10;\n" + 
                 "}\n";
