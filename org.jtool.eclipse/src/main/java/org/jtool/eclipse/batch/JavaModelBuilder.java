@@ -58,7 +58,7 @@ public class JavaModelBuilder {
         this(name, target, null, classpath);
     }
     
-    public JavaModelBuilder(String name, String target, String srcpath, String classpath) {
+    public JavaModelBuilder(String name, String target, String classpath, String srcpath) {
         try {
             projectName = replaceFileSeparator(name);
             File dir = new File(target);

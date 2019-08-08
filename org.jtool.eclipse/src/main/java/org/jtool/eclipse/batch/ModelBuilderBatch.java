@@ -103,7 +103,7 @@ public class ModelBuilderBatch extends ModelBuilder {
     static String[] getSrcPath(String srcpath, String path) {
         if (srcpath == null) {
             String[] srcpaths = new String[1];
-            srcpaths[0] = path + File.pathSeparator + "src";
+            srcpaths[0] = path + File.separator + "src";
             return srcpaths;
         }
         return srcpath.split(File.pathSeparator);
@@ -234,6 +234,9 @@ public class ModelBuilderBatch extends ModelBuilder {
     private static List<File> collectAllJavaFiles(String[] paths) {
         List<File> files = new ArrayList<File>();
         for (String path : paths) {
+            
+            System.out.println("PATH = " + path);
+            
             files.addAll(collectAllJavaFiles(path));
         }
         return files;
