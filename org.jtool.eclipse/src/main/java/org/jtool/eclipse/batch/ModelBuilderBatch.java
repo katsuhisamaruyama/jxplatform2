@@ -234,9 +234,6 @@ public class ModelBuilderBatch extends ModelBuilder {
     private static List<File> collectAllJavaFiles(String[] paths) {
         List<File> files = new ArrayList<File>();
         for (String path : paths) {
-            
-            System.out.println("PATH = " + path);
-            
             files.addAll(collectAllJavaFiles(path));
         }
         return files;
