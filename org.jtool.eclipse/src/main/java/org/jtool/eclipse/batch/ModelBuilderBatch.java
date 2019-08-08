@@ -47,54 +47,48 @@ public class ModelBuilderBatch extends ModelBuilder {
         return false;
     }
     
-    public JavaProject build(String name, String target, String classPath) {
-        return build(name, target, getClassPath(classPath));
+    public JavaProject build(String name, String target, String classpath) {
+        return build(name, target, classpath, null);
     }
     
-    public JavaProject build(String name, String target, String[] classPath) {
-        try {
-            File file = new File(target);
-            String dir = file.getCanonicalPath();
-            String[] sourcePath = new String[1];
-            sourcePath[0] = dir + File.separatorChar + "src";
-            String binaryPath = dir + File.separatorChar + "bin";
-            return build(name, target, classPath, sourcePath, binaryPath);
-        } catch (IOException e) {
-            currentProject = null;
-            return null;
-        }
+    public JavaProject build(String name, String target, String classpath, String srcpath, String binpath) {
+        return build(name, target, classpath, srcpath, binpath);
     }
     
-    public JavaProject build(String name, String target, String classPath, String sourcePath, String binaryPath) {
-        return build(name, target, getClassPath(classPath), sourcePath, binaryPath);
+    public JavaProject build(String name, String target, String classpath, String[] srcpaths, String binpath) {
+        return build(name, target, getClassPath(classpath), srcpaths, binpath);
     }
     
-    public JavaProject build(String name, String target, String classPath, String[] sourcePath, String binaryPath) {
-        return build(name, target, getClassPath(classPath), sourcePath, binaryPath);
-    }
-    
-    public JavaProject build(String name, String target, String[] classPath, String sourcePath, String binaryPath) {
-        String[] sourcePaths = new String[1];
-        sourcePaths[0] = sourcePath;
-        return build(name, target, classPath, sourcePaths, binaryPath);
-    }
-    
-    public JavaProject build(String name, String target, String[] classPath, String[] sourcePath, String binaryPath) {
+    public JavaProject build(String name, String target, String classpath, String srcpath) {
         try {
             File file = new File(target);
             String path = file.getCanonicalPath();
-            return build(name, target, path, classPath, sourcePath, binaryPath);
+            String[] classpaths = getClassPath(classpath);
+            String[] srcpaths = getSrcPath(srcpath, path);
+            String binpath = path + File.separatorChar + "bin";
+            return build(name, target, path, classpaths, srcpaths, binpath);
         } catch (IOException e) {
             currentProject = null;
             return null;
         }
     }
     
-    public JavaProject build(String name, String target, String path, String[] classPath, String[] sourcePath, String binaryPath) {
+    public JavaProject build(String name, String target, String[] classpaths, String[] srcpaths, String binpath) {
+        try {
+            File file = new File(target);
+            String path = file.getCanonicalPath();
+            return build(name, target, path, classpaths, srcpaths, binpath);
+        } catch (IOException e) {
+            currentProject = null;
+            return null;
+        }
+    }
+    
+    public JavaProject build(String name, String target, String path, String[] classpaths, String[] srcpaths, String binpath) {
         currentProject = new JavaProject(name, path, path);
         currentProject.setModelBuilder(this);
-        currentProject.setClassPath(classPath);
-        currentProject.setSourceBinaryPaths(sourcePath, binaryPath);
+        currentProject.setClassPath(classpaths);
+        currentProject.setSourceBinaryPaths(srcpaths, binpath);
         
         ProjectStore.getInstance().addProject(currentProject);
         ProjectStore.getInstance().setModelBuilder(this);
@@ -104,6 +98,15 @@ public class ModelBuilderBatch extends ModelBuilder {
         run();
         Logger.getInstance().writeLog();
         return currentProject;
+    }
+    
+    static String[] getSrcPath(String srcpath, String path) {
+        if (srcpath == null) {
+            String[] srcpaths = new String[1];
+            srcpaths[0] = path + File.pathSeparator + "src";
+            return srcpaths;
+        }
+        return srcpath.split(File.pathSeparator);
     }
     
     static String[] getClassPath(String classpath) {
@@ -150,7 +153,8 @@ public class ModelBuilderBatch extends ModelBuilder {
     
     public JavaProject update() {
         ProjectStore.getInstance().removeProject(currentProject.getPath());
-        return build(currentProject.getName(), currentProject.getPath(), currentProject.getClassPath());
+        return build(currentProject.getName(), currentProject.getPath(),
+                currentProject.getClassPath(), currentProject.getSourcePath(), currentProject.getBinaryPath());
     }
     
     private void run() {

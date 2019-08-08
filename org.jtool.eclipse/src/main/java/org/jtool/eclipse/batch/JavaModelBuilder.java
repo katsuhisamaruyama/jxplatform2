@@ -21,7 +21,8 @@ public class JavaModelBuilder {
     
     private String projectName;
     private String projectPath;
-    private String projectClasspath;
+    private String srcpath;
+    private String classpath;
     
     private ModelBuilderBatch modelBuilder;
     
@@ -37,7 +38,8 @@ public class JavaModelBuilder {
             projectName = options.get("-name", getProjectName(target, cdir));
             File dir = new File(ModelBuilderBatch.getFullPath(target, cdir));
             projectPath = dir.getCanonicalPath();
-            projectClasspath = options.get("-classpath", ".");
+            classpath = options.get("-classpath", ".");
+            srcpath = options.get("-srcpath", ".");
             
             logfile = options.get("-logfile", "");
             if (logfile.length() > 0) {
@@ -49,7 +51,23 @@ public class JavaModelBuilder {
     }
     
     public JavaModelBuilder(String name, String target) {
-        this(name, target, target);
+        this(name, target, target, null);
+    }
+    
+    public JavaModelBuilder(String name, String target, String classpath) {
+        this(name, target, null, classpath);
+    }
+    
+    public JavaModelBuilder(String name, String target, String srcpath, String classpath) {
+        try {
+            projectName = replaceFileSeparator(name);
+            File dir = new File(target);
+            projectPath = dir.getCanonicalPath();
+            this.srcpath = srcpath;
+            this.classpath = classpath;
+        } catch (IOException e) {
+            System.err.println("Cannot build a Java model due to the invalid options/settings.");
+        }
     }
     
     private String getProjectName(String target, String cdir) {
@@ -62,17 +80,6 @@ public class JavaModelBuilder {
             name = name.substring(0, index);
         }
         return replaceFileSeparator(name);
-    }
-    
-    public JavaModelBuilder(String name, String target, String classpath) {
-        try {
-            projectName = replaceFileSeparator(name);
-            File dir = new File(target);
-            projectPath = dir.getCanonicalPath();
-            projectClasspath = classpath;
-        } catch (IOException e) {
-            System.err.println("Cannot build a Java model due to the invalid options/settings.");
-        }
     }
     
     private String removeLastFileSeparator(String path) {
@@ -88,7 +95,7 @@ public class JavaModelBuilder {
     
     public JavaProject build() {
         modelBuilder = new ModelBuilderBatch();
-        return modelBuilder.build(projectName, projectPath, projectClasspath);
+        return modelBuilder.build(projectName, projectPath, classpath, srcpath);
     }
     
     public void unbuild() {
