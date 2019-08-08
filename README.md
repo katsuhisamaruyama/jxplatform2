@@ -115,7 +115,7 @@ and put it in the 'plug-ins' directory under the Eclipse installation. Eclipse n
 
 `jxplatform-1.0-all.jar` is an executable jar file itself. For example, when you put Java source code under the `xxx` folder (Java source files are expanded under the folder), the following command builds a Java model for the source code.
 
-    java -jar jxplatform-1.0-all.jar -target xxx/ -classpath 'xxx/lib/*' -name name -logfile xxx.log
+    java -jar jxplatform-1.0-all.jar -target xxx/ -classpath 'xxx/lib/*:xxx/libs/*' -srcpath 'xxx/src:xxx/test' -name name -logfile xxx.log
 
 * `-classpath`: (optional) specifies class paths where needed libraries are contained 
 * `-name`: (optional) specifies the name of a project managed in jxplatform2 
