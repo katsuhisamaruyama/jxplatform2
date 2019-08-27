@@ -52,7 +52,7 @@ public class ModelBuilderBatch extends ModelBuilder {
     }
     
     public JavaProject build(String name, String target, String classpath, String srcpath, String binpath) {
-        return build(name, target, classpath, srcpath, binpath);
+        return build(name, target, classpath, getSrcPath(srcpath, target), binpath);
     }
     
     public JavaProject build(String name, String target, String classpath, String[] srcpaths, String binpath) {
@@ -100,10 +100,10 @@ public class ModelBuilderBatch extends ModelBuilder {
         return currentProject;
     }
     
-    static String[] getSrcPath(String srcpath, String path) {
+    static String[] getSrcPath(String srcpath, String basepath) {
         if (srcpath == null) {
             String[] srcpaths = new String[1];
-            srcpaths[0] = path + File.separator + "src";
+            srcpaths[0] = basepath + File.separator + "src";
             return srcpaths;
         }
         return srcpath.split(File.pathSeparator);
