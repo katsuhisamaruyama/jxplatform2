@@ -28,6 +28,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Block;
@@ -50,10 +51,12 @@ import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.SynchronizedStatement;
+import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
@@ -163,27 +166,27 @@ public class SliceExtractor extends ASTVisitor {
         return code;
     }
     
-    private boolean contains(ASTNode astnode) {
-        if (astnode == null) {
+    private boolean contains(ASTNode node) {
+        if (node == null) {
             return false;
         }
         
-        for (ASTNode node : sliceNodes) {
-            if (astnode.getStartPosition() == node.getStartPosition()) {
+        for (ASTNode n : sliceNodes) {
+            if (node.getStartPosition() == n.getStartPosition()) {
                 return true;
             }
         }
         return false;
     }
     
-    private boolean containsAnyInSubTree(ASTNode astnode) {
-        if (astnode == null) {
+    private boolean containsAnyInSubTree(ASTNode node) {
+        if (node == null) {
             return false;
         }
         
-        ASTNodeOnCFGCollector collector = new ASTNodeOnCFGCollector(astnode);
-        for (ASTNode node : collector.getNodeSet()) {
-            if (contains(node)) {
+        ASTNodeOnCFGCollector collector = new ASTNodeOnCFGCollector(node);
+        for (ASTNode n : collector.getNodeSet()) {
+            if (contains(n)) {
                 return true;
             }
         }
@@ -191,6 +194,10 @@ public class SliceExtractor extends ASTVisitor {
     }
     
     private boolean removeWholeElement(ASTNode node) {
+        if (node == null) {
+            return true;
+        }
+        
         if (!containsAnyInSubTree(node)) {
             node.delete();
             return true;
@@ -336,9 +343,9 @@ public class SliceExtractor extends ASTVisitor {
         List<MethodInvocation> invocations = new ArrayList<MethodInvocation>();
         for (Expression expr : exprs) {
             MethodInvocationCollector collector = new MethodInvocationCollector(expr);
-            for (ASTNode astnode : collector.getNodes()) {
-                if (astnode instanceof MethodInvocation) {
-                    invocations.add((MethodInvocation)astnode);
+            for (ASTNode n : collector.getNodes()) {
+                if (n instanceof MethodInvocation && contains(n)) {
+                    invocations.add((MethodInvocation)n);
                 }
             }
         }
@@ -367,6 +374,25 @@ public class SliceExtractor extends ASTVisitor {
             } else if (location.isChildListProperty()) {
                 List<ASTNode> property = (List<ASTNode>)statement.getParent().getStructuralProperty(location);
                 property.set(property.indexOf(statement), newStatement);
+            }
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void repalceStatement(Statement statement, Block block) {
+        StructuralPropertyDescriptor location = statement.getLocationInParent();
+        if (location != null) {
+            if (location.isChildProperty()) {
+                statement.getParent().setStructuralProperty(location, block);
+            } else if (location.isChildListProperty()) {
+                List<ASTNode> property = (List<ASTNode>)statement.getParent().getStructuralProperty(location);
+                int index = property.indexOf(statement);
+                for (Statement st : (List<Statement>)block.statements()) {
+                    Statement newStatement = (Statement)ASTNode.copySubtree(st.getAST(), st);
+                    property.add(index, newStatement);
+                    index++;
+                }
+                statement.delete();
             }
         }
     }
@@ -724,6 +750,46 @@ public class SliceExtractor extends ASTVisitor {
     
     @Override
     public boolean visit(TryStatement node) {
+        if (removeWholeElement(node)) {
+            return false;
+        }
+        
+        checkCatchClauses(node);
+        
+        return true;
+    }
+    
+    @Override
+    public void endVisit(TryStatement node) {
+        if (node.catchClauses().size() == 0 && !containsAnyInSubTree(node.getFinally())) {
+            repalceStatement(node, node.getBody());
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void checkCatchClauses(TryStatement node) {
+        Set<String> exceptionsOninvocation = new HashSet<String>();
+        MethodInvocationCollector collector = new MethodInvocationCollector(node);
+        for (ASTNode n : collector.getNodes()) {
+            if (contains(n) && n instanceof MethodInvocation) {
+                MethodInvocation inv = (MethodInvocation)n;
+                for (ITypeBinding tbinding : inv.resolveMethodBinding().getExceptionTypes()) {
+                    exceptionsOninvocation.add(tbinding.getQualifiedName());
+                }
+            }
+        }
+        
+        List<CatchClause> tmpCatchClauses = new ArrayList<CatchClause>(node.catchClauses());
+        for (CatchClause catchClause : tmpCatchClauses) {
+            String exception = catchClause.getException().getType().resolveBinding().getQualifiedName();
+            if (!exceptionsOninvocation.contains(exception)) {
+                catchClause.delete();
+            }
+        }
+    }
+    
+    @Override
+    public boolean visit(ThrowStatement node) {
         if (removeWholeElement(node)) {
             return false;
         }
