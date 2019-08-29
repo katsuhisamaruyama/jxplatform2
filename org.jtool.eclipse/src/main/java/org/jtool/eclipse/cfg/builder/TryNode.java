@@ -1,16 +1,18 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
 
 package org.jtool.eclipse.cfg.builder;
 
-import org.jtool.eclipse.cfg.CFGNode;
-import org.jtool.eclipse.cfg.CFGStatement;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.jtool.eclipse.cfg.CFGStatement;
+import org.jtool.eclipse.cfg.CFGNode;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * A node for a <code>try</code> statement of a CFG.
@@ -20,12 +22,20 @@ import java.util.ArrayList;
  */
 class TryNode extends CFGStatement {
     
+    private Set<ExceptionOccurrence> exceptionOccurrences = new HashSet<ExceptionOccurrence>();
+    
     private List<CatchNode> catchClauses = new ArrayList<CatchNode>();
     private CFGStatement finallyBlock;
-    private CFGNode finallyEnd;
-    private CFGNode tryEnd;
     
     TryNode() {
+    }
+    
+    void addExceptionOccurrence(CFGNode node, String type) {
+        exceptionOccurrences.add(new ExceptionOccurrence(node, type));
+    }
+    
+    Set<ExceptionOccurrence> getExceptionOccurrences() {
+        return exceptionOccurrences;
     }
     
     TryNode(ASTNode node, Kind kind) {
@@ -54,19 +64,13 @@ class TryNode extends CFGStatement {
         return finallyBlock;
     }
     
-    void setFinallyBlockEnd(CFGNode node) {
-        finallyEnd = node;
-    }
-    
-    CFGNode getFinallyBlockEnd() {
-        return finallyEnd;
-    }
-    
-    void setTryEnd(CFGNode node) {
-        tryEnd = node;
-    }
-    
-    CFGNode getTryEnd() {
-        return tryEnd;
+    class ExceptionOccurrence {
+        CFGNode node;
+        String type;
+        
+        ExceptionOccurrence(CFGNode node, String type) {
+            this.node = node;
+            this.type = type;
+        }
     }
 }

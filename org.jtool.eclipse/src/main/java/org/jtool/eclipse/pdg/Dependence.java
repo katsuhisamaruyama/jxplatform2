@@ -21,14 +21,15 @@ import java.util.Comparator;
  */
 public class Dependence extends GraphEdge {
     
-    protected Kind kind;
+    protected Kind kind = Kind.undefined;
     
     public enum Kind {
         controlDependence,               // Control dependence in general
         trueControlDependence,           // Control dependence with respect to a true-branch flow
         falseControlDependence,          // Control dependence with respect to a false-branch flow
         fallThroughControlDependence,    // Control dependence with respect to a fall-through flow
-        declarationDependence,           // Control dependence with respect to a declaration-reference flow
+        declarationDependence,           // Control dependence with respect to a declaration-reference relationship
+        exceptionCatchDependence,        // Control dependence with respect to an exception-catch within a try statement
         
         dataDependence,                  // Data dependence in general
         loopIndependentDefUseDependence, // Data dependence with respect to a loop-independent variable
@@ -43,6 +44,8 @@ public class Dependence extends GraphEdge {
         
         classMember,                     // Connection between a class and its members
         call,                            // Connection between a caller and its callee
+        
+        undefined,
     }
     
     protected Dependence() {
@@ -61,7 +64,8 @@ public class Dependence extends GraphEdge {
         return kind == Kind.trueControlDependence ||
                kind == Kind.falseControlDependence ||
                kind == Kind.fallThroughControlDependence ||
-               kind == Kind.declarationDependence;
+               kind == Kind.declarationDependence ||
+               kind == Kind.exceptionCatchDependence;
     }
     
     public boolean isDD() {
@@ -90,6 +94,10 @@ public class Dependence extends GraphEdge {
     
     public boolean isDeclaration() {
         return kind == Kind.declarationDependence;
+    }
+    
+    public boolean isExceptionCatch() {
+        return kind == Kind.exceptionCatchDependence;
     }
     
     public boolean isLIDD() {

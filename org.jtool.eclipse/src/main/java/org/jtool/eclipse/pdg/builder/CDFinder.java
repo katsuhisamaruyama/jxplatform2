@@ -54,13 +54,16 @@ public class CDFinder {
             
             for (CFGNode cfgnode : postDominatorForBranch) {
                 if (cfgnode.isStatementNotParameter() && !branchNode.equals(cfgnode) && !postDominator.contains(cfgnode)) {
+                    
                     CD edge = new CD(branchNode.getPDGNode(), cfgnode.getPDGNode());
                     if (branch.isTrue()) {
                         edge.setTrue();
                     } else if (branch.isFalse()) {
                         edge.setFalse();
-                    } else {
+                    } else if (branch.isFallThrough()) {
                         edge.setFallThrough();
+                    } else if (branch.isExceptionCatch()) {
+                        edge.setExceptionCatch();
                     }
                     pdg.add(edge);
                 }
@@ -96,7 +99,7 @@ public class CDFinder {
         track.add(node);
         
         for (ControlFlow flow : node.getOutgoingFlows()) {
-            if (containingFallThroughEdge || !flow.isJump()) {
+            if (containingFallThroughEdge || (!flow.isJump() && !flow.isExceptionCatch())) {
                 CFGNode succ = flow.getDstNode();
                 if (!track.contains(succ)) {
                     walkForward(succ, to, containingFallThroughEdge, track);
@@ -173,8 +176,7 @@ public class CDFinder {
     }
     
     /*****************
-    
-    
+      Try to reduce the processing time to find control dependences.
     ******************
     
     private static Map<CFGNode, Set<CFGNode>> forwardReachableNodes = new HashMap<CFGNode, Set<CFGNode>>();

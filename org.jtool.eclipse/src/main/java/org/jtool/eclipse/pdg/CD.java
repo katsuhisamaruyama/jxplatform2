@@ -37,6 +37,10 @@ public class CD extends Dependence {
         kind = Kind.declarationDependence;
     }
     
+    public void setExceptionCatch() {
+        kind = Kind.exceptionCatchDependence;
+    }
+    
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
@@ -49,6 +53,8 @@ public class CD extends Dependence {
             buf.append(" Fall:");
         } else if (kind == Kind.declarationDependence) {
             buf.append(" Decl:");
+        } else if (kind == Kind.exceptionCatchDependence) {
+            buf.append(" Excp:");
         }
         return buf.toString();
     }

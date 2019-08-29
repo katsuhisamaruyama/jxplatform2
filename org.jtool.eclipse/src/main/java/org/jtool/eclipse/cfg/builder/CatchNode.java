@@ -1,14 +1,13 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
 
 package org.jtool.eclipse.cfg.builder;
 
-import org.jtool.eclipse.cfg.CFGParameter;
-import org.jtool.eclipse.cfg.CFGStatement;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.jtool.eclipse.cfg.CFGStatement;
 
 /**
  * A node for a <code>catch</code> clause of a CFG.
@@ -18,7 +17,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
  */
 class CatchNode extends CFGStatement {
     
-    private CFGParameter formalIn;
+    private String exceptionType;
     
     CatchNode() {
     }
@@ -27,11 +26,11 @@ class CatchNode extends CFGStatement {
         super(node, kind);
     }
     
-    void setFormalIn(CFGParameter node) {
-        formalIn = node;
+    void setExceptionType(String exceptionType) {
+        this.exceptionType = exceptionType;
     }
     
-    CFGParameter getFormalIn() {
-        return formalIn;
+    String getExceptionType() {
+        return exceptionType;
     }
 }

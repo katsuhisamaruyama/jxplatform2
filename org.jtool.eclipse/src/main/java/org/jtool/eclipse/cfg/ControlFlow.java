@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 public class ControlFlow extends GraphEdge {
     
     private CFGNode loopback = null;
-    protected Kind kind;
+    protected Kind kind = Kind.undefined;
     
     public enum Kind {
         trueControlFlow,                 // Control flow outgoing to a true-branch
@@ -31,6 +31,8 @@ public class ControlFlow extends GraphEdge {
         jumpFlow,                        // Control flow representing a jump caused by return, break, and continue
         methodCall,                      // Flow representing the call to a method
         parameterFlow,                   // Flow representing the relationship between a class/method and its parameter
+        exceptionCatchFlow,              // Flow representing the relationship between an exception occurrence and its catch
+        undefined,
     }
     
     protected ControlFlow() {
@@ -95,6 +97,14 @@ public class ControlFlow extends GraphEdge {
     
     public boolean isParameter() {
         return kind == Kind.parameterFlow;
+    }
+    
+    public void setExceptionCatch() {
+        kind = Kind.exceptionCatchFlow;
+    }
+    
+    public boolean isExceptionCatch() {
+        return kind == Kind.exceptionCatchFlow;
     }
     
     @Override

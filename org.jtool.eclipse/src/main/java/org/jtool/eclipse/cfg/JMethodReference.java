@@ -26,6 +26,8 @@ public class JMethodReference extends JReference {
     private boolean isConstructor;
     private boolean isLocalCall;
     
+    private List<String> exceptionTypes = new ArrayList<String>();
+    
     private List<Expression> arguments = new ArrayList<Expression>();
     private List<String> argumentTypes = new ArrayList<String>();
     private List<Boolean> argumentPrimitiveTypes = new ArrayList<Boolean>();
@@ -51,6 +53,11 @@ public class JMethodReference extends JReference {
         isMethod = isMethod(binding);
         isConstructor = isConstructor(binding);
         isLocalCall = enclosingClassName.equals(declaringClassName);
+        
+        for (ITypeBinding tbinding : mbinding.getExceptionTypes()) {
+            exceptionTypes.add(tbinding.getQualifiedName());
+        }
+        
         arguments.addAll(args);
         setArgumentTypes(binding);
     }
@@ -94,6 +101,10 @@ public class JMethodReference extends JReference {
     
     public boolean isStrictfp() {
         return Modifier.isStrictfp(modifiers);
+    }
+    
+    public List<String> getExceptionTypes() {
+        return exceptionTypes;
     }
     
     public List<Expression> getArguments() {

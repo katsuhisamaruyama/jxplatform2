@@ -106,6 +106,8 @@ import java.util.Stack;
  */
 public class ExpressionVisitor extends ASTVisitor {
     
+    protected StatementVisitor statementVisitor;
+    
     protected CFG cfg;
     protected CFGStatement curNode;
     protected CFGStatement entryNode;
@@ -122,6 +124,11 @@ public class ExpressionVisitor extends ASTVisitor {
     private Set<JMethod> visited;
     
     protected ExpressionVisitor(CFG cfg, CFGStatement node, JInfoStore infoStore, Set<JMethod> visited) {
+        this(null, cfg, node, infoStore, visited);
+    }
+    
+    protected ExpressionVisitor(StatementVisitor visitor, CFG cfg, CFGStatement node, JInfoStore infoStore, Set<JMethod> visited) {
+        this.statementVisitor = visitor;
         this.cfg = cfg;
         this.infoStore = infoStore;
         this.visited = visited;
@@ -329,6 +336,11 @@ public class ExpressionVisitor extends ASTVisitor {
         JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.methodCall);
         CFGStatement primaryNode = null;
+        if (statementVisitor != null && jcall.getExceptionTypes().size() > 0) {
+            for (String type : jcall.getExceptionTypes()) {
+                statementVisitor.setExceptionFlow(callNode, type);
+            }
+        }
         
         Expression primary = node.getExpression();
         if (primary != null) {
@@ -392,6 +404,12 @@ public class ExpressionVisitor extends ASTVisitor {
         
         JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.methodCall);
+        if (statementVisitor != null && jcall.getExceptionTypes().size() > 0) {
+            for (String type : jcall.getExceptionTypes()) {
+                statementVisitor.setExceptionFlow(callNode, type);
+            }
+        }
+        
         setActualNodes(callNode, null, node, node.arguments());
         return false;
     }
@@ -407,6 +425,12 @@ public class ExpressionVisitor extends ASTVisitor {
         JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.instanceCreation);
         CFGStatement primaryNode = null;
+        
+        if (statementVisitor != null && jcall.getExceptionTypes().size() > 0) {
+            for (String type : jcall.getExceptionTypes()) {
+                statementVisitor.setExceptionFlow(callNode, type);
+            }
+        }
         
         Expression primary = node.getExpression();
         if (primary != null) {
@@ -443,6 +467,12 @@ public class ExpressionVisitor extends ASTVisitor {
         
         JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
+        if (statementVisitor != null && jcall.getExceptionTypes().size() > 0) {
+            for (String type : jcall.getExceptionTypes()) {
+                statementVisitor.setExceptionFlow(callNode, type);
+            }
+        }
+        
         setActualNodes(callNode, null, node, node.arguments());
         return false;
     }
@@ -457,6 +487,12 @@ public class ExpressionVisitor extends ASTVisitor {
         
         JMethodReference jcall = new JMethodReference(node, binding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
+        if (statementVisitor != null && jcall.getExceptionTypes().size() > 0) {
+            for (String type : jcall.getExceptionTypes()) {
+                statementVisitor.setExceptionFlow(callNode, type);
+            }
+        }
+        
         setActualNodes(callNode, null, node, node.arguments());
         
         for (CFGParameter ain : callNode.getActualIns()) {
@@ -476,6 +512,12 @@ public class ExpressionVisitor extends ASTVisitor {
         
         JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
+        if (statementVisitor != null && jcall.getExceptionTypes().size() > 0) {
+            for (String type : jcall.getExceptionTypes()) {
+                statementVisitor.setExceptionFlow(callNode, type);
+            }
+        }
+        
         setActualNodes(callNode, null, node, node.arguments());
         
         for (CFGParameter ain : callNode.getActualIns()) {
