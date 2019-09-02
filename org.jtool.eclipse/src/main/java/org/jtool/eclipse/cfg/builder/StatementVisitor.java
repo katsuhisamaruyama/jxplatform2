@@ -127,15 +127,19 @@ public class StatementVisitor extends ASTVisitor {
         return edge;
     }
     
-    private void reconnect(CFGNode node) {
-        Set<GraphEdge> edges = new HashSet<GraphEdge>(nextNode.getIncomingEdges());
+    private void reconnect(CFGNode origNode, CFGNode node) {
+        Set<GraphEdge> edges = new HashSet<GraphEdge>(origNode.getIncomingEdges());
         for (GraphEdge edge : edges) {
             edge.setDstNode(node);
         }
         
         cfg.add(node);
-        nextNode.clear();
+        origNode.clear();
         prevNode = node;
+    }
+    
+    private void reconnect(CFGNode node) {
+        reconnect(nextNode, node);
     }
     
     @Override
@@ -693,8 +697,6 @@ public class StatementVisitor extends ASTVisitor {
         CFGNode curNode = exprVisitor.getExitNode();
         
         setExceptionFlow(throwNode, expression.resolveTypeBinding().getQualifiedName());
-        //ControlFlow trueEdge = createFlow(curNode, cfg.getEndNode());
-        //trueEdge.setTrue();
         
         ControlFlow fallEdge = createFlow(curNode, nextNode);
         fallEdge.setFalse();
@@ -792,12 +794,11 @@ public class StatementVisitor extends ASTVisitor {
     
     private void visitFinallyBlock(TryNode tryNode, Block block, CFGMerge mergeNode) {
         CFGStatement finallyNode = new CFGStatement(block, CFGNode.Kind.finallySt);
-        ControlFlow finallyEdge = createFlow(tryNode, finallyNode);
-        finallyEdge.setFalse();
+        reconnect(mergeNode, finallyNode);
         tryNode.setFinallyBlock(finallyNode);
         
-        ControlFlow truEdge = createFlow(finallyNode, nextNode);
-        truEdge.setTrue();
+        ControlFlow trueEdge = createFlow(finallyNode, nextNode);
+        trueEdge.setTrue();
         
         block.accept(this);
         reconnect(mergeNode);

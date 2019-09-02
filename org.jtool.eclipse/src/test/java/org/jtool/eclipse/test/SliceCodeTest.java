@@ -57,8 +57,8 @@ public class SliceCodeTest {
         Set<JavaClass> classes = builder.getAllClassesBackward(jclass);
         SDG sdg = builder.getSDG(classes);
         ClDG cldg = sdg.getClDG(jclass.getQualifiedName());
-        //cldg.getCFG().print();
-        //cldg.print();
+        cldg.getCFG().print();
+        cldg.print();
         
         String code = jclass.getFile().getCode();
         SliceCriterion criterion = SliceCriterion.find(cldg, code, lineNumber, offset);
@@ -1242,6 +1242,102 @@ public class SliceCodeTest {
     }
     
     @Test
+    public void testSlice122_1() {
+        String code = getSlicedCode("Test122", 15, 12);
+        //System.out.println(code);
+        String expected = 
+                "class Test122 {\n" + 
+                "    public void m() {\n" + 
+                "        int a = 2;\n" + 
+                "        int b = 0;\n" + 
+                "        try {\n" + 
+                "            b = n(a);\n" + 
+                "        } catch (Exception e) {\n" + 
+                "        } finally {\n" +
+                "        }\n" + 
+                "        int c = b;\n" + 
+                "    }\n" + 
+                "    public int n(int x) throws Exception {\n" + 
+                "        if (x == 0) {\n" + 
+                "            throw new Exception();\n" + 
+                "        }\n" + 
+                "        return 10 / x;\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
+    public void testSlice122_2() {
+        String code = getSlicedCode("Test122", 9, 16);
+        //System.out.println(code);
+        String expected = 
+                "class Test122 {\n" + 
+                "    public void m() {\n" + 
+                "        int a = 2;\n" + 
+                "        int b = 0;\n" + 
+                "        try {\n" + 
+                "            b = n(a);\n" + 
+                "            int q = b + 5;\n" + 
+                "        } catch (Exception e) {\n" + 
+                "        } finally {\n" +
+                "        }\n" + 
+                "    }\n" + 
+                "    public int n(int x) throws Exception {\n" + 
+                "        if (x == 0) {\n" + 
+                "            throw new Exception();\n" + 
+                "        }\n" + 
+                "        return 10 / x;\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
+    public void testSlice122_3() {
+        String code = getSlicedCode("Test122", 11, 22);
+        //System.out.println(code);
+        String expected = 
+                "class Test122 {\n" + 
+                "    public void m() {\n" + 
+                "        try {\n" + 
+                "            n(a);\n" + 
+                "        } catch (Exception e) {\n" + 
+                "            Exception f = e;\n" + 
+                "        } finally {\n" +
+                "        }\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
+    public void testSlice122_4() {
+        String code = getSlicedCode("Test122", 13, 16);
+        //System.out.println(code);
+        String expected = 
+                "class Test122 {\n" + 
+                "    public void m() {\n" + 
+                "        int a = 2;\n" + 
+                "        int b = 0;\n" + 
+                "        try {\n" + 
+                "            b = n(a);\n" + 
+                "        } catch (Exception e) {\n" + 
+                "        } finally {\n" + 
+                "            int r = b + 7;\n" + 
+                "        }\n" + 
+                "    }\n" + 
+                "    public int n(int x) throws Exception {\n" + 
+                "        if (x == 0) {\n" + 
+                "            throw new Exception();\n" + 
+                "        }\n" + 
+                "        return 10 / x;\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
     public void testCustomer1() {
         String code = getSlicedCode("Customer", 22, 12);
         //System.out.println(code);
@@ -1381,6 +1477,7 @@ public class SliceCodeTest {
         
         SliceCodeTest tester = new SliceCodeTest();
         
+        /*
         tester.testSlice101_1();
         tester.testSlice101_1m();
         tester.testSlice101_2();
@@ -1477,6 +1574,12 @@ public class SliceCodeTest {
         tester.testTest200_1();
         tester.testTest200_2();
         tester.testTest200_3();
+        */
+        
+        tester.testSlice122_1();
+        tester.testSlice122_2();
+        tester.testSlice122_3();
+        tester.testSlice122_4();
         
         unbuild();
     }
