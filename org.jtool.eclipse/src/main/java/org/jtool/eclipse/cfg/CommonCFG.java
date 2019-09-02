@@ -53,6 +53,18 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
         return start.getQualifiedName();
     }
     
+    public boolean isMethod() {
+        return start instanceof CFGMethodEntry;
+    }
+    
+    public boolean isField() {
+        return start instanceof CFGFieldEntry;
+    }
+    
+    public boolean isClass() {
+        return start instanceof CFGClassEntry;
+    }
+    
     public boolean isBranch(CFGNode node) {
         return node.isBranch();
     }

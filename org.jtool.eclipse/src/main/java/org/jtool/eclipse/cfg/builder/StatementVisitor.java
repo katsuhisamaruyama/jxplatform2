@@ -764,7 +764,12 @@ public class StatementVisitor extends ASTVisitor {
     }
     
     private void setExceptionFlowOnMethodExit(CFGNode node, String type) {
-        JavaMethod jmethod = cfg.getStartNode().getJavaMethod();
+        if (!cfg.isMethod()) {
+            return;
+        }
+        
+        CFGMethodEntry entry = (CFGMethodEntry)cfg.getStartNode();
+        JavaMethod jmethod = entry.getJavaMethod();
         for (JavaClass jclass : jmethod.getExceptions()) {
             if (jclass.getQualifiedName().endsWith(type)) {
                 ControlFlow exceptionEdge = createFlow(node, cfg.getEndNode());

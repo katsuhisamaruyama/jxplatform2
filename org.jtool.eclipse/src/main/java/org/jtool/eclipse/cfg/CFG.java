@@ -22,11 +22,6 @@ public class CFG extends CommonCFG {
         super();
     }
     
-    @Override
-    public CFGMethodEntry getStartNode() {
-        return (CFGMethodEntry)start;
-    }
-    
     public void append(CFG cfg) {
         for (CFGNode node : cfg.getNodes()) {
             add(node);

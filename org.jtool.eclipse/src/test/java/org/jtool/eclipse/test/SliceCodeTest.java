@@ -1477,7 +1477,6 @@ public class SliceCodeTest {
         
         SliceCodeTest tester = new SliceCodeTest();
         
-        /*
         tester.testSlice101_1();
         tester.testSlice101_1m();
         tester.testSlice101_2();
@@ -1566,6 +1565,11 @@ public class SliceCodeTest {
         tester.testSlice121_2();
         tester.testSlice121_3();
         
+        tester.testSlice122_1();
+        tester.testSlice122_2();
+        tester.testSlice122_3();
+        tester.testSlice122_4();
+        
         tester.testCustomer1();
         tester.testCustomer2();
         tester.testCustomer3();
@@ -1574,12 +1578,6 @@ public class SliceCodeTest {
         tester.testTest200_1();
         tester.testTest200_2();
         tester.testTest200_3();
-        */
-        
-        tester.testSlice122_1();
-        tester.testSlice122_2();
-        tester.testSlice122_3();
-        tester.testSlice122_4();
         
         unbuild();
     }
