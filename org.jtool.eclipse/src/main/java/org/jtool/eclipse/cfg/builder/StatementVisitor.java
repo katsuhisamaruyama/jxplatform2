@@ -784,7 +784,7 @@ public class StatementVisitor extends ASTVisitor {
         tryNode.addCatchClause(catchNode);
         
         IVariableBinding vbinding = node.getException().resolveBinding();
-        JReference jvar = new JLocalVarReference(node.getException(), vbinding);
+        JReference jvar = new JLocalVarReference(node.getException().getName(), vbinding);
         catchNode.addDefVariable(jvar);
         
         ControlFlow trueEdge = createFlow(catchNode, nextNode);
