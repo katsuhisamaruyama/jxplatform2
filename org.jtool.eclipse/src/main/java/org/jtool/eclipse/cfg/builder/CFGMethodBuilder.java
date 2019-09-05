@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -18,6 +18,7 @@ import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.graph.GraphEdge;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -77,6 +78,8 @@ public class CFGMethodBuilder {
         CFGNode tmpExit = new CFGNode();
         cfg.setEndNode(tmpExit);
         
+        createExceptionTypes(jmethod, entry, cfg);
+        
         CFGNode finalFormalInNode = createFormalIn(params, cfg, entry, entry);
         CFGNode nextNode = new CFGNode();
         
@@ -134,6 +137,16 @@ public class CFGMethodBuilder {
         Set<GraphEdge> edges = new HashSet<GraphEdge>(tmpNode.getIncomingEdges());
         for (GraphEdge edge : edges) {
             edge.setDstNode(node);
+        }
+    }
+    
+    private static void createExceptionTypes(JavaMethod jmethod, CFGMethodEntry entry, CFG cfg) {
+        for (Type type : jmethod.getExceptionTypeNodes().values()) {
+            CatchNode catchNode = new CatchNode(type, CFGNode.Kind.catchSt, type.resolveBinding().getTypeDeclaration());
+            catchNode.setParent(entry);
+            
+            entry.addCatchNode(catchNode.getTypeName(), catchNode);
+            cfg.add(catchNode);
         }
     }
     

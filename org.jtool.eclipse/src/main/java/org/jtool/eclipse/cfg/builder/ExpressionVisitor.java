@@ -43,6 +43,7 @@ import org.eclipse.jdt.core.dom.ConstructorInvocation;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
 import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
@@ -337,8 +338,8 @@ public class ExpressionVisitor extends ASTVisitor {
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.methodCall);
         CFGStatement primaryNode = null;
         if (statementVisitor != null && jcall.getExceptionTypes().size() > 0) {
-            for (String type : jcall.getExceptionTypes()) {
-                statementVisitor.setExceptionFlow(callNode, type);
+            for (ITypeBinding type : jcall.getExceptionTypes()) {
+                statementVisitor.setExceptionFlowOnMethodCall(callNode, type);
             }
         }
         
@@ -405,8 +406,8 @@ public class ExpressionVisitor extends ASTVisitor {
         JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.methodCall);
         if (statementVisitor != null && jcall.getExceptionTypes().size() > 0) {
-            for (String type : jcall.getExceptionTypes()) {
-                statementVisitor.setExceptionFlow(callNode, type);
+            for (ITypeBinding type : jcall.getExceptionTypes()) {
+                statementVisitor.setExceptionFlowOnMethodCall(callNode, type);
             }
         }
         
@@ -427,8 +428,8 @@ public class ExpressionVisitor extends ASTVisitor {
         CFGStatement primaryNode = null;
         
         if (statementVisitor != null && jcall.getExceptionTypes().size() > 0) {
-            for (String type : jcall.getExceptionTypes()) {
-                statementVisitor.setExceptionFlow(callNode, type);
+            for (ITypeBinding type : jcall.getExceptionTypes()) {
+                statementVisitor.setExceptionFlowOnMethodCall(callNode, type);
             }
         }
         
@@ -468,8 +469,8 @@ public class ExpressionVisitor extends ASTVisitor {
         JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
         if (statementVisitor != null && jcall.getExceptionTypes().size() > 0) {
-            for (String type : jcall.getExceptionTypes()) {
-                statementVisitor.setExceptionFlow(callNode, type);
+            for (ITypeBinding type : jcall.getExceptionTypes()) {
+                statementVisitor.setExceptionFlowOnMethodCall(callNode, type);
             }
         }
         
@@ -488,8 +489,8 @@ public class ExpressionVisitor extends ASTVisitor {
         JMethodReference jcall = new JMethodReference(node, binding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
         if (statementVisitor != null && jcall.getExceptionTypes().size() > 0) {
-            for (String type : jcall.getExceptionTypes()) {
-                statementVisitor.setExceptionFlow(callNode, type);
+            for (ITypeBinding type : jcall.getExceptionTypes()) {
+                statementVisitor.setExceptionFlowOnMethodCall(callNode, type);
             }
         }
         
@@ -513,8 +514,8 @@ public class ExpressionVisitor extends ASTVisitor {
         JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
         if (statementVisitor != null && jcall.getExceptionTypes().size() > 0) {
-            for (String type : jcall.getExceptionTypes()) {
-                statementVisitor.setExceptionFlow(callNode, type);
+            for (ITypeBinding type : jcall.getExceptionTypes()) {
+                statementVisitor.setExceptionFlowOnMethodCall(callNode, type);
             }
         }
         

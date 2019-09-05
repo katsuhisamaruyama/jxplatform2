@@ -7,6 +7,8 @@
 package org.jtool.eclipse.cfg.builder;
 
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGStatement;
 
 /**
@@ -17,20 +19,30 @@ import org.jtool.eclipse.cfg.CFGStatement;
  */
 class CatchNode extends CFGStatement {
     
-    private String exceptionType;
+    private ITypeBinding type;
+    private CFGNode parent;
     
     CatchNode() {
     }
     
-    CatchNode(ASTNode node, Kind kind) {
+    CatchNode(ASTNode node, CFGNode.Kind kind, ITypeBinding type) {
         super(node, kind);
+        this.type = type;
     }
     
-    void setExceptionType(String exceptionType) {
-        this.exceptionType = exceptionType;
+    ITypeBinding getType() {
+        return type;
     }
     
-    String getExceptionType() {
-        return exceptionType;
+    String getTypeName() {
+        return type.getQualifiedName();
+    }
+    
+    void setParent(CFGNode parent) {
+        this.parent = parent;
+    }
+    
+    CFGNode getParent() {
+        return parent;
     }
 }

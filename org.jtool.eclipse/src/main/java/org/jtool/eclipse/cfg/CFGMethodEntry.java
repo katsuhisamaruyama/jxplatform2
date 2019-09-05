@@ -21,6 +21,7 @@ public class CFGMethodEntry extends CFGEntry {
     
     private List<CFGParameter> formalIns = new ArrayList<CFGParameter>();
     private List<CFGParameter> formalOuts = new ArrayList<CFGParameter>();
+    private List<CFGNode> catchNodes = new ArrayList<CFGNode>();
     
     protected CFGMethodEntry() {
     }
@@ -84,6 +85,14 @@ public class CFGMethodEntry extends CFGEntry {
     
     public boolean hasParameters() {
         return formalIns.size() != 0;
+    }
+    
+    public void addCatchNode(String type, CFGNode node) {
+        catchNodes.add(node);
+    }
+    
+    public List<CFGNode> getCatchNodes() {
+        return catchNodes;
     }
     
     @Override
