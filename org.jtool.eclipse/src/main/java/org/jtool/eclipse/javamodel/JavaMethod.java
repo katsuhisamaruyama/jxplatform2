@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
@@ -24,6 +25,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * An object representing a method, a constructor, or an initializer.
@@ -53,6 +56,8 @@ public class JavaMethod extends JavaElement {
     protected List<JavaLocalVar> parameters = new ArrayList<JavaLocalVar>();
     protected List<JavaLocalVar> localDecls = new ArrayList<JavaLocalVar>();
     protected JavaLocalVar returnVariable = null;
+    
+    protected Map<String, Type> exceptionTypes = new HashMap<String, Type>();
     
     protected JavaMethod() {
     }
@@ -85,6 +90,9 @@ public class JavaMethod extends JavaElement {
                 returnVariable = new JavaLocalVar(this, "$" + name);
             } else {
                 returnVariable = null;
+            }
+            for (Type exceptionType : (List<Type>)node.thrownExceptionTypes()) {
+                exceptionTypes.put(exceptionType.resolveBinding().getTypeDeclaration().getQualifiedName(), exceptionType);
             }
             
         } else {
@@ -340,6 +348,14 @@ public class JavaMethod extends JavaElement {
             }
         }
         return null;
+    }
+    
+    public Map<String, Type> getExceptionTypeNodes() {
+        return exceptionTypes;
+    }
+    
+    public ASTNode getExceptionTypeNode(String type) {
+        return exceptionTypes.get(type);
     }
     
     public boolean isPublic() {
