@@ -28,7 +28,6 @@ import java.util.HashSet;
 public class PDGStore {
     
     private CFGStore cfgStore;
-    boolean containingFallThroughEdge = true;
     
     private Map<String, PDG> pdgMap = new HashMap<String, PDG>();
     private Map<String, ClDG> cldgMap = new HashMap<String, ClDG>();
@@ -42,14 +41,6 @@ public class PDGStore {
     public void destroy() {
         pdgMap.clear();
         cfgStore = null;
-    }
-    
-    public void setContainingFallThroughEdge(boolean containingFallThroughEdge) {
-        this.containingFallThroughEdge = containingFallThroughEdge;
-    }
-    
-    public boolean isContainingFallThroughEdge() {
-        return containingFallThroughEdge;
     }
     
     private void addPDG(PDG pdg) {
@@ -95,7 +86,7 @@ public class PDGStore {
                 return pdg;
             }
         }
-        PDG pdg = PDGBuilder.buildPDG(cfg, containingFallThroughEdge);
+        PDG pdg = PDGBuilder.buildPDG(cfg);
         addPDG(pdg);
         return pdg;
     }
@@ -118,7 +109,7 @@ public class PDGStore {
                 return cldg;
             }
         }
-        ClDG cldg = PDGBuilder.buildClDG(ccfg, containingFallThroughEdge);
+        ClDG cldg = PDGBuilder.buildClDG(ccfg);
         return cldg;
     }
     
