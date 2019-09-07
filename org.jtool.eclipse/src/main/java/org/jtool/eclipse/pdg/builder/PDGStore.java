@@ -73,29 +73,9 @@ public class PDGStore {
     }
     
     public PDG getPDG(CFG cfg, boolean force) {
-        if (!force) {
-            PDG pdg = pdgMap.get(cfg.getQualifiedName());
-            if (pdg != null) {
-                return pdg;
-            }
-        }
-        PDG pdg = PDGBuilder.buildPDG(cfg, containingFallThroughEdge);
-        PDGBuilder.connectParametersConservatively(pdg);
-        addPDG(pdg);
+        PDG pdg = getPDGCore(cfg, force);
+        PDGBuilder.connectMethodCallsConservatively(pdg);
         return pdg;
-    }
-    
-    public ClDG getClDG(CCFG ccfg, boolean force) {
-        if (!force) {
-            ClDG cldg = cldgMap.get(ccfg.getQualifiedName());
-            if (cldg != null) {
-                return cldg;
-            }
-        }
-        ClDG cldg = PDGBuilder.buildClDG(ccfg, containingFallThroughEdge);
-        
-        PDGBuilder.connectParameters(cldg);
-        return cldg;
     }
     
     public PDG getPDG(JavaMethod jmethod, boolean force) {
@@ -108,14 +88,22 @@ public class PDGStore {
         return getPDG(cfg, force);
     }
     
-    public PDG getPDGWithinSDG(JavaMethod jmethod, boolean force) {
-        getSDG(jmethod.getDeclaringClass(), force);
-        return pdgMap.get(jmethod.getQualifiedName());
+    private PDG getPDGCore(CFG cfg, boolean force) {
+        if (!force) {
+            PDG pdg = pdgMap.get(cfg.getQualifiedName());
+            if (pdg != null) {
+                return pdg;
+            }
+        }
+        PDG pdg = PDGBuilder.buildPDG(cfg, containingFallThroughEdge);
+        addPDG(pdg);
+        return pdg;
     }
     
-    public PDG getPDGWithinSDG(JavaField jfield, boolean force) {
-        getSDG(jfield.getDeclaringClass(), force);
-        return pdgMap.get(jfield.getQualifiedName());
+    public ClDG getClDG(CCFG ccfg, boolean force) {
+        ClDG cldg = getClDGCore(ccfg, force);
+        PDGBuilder.connectMethodCalls(cldg);
+        return cldg;
     }
     
     public ClDG getClDG(JavaClass jclass, boolean force) {
@@ -123,9 +111,21 @@ public class PDGStore {
         return getClDG(ccfg, force);
     }
     
-    public ClDG getClDGWithinSDG(JavaClass jclass, boolean force) {
-        getSDG(jclass, force);
-        return cldgMap.get(jclass.getQualifiedName());
+    private ClDG getClDGCore(CCFG ccfg, boolean force) {
+        if (!force) {
+            ClDG cldg = cldgMap.get(ccfg.getQualifiedName());
+            if (cldg != null) {
+                return cldg;
+            }
+        }
+        ClDG cldg = PDGBuilder.buildClDG(ccfg, containingFallThroughEdge);
+        return cldg;
+    }
+    
+    public SDG getSDG(JavaClass jclass, boolean force) {
+        Set<JavaClass> classes = new HashSet<JavaClass>();
+        classes.add(jclass);
+        return getSDG(classes, force);
     }
     
     public SDG getSDG(Set<JavaClass> classes, boolean force) {
@@ -138,29 +138,6 @@ public class PDGStore {
         return sdg;
     }
     
-    public SDG getSDGForClasses(Set<JavaClass> classes, boolean force) {
-        SDG sdg = new SDG();
-        for (JavaClass jc : classes) {
-            CCFG ccfg = cfgStore.getCCFG(jc, force);
-            ClDG cldg = getClDG(ccfg, force);
-            
-            sdg.add(cldg);
-            addClDG(cldg);
-        }
-        for (PDG pdg : sdg.getPDGs()) {
-            addPDG(pdg);
-        }
-        PDGBuilder.connectParameters(classes, sdg);
-        PDGBuilder.connectFieldAccesses(sdg);
-        return sdg;
-    }
-    
-    public SDG getSDG(JavaClass jclass, boolean force) {
-        Set<JavaClass> classes = new HashSet<JavaClass>();
-        classes.add(jclass);
-        return getSDG(classes, force);
-    }
-    
     public SDG getSDG(boolean force) {
         if (!force && currentSDG != null) {
             return currentSDG;
@@ -168,6 +145,38 @@ public class PDGStore {
         Set<JavaClass> classes = new HashSet<JavaClass>(cfgStore.getJavaProject().getClasses());
         currentSDG = getSDGForClasses(classes, force);
         return currentSDG;
+    }
+    
+    public SDG getSDGForClasses(Set<JavaClass> classes, boolean force) {
+        SDG sdg = new SDG();
+        for (JavaClass jc : classes) {
+            CCFG ccfg = cfgStore.getCCFG(jc, force);
+            ClDG cldg = getClDGCore(ccfg, force);
+            
+            sdg.add(cldg);
+            addClDG(cldg);
+        }
+        for (PDG pdg : sdg.getPDGs()) {
+            addPDG(pdg);
+        }
+        PDGBuilder.connectMethodCalls(classes, sdg);
+        PDGBuilder.connectFieldAccesses(sdg);
+        return sdg;
+    }
+    
+    public PDG getPDGWithinSDG(JavaMethod jmethod, boolean force) {
+        getSDG(jmethod.getDeclaringClass(), force);
+        return pdgMap.get(jmethod.getQualifiedName());
+    }
+    
+    public PDG getPDGWithinSDG(JavaField jfield, boolean force) {
+        getSDG(jfield.getDeclaringClass(), force);
+        return pdgMap.get(jfield.getQualifiedName());
+    }
+    
+    public ClDG getClDGWithinSDG(JavaClass jclass, boolean force) {
+        getSDG(jclass, force);
+        return cldgMap.get(jclass.getQualifiedName());
     }
     
     private void collectEfferentClasses(JavaClass jclass, Set<JavaClass> classes) {
