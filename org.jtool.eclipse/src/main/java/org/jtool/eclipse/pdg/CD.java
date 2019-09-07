@@ -50,11 +50,11 @@ public class CD extends Dependence {
         } else if (kind == Kind.falseControlDependence) {
             buf.append(" F");
         } else if (kind == Kind.fallThroughControlDependence) {
-            buf.append(" Fall:");
+            buf.append(" FALL");
         } else if (kind == Kind.declarationDependence) {
-            buf.append(" Decl:");
+            buf.append(" DECL");
         } else if (kind == Kind.exceptionCatchDependence) {
-            buf.append(" Excp:");
+            buf.append(" EXCP");
         }
         return buf.toString();
     }
