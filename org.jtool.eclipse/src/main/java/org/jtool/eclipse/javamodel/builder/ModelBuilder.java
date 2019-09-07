@@ -71,10 +71,6 @@ public abstract class ModelBuilder {
         return analyzingBytecode;
     }
     
-    public void setContainingFallThroughEdge(boolean containingFallThroughEdge) {
-        pdgStore.setContainingFallThroughEdge(containingFallThroughEdge);
-    }
-    
     public void unbuild() {
         cfgStore.destroy();
         pdgStore.destroy();

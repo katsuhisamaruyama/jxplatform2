@@ -164,7 +164,6 @@ public class PDGModelBuilderTest {
         
         ModelBuilderBatch builder = new ModelBuilderBatch();
         builder.setLogVisible(true);
-        builder.setContainingFallThroughEdge(true); 
         JavaProject jproject = builder.build(name, target, classpath);
         
         for (JavaClass jclass : jproject.getClasses()) {

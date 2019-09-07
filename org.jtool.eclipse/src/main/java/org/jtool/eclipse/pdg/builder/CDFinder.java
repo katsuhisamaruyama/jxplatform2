@@ -28,32 +28,36 @@ import java.util.HashSet;
  */
 public class CDFinder {
     
-    public static void find(PDG pdg, CFG cfg, boolean containingFallThroughEdge) {
-        findCDs(pdg, cfg, containingFallThroughEdge);
+    public static void find(PDG pdg, CFG cfg) {
+        findCDs(pdg, cfg);
         findCDsFromEntry(pdg, cfg);
         addCDsFromEntry(pdg);
         findCDsOnDeclarations(pdg, cfg);
     }
     
-    private static void findCDs(PDG pdg, CFG cfg, boolean containingFallThroughEdge) {
+    private static void findCDs(PDG pdg, CFG cfg) {
         for (CFGNode cfgnode : cfg.getNodes()) {
             if (cfgnode.isBranch()) {
-                findCDs(pdg, cfg, cfgnode, containingFallThroughEdge);
+                findCDs(pdg, cfg, cfgnode);
             } else if (cfgnode.isMethodCall()) {
                 findCDsOnParameters(pdg, (CFGMethodCall)cfgnode);
             }
         }
     }
     
-    private static void findCDs(PDG pdg, CFG cfg, CFGNode branchNode, boolean containingFallThroughEdge) {
-        Set<CFGNode> postDominator = postDominator(cfg, branchNode, containingFallThroughEdge);
+    private static void findCDs(PDG pdg, CFG cfg, CFGNode branchNode) {
+        Set<CFGNode> postDominator = postDominator(cfg, branchNode);
         for (ControlFlow branch : branchNode.getOutgoingFlows()) {
             CFGNode branchDstNode = branch.getDstNode();
-            Set<CFGNode> postDominatorForBranch = postDominator(cfg, branchDstNode, containingFallThroughEdge);
+            Set<CFGNode> postDominatorForBranch = postDominator(cfg, branchDstNode);
             postDominatorForBranch.add(branchDstNode);
             
             for (CFGNode cfgnode : postDominatorForBranch) {
+                
+                
                 if (cfgnode.isStatementNotParameter() && !branchNode.equals(cfgnode) && !postDominator.contains(cfgnode)) {
+                    
+                    
                     
                     CD edge = new CD(branchNode.getPDGNode(), cfgnode.getPDGNode());
                     if (branch.isTrue()) {
@@ -71,11 +75,11 @@ public class CDFinder {
         }
     }
     
-    public static Set<CFGNode> postDominator(CFG cfg, CFGNode anchor, boolean containingFallThroughEdge) {
+    public static Set<CFGNode> postDominator(CFG cfg, CFGNode anchor) {
         Set<CFGNode> postDominator = new HashSet<CFGNode>();
         for (CFGNode node : cfg.getNodes()) {
             if (!anchor.equals(node)) {
-                Set<CFGNode> track = getForwardTrack(anchor, node, containingFallThroughEdge);
+                Set<CFGNode> track = getForwardTrack(anchor, node);
                 if (track.contains(node) && !track.contains(cfg.getEndNode())) {
                     postDominator.add(node);
                 }
@@ -84,14 +88,14 @@ public class CDFinder {
         return postDominator;
     }
     
-    private static Set<CFGNode> getForwardTrack(CFGNode from, CFGNode to, boolean containingFallThroughEdge) {
+    private static Set<CFGNode> getForwardTrack(CFGNode from, CFGNode to) {
         Set<CFGNode> track = new HashSet<CFGNode>();
-        walkForward(from, to, containingFallThroughEdge, track);
+        walkForward(from, to, track);
         track.add(to);
         return track;
     }
     
-    private static void walkForward(CFGNode node, CFGNode to, boolean containingFallThroughEdge, Set<CFGNode> track) {
+    private static void walkForward(CFGNode node, CFGNode to, Set<CFGNode> track) {
         if (node.equals(to)) {
             return;
         }
@@ -99,10 +103,10 @@ public class CDFinder {
         track.add(node);
         
         for (ControlFlow flow : node.getOutgoingFlows()) {
-            if (containingFallThroughEdge || (!flow.isJump() && !flow.isExceptionCatch())) {
+            if (!flow.isExceptionCatch()) {
                 CFGNode succ = flow.getDstNode();
                 if (!track.contains(succ)) {
-                    walkForward(succ, to, containingFallThroughEdge, track);
+                    walkForward(succ, to, track);
                 }
             }
         }

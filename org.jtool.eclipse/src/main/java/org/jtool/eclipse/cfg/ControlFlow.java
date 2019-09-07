@@ -28,7 +28,6 @@ public class ControlFlow extends GraphEdge {
         trueControlFlow,                 // Control flow outgoing to a true-branch
         falseControlFlow,                // Control flow outgoing to a false-branch
         fallThroughFlow,                 // Control flow representing a fall-through
-        jumpFlow,                        // Control flow representing a jump caused by return, break, and continue
         methodCall,                      // Flow representing the call to a method
         parameterFlow,                   // Flow representing the relationship between a class/method and its parameter
         exceptionCatchFlow,              // Flow representing the relationship between an exception occurrence and its catch
@@ -73,14 +72,6 @@ public class ControlFlow extends GraphEdge {
     
     public boolean isFallThrough() {
         return kind == Kind.fallThroughFlow;
-    }
-    
-    public void setJump() {
-        kind = Kind.jumpFlow;
-    }
-    
-    public boolean isJump() {
-        return kind == Kind.jumpFlow;
     }
     
     public void setMethodCall() {
