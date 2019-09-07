@@ -14,7 +14,7 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
  * 
  * @author Katsuhisa Maruyama
  */
-public class CFGCatch extends CFGNode {
+public class CFGCatch extends CFGStatement {
     
     private ITypeBinding type;
     private CFGNode parent;

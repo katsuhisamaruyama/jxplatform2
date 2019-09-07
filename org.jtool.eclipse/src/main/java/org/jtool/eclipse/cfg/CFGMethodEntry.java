@@ -21,7 +21,7 @@ public class CFGMethodEntry extends CFGEntry {
     
     private List<CFGParameter> formalIns = new ArrayList<CFGParameter>();
     private List<CFGParameter> formalOuts = new ArrayList<CFGParameter>();
-    private List<CFGNode> catchNodes = new ArrayList<CFGNode>();
+    private List<CFGCatch> exceptionNodes = new ArrayList<CFGCatch>();
     
     protected CFGMethodEntry() {
     }
@@ -87,12 +87,21 @@ public class CFGMethodEntry extends CFGEntry {
         return formalIns.size() != 0;
     }
     
-    public void addCatchNode(CFGNode node) {
-        catchNodes.add(node);
+    public void addExceptionNode(CFGCatch node) {
+        exceptionNodes.add(node);
     }
     
-    public List<CFGNode> getCatchNodes() {
-        return catchNodes;
+    public List<CFGCatch> getExceptionNodes() {
+        return exceptionNodes;
+    }
+    
+    public CFGCatch getExceptionNode(String type) {
+        for (CFGCatch node : exceptionNodes) {
+            if (node.getTypeName().equals(type)) {
+                return node;
+            }
+        }
+        return null;
     }
     
     @Override

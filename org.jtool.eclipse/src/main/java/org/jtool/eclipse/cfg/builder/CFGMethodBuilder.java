@@ -146,7 +146,7 @@ public class CFGMethodBuilder {
             CFGCatch catchNode = new CFGCatch(type, CFGNode.Kind.catchSt, type.resolveBinding().getTypeDeclaration());
             catchNode.setParent(entry);
             
-            entry.addCatchNode(catchNode);
+            entry.addExceptionNode(catchNode);
             cfg.add(catchNode);
         }
     }
