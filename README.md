@@ -238,7 +238,6 @@ The following code builds ClDGs for all classes and PDGs for all methods and fie
     
     ModelBuilderBatch builder = new ModelBuilderBatch();
     builder.setLogVisible(true);
-    builder.setContainingFallThroughEdge(true);  // contains fall-through edges in the constructing a PDG
     JavaProject jproject = builder.build(name, target, classpath);
     
     for (JavaClass jclass : jproject.getClasses()) {
