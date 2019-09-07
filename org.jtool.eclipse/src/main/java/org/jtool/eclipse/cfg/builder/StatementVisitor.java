@@ -573,7 +573,7 @@ public class StatementVisitor extends ASTVisitor {
         }
         if (jumpNode != null) {
             ControlFlow edge = createFlow(breakNode, jumpNode);
-            edge.setJump();
+            edge.setTrue();
             edge = createFlow(breakNode, nextNode);
             edge.setFallThrough();
         }
@@ -594,7 +594,7 @@ public class StatementVisitor extends ASTVisitor {
         }
         if (jumpNode != null) {
             ControlFlow edge = createFlow(continueNode, jumpNode);
-            edge.setJump();
+            edge.setTrue();
             edge = createFlow(continueNode, nextNode);
             edge.setFallThrough();
         }
@@ -622,7 +622,7 @@ public class StatementVisitor extends ASTVisitor {
         }
         
         ControlFlow trueEdge = createFlow(curNode, cfg.getEndNode());
-        trueEdge.setJump();
+        trueEdge.setTrue();
         
         ControlFlow fallEdge = createFlow(curNode, nextNode);
         fallEdge.setFallThrough();
@@ -696,7 +696,7 @@ public class StatementVisitor extends ASTVisitor {
         expression.accept(exprVisitor);
         CFGNode curNode = exprVisitor.getExitNode();
         
-        setExceptionFlowOnThrow(throwNode, expression.resolveTypeBinding().getTypeDeclaration());
+        //setExceptionFlowOnThrow(throwNode, expression.resolveTypeBinding().getTypeDeclaration());
         
         ControlFlow fallEdge = createFlow(curNode, nextNode);
         fallEdge.setFallThrough();
@@ -744,7 +744,7 @@ public class StatementVisitor extends ASTVisitor {
                 if (occurence.isMethodCall()) {
                     exceptionEdge.setExceptionCatch();
                 } else {
-                    exceptionEdge.setJump();
+                    exceptionEdge.setTrue();
                 }
                 tryNode.getExceptionOccurrences().remove(occurence);
             }
@@ -789,12 +789,12 @@ public class StatementVisitor extends ASTVisitor {
             return;
         }
         
-        for (CFGCatch catchNode : getCatchNodes(type, entry.getCatchNodes())) {
+        for (CFGCatch catchNode : getCatchNodes(type, entry.getExceptionNodes())) {
             ControlFlow exceptionEdge = createFlow(node, catchNode);
             if (methodCall) {
                 exceptionEdge.setExceptionCatch();
             } else {
-                exceptionEdge.setJump();
+                exceptionEdge.setTrue();
             }
         }
     }
