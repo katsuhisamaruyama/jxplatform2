@@ -12,9 +12,9 @@ import org.jtool.eclipse.cfg.CFGMerge;
 import org.jtool.eclipse.cfg.CFGMethodEntry;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGStatement;
+import org.jtool.eclipse.cfg.CFGCatch;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JReference;
-import org.jtool.eclipse.cfg.JLocalVarReference;
 import org.jtool.eclipse.cfg.JInvisibleVarReference;
 import org.jtool.eclipse.graph.GraphEdge;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -731,15 +731,15 @@ public class StatementVisitor extends ASTVisitor {
         ControlFlow trueEdge = createFlow(mergeNode, nextNode);
         trueEdge.setTrue();
         
-        checkCatchNodes(tryNode);
+        findCatchNodes(tryNode);
         
         return false;
     }
     
-    private void checkCatchNodes(TryNode tryNode) {
+    private void findCatchNodes(TryNode tryNode) {
         Set<TryNode.ExceptionOccurrence> occurrences = new HashSet<TryNode.ExceptionOccurrence>(tryNode.getExceptionOccurrences());
         for (TryNode.ExceptionOccurrence occurence : occurrences) {
-            for (CatchNode catchNode : findCatchNodes(occurence.getType(), tryNode.getCatchNodes())) {
+            for (CFGCatch catchNode : getCatchNodes(occurence.getType(), tryNode.getCatchNodes())) {
                 ControlFlow exceptionEdge = createFlow(occurence.getNode(), catchNode);
                 if (occurence.isMethodCall()) {
                     exceptionEdge.setExceptionCatch();
@@ -762,15 +762,15 @@ public class StatementVisitor extends ASTVisitor {
         }
     }
     
-    void setExceptionFlowOnMethodCall(CFGNode node, ITypeBinding type) {
+    void setExceptionFlowOnMethodCall(CFGStatement node, ITypeBinding type) {
         setExceptionFlow(node, type, true);
     }
     
-    private void setExceptionFlowOnThrow(CFGNode node, ITypeBinding type) {
+    private void setExceptionFlowOnThrow(CFGStatement node, ITypeBinding type) {
         setExceptionFlow(node, type, false);
     }
     
-    private void setExceptionFlow(CFGNode node, ITypeBinding type, boolean methodCall) {
+    private void setExceptionFlow(CFGStatement node, ITypeBinding type, boolean methodCall) {
         if (tryNodeStack.size() > 0) {
             tryNodeStack.peek().addExceptionOccurrence(node, type, methodCall);
         } else {
@@ -778,7 +778,7 @@ public class StatementVisitor extends ASTVisitor {
         }
     }
     
-    private void setExceptionFlowOnMethod(CFGNode node, ITypeBinding type, boolean methodCall) {
+    private void setExceptionFlowOnMethod(CFGStatement node, ITypeBinding type, boolean methodCall) {
         if (!cfg.isMethod()) {
             return;
         }
@@ -789,7 +789,7 @@ public class StatementVisitor extends ASTVisitor {
             return;
         }
         
-        for (CatchNode catchNode : findCatchNodes(type, entry.getCatchNodes())) {
+        for (CFGCatch catchNode : getCatchNodes(type, entry.getCatchNodes())) {
             ControlFlow exceptionEdge = createFlow(node, catchNode);
             if (methodCall) {
                 exceptionEdge.setExceptionCatch();
@@ -799,11 +799,11 @@ public class StatementVisitor extends ASTVisitor {
         }
     }
     
-    private Set<CatchNode> findCatchNodes(ITypeBinding type, List<? extends CFGNode> catchNodes) {
-        Set<CatchNode> nodes = new HashSet<CatchNode>();
+    private Set<CFGCatch> getCatchNodes(ITypeBinding type, List<? extends CFGNode> catchNodes) {
+        Set<CFGCatch> nodes = new HashSet<CFGCatch>();
         while (type != null) {
             for (CFGNode node : catchNodes) {
-                CatchNode catchNode = (CatchNode)node;
+                CFGCatch catchNode = (CFGCatch)node;
                 if (type.getQualifiedName().equals(catchNode.getTypeName())) {
                     nodes.add(catchNode);
                 }
@@ -815,14 +815,11 @@ public class StatementVisitor extends ASTVisitor {
     
     private void visitCatchClause(TryNode tryNode, CatchClause node, CFGMerge mergeNode) {
         IVariableBinding vbinding = node.getException().resolveBinding();
-        CatchNode catchNode = new CatchNode(node.getException(), CFGNode.Kind.catchSt, vbinding.getType().getTypeDeclaration());
+        CFGCatch catchNode = new CFGCatch(node.getException(), CFGNode.Kind.catchSt, vbinding.getType().getTypeDeclaration());
         catchNode.setParent(tryNode);
         tryNode.addCatchNode(catchNode);
         
         reconnect(catchNode);
-        
-        JReference jvar = new JLocalVarReference(node.getException().getName(), vbinding);
-        catchNode.addDefVariable(jvar);
         
         ControlFlow trueEdge = createFlow(catchNode, nextNode);
         trueEdge.setTrue();

@@ -11,6 +11,7 @@ import org.jtool.eclipse.cfg.CFGExit;
 import org.jtool.eclipse.cfg.CFGMethodEntry;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGParameter;
+import org.jtool.eclipse.cfg.CFGCatch;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JInvisibleVarReference;
 import org.jtool.eclipse.cfg.JLocalVarReference;
@@ -142,10 +143,10 @@ public class CFGMethodBuilder {
     
     private static void createExceptionTypes(JavaMethod jmethod, CFGMethodEntry entry, CFG cfg) {
         for (Type type : jmethod.getExceptionTypeNodes().values()) {
-            CatchNode catchNode = new CatchNode(type, CFGNode.Kind.catchSt, type.resolveBinding().getTypeDeclaration());
+            CFGCatch catchNode = new CFGCatch(type, CFGNode.Kind.catchSt, type.resolveBinding().getTypeDeclaration());
             catchNode.setParent(entry);
             
-            entry.addCatchNode(catchNode.getTypeName(), catchNode);
+            entry.addCatchNode(catchNode);
             cfg.add(catchNode);
         }
     }

@@ -4,45 +4,42 @@
  *  Department of Computer Science, Ritsumeikan University
  */
 
-package org.jtool.eclipse.cfg.builder;
+package org.jtool.eclipse.cfg;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.jtool.eclipse.cfg.CFGNode;
-import org.jtool.eclipse.cfg.CFGStatement;
 
 /**
- * A node for a <code>catch</code> clause of a CFG.
- * All methods of this class are not intended to be directly called by clients.
+ * A node for a <code>catch</code> clause or <code>throws</code> of method in a CFG.
  * 
  * @author Katsuhisa Maruyama
  */
-class CatchNode extends CFGStatement {
+public class CFGCatch extends CFGNode {
     
     private ITypeBinding type;
     private CFGNode parent;
     
-    CatchNode() {
+    protected CFGCatch() {
     }
     
-    CatchNode(ASTNode node, CFGNode.Kind kind, ITypeBinding type) {
+    public CFGCatch(ASTNode node, CFGNode.Kind kind, ITypeBinding type) {
         super(node, kind);
         this.type = type;
     }
     
-    ITypeBinding getType() {
+    public ITypeBinding getType() {
         return type;
     }
     
-    String getTypeName() {
+    public String getTypeName() {
         return type.getQualifiedName();
     }
     
-    void setParent(CFGNode parent) {
+    public void setParent(CFGNode parent) {
         this.parent = parent;
     }
     
-    CFGNode getParent() {
+    public CFGNode getParent() {
         return parent;
     }
 }

@@ -8,7 +8,7 @@ package org.jtool.eclipse.cfg.builder;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.jtool.eclipse.cfg.CFGStatement;
-import org.jtool.eclipse.cfg.CFGNode;
+import org.jtool.eclipse.cfg.CFGCatch;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import java.util.List;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ class TryNode extends CFGStatement {
     
     private Set<ExceptionOccurrence> exceptionOccurrences = new HashSet<ExceptionOccurrence>();
     
-    private List<CatchNode> catchNodes = new ArrayList<CatchNode>();
+    private List<CFGCatch> catchNodes = new ArrayList<CFGCatch>();
     private CFGStatement finallyNode;
     
     TryNode() {
@@ -35,7 +35,7 @@ class TryNode extends CFGStatement {
         super(node, kind);
     }
     
-    void addExceptionOccurrence(CFGNode node, ITypeBinding type, boolean methidCall) {
+    void addExceptionOccurrence(CFGStatement node, ITypeBinding type, boolean methidCall) {
         exceptionOccurrences.add(new ExceptionOccurrence(node, type, methidCall));
     }
     
@@ -43,17 +43,17 @@ class TryNode extends CFGStatement {
         return exceptionOccurrences;
     }
     
-    void addCatchNode(CatchNode node) {
+    void addCatchNode(CFGCatch node) {
         catchNodes.add(node);
     }
     
-    void setCatchNodes(List<CatchNode> nodes) {
-        for (CatchNode node : nodes) {
+    void setCatchNodes(List<CFGCatch> nodes) {
+        for (CFGCatch node : nodes) {
             addCatchNode(node);
         }
     }
     
-    List<CatchNode> getCatchNodes() {
+    List<CFGCatch> getCatchNodes() {
         return catchNodes;
     }
     
@@ -66,17 +66,17 @@ class TryNode extends CFGStatement {
     }
     
     class ExceptionOccurrence {
-        private CFGNode node;
+        private CFGStatement node;
         private ITypeBinding type;
         private boolean methodCall;
         
-        ExceptionOccurrence(CFGNode node, ITypeBinding type, boolean methodCall) {
+        ExceptionOccurrence(CFGStatement node, ITypeBinding type, boolean methodCall) {
             this.node = node;
             this.type = type;
             this.methodCall = methodCall;
         }
         
-        CFGNode getNode() {
+        CFGStatement getNode() {
             return node;
         }
         

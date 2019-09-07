@@ -87,7 +87,7 @@ public class CFGMethodEntry extends CFGEntry {
         return formalIns.size() != 0;
     }
     
-    public void addCatchNode(String type, CFGNode node) {
+    public void addCatchNode(CFGNode node) {
         catchNodes.add(node);
     }
     
