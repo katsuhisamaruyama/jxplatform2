@@ -71,7 +71,7 @@ public class SliceCodeTest {
     private String getSlicedCode(String fqn, int lineNumber, int offset) {
         JavaClass jclass = jproject.getClass(fqn);
         if (jclass != null) {
-            Slice slice = slice(jclass, lineNumber, offset); 
+            Slice slice = slice(jclass, lineNumber, offset);
             if (slice != null) {
                 System.out.println(slice.toString());
                 
@@ -1300,12 +1300,19 @@ public class SliceCodeTest {
         String expected = 
                 "class Test122 {\n" + 
                 "    public void m() {\n" + 
+                "        int a = 2;\n" + 
                 "        try {\n" + 
                 "            n(a);\n" + 
                 "        } catch (Exception e) {\n" + 
                 "            Exception f = e;\n" + 
                 "        } finally {\n" +
                 "        }\n" + 
+                "    }\n" + 
+                "    public int n(int x) throws Exception {\n" + 
+                "        if (x == 0) {\n" + 
+                "            throw new Exception();\n" + 
+                "        }\n" + 
+                "        return 0;\n" + 
                 "    }\n" + 
                 "}\n";
         assertEquals(expected, code);
@@ -1332,6 +1339,157 @@ public class SliceCodeTest {
                 "            throw new Exception();\n" + 
                 "        }\n" + 
                 "        return 10 / x;\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
+    public void testSlice122_5() {
+        String code = getSlicedCode("Test122", 10, 27);
+        //System.out.println(code);
+        String expected = 
+                "class Test122 {\n" + 
+                "    public void m() {\n" + 
+                "        int a = 2;\n" + 
+                "        try {\n" + 
+                "            n(a);\n" + 
+                "        } catch (Exception e) {\n" + 
+                "        } finally {\n" + 
+                "        }\n" + 
+                "    }\n" + 
+                "    public int n(int x) throws Exception {\n" + 
+                "        if (x == 0) {\n" + 
+                "            throw new Exception();\n" + 
+                "        }\n" + 
+                "        return 0;\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
+    public void testSlice123_1() {
+        String code = getSlicedCode("Test123", 15, 12);
+        //System.out.println(code);
+        String expected = 
+                "class Test123 {\n" + 
+                "    public void m() {\n" + 
+                "        int a = 2;\n" + 
+                "        int b = 0;\n" + 
+                "        try {\n" + 
+                "            b = n(a);\n" + 
+                "        } catch (Exception e) {\n" + 
+                "        } finally {\n" +
+                "        }\n" + 
+                "        int c = b;\n" + 
+                "    }\n" + 
+                "    public int n(int x) throws SubException {\n" + 
+                "        if (x == 0) {\n" + 
+                "            throw new SubSubException();\n" + 
+                "        }\n" + 
+                "        return 10 / x;\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
+    public void testSlice123_2() {
+        String code = getSlicedCode("Test123", 9, 16);
+        //System.out.println(code);
+        String expected = 
+                "class Test123 {\n" + 
+                "    public void m() {\n" + 
+                "        int a = 2;\n" + 
+                "        int b = 0;\n" + 
+                "        try {\n" + 
+                "            b = n(a);\n" + 
+                "            int q = b + 5;\n" + 
+                "        } catch (Exception e) {\n" + 
+                "        } finally {\n" +
+                "        }\n" + 
+                "    }\n" + 
+                "    public int n(int x) throws SubException {\n" + 
+                "        if (x == 0) {\n" + 
+                "            throw new SubSubException();\n" + 
+                "        }\n" + 
+                "        return 10 / x;\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
+    public void testSlice123_3() {
+        String code = getSlicedCode("Test123", 11, 22);
+        //System.out.println(code);
+        String expected = 
+                "class Test123 {\n" + 
+                "    public void m() {\n" + 
+                "        int a = 2;\n" + 
+                "        try {\n" + 
+                "            n(a);\n" + 
+                "        } catch (Exception e) {\n" + 
+                "            Exception f = e;\n" + 
+                "        } finally {\n" +
+                "        }\n" + 
+                "    }\n" + 
+                "    public int n(int x) throws SubException {\n" + 
+                "        if (x == 0) {\n" + 
+                "            throw new SubSubException();\n" + 
+                "        }\n" + 
+                "        return 0;\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
+    public void testSlice123_4() {
+        String code = getSlicedCode("Test123", 13, 16);
+        //System.out.println(code);
+        String expected = 
+                "class Test123 {\n" + 
+                "    public void m() {\n" + 
+                "        int a = 2;\n" + 
+                "        int b = 0;\n" + 
+                "        try {\n" + 
+                "            b = n(a);\n" + 
+                "        } catch (Exception e) {\n" + 
+                "        } finally {\n" + 
+                "            int r = b + 7;\n" + 
+                "        }\n" + 
+                "    }\n" + 
+                "    public int n(int x) throws SubException {\n" + 
+                "        if (x == 0) {\n" + 
+                "            throw new SubSubException();\n" + 
+                "        }\n" + 
+                "        return 10 / x;\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
+    public void testSlice123_5() {
+        String code = getSlicedCode("Test123", 10, 27);
+        //System.out.println(code);
+        String expected = 
+                "class Test123 {\n" + 
+                "    public void m() {\n" + 
+                "        int a = 2;\n" + 
+                "        try {\n" + 
+                "            n(a);\n" + 
+                "        } catch (Exception e) {\n" + 
+                "        } finally {\n" + 
+                "        }\n" + 
+                "    }\n" + 
+                "    public int n(int x) throws SubException {\n" + 
+                "        if (x == 0) {\n" + 
+                "            throw new SubSubException();\n" + 
+                "        }\n" + 
+                "        return 0;\n" + 
                 "    }\n" + 
                 "}\n";
         assertEquals(expected, code);
@@ -1569,6 +1727,13 @@ public class SliceCodeTest {
         tester.testSlice122_2();
         tester.testSlice122_3();
         tester.testSlice122_4();
+        tester.testSlice122_5();
+        
+        tester.testSlice123_1();
+        tester.testSlice123_2();
+        tester.testSlice123_3();
+        tester.testSlice123_4();
+        tester.testSlice123_5();
         
         tester.testCustomer1();
         tester.testCustomer2();

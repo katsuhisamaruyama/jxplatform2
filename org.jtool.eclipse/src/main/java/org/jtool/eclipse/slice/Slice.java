@@ -145,6 +145,15 @@ public class Slice {
         }
         nodesInSlice.add(node);
         
+        if (node.getCFGNode().isCatch()) {
+            for (Dependence edge : node.getIncomingDependeceEdges()) {
+                PDGNode src = edge.getSrcNode();
+                if (src.getCFGNode().isMethodCall()) {
+                    visitCallNodes.add(src);
+                }
+            }
+        }
+        
         for (Dependence edge : node.getIncomingDependeceEdges()) {
             PDGNode src = edge.getSrcNode();
             
@@ -171,11 +180,21 @@ public class Slice {
                 }
                 
             } else if (edge.isParameterIn()) {
-                if (visitCallNodes.contains(getDominantNode(src))) {
+                PDGNode callnode = getDominantNode(src);
+                if (visitCallNodes.contains(callnode)) {
                     traverseBackward(src);
+                    
+                    System.out.println("PIN = " + edge + " " + src);
+                    
+                    for (Dependence e : callnode.getOutgoingDependeceEdges()) {
+                        if (e.isExceptionCatch()) {
+                            traverseBackward(e.getDstNode());
+                        }
+                    }
                 }
             } else if (edge.isParameterOut()) {
-                visitCallNodes.add(getDominantNode(node));
+                PDGNode callnode = getDominantNode(node);
+                visitCallNodes.add(callnode);
                 traverseBackward(src);
                 
             } else if (edge.isSummary()) {

@@ -79,7 +79,7 @@ public class CFGMethodBuilder {
         CFGNode tmpExit = new CFGNode();
         cfg.setEndNode(tmpExit);
         
-        createExceptionTypes(jmethod, entry, cfg);
+        Set<CFGCatch> exceptionNodes = createExceptionNodes(jmethod, entry, cfg);
         
         CFGNode finalFormalInNode = createFormalIn(params, cfg, entry, entry);
         CFGNode nextNode = new CFGNode();
@@ -128,6 +128,12 @@ public class CFGMethodBuilder {
             cfg.add(exitEdge);
         }
         
+        for (CFGCatch n : exceptionNodes) {
+            ControlFlow exitEdge = new ControlFlow(n, exit);
+            exitEdge.setTrue();
+            cfg.add(exitEdge);
+        }
+        
         PrimaryCollector.collect(cfg);
         LocalAliasResolver.resolve(cfg);
         
@@ -141,14 +147,18 @@ public class CFGMethodBuilder {
         }
     }
     
-    private static void createExceptionTypes(JavaMethod jmethod, CFGMethodEntry entry, CFG cfg) {
+    private static Set<CFGCatch> createExceptionNodes(JavaMethod jmethod, CFGMethodEntry entry, CFG cfg) {
+        Set<CFGCatch> nodes = new HashSet<CFGCatch>();
         for (Type type : jmethod.getExceptionTypeNodes().values()) {
             CFGCatch catchNode = new CFGCatch(type, CFGNode.Kind.catchSt, type.resolveBinding().getTypeDeclaration());
             catchNode.setParent(entry);
             
             entry.addExceptionNode(catchNode);
             cfg.add(catchNode);
+            
+            nodes.add(catchNode);
         }
+        return nodes;
     }
     
     private static CFGNode createFormalIn(List<VariableDeclaration> params, CFG cfg, CFGMethodEntry entry, CFGNode prevNode) {
@@ -159,11 +169,12 @@ public class CFGMethodBuilder {
             entry.addFormalIn(formalInNode);
             cfg.add(formalInNode);
             
-            JReference jvout = new JLocalVarReference(param.getName(), param.resolveBinding());
-            formalInNode.setDefVariable(jvout);
+            JReference def = new JLocalVarReference(param.getName(), param.resolveBinding());
+            formalInNode.setDefVariable(def);
             
-            JReference jvin = new JInvisibleVarReference(param.getName(), "$" + String.valueOf(ExpressionVisitor.paramNumber), jvout.getType(), jvout.isPrimitiveType());
-            formalInNode.setUseVariable(jvin);
+            JReference use = new JInvisibleVarReference(param.getName(),
+                    "$" + String.valueOf(ExpressionVisitor.paramNumber), def.getType(), def.isPrimitiveType());
+            formalInNode.setUseVariable(use);
             ExpressionVisitor.paramNumber++;
             
             ControlFlow edge = new ControlFlow(prevNode, formalInNode);
@@ -185,11 +196,12 @@ public class CFGMethodBuilder {
                 entry.addFormalOut(formalOutNode);
                 cfg.add(formalOutNode);
                 
-                JReference jvout = new JLocalVarReference(param.getName(), param.resolveBinding());
-                formalOutNode.setUseVariable(jvout);
+                JReference use = new JLocalVarReference(param.getName(), param.resolveBinding());
+                formalOutNode.setUseVariable(use);
                 
-                JReference jvin = new JInvisibleVarReference(param.getName(), "$" + String.valueOf(ExpressionVisitor.paramNumber), jvout.getType(), jvout.isPrimitiveType());
-                formalOutNode.setDefVariable(jvin);
+                JReference def = new JInvisibleVarReference(param.getName(),
+                        "$" + String.valueOf(ExpressionVisitor.paramNumber), use.getType(), use.isPrimitiveType());
+                formalOutNode.setDefVariable(def);
                 ExpressionVisitor.paramNumber++;
                 
                 replace(cfg, nextNode, formalOutNode);
@@ -211,12 +223,12 @@ public class CFGMethodBuilder {
         String returnType = entry.getJavaMethod().getReturnType();
         boolean isPrimitiveType = entry.getJavaMethod().isPrimitiveReturnType();
         
-        JReference jvout = new JInvisibleVarReference(node, "$" + String.valueOf(ExpressionVisitor.paramNumber), returnType, isPrimitiveType);
-        formalOutNode.addDefVariable(jvout);
+        JReference def = new JInvisibleVarReference(node, "$" + String.valueOf(ExpressionVisitor.paramNumber), returnType, isPrimitiveType);
+        formalOutNode.addDefVariable(def);
         ExpressionVisitor.paramNumber++;
         
-        JReference jvin = new JInvisibleVarReference(node, "$_", returnType, isPrimitiveType);
-        formalOutNode.addUseVariable(jvin);
+        JReference use = new JInvisibleVarReference(node, "$_", returnType, isPrimitiveType);
+        formalOutNode.addUseVariable(use);
         return formalOutNode;
     }
 }

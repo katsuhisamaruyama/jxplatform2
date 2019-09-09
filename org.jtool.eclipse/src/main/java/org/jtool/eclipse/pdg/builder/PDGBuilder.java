@@ -19,6 +19,7 @@ import org.jtool.eclipse.pdg.DD;
 import org.jtool.eclipse.pdg.CD;
 import org.jtool.eclipse.pdg.ParameterEdge;
 import org.jtool.eclipse.pdg.CallEdge;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.jtool.eclipse.cfg.CCFG;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGEntry;
@@ -273,13 +274,23 @@ public class PDGBuilder {
         for (ControlFlow flow : caller.getOutgoingFlows()) {
             if (flow.isExceptionCatch()) {
                 CFGCatch catchNode = (CFGCatch)flow.getDstNode();
-                CFGCatch exceptionNode = callee.getExceptionNode(catchNode.getTypeName());
-                if (exceptionNode != null) {
-                    CD edge = new CD(exceptionNode.getPDGNode(), catchNode.getPDGNode());
-                    edge.setExceptionCatch();
-                    pdg.add(edge);
+                for (CFGCatch exceptionNode : callee.getExceptionNodes()) {
+                    if (getCatchTypes(exceptionNode.getType()).contains(catchNode.getTypeName())) {
+                        CD edge = new CD(exceptionNode.getPDGNode(), catchNode.getPDGNode());
+                        edge.setExceptionCatch();
+                        pdg.add(edge);
+                    }
                 }
             }
         }
+    }
+    
+    private static Set<String> getCatchTypes(ITypeBinding type) {
+        Set<String> types = new HashSet<String>();
+        while (type != null) {
+            types.add(type.getQualifiedName());
+            type = type.getSuperclass();
+        }
+        return types;
     }
 }

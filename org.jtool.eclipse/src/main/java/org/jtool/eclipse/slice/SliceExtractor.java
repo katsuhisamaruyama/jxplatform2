@@ -748,14 +748,19 @@ public class SliceExtractor extends ASTVisitor {
         return true;
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public boolean visit(TryStatement node) {
         if (removeWholeElement(node)) {
             return false;
         }
         
-        checkCatchClauses(node);
-        
+        List<CatchClause> tmpCatchClauses = new ArrayList<CatchClause>(node.catchClauses());
+        for (CatchClause catchClause : tmpCatchClauses) {
+            if (removeWholeElement(catchClause)) {
+                catchClause.delete();
+            }
+        }
         return true;
     }
     
@@ -763,28 +768,6 @@ public class SliceExtractor extends ASTVisitor {
     public void endVisit(TryStatement node) {
         if (node.catchClauses().size() == 0 && !containsAnyInSubTree(node.getFinally())) {
             repalceStatement(node, node.getBody());
-        }
-    }
-    
-    @SuppressWarnings("unchecked")
-    private void checkCatchClauses(TryStatement node) {
-        Set<String> exceptionsOninvocation = new HashSet<String>();
-        MethodInvocationCollector collector = new MethodInvocationCollector(node);
-        for (ASTNode n : collector.getNodes()) {
-            if (contains(n) && n instanceof MethodInvocation) {
-                MethodInvocation inv = (MethodInvocation)n;
-                for (ITypeBinding tbinding : inv.resolveMethodBinding().getExceptionTypes()) {
-                    exceptionsOninvocation.add(tbinding.getQualifiedName());
-                }
-            }
-        }
-        
-        List<CatchClause> tmpCatchClauses = new ArrayList<CatchClause>(node.catchClauses());
-        for (CatchClause catchClause : tmpCatchClauses) {
-            String exception = catchClause.getException().getType().resolveBinding().getQualifiedName();
-            if (!exceptionsOninvocation.contains(exception)) {
-                catchClause.delete();
-            }
         }
     }
     
