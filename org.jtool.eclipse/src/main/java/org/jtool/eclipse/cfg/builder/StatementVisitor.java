@@ -16,6 +16,7 @@ import org.jtool.eclipse.cfg.CFGCatch;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.cfg.JInvisibleVarReference;
+import org.jtool.eclipse.cfg.JLocalVarReference;
 import org.jtool.eclipse.graph.GraphEdge;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -696,7 +697,7 @@ public class StatementVisitor extends ASTVisitor {
         expression.accept(exprVisitor);
         CFGNode curNode = exprVisitor.getExitNode();
         
-        //setExceptionFlowOnThrow(throwNode, expression.resolveTypeBinding().getTypeDeclaration());
+        setExceptionFlowOnThrow(throwNode, expression.resolveTypeBinding().getTypeDeclaration());
         
         ControlFlow fallEdge = createFlow(curNode, nextNode);
         fallEdge.setFallThrough();
@@ -819,10 +820,17 @@ public class StatementVisitor extends ASTVisitor {
         catchNode.setParent(tryNode);
         tryNode.addCatchNode(catchNode);
         
+        JReference def = new JLocalVarReference(node.getException().getName(), vbinding);
+        catchNode.setDefVariable(def);
+        
         reconnect(catchNode);
         
         ControlFlow trueEdge = createFlow(catchNode, nextNode);
         trueEdge.setTrue();
+        
+        ControlFlow fallEdge = createFlow(catchNode, mergeNode);
+        fallEdge.setFallThrough();
+        cfg.add(fallEdge);
         
         Statement body = node.getBody();
         body.accept(this);
