@@ -55,29 +55,29 @@ public class SliceCriterion {
     
     public static SliceCriterion find(CommonPDG pdg, String code, int lineNumber, int columnNumber) {
         String[] lines = code.split(System.getProperty("line.separator"));
-        int index = 0;
+        int position = 0;
         for (int line = 0; line < lineNumber - 1; line++) {
-            index = index + lines[line].length() + 1;
+            position = position + lines[line].length() + 1;
         }
-        index = index + columnNumber;
-        return find(pdg, index);
+        position = position + columnNumber;
+        return find(pdg, position);
     }
     
     public static SliceCriterion find(CommonPDG pdg, ASTNode node) {
         return find(pdg, node.getStartPosition());
     }
     
-    public static SliceCriterion find(CommonPDG pdg, int columnNumber) {
+    public static SliceCriterion find(CommonPDG pdg, int position) {
         for (PDGNode node : pdg.getNodes()) {
             if (node.isStatement()) {
                 PDGStatement stnode = (PDGStatement)node;
                 for (JReference def : stnode.getDefVariables()) {
-                    if (def.isVisible() && columnNumber == def.getASTNode().getStartPosition()) {
+                    if (def.isVisible() && position == def.getASTNode().getStartPosition()) {
                         return new SliceCriterion(pdg, stnode, def);
                     }
                 }
                 for (JReference use : stnode.getUseVariables()) {
-                    if (use.isVisible() && columnNumber == use.getASTNode().getStartPosition()) {
+                    if (use.isVisible() && position == use.getASTNode().getStartPosition()) {
                         return new SliceCriterion(pdg, stnode, use);
                     }
                 }
