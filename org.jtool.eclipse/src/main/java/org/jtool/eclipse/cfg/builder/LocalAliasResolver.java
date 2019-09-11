@@ -55,6 +55,10 @@ class LocalAliasResolver {
             return null;
         }
         
+        if (def.isVisible() || !use.isVisible()) {
+            return null;
+        }
+        
         return new Alias((JLocalVarReference)def, use);
     }
     
