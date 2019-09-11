@@ -76,7 +76,11 @@ public class JavaMethod extends JavaElement {
             name = binding.getName();
             signature = getSignature(binding);
             fqn = jclass.getQualifiedName() + QualifiedNameSeparator + signature;
-            returnType = binding.getReturnType().getQualifiedName();
+            if (mbinding.isConstructor()) {
+                returnType = binding.getName();
+            } else {
+                returnType = binding.getReturnType().getQualifiedName();
+            }
             modifiers = binding.getModifiers();
             kind = getKind(binding);
             inProject = true;
@@ -159,7 +163,11 @@ public class JavaMethod extends JavaElement {
             name = binding.getName();
             signature = getSignature(binding);
             fqn = jclass.getQualifiedName() + QualifiedNameSeparator + signature;
-            returnType = binding.getReturnType().getQualifiedName();
+            if (mbinding.isConstructor()) {
+                returnType = binding.getName();
+            } else {
+                returnType = binding.getReturnType().getQualifiedName();
+            }
             modifiers = binding.getModifiers();
             kind = getKind(binding);
             this.inProject = inProject;
@@ -566,6 +574,23 @@ public class JavaMethod extends JavaElement {
             }
         }
         return methods;
+    }
+    
+    public Set<JavaMethod> getAllCalledMethods() {
+        Set<JavaMethod> methods = new HashSet<JavaMethod>();
+        collectAllCalledMethods(this, methods);
+        methods.remove(this);
+        return methods;
+    }
+    
+    private void collectAllCalledMethods(JavaMethod jmethod, Set<JavaMethod> methods) {
+        if (methods.contains(jmethod)) {
+            return;
+        }
+        methods.add(jmethod);
+        for (JavaMethod jm : jmethod.getCalledMethods()) {
+            collectAllCalledMethods(jm, methods);
+        }
     }
     
     public Set<JavaMethod> getCallingMethods() {

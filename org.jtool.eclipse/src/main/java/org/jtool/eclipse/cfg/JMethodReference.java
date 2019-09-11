@@ -32,7 +32,7 @@ public class JMethodReference extends JReference {
     private List<String> argumentTypes = new ArrayList<String>();
     private List<Boolean> argumentPrimitiveTypes = new ArrayList<Boolean>();
     
-    private CFGStatement primary = null;
+    private CFGStatement receiver = null;
     
     public JMethodReference(ASTNode node, IMethodBinding mbinding, List<Expression> args) {
         super(node);
@@ -147,16 +147,16 @@ public class JMethodReference extends JReference {
         }
     }
     
-    public boolean hasPrimary() {
-        return primary != null;
+    public boolean hasReceiver() {
+        return receiver != null;
     }
     
-    public void setPrimary(CFGStatement primary) {
-        this.primary = primary;
+    public void setReceiver(CFGStatement receiver) {
+        this.receiver = receiver;
     }
     
-    public CFGStatement getPrimary() {
-        return primary;
+    public CFGStatement getReceiver() {
+        return receiver;
     }
     
     public boolean callSelfDirectly() {

@@ -83,6 +83,16 @@ public class CFGMethodEntry extends CFGEntry {
         }
     }
     
+    public CFGParameter getFormalOutForReturn() {
+        for (CFGParameter fout : formalOuts) {
+            JReference use = fout.getUseVariable();
+            if (use.getName().endsWith("$_")) {
+                return fout;
+            }
+        }
+        return null;
+    }
+    
     public boolean hasParameters() {
         return formalIns.size() != 0;
     }

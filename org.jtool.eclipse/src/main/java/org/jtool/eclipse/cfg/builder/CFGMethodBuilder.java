@@ -20,6 +20,7 @@ import org.jtool.eclipse.graph.GraphEdge;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -105,7 +106,7 @@ public class CFGMethodBuilder {
         cfg.setEndNode(exit);
         cfg.add(exit);
         
-        if (entry.getJavaMethod().isVoid()) {
+        if (entry.getJavaMethod().isVoid() && !entry.getJavaMethod().isConstructor()) {
             if (params.size() > 0) {
                 createFormalOut(params, cfg, entry, nextNode);
             }
@@ -134,7 +135,7 @@ public class CFGMethodBuilder {
             cfg.add(exitEdge);
         }
         
-        PrimaryCollector.collect(cfg);
+        ReceiverCollector.collect(cfg);
         LocalAliasResolver.resolve(cfg);
         
         return cfg;
@@ -150,15 +151,26 @@ public class CFGMethodBuilder {
     private static Set<CFGCatch> createExceptionNodes(JavaMethod jmethod, CFGMethodEntry entry, CFG cfg) {
         Set<CFGCatch> nodes = new HashSet<CFGCatch>();
         for (Type type : jmethod.getExceptionTypeNodes().values()) {
-            CFGCatch catchNode = new CFGCatch(type, CFGNode.Kind.catchSt, type.resolveBinding().getTypeDeclaration());
-            catchNode.setParent(entry);
-            
-            entry.addExceptionNode(catchNode);
-            cfg.add(catchNode);
-            
-            nodes.add(catchNode);
+            CFGCatch exceptionNode = createExceptionNode(entry, cfg, type.resolveBinding().getTypeDeclaration());
+            nodes.add(exceptionNode);
         }
+        
+        ExceptionTypeCollector collector = new ExceptionTypeCollector();
+        for (ITypeBinding tbinding : collector.getExceptions(jmethod)) {
+            CFGCatch exceptionNode = createExceptionNode(entry, cfg, tbinding);
+            nodes.add(exceptionNode);
+        }
+        
         return nodes;
+    }
+    
+    private static CFGCatch createExceptionNode(CFGMethodEntry entry, CFG cfg, ITypeBinding tbinding) {
+        CFGCatch exceptionNode = new CFGCatch(entry.getASTNode(), CFGNode.Kind.catchSt, tbinding);
+        exceptionNode.setParent(entry);
+        
+        entry.addExceptionNode(exceptionNode);
+        cfg.add(exceptionNode);
+        return exceptionNode;
     }
     
     private static CFGNode createFormalIn(List<VariableDeclaration> params, CFG cfg, CFGMethodEntry entry, CFGNode prevNode) {
@@ -229,6 +241,7 @@ public class CFGMethodBuilder {
         
         JReference use = new JInvisibleVarReference(node, "$_", returnType, isPrimitiveType);
         formalOutNode.addUseVariable(use);
+        
         return formalOutNode;
     }
 }

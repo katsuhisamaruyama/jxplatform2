@@ -21,9 +21,9 @@ import java.util.ArrayList;
  * 
  * @author Katsuhisa Maruyama
  */
-class PrimaryCollector {
+class ReceiverCollector {
     
-    protected static final String ExternalFieldAccess = "$";
+    protected static final String ExternalFieldAccess = "$$";
     
     static void collect(CFG cfg) {
         for (CFGNode node : cfg.getNodes()) {

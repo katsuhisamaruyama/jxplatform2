@@ -118,6 +118,10 @@ public class StatementVisitor extends ASTVisitor {
          this.visited = visited;
     }
     
+    protected JInfoStore getInfoStore() {
+        return infoStore;
+    }
+    
     protected CFGNode getNextCFGNode() {
         return nextNode;
     }

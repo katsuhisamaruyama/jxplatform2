@@ -116,6 +116,16 @@ public class PDGBuilder {
                                     DD edge = new DD(node.getPDGNode(), fieldEntry.getDeclarationNode().getPDGNode(), fvar);
                                     edge.setFieldAccess();
                                     pdg.add(edge);
+                                    
+                                    if (cfg.isMethod()) {
+                                        CFGMethodEntry cfgEntry = (CFGMethodEntry)cfg.getStartNode();
+                                        if (cfgEntry.isConstructorEntry()) {
+                                            CFGParameter foutForInstance = cfgEntry.getFormalOutForReturn();
+                                            DD instanceCreationEdge = new DD(fieldEntry.getDeclarationNode().getPDGNode(), foutForInstance.getPDGNode(), fvar);
+                                            instanceCreationEdge.setFieldAccess();
+                                            pdg.add(instanceCreationEdge);
+                                        }
+                                    }
                                 }
                             }
                         }

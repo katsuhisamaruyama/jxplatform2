@@ -19,6 +19,8 @@ import org.jtool.eclipse.cfg.JFieldReference;
 import org.jtool.eclipse.cfg.JLocalVarReference;
 import org.jtool.eclipse.cfg.JInvisibleVarReference;
 import org.jtool.eclipse.graph.GraphEdge;
+import org.jtool.eclipse.javamodel.JavaClass;
+import org.jtool.eclipse.javamodel.JavaMethod;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayAccess;
@@ -336,52 +338,61 @@ public class ExpressionVisitor extends ASTVisitor {
         
         JMethodReference jcall = new JMethodReference(node, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.methodCall);
-        CFGStatement primaryNode = null;
-        if (statementVisitor != null && jcall.getExceptionTypes().size() > 0) {
+        if (statementVisitor != null) {
             for (ITypeBinding type : jcall.getExceptionTypes()) {
                 statementVisitor.setExceptionFlowOnMethodCall(callNode, type);
             }
+            
+            JavaClass jclass = statementVisitor.getInfoStore().getJavaProject().getClass(jcall.getDeclaringClassName());
+            if (jclass != null) {
+                JavaMethod jmethod = jclass.getMethod(jcall.getSignature());
+                
+                ExceptionTypeCollector collector = new ExceptionTypeCollector();
+                for (ITypeBinding type : collector.getExceptions(jmethod)) {
+                    statementVisitor.setExceptionFlowOnMethodCall(callNode, type);
+                }
+            }
         }
         
-        Expression primary = node.getExpression();
-        if (primary != null) {
+        CFGStatement receiverNode = null;
+        Expression receiver = node.getExpression();
+        if (receiver != null) {
             CFGStatement tmpNode = curNode;
-            primaryNode = new CFGStatement(primary, CFGNode.Kind.methodCallPrimary);
-            curNode = primaryNode;
+            receiverNode = new CFGStatement(receiver, CFGNode.Kind.methodCallPrimary);
+            curNode = receiverNode;
             analysisMode.push(AnalysisMode.USE);
-            primary.accept(this);
+            receiver.accept(this);
             analysisMode.pop();
             curNode = tmpNode;
             
-            callNode.addUseVariables(primaryNode.getUseVariables());
-            jcall.setPrimary(primaryNode);
+            callNode.addUseVariables(receiverNode.getUseVariables());
+            jcall.setReceiver(receiverNode);
             
-            checkDefUseFieldsInCalledMethod(callNode, jcall);
+            checkDefUseFieldsInCalledMethod(callNode, jcall, receiverNode);
         }
         
-        setActualNodes(callNode, primaryNode, node, node.arguments());
-        
+        setActualNodes(callNode, receiverNode, node, node.arguments());
         return false;
     }
     
-    private void checkDefUseFieldsInCalledMethod(CFGMethodCall callNode, JMethodReference jcall) {
+    private void checkDefUseFieldsInCalledMethod(CFGMethodCall callNode, JMethodReference jcall, CFGStatement receiverNode) {
         JMethod method = infoStore.getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
         if (method != null) {
             if (method.defuseDecided()) {
-                addFields(callNode, jcall, method);
+                addFields(callNode, jcall, receiverNode, method);
             } else {
                 if (visited != null) {
                     if (!visited.contains(method)) {
                         visited.add(method);
                         method.findDefUseFields(visited, true);
-                        addFields(callNode, jcall, method);
+                        addFields(callNode, jcall, receiverNode, method);
                     }
                 }
             }
         }
     }
     
-    private void addFields(CFGMethodCall callNode, JMethodReference jcall, JMethod method) {
+    private void addFields(CFGMethodCall callNode, JMethodReference jcall, CFGStatement receiverNode, JMethod method) {
         for (String name : method.getDefFields()) {
             String[] elem = name.split(QualifiedNameSeparator);
             String type = jcall.getDeclaringClassName();
@@ -390,6 +401,12 @@ public class ExpressionVisitor extends ASTVisitor {
                 ref = new JFieldReference(callNode.getASTNode(), elem[0], elem[1], type, false, true);
             } else {
                 ref = new JFieldReference(callNode.getASTNode(), elem[0], elem[1], type, false, false);
+            }
+            
+            if (receiverNode != null) {
+                for (JReference receiverRef : receiverNode.getUseVariables()) {
+                    receiverNode.addDefVariable(receiverRef);
+                }
             }
             callNode.addDefVariable(ref);
         }
@@ -444,17 +461,17 @@ public class ExpressionVisitor extends ASTVisitor {
             curNode = tmpNode;
             
             callNode.addUseVariables(primaryNode.getUseVariables());
-            jcall.setPrimary(primaryNode);
+            jcall.setReceiver(primaryNode);
             
-            checkDefUseFieldsInCalledMethod(callNode, jcall);
+            checkDefUseFieldsInCalledMethod(callNode, jcall, primaryNode);
         }
         
         setActualNodes(callNode, primaryNode, node, node.arguments());
-        
+        /*
         for (CFGParameter ain : callNode.getActualIns()) {
             callNode.addDefVariables(ain.getDefVariables());
         }
-        
+        */
         return false;
     }
     
@@ -602,17 +619,13 @@ public class ExpressionVisitor extends ASTVisitor {
     }
     
     private void createActualOutForReturnValue(CFGMethodCall callNode) {
-        if (callNode.getMethodCall().isVoidType()) {
-            if (callNode.isConstructorCall()) {
-                mergeActualOut(callNode);
-                curNode.addUseVariable(callNode.getDefVariables().get(0));
-            }
+        if (!callNode.isConstructorCall() && callNode.isVoidType()) {
             return;
         }
         
         CFGParameter returnNode = new CFGParameter(callNode.getASTNode(), CFGNode.Kind.actualOut, 0);
         returnNode.setParent(callNode);
-        callNode.addActualOut(returnNode );
+        callNode.addActualOut(returnNode);
         
         String type = callNode.getReturnType();
         boolean primitive = callNode.isPrimitiveType();
