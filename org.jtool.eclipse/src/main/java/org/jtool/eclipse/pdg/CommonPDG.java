@@ -96,7 +96,7 @@ public class CommonPDG extends Graph<PDGNode, Dependence> {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("----- PDG (from here) -----\n");
-        buf.append("Name = " + getName());
+        buf.append("Name = " + getQualifiedName());
         buf.append("\n");
         buf.append(getNodeInfo()); 
         buf.append(getEdgeInfo());
@@ -126,7 +126,7 @@ public class CommonPDG extends Graph<PDGNode, Dependence> {
     public String printCDG() {
         StringBuilder buf = new StringBuilder();
         buf.append("----- CDG (from here) -----\n");
-        buf.append("Name = " + getName());
+        buf.append("Name = " + getQualifiedName());
         buf.append("\n");
         buf.append(getNodeInfo()); 
         buf.append(getCDEdgeInfo());
@@ -137,7 +137,7 @@ public class CommonPDG extends Graph<PDGNode, Dependence> {
     public String printDDG() {
         StringBuilder buf = new StringBuilder();
         buf.append("----- DDG (from here) -----\n");
-        buf.append("Name = " + getName());
+        buf.append("Name = " + getQualifiedName());
         buf.append("\n");
         buf.append(getNodeInfo()); 
         buf.append(getDDEdgeInfo());

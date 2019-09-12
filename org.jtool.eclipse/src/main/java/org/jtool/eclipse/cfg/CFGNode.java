@@ -85,7 +85,7 @@ public class CFGNode extends GraphNode {
         formalOut,                  // CFGParameter
         actualIn,                   // CFGParameter
         actualOut,                  // CFGParameter
-        methodCallPrimary,          // CFGStatement
+        methodCallReceiver,         // CFGStatement
         
         merge,                      // CFGMerge (for merge)
         dummy;                      // CFGDummy (for dummy)

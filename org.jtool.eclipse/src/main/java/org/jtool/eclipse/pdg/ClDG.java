@@ -77,7 +77,7 @@ public class ClDG extends CommonPDG {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("----- ClDG (from here) -----\n");
-        buf.append("Name = " + getName());
+        buf.append("Class Name = " + getQualifiedName());
         buf.append("\n");
         buf.append(getNodeInfo());
         buf.append(getEdgeInfo());

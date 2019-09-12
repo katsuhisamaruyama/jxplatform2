@@ -42,7 +42,7 @@ public class CFG extends CommonCFG {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append("----- CFG of " + getName() + "-----\n");
+        buf.append("----- CFG of " + getQualifiedName() + "-----\n");
         buf.append(getNodeInfo()); 
         buf.append(getEdgeInfo());
         buf.append("-----------------------------------\n");

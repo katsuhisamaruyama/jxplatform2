@@ -71,7 +71,7 @@ public class CCFG extends CommonCFG {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("----- CCFG (from here) -----\n");
-        buf.append("Name = " + getName());
+        buf.append("Class Name = " + getQualifiedName());
         buf.append("\n");
         for (CFG cfg : cfgs.values()) {
             buf.append(cfg.getNodeInfo());

@@ -185,9 +185,9 @@ public class CFGMethodBuilder {
             formalInNode.setDefVariable(def);
             
             JReference use = new JInvisibleVarReference(param.getName(),
-                    "$" + String.valueOf(ExpressionVisitor.paramNumber), def.getType(), def.isPrimitiveType());
+                    "$" + String.valueOf(ExpressionVisitor.temporaryVariableId), def.getType(), def.isPrimitiveType());
             formalInNode.setUseVariable(use);
-            ExpressionVisitor.paramNumber++;
+            ExpressionVisitor.temporaryVariableId++;
             
             ControlFlow edge = new ControlFlow(prevNode, formalInNode);
             edge.setTrue();
@@ -212,9 +212,9 @@ public class CFGMethodBuilder {
                 formalOutNode.setUseVariable(use);
                 
                 JReference def = new JInvisibleVarReference(param.getName(),
-                        "$" + String.valueOf(ExpressionVisitor.paramNumber), use.getType(), use.isPrimitiveType());
+                        "$" + String.valueOf(ExpressionVisitor.temporaryVariableId), use.getType(), use.isPrimitiveType());
                 formalOutNode.setDefVariable(def);
-                ExpressionVisitor.paramNumber++;
+                ExpressionVisitor.temporaryVariableId++;
                 
                 replace(cfg, nextNode, formalOutNode);
                 ControlFlow edge = new ControlFlow(formalOutNode, nextNode);
@@ -235,9 +235,9 @@ public class CFGMethodBuilder {
         String returnType = entry.getJavaMethod().getReturnType();
         boolean isPrimitiveType = entry.getJavaMethod().isPrimitiveReturnType();
         
-        JReference def = new JInvisibleVarReference(node, "$" + String.valueOf(ExpressionVisitor.paramNumber), returnType, isPrimitiveType);
+        JReference def = new JInvisibleVarReference(node, "$" + String.valueOf(ExpressionVisitor.temporaryVariableId), returnType, isPrimitiveType);
         formalOutNode.addDefVariable(def);
-        ExpressionVisitor.paramNumber++;
+        ExpressionVisitor.temporaryVariableId++;
         
         JReference use = new JInvisibleVarReference(node, "$_", returnType, isPrimitiveType);
         formalOutNode.addUseVariable(use);
