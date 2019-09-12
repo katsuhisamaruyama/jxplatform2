@@ -134,7 +134,11 @@ public class DD extends Dependence {
         StringBuilder buf = new StringBuilder();
         buf.append(super.toString());
         buf.append(" [ ");
-        buf.append(getVariable().getQualifiedName());
+        if (jvar.isFieldAccess()) {
+            buf.append(jvar.getQualifiedName());
+        } else {
+            buf.append(jvar.getName());
+        }
         if (isLoopCarried()) {
             buf.append(" LC = ");
             buf.append(getLoopCarriedNode().getId());
