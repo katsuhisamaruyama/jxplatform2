@@ -68,6 +68,18 @@ public class CommonPDG extends Graph<PDGNode, Dependence> {
         return null;
     }
     
+    public boolean isPDG() {
+        return false;
+    }
+    
+    public boolean isClDG() {
+        return false;
+    }
+    
+    public boolean isSDG() {
+        return false;
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof CommonPDG) {

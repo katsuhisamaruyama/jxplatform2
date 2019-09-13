@@ -82,6 +82,11 @@ public class SDG extends CommonPDG {
     }
     
     @Override
+    public boolean isSDG() {
+        return true;
+    }
+    
+    @Override
     public Set<PDGNode> getNodes() {
         Set<PDGNode> nodes = new HashSet<PDGNode>();
         for (PDG pdg : pdgs.values()) {

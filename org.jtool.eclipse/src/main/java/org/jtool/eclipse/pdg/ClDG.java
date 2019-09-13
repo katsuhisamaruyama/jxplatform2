@@ -56,6 +56,11 @@ public class ClDG extends CommonPDG {
     }
     
     @Override
+    public boolean isClDG() {
+        return true;
+    }
+    
+    @Override
     public Set<PDGNode> getNodes() {
         Set<PDGNode> nodes = new HashSet<PDGNode>();
         for (PDG pdg : pdgs.values()) {

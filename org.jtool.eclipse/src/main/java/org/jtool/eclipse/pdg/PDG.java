@@ -38,4 +38,9 @@ public class PDG extends CommonPDG {
             add(edge);
         }
     }
+    
+    @Override
+    public boolean isPDG() {
+        return true;
+    }
 }
