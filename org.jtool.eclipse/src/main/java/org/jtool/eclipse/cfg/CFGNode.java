@@ -365,6 +365,10 @@ public class CFGNode extends GraphNode {
         return kind == Kind.actualOut;
     }
     
+    public boolean isMethodCallReceiver() {
+        return kind == Kind.methodCallReceiver;
+    }
+    
     public boolean isStatementNotParameter() {
         return (this instanceof CFGStatement) && !(this instanceof CFGParameter);
     }
