@@ -5,10 +5,11 @@ class Test119 {
         p = 10;
         A a = new A();
         a.setX(1);
-        a.setX(2);
         int b = a.getX();
-        int c = a.x + p;
-        int d = getP() + 2;
+        a.setX(2);
+        int c = a.getX();
+        int d = a.x + p;
+        int e = getP() + 2;
     }
     
     private int getP() {
