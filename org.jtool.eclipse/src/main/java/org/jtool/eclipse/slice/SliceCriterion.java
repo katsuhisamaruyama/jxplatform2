@@ -69,15 +69,15 @@ public class SliceCriterion {
     
     public static SliceCriterion find(CommonPDG pdg, int position) {
         for (PDGNode node : pdg.getNodes()) {
-            if (node.isStatement()) {
+            if (node.isStatement() && !node.getCFGNode().isActualOut()) {
                 PDGStatement stnode = (PDGStatement)node;
                 for (JReference def : stnode.getDefVariables()) {
-                    if (def.isVisible() && position == def.getASTNode().getStartPosition()) {
+                    if (def.isVisible() && position == def.getStartPosition()) {
                         return new SliceCriterion(pdg, stnode, def);
                     }
                 }
                 for (JReference use : stnode.getUseVariables()) {
-                    if (use.isVisible() && position == use.getASTNode().getStartPosition()) {
+                    if (use.isVisible() && position == use.getStartPosition()) {
                         return new SliceCriterion(pdg, stnode, use);
                     }
                 }
