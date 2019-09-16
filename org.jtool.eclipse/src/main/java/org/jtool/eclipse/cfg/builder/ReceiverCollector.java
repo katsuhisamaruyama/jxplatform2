@@ -23,7 +23,7 @@ import java.util.ArrayList;
  */
 class ReceiverCollector {
     
-    protected static final String ExternalFieldAccess = "$$";
+    protected static final String ExternalFieldName = "$$";
     
     static void collect(CFG cfg) {
         for (CFGNode node : cfg.getNodes()) {
@@ -40,15 +40,15 @@ class ReceiverCollector {
                 }
                 
                 if (count > 0) {
-                    for (JReference primary : callNode.getPrimary().getUseVariables()) {
-                        callNode.addDefVariable(primary);
+                    for (JReference receiver : callNode.getReceiver().getUseVariables()) {
+                        callNode.addDefVariable(receiver);
                         
                         String type = callNode.getDeclaringClassName();
-                        JReference var = new JFieldReference(primary.getASTNode(), type, ExternalFieldAccess, type, false, false);
+                        JReference var = new JFieldReference(receiver.getASTNode(), type, ExternalFieldName, ExternalFieldName, type, false, false);
                         callNode.addDefVariable(var);
                         
                         for (CFGParameter param : callNode.getActualOuts()) {
-                            param.addDefVariable(primary);
+                            param.addDefVariable(receiver);
                         }
                     }
                 }

@@ -23,7 +23,7 @@ public class JFieldReference extends JReference {
     private boolean isField;
     private boolean isEnumConstant;
     
-    public JFieldReference(ASTNode node, IVariableBinding vbinding) {
+    public JFieldReference(ASTNode node, String rname, IVariableBinding vbinding) {
         super(node);
         
         IVariableBinding binding = vbinding.getVariableDeclaration();
@@ -36,9 +36,15 @@ public class JFieldReference extends JReference {
             declaringClassName = JavaClass.ArrayClassFqn;
         }
         declaringMethodName = "";
+        
         name = binding.getName();
         signature = declaringClassName + QualifiedNameSeparator + name;
         fqn = signature;
+        if (rname.indexOf(QualifiedNameSeparator) == -1) {
+            referenceName = declaringClassName + QualifiedNameSeparator + rname;
+        } else {
+            referenceName = rname;
+        }
         type = binding.getType().getQualifiedName();
         isPrimitiveType = binding.getType().isPrimitive();
         modifiers = binding.getModifiers();
@@ -51,7 +57,7 @@ public class JFieldReference extends JReference {
         isEnumConstant = isEnumConstant(binding);
     }
     
-    public JFieldReference(ASTNode node, String className, String name, String type, boolean primitive, boolean inProject) {
+    public JFieldReference(ASTNode node, String className, String name, String rname, String type, boolean primitive, boolean inProject) {
         super(node);
         
         enclosingClassName = findEnclosingClassName(node);
@@ -62,6 +68,11 @@ public class JFieldReference extends JReference {
         this.name = name;
         signature = declaringClassName + QualifiedNameSeparator + name;
         fqn = signature;
+        if (rname.indexOf(QualifiedNameSeparator) == -1) {
+            referenceName = declaringClassName + QualifiedNameSeparator + rname;
+        } else {
+            referenceName = rname;
+        }
         this.type = type;
         isPrimitiveType = primitive;
         modifiers = 0;
@@ -97,6 +108,16 @@ public class JFieldReference extends JReference {
     
     public boolean isTransient() {
         return Modifier.isTransient(modifiers);
+    }
+    
+    @Override
+    public int getStartPosition() {
+        int index = referenceName.lastIndexOf('.');
+        if (index == -1) {
+            return astNode.getStartPosition();
+        } else {
+            return index + astNode.getStartPosition() - 1;
+        }
     }
     
     @Override

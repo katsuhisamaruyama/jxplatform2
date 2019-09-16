@@ -71,6 +71,7 @@ public class JInvisibleVarReference extends JReference {
         
         signature = name;
         fqn = declaringMethodName + "!" + name;
+        referenceName = fqn;
         inProject = true;
     }
     

@@ -34,7 +34,7 @@ public class JMethodReference extends JReference {
     
     private CFGStatement receiver = null;
     
-    public JMethodReference(ASTNode node, IMethodBinding mbinding, List<Expression> args) {
+    public JMethodReference(ASTNode node, String receiverName, IMethodBinding mbinding, List<Expression> args) {
         super(node);
         
         IMethodBinding binding = mbinding.getMethodDeclaration();
@@ -46,6 +46,11 @@ public class JMethodReference extends JReference {
         name = binding.getName();
         signature = getSignature(binding);
         fqn = declaringClassName + QualifiedNameSeparator + signature;
+        if (receiverName != null) {
+            referenceName = receiverName + QualifiedNameSeparator + signature;
+        } else {
+            referenceName = signature;
+        }
         type = binding.getReturnType().getQualifiedName();
         isPrimitiveType = binding.getReturnType().isPrimitive();
         modifiers = binding.getModifiers();

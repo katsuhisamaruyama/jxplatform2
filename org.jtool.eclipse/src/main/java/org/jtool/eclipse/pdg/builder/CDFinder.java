@@ -71,15 +71,22 @@ public class CDFinder {
         }
     }
     
-    private static void findCDsOnParameters(PDG pdg, CFGMethodCall callnode) {
-        for (CFGParameter cfgnode : callnode.getActualIns()) {
-            CD edge = new CD(callnode.getPDGNode(), cfgnode.getPDGNode());
+    private static void findCDsOnParameters(PDG pdg, CFGMethodCall callNode) {
+        for (CFGParameter cfgnode : callNode.getActualIns()) {
+            CD edge = new CD(callNode.getPDGNode(), cfgnode.getPDGNode());
             edge.setTrue();
             pdg.add(edge);
         }
         
-        for (CFGParameter cfgnode : callnode.getActualOuts()) {
-            CD edge = new CD(callnode.getPDGNode(), cfgnode.getPDGNode());
+        for (CFGParameter cfgnode : callNode.getActualOuts()) {
+            CD edge = new CD(callNode.getPDGNode(), cfgnode.getPDGNode());
+            edge.setTrue();
+            pdg.add(edge);
+        }
+        
+        CFGNode receiverNode = callNode.getReceiver();
+        if (receiverNode != null) {
+            CD edge = new CD(callNode.getPDGNode(), receiverNode.getPDGNode());
             edge.setTrue();
             pdg.add(edge);
         }

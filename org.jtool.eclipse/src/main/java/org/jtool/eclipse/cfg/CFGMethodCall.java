@@ -35,11 +35,11 @@ public class CFGMethodCall extends CFGStatement {
         return jmethodCall;
     }
     
-    public boolean hasPrimary() {
+    public boolean hasReceiver() {
         return jmethodCall.hasReceiver();
     }
     
-    public CFGStatement getPrimary() {
+    public CFGStatement getReceiver() {
         return jmethodCall.getReceiver();
     }
     

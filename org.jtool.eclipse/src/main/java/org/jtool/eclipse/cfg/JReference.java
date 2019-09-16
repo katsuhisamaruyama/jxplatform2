@@ -34,6 +34,7 @@ public abstract class JReference {
     protected String name;
     protected String signature;
     protected String fqn;
+    protected String referenceName;
     protected String type;
     protected boolean isPrimitiveType;
     protected int modifiers;
@@ -78,6 +79,10 @@ public abstract class JReference {
     
     public String getQualifiedName() {
         return fqn;
+    }
+    
+    public String getReferenceName() {
+        return referenceName;
     }
     
     public String getType() {
@@ -143,6 +148,10 @@ public abstract class JReference {
         return codeRange;
     }
     
+    public int getStartPosition() {
+        return astNode.getStartPosition();
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof JReference) {
@@ -155,7 +164,7 @@ public abstract class JReference {
         if (jvar == null) {
             return false;
         }
-        return this == jvar || fqn.equals(jvar.fqn);
+        return this == jvar || referenceName.equals(jvar.referenceName);
     }
     
     @Override

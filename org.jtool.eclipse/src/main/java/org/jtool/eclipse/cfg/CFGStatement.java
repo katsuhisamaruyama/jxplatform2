@@ -162,11 +162,7 @@ public class CFGStatement extends CFGNode {
     protected String toString(List<JReference> jvars) {
         StringBuffer buf = new StringBuffer();
         for (JReference jvar : jvars) {
-            if (jvar.isFieldAccess()) {
-                buf.append(jvar.getQualifiedName());
-            } else {
-                buf.append(jvar.getName());
-            }
+            buf.append(jvar.getReferenceName());
             buf.append(", ");
         }
         if (buf.length() != 0) {
