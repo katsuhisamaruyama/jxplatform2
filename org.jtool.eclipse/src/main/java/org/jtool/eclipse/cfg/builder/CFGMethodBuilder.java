@@ -202,26 +202,24 @@ public class CFGMethodBuilder {
         List<CFGParameter> formalOuts = new ArrayList<CFGParameter>();
         for (int ordinal = 0; ordinal < params.size(); ordinal++) {
             VariableDeclaration param = params.get(ordinal);
-            if (!param.resolveBinding().getType().isPrimitive()) {
-                CFGParameter formalOutNode = new CFGParameter(param, CFGNode.Kind.formalOut, ordinal);
-                formalOutNode.setParent(entry);
-                entry.addFormalOut(formalOutNode);
-                cfg.add(formalOutNode);
-                
-                JReference use = new JLocalVarReference(param.getName(), param.resolveBinding());
-                formalOutNode.setUseVariable(use);
-                
-                JReference def = new JInvisibleVarReference(param.getName(),
-                        "$" + String.valueOf(ExpressionVisitor.temporaryVariableId), use.getType(), use.isPrimitiveType());
-                formalOutNode.setDefVariable(def);
-                ExpressionVisitor.temporaryVariableId++;
-                
-                replace(cfg, nextNode, formalOutNode);
-                ControlFlow edge = new ControlFlow(formalOutNode, nextNode);
-                edge.setTrue();
-                cfg.add(edge);
-                formalOuts.add(formalOutNode);
-            }
+            CFGParameter formalOutNode = new CFGParameter(param, CFGNode.Kind.formalOut, ordinal);
+            formalOutNode.setParent(entry);
+            entry.addFormalOut(formalOutNode);
+            cfg.add(formalOutNode);
+            
+            JReference use = new JLocalVarReference(param.getName(), param.resolveBinding());
+            formalOutNode.setUseVariable(use);
+            
+            JReference def = new JInvisibleVarReference(param.getName(),
+                    "$" + String.valueOf(ExpressionVisitor.temporaryVariableId), use.getType(), use.isPrimitiveType());
+            formalOutNode.setDefVariable(def);
+            ExpressionVisitor.temporaryVariableId++;
+            
+            replace(cfg, nextNode, formalOutNode);
+            ControlFlow edge = new ControlFlow(formalOutNode, nextNode);
+            edge.setTrue();
+            cfg.add(edge);
+            formalOuts.add(formalOutNode);
         }
         return formalOuts;
     }

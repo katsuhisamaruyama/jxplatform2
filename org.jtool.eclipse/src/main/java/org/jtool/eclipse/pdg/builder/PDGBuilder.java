@@ -19,7 +19,6 @@ import org.jtool.eclipse.pdg.DD;
 import org.jtool.eclipse.pdg.CD;
 import org.jtool.eclipse.pdg.ParameterEdge;
 import org.jtool.eclipse.pdg.CallEdge;
-import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.jtool.eclipse.cfg.CCFG;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGEntry;
@@ -36,6 +35,7 @@ import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.cfg.JFieldReference;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaMethod;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -65,19 +65,19 @@ public class PDGBuilder {
     
     private static PDGNode createNode(PDG pdg, CFGNode node) {
         if (node.isInterfaceEntry() || node.isClassEntry() || node.isEnumEntry()) {
-            PDGClassEntry pnode = new PDGClassEntry((CFGClassEntry)node);
-            pdg.setEntryNode(pnode);
-            return pnode;
+            PDGClassEntry pdgNode = new PDGClassEntry((CFGClassEntry)node);
+            pdg.setEntryNode(pdgNode);
+            return pdgNode;
             
         } else if (node.isMethodEntry() || node.isConstructorEntry() || node.isInitializerEntry() ||
                    node.isFieldEntry() || node.isEnumConstantEntry()) {
-            PDGEntry pnode = new PDGEntry((CFGEntry)node);
-            pdg.setEntryNode(pnode);
-            return pnode;
+            PDGEntry pdgNode = new PDGEntry((CFGEntry)node);
+            pdg.setEntryNode(pdgNode);
+            return pdgNode;
             
         } else if (node.isStatement()) {
-            PDGStatement pnode = new PDGStatement((CFGStatement)node);
-            return pnode;
+            PDGStatement pdgNode = new PDGStatement((CFGStatement)node);
+            return pdgNode;
         }
         return null;
     }
@@ -113,6 +113,7 @@ public class PDGBuilder {
                                 PDGEntry entry = graph.getEntryNode();
                                 if (entry.getQualifiedName().equals(fvar.getQualifiedName())) {
                                     CFGFieldEntry fieldEntry = (CFGFieldEntry)entry.getCFGEntry();
+                                    
                                     DD edge = new DD(node.getPDGNode(), fieldEntry.getDeclarationNode().getPDGNode(), fvar);
                                     edge.setFieldAccess();
                                     pdg.add(edge);
@@ -121,6 +122,7 @@ public class PDGBuilder {
                                         CFGMethodEntry cfgEntry = (CFGMethodEntry)cfg.getStartNode();
                                         if (cfgEntry.isConstructorEntry()) {
                                             CFGParameter foutForInstance = cfgEntry.getFormalOutForReturn();
+                                            
                                             DD instanceCreationEdge = new DD(fieldEntry.getDeclarationNode().getPDGNode(), foutForInstance.getPDGNode(), fvar);
                                             instanceCreationEdge.setFieldAccess();
                                             pdg.add(instanceCreationEdge);
@@ -232,15 +234,25 @@ public class PDGBuilder {
             }
         }
         
-        for (int ordinal = 0; ordinal < caller.getActualOuts().size(); ordinal++) {
+        for (int ordinal = 0; ordinal < caller.getActualIns().size(); ordinal++) {
             CFGParameter actualOut = caller.getActualOut(ordinal);
             CFGParameter formalOut = callee.getFormalOut(ordinal);
-            if (formalOut != null) {
+            if (formalOut != null && actualOut.getDefVariables().size() == 1) {
                 JReference jvar = formalOut.getUseVariables().get(0);
                 ParameterEdge edge = new ParameterEdge(formalOut.getPDGNode(), actualOut.getPDGNode(), jvar);
                 edge.setParameterOut();
                 pdg.add(edge);
             }
+        }
+        
+        if (!caller.isVoidType() || caller.isConstructorCall()) {
+            int ordinal = caller.getActualOuts().size() - 1;
+            CFGParameter actualOut = caller.getActualOut(ordinal);
+            CFGParameter formalOut = callee.getFormalOut(ordinal);
+            JReference jvar = formalOut.getUseVariables().get(0);
+            ParameterEdge edge = new ParameterEdge(formalOut.getPDGNode(), actualOut.getPDGNode(), jvar);
+            edge.setParameterOut();
+            pdg.add(edge);
         }
     }
     
