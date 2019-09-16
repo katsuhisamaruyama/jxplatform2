@@ -390,23 +390,6 @@ public class ExpressionVisitor extends ASTVisitor {
         return false;
     }
     
-    private void setDefUseFieldsInCalledMethod1(CFGMethodCall callNode, JMethodReference jcall, CFGStatement receiverNode, String receiverName) {
-        JMethod method = infoStore.getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
-        if (method != null) {
-            if (method.defuseDecided()) {
-                setFields1(callNode, jcall, receiverNode, receiverName, method);
-            } else {
-                if (visited != null) {
-                    if (!visited.contains(method)) {
-                        visited.add(method);
-                        method.findDefUseFields(visited, true);
-                        setFields1(callNode, jcall, receiverNode, receiverName, method);
-                    }
-                }
-            }
-        }
-    }
-    
     private void setDefFields(CFGMethodCall callNode, JMethodReference jcall, CFGStatement receiverNode, String receiverName) {
         Set<JMethod> methods = getFieldsInCalledMethod(jcall);
         for (JMethod method : methods) {
@@ -442,27 +425,6 @@ public class ExpressionVisitor extends ASTVisitor {
             methods.add(method);
         }
         return methods;
-    }
-    
-    private void setFields1(CFGMethodCall callNode, JMethodReference jcall, CFGStatement receiverNode, String receiverName, JMethod method) {
-        for (String def : method.getDefFields()) {
-            String[] elem = def.split(QualifiedNameSeparator);
-            String rname = receiverName + "." + elem[1];
-            String type = jcall.getDeclaringClassName();
-            JReference ref;
-            if (infoStore.findInternalClass(elem[0]) != null) {
-                ref = new JFieldReference(callNode.getASTNode(), elem[0], elem[1], rname, type, false, true);
-            } else {
-                ref = new JFieldReference(callNode.getASTNode(), elem[0], elem[1], rname, type, false, false);
-            }
-            
-            callNode.addDefVariable(ref);
-            
-            if (receiverNode != null) {
-                receiverNode.addDefVariables(receiverNode.getUseVariables());
-                receiverNode.addUseVariable(ref);
-            }
-        }
     }
     
     @Override
