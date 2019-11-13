@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -139,18 +139,23 @@ public class JavaField extends JavaVariable {
     protected Set<JavaField> accessingFields = new HashSet<JavaField>();
     
     protected void collectInfo() {
+        if (!inProject || resolved) {
+            return;
+        }
+        
         boolean resolveOk = true;
-        if (binding != null && inProject) {
+        if (binding != null) {
             resolveOk = resolveOk && findCalledMethods();
             resolveOk = resolveOk && findAccessedFields();
         } else {
             resolveOk = false;
         }
+        
         if (!resolveOk) {
             if (declaringClass != null) {
-                Logger.getInstance().printUnresolvedError(getQualifiedName() + " of " + declaringClass.getQualifiedName());
+                Logger.getInstance().printUnresolvedError("Field " + getQualifiedName() + " of " + declaringClass.getQualifiedName() + " in " + jfile.getPath());
             } else {
-                Logger.getInstance().printUnresolvedError(getQualifiedName());
+                Logger.getInstance().printUnresolvedError("Field in " + jfile.getPath());
             }
         }
         resolved = true;

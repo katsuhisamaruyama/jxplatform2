@@ -38,7 +38,6 @@ import java.util.Map;
  * 
  * @author Katsuhisa Maruyama
  */
-@SuppressWarnings("restriction")
 public class CodeGenerator {
     
     private Map<String, String> options = null;

@@ -483,21 +483,29 @@ public class JavaMethod extends JavaElement {
     protected StatementCollector statementCollector = null;
     
     protected void collectInfo() {
-        boolean resolveOk = true;
-        if (binding != null) {
-            resolveOk = resolveOk && findExceptions();
+        if (!inProject || resolved) {
+            return;
         }
-        if (inProject) {
+        
+        boolean resolveOk = true;
+        if (!isInitializer()) {
+            if (binding != null) {
+                resolveOk = resolveOk && findExceptions();
+                resolveOk = resolveOk && findCalledMethods();
+                resolveOk = resolveOk && findAccessedFields();
+            } else {
+                resolveOk = false;
+            }
+        } else {
             resolveOk = resolveOk && findCalledMethods();
             resolveOk = resolveOk && findAccessedFields();
-        } else {
-            resolveOk = false;
         }
+        
         if (!resolveOk) {
             if (declaringClass != null) {
-                Logger.getInstance().printUnresolvedError(getName() + " of " + declaringClass.getQualifiedName());
+                Logger.getInstance().printUnresolvedError("Method " + getName() + " of " + declaringClass.getQualifiedName() + " in " + jfile.getPath());
             } else {
-                Logger.getInstance().printUnresolvedError(getName());
+                Logger.getInstance().printUnresolvedError("Method in " + jfile.getPath());
             }
         }
         resolved = true;
@@ -515,7 +523,7 @@ public class JavaMethod extends JavaElement {
                 exceptions.add(jc);
             } else {
                 resolveOk = false;
-                Logger.getInstance().printUnresolvedError(tbinding.getQualifiedName());
+                Logger.getInstance().printUnresolvedError("Exception type in " + jfile.getPath());
             }
         }
         return resolveOk;

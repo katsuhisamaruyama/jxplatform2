@@ -483,7 +483,7 @@ public class JavaClass extends JavaElement {
     protected Set<JavaClass> efferentClasses = new HashSet<JavaClass>();
     
     protected void collectInfo() {
-        if (resolved) {
+        if (!inProject || resolved) {
             return;
         }
         
@@ -501,11 +501,10 @@ public class JavaClass extends JavaElement {
                 }
                 findEfferentClasses();
             }
-        } else {
-            resolveOk = false;
         }
+        
         if (!resolveOk) {
-            Logger.getInstance().printUnresolvedError(getQualifiedName());
+            Logger.getInstance().printUnresolvedError("Class in " + jfile.getPath());
         }
         resolved = true;
     }

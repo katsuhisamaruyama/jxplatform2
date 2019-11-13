@@ -1,12 +1,11 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
 
 package org.jtool.eclipse.javamodel.builder;
 
-import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaElement;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.util.Logger;
@@ -24,7 +23,6 @@ import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.SuperMethodReference;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeMethodReference;
-import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import java.util.Set;
 import java.util.HashSet;
@@ -95,8 +93,6 @@ public class MethodCallCollector extends ASTVisitor {
     public boolean visit(ClassInstanceCreation node) {
         if (node.resolveConstructorBinding() != null) {
             addMethodCall(node.resolveConstructorBinding());
-        } else {
-            addMethodCall(node.getType());
         }
         return false;
     }
@@ -117,16 +113,6 @@ public class MethodCallCollector extends ASTVisitor {
                     Logger.getInstance().printUnresolvedError(mbinding.getName() + " of " + mbinding.getDeclaringClass().getQualifiedName());
                     bindingOk = false;
                 }
-            }
-        }
-    }
-    
-    private void addMethodCall(Type type) {
-        if (type != null) {
-            JavaClass jc = JavaElement.findDeclaringClass(type.resolveBinding());
-            if (jc != null && jc.isInProject()) {
-                bindingOk = false;
-                Logger.getInstance().printUnresolvedError("$ClassInstanceCreation" + " of " + jc.getQualifiedName());
             }
         }
     }

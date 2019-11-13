@@ -59,51 +59,131 @@ public class JavaModelBuilderTest {
     }
     
     @Ignore
-    public void testTetris() {
+    public void testAntlr() {
         String dir = "/Users/maru/Desktop/TestSamples/";
-        String target = dir + "Tetris/";
+        String target = dir + "antlr-4.7.2/";
+        String binpath = target  + "bin";
+        String classpath = target + "../libs/*";
         ModelBuilderBatch builder = new ModelBuilderBatch();
-        builder.build(target, target, target, target + "/src", target);
-        builder.unbuild();
-    }
-    
-    @Ignore
-    public void testCSSample() {
-        String dir = "/Users/maru/Desktop/TestSamples/";
-        String target = dir + "CS-Sample/";
-        String classpath = dir + "CS-Sample/lib/*";
-        ModelBuilderBatch builder = new ModelBuilderBatch();
-        builder.build(target, target, classpath, target + "/src", target);
-        builder.unbuild();
-    }
-    
-    @Ignore
-    public void testFindbugs() {
-        String dir = "/Users/maru/Desktop/TestSamples/";
-        String target = dir + "findbugs/";
-        String classpath = dir + "findbugs/lib/*";
-        ModelBuilderBatch builder = new ModelBuilderBatch();
-        builder.build(target, target, classpath, target + "/src", target);
+        builder.build(target, target, classpath, target, binpath);
         builder.unbuild();
     }
     
     @Ignore
     public void testApacheAnt() {
         String dir = "/Users/maru/Desktop/TestSamples/";
-        String target = dir + "apache-ant/";
-        String classpath = dir + "apache-ant/lib/*";
+        String target = dir + "apache-ant-1.10.7/";
+        String binpath = target  + "bin";
+        String classpath = target + "../libs/*";
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, classpath, target, binpath);
+        builder.unbuild();
+    }
+    
+    @Ignore
+    public void testApacheLog4j() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "apache-log4j-2.12.1/";
+        String binpath = target  + "bin";
+        String classpath = target + "../libs/*";
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, classpath, target, binpath);
+        builder.unbuild();
+    }
+    @Ignore
+public void testCassandra() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "cassandra-3.11.4/";
+        String[] srcpath = new String[2];
+        srcpath[0] = target + "src/java";
+        srcpath[1] = target + "test";
+        String binpath = target  + "bin";
+        String classpath = target + "../libs/*";
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, classpath, srcpath, binpath);
+        builder.unbuild();
+    }
+    
+    @Ignore
+    public void testCommonsCollections() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "commons-collections4-4.2/";
+        String binpath = target  + "bin";
+        String classpath = target + "lib/*";
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, classpath, target, binpath);
+        builder.unbuild();
+    }
+    
+    @Ignore
+    public void testCommonsMath() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "commons-math3-3.6.1/";
+        String binpath = target  + "bin";
+        String classpath = target + "lib/*";
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, classpath, target, binpath);
+        builder.unbuild();
+    }
+    
+    @Ignore
+public void testElasticSearch() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "elasticsearch-6.7.2/";
+        String[] srcpath = new String[6];
+        srcpath[0] = target + "server/src/main";
+        srcpath[1] = target + "server/src/test";
+        srcpath[2] = target + "client/src/main";
+        srcpath[3] = target + "client/src/test";
+        srcpath[4] = target + "libs";
+        srcpath[5] = target + "modules";
+        String binpath = target  + "bin";
+        String classpath = target + "lib/*";
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, classpath, target, binpath);
+        builder.unbuild();
+    }
+    
+    @Ignore
+    public void testGuava() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "guava-28.1/";
+        String binpath = target  + "bin";
+        String classpath = target + "../libs/*";
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, classpath, target, binpath);
+        builder.unbuild();
+    }
+    
+    @Ignore
+    public void testJdk() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "jdk1.8.0_131/";
+        String classpath = dir + "jdk1.8.0_131/lib/*";
         ModelBuilderBatch builder = new ModelBuilderBatch();
         builder.build(target, target, classpath, target + "/src", target);
         builder.unbuild();
     }
     
     @Ignore
-    public void testJdk8() {
+    public void testJunit() {
         String dir = "/Users/maru/Desktop/TestSamples/";
-        String target = dir + "jdk1.8.0_131/";
-        String classpath = dir + "jdk1.8.0_131/lib/*";
+        String target = dir + "junit-5.5.2/";
+        String binpath = target  + "bin";
+        String classpath = target + "../libs/*";
         ModelBuilderBatch builder = new ModelBuilderBatch();
-        builder.build(target, target, classpath, target + "/src", target);
+        builder.build(target, target, classpath, target, binpath);
+        builder.unbuild();
+    }
+    
+    @Ignore
+    public void testPMD() {
+        String dir = "/Users/maru/Desktop/TestSamples/";
+        String target = dir + "pmd-6.18.0/";
+        String binpath = target  + "bin";
+        String classpath = target + "../libs/*";
+        ModelBuilderBatch builder = new ModelBuilderBatch();
+        builder.build(target, target, classpath, target, binpath);
         builder.unbuild();
     }
     
@@ -133,16 +213,22 @@ public class JavaModelBuilderTest {
     public static void main(String[] args) {
         JavaModelBuilderTest tester = new JavaModelBuilderTest();
         
-        tester.testSimple();
-        tester.testDrawTool();
-        tester.testLambda();
-        tester.testJrb();
+        //tester.testSimple();
+        //tester.testDrawTool();
+        //tester.testLambda();
+        //tester.testJrb();
         
-        //tester.testTetris();
-        //tester.testCSSample();
-        //tester.testFindbugs();
+        //tester.testAntlr();
         //tester.testApacheAnt();
-        //tester.testJdk8();
+        //tester.testApacheLog4j();
+//tester.testCassandra();
+        //tester.testCommonsCollections();
+        //tester.testCommonsMath();
+//tester.testElasticSearch();
+        //tester.testGuava();
+//tester.testJdk();
+tester.testJunit();
+        //tester.testPMD();
         
         // print();
     }
