@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml">
+  <top>
+    <Label text="Enjoy JavaFX." BorderPane.alignment="CENTER"/>
+  </top>
+  <center>
+    <Button text="Push" BorderPane.alignment="CENTER"/>
+  </center>
+</BorderPane>
