@@ -49,7 +49,7 @@ repositories {
 }
 
 dependencies {
-    compile 'org.eclipse.jdt:org.eclipse.jdt.core:3.13.+'
+    compile 'org.eclipse.jdt:org.eclipse.jdt.core:3.19.+'
     compile files('lib/javassist.jar')
     testCompile 'junit:junit:4.+'
 }

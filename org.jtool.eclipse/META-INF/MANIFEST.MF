@@ -21,6 +21,8 @@ Bundle-Activator: org.jtool.eclipse.plugin.Activator
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
+ org.eclipse.jdt.core,
  org.eclipse.ui,
- org.eclipse.ui.console
+ org.eclipse.ui.console,
+ org.eclipse.text
 Bundle-ClassPath: lib/javassist.jar

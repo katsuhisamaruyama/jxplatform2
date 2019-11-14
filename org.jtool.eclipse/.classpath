@@ -2,18 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="src" path="src/test/java"/>
-	<classpathentry exported="true" kind="lib" path="lib/javassist.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8/"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.core.contenttype-3.7.0.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.core.jobs-3.10.0.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.core.resources-3.13.0.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.core.runtime-3.14.0.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.equinox.common-3.10.0.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.equinox.preferences-3.7.100.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.jdt.core-3.14.0.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.osgi-3.13.0.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.text-3.8.100.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
