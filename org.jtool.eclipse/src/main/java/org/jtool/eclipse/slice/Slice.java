@@ -32,7 +32,7 @@ import java.util.HashSet;
  */
 public class Slice {
     
-    private SliceCriterion criterion;
+    protected SliceCriterion criterion;
     
     private PDG pdgForTargetMethod;
     private Set<CFGNode> allNodesInTargetMethod;

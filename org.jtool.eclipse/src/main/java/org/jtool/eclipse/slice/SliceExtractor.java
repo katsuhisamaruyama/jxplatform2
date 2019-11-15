@@ -69,9 +69,9 @@ import java.util.Map;
  */
 public class SliceExtractor extends ASTVisitor {
     
-    private JavaFile jfile;
-    private Set<ASTNode> sliceNodes = new HashSet<ASTNode>();
-    private ASTNode astNode;
+    protected JavaFile jfile;
+    protected Set<ASTNode> sliceNodes = new HashSet<ASTNode>();
+    protected ASTNode astNode;
     
     public SliceExtractor(ModelBuilder builder, Slice slice, JavaClass jclass) {
         this(builder, slice.getNodes(), jclass);
