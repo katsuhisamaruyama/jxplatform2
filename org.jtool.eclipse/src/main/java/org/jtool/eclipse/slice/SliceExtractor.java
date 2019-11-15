@@ -352,10 +352,10 @@ public class SliceExtractor extends ASTVisitor {
         if (invocations.size() == 1) {
             Expression newExpression = (Expression)ASTNode.copySubtree(statement.getAST(), invocations.get(0));
             ExpressionStatement newStatement = (ExpressionStatement)statement.getAST().newExpressionStatement(newExpression);
-            repalceStatement(statement, newStatement);
+            repalceStatementWithStatement(statement, newStatement);
         } else if (invocations.size() > 1) {
             Block newBlock = (Block)statement.getAST().newBlock();
-            repalceStatement(statement, newBlock);
+            repalceStatementWithBlock(statement, newBlock);
             for (int index = 0; index < invocations.size(); index++) {
                 Expression newExpression = (Expression)ASTNode.copySubtree(statement.getAST(), invocations.get(index));
                 ExpressionStatement newStatement = (ExpressionStatement)statement.getAST().newExpressionStatement(newExpression);
@@ -365,7 +365,7 @@ public class SliceExtractor extends ASTVisitor {
     }
     
     @SuppressWarnings("unchecked")
-    protected void repalceStatement(Statement statement, Statement newStatement) {
+    protected void repalceStatementWithStatement(Statement statement, Statement newStatement) {
         StructuralPropertyDescriptor location = statement.getLocationInParent();
         if (location != null) {
             if (location.isChildProperty()) {
@@ -378,7 +378,7 @@ public class SliceExtractor extends ASTVisitor {
     }
     
     @SuppressWarnings("unchecked")
-    protected void repalceStatement(Statement statement, Block block) {
+    protected void repalceStatementWithBlock(Statement statement, Block block) {
         StructuralPropertyDescriptor location = statement.getLocationInParent();
         if (location != null) {
             if (location.isChildProperty()) {
@@ -728,7 +728,7 @@ public class SliceExtractor extends ASTVisitor {
             parentBlock = (Block)statement.getParent();
         } else {
             parentBlock = (Block)statement.getAST().newBlock();
-            repalceStatement(statement, parentBlock);
+            repalceStatementWithBlock(statement, parentBlock);
         }
         for (int index = 0; index < invocations.size(); index++) {
             Expression newExpression = (Expression)ASTNode.copySubtree(statement.getAST(), invocations.get(index));
@@ -765,7 +765,7 @@ public class SliceExtractor extends ASTVisitor {
     @Override
     public void endVisit(TryStatement node) {
         if (node.catchClauses().size() == 0 && !containsAnyInSubTree(node.getFinally())) {
-            repalceStatement(node, node.getBody());
+            repalceStatementWithBlock(node, node.getBody());
         }
     }
     
