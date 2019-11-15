@@ -534,6 +534,7 @@ public class SliceExtractor extends ASTVisitor {
         if (!containsAnyInSubTree(node.getBody())) {
             pullUpMethodInvocationInCondition(node, node.getExpression());
             node.delete();
+            return false;
         }
         
         return true;
@@ -548,6 +549,7 @@ public class SliceExtractor extends ASTVisitor {
         if (!containsAnyInSubTree(node.getBody())) {
             pullUpMethodInvocationInCondition(node, node.getExpression());
             node.delete();
+            return false;
         }
         
         return true;
@@ -575,6 +577,7 @@ public class SliceExtractor extends ASTVisitor {
             exprs.addAll((List<Expression>)node.updaters());
             pullUpMethodInvocationInCondition(node, exprs);
             node.delete();
+            return false;
         }
         
         List<Expression> removeNodes = new ArrayList<Expression>();
@@ -586,6 +589,7 @@ public class SliceExtractor extends ASTVisitor {
         for (Expression n : removeNodes) {
             n.delete();
         }
+        
         return true;
     }
     
@@ -638,6 +642,7 @@ public class SliceExtractor extends ASTVisitor {
         if (!containsAnyInSubTree(node.getBody())) {
             pullUpMethodInvocationInCondition(node, node.getExpression());
             node.delete();
+            return false;
         }
         
         return true;
