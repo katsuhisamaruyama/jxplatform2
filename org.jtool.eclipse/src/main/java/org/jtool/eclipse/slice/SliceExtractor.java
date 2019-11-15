@@ -601,8 +601,7 @@ public class SliceExtractor extends ASTVisitor {
             return false;
         }
         
-        Statement thenStatement = node.getThenStatement();
-        if (!(thenStatement instanceof Block) && !containsAnyInSubTree(thenStatement)) {
+        if (!(node.getThenStatement() instanceof Block) && !containsAnyInSubTree(node.getThenStatement())) {
             EmptyStatement empty = node.getAST().newEmptyStatement();
             node.setThenStatement(empty);
         }
