@@ -287,7 +287,10 @@ public class Slice {
     }
     
     private PDGNode getMethodEntry(PDGNode node) {
-        while (node != null && !node.getCFGNode().isMethodEntry()) {
+        while (node != null &&
+                !node.getCFGNode().isMethodEntry() &&
+                !node.getCFGNode().isConstructorEntry() &&
+                !node.getCFGNode().isInitializerEntry()) {
             node = getDominantNode(node);
         }
         return node;
