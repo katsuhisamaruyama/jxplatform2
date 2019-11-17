@@ -88,7 +88,7 @@ JDK 1.8
 
 ### From the command line
 
-You can directly download jar files for the batch-process application and library versions of JxPlatform2 on [GitHub](<https://github.com/katsuhisamaruyama/jxplatform2/tree/master/org.jtool.eclipse/releases>). 
+You can directly download jar files for the batch-process application and library versions of JxPlatform2 on [GitHub](https://github.com/katsuhisamaruyama/jxplatform2/tree/master/org.jtool.eclipse/releases). 
 
 Alternatively, you can build the batch-process versions of JxPlatform2 with the following commands: 
 
@@ -99,13 +99,12 @@ Alternatively, you can build the batch-process versions of JxPlatform2 with the 
 Jar files of JxPlatform2 can be found in the 'build/libs' folder. 
 
 
-### From an Eclipse
+### From Eclipse
 
 When using the Eclipse update site, select menu items: "Help" -> "Install New Software..." ->  
 Input `https://katsuhisamaruyama.github.io/jxplatform2/org.jtool.eclipse.site/site.xml` in the text field of "Work with:" 
 
-If you prefer to manually install the plug-in, download the latest release of the jar file in the [plug-in directory]
-(<https://github.com/katsuhisamaruyama/jxplatform2/tree/master/org.jtool.eclipse.site/plugins>)
+If you prefer to manually install the plug-in, download the latest release of the jar file in the [plug-in directory](<https://github.com/katsuhisamaruyama/jxplatform2/tree/master/org.jtool.eclipse.site/plugins>)
 and put it in the 'plug-ins' directory under the Eclipse installation. Eclipse needs to be restarted. 
 
 
@@ -124,7 +123,7 @@ and put it in the 'plug-ins' directory under the Eclipse installation. Eclipse n
 
 ### As a library embedded into an application
 
-If your batch-process application employs JxPlatform2 as a library, you should use `jxplatform-1.0-lib.jar` instead of `jxplatform-1.0-all.jar`. In this case, the following jar files are also included in the classpath. 
+If your batch-process application employs JxPlatform2 as a library, you should use `jxplatform-1.0.jar` instead of `jxplatform-1.0-all.jar` In this case, the following jar files are also included in the classpath. 
 
 * `org.eclipse.core.contenttype-*.jar`
 * `org.eclipse.core.jobs-*.jar`
@@ -136,7 +135,28 @@ If your batch-process application employs JxPlatform2 as a library, you should u
 * `org.eclipse.osgi-*.jar`
 * `javassist.jar`
 
-The code building a Java model is describe below. 
+### As a library embedded into an Eclipse plug-in
+
+If your batch-process application employs JxPlatform2 as a library embedded into an Eclipse plug-in, the following built-in plug-ins are added into Required plug-ins the plug-in configuration. 
+
+* `org.eclipse.core.resources`
+* `org.eclipse.core.runtime`
+* `org.eclipse.jdt.core`
+* `org.eclipse.ui`
+* `org.eclipse.ui.console`
+* `org.eclipse.text`
+
+Also, the following jar files are added in the class path and build path.
+
+* `jxplatform-1.0.jar`
+* `javassist.jar`
+
+
+## Writing code
+
+### Building a Java model of source code outside an Eclipse project
+
+The code building a Java model of source code outside an Eclipse project is describe below. 
 
     // import org.jtool.eclipse.batch.ModelBuilderBatch;
     // import org.jtool.eclipse.javamodel.JavaProject;
@@ -164,9 +184,9 @@ The code building a Java model is describe below.
     
     builder.unbuild();
 
-### As an Eclipse plug-in
+#### Building a Java model of source code within an Eclipse project
 
-The following is the typical code for building a Java model for the source code within the Eclipse project.
+The following is the typical code for building a Java model of source code within an Eclipse project.
 
     // import org.eclipse.jdt.core.IJavaProject;
     // import org.jtool.eclipse.plugin.ModelBuilderPlugin;

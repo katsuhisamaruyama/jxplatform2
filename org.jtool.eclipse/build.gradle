@@ -29,7 +29,7 @@ eclipse {
 
 jar {
     baseName = 'jxplatform'
-    classifier = 'lib'
+    classifier = ''
     version = '1.0'
 }
 
