@@ -182,7 +182,6 @@ abstract class JMethod extends JElement {
     
     protected void findDefUseFields(Set<JMethod> visited) {
         findDefUseFields(visited, false);
-        
     }
     protected void findDefUseFields(Set<JMethod> visited, boolean recursivelyCollect) {
         if (defFields == null) {

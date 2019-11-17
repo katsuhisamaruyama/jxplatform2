@@ -343,8 +343,10 @@ public class ExpressionVisitor extends ASTVisitor {
             receiver.accept(this);
             analysisMode.pop();
             
-            if (curNode.getUseVariables().size() == 1) {
-                receiverName = curNode.getUseVariables().get(0).getQualifiedName();
+            List<JReference> uses = curNode.getUseVariables();
+            if (uses.size() > 0) {
+                JReference ref = uses.get(uses.size() - 1);
+                receiverName = ref.getQualifiedName();
             }
         }
         
@@ -358,7 +360,7 @@ public class ExpressionVisitor extends ASTVisitor {
             jcall.setReceiver(receiverNode);
             receiverNode.addUseVariables(curNode.getUseVariables());
             
-            setDefFields(callNode, jcall, receiverNode, receiverName);
+            setDefUseFields(callNode, jcall, receiverNode, receiverName);
         }
         
         setActualNodes(callNode, node.arguments(), receiverNode);
@@ -390,28 +392,40 @@ public class ExpressionVisitor extends ASTVisitor {
         return false;
     }
     
-    private void setDefFields(CFGMethodCall callNode, JMethodReference jcall, CFGStatement receiverNode, String receiverName) {
+    private void setDefUseFields(CFGMethodCall callNode, JMethodReference jcall, CFGStatement receiverNode, String receiverName) {
+        ASTNode node = callNode.getASTNode();
+        String type = jcall.getDeclaringClassName();
         Set<JMethod> methods = getFieldsInCalledMethod(jcall);
         for (JMethod method : methods) {
             for (String def : method.getDefFields()) {
-                String[] elem = def.split(QualifiedNameSeparator);
-                String rname = receiverName + "." + elem[1];
-                String type = jcall.getDeclaringClassName();
-                JReference ref;
-                if (infoStore.findInternalClass(elem[0]) != null) {
-                    ref = new JFieldReference(callNode.getASTNode(), elem[0], elem[1], rname, type, false, true);
-                } else {
-                    ref = new JFieldReference(callNode.getASTNode(), elem[0], elem[1], rname, type, false, false);
-                }
-                
+                JReference ref = createFielReference(node, def, type, receiverName);
                 callNode.addDefVariable(ref);
-                
                 if (receiverNode != null) {
                     receiverNode.addDefVariables(receiverNode.getUseVariables());
                     receiverNode.addUseVariable(ref);
                 }
             }
+            
+            for (String use : method.getUseFields()) {
+                JReference ref = createFielReference(node, use, type, receiverName);
+                callNode.addUseVariable(ref);
+                if (receiverNode != null) {
+                    receiverNode.addUseVariable(ref);
+                }
+            }
         }
+    }
+    
+    private JReference createFielReference(ASTNode node, String var, String type, String receiverName) {
+        String[] elem = var.split(QualifiedNameSeparator);
+        String rname = receiverName + "." + elem[1];
+        JReference ref;
+        if (infoStore.findInternalClass(elem[0]) != null) {
+            ref = new JFieldReference(node, elem[0], elem[1], rname, type, false, true);
+        } else {
+            ref = new JFieldReference(node, elem[0], elem[1], rname, type, false, false);
+        }
+        return ref;
     }
     
     private Set<JMethod> getFieldsInCalledMethod(JMethodReference jcall) {

@@ -100,7 +100,7 @@ public class JMethodExternal extends JMethod {
                     try {
                         JClass clazz = cfgStore.getJInfoStore().getJClass(cm.getClassName());
                         if (clazz != null) {
-                            JMethod method = clazz.getMethod(cm.getSignature());
+                            JMethod method = clazz.getMethod(JMethodExternal.getSignature(cm.getMethod()));
                             if (method != null) {
                                 methods.add(method);
                             }
@@ -108,18 +108,20 @@ public class JMethodExternal extends JMethod {
                     } catch (ClassCastException e) {
                         // javassit's bug related to invocation for Lambda interface methods
                         // javassist.bytecode.InterfaceMethodrefInfo cannot be cast to javassist.bytecode.MethodrefInfo
-                    }
+                    } catch (NotFoundException e) { /* empty */ }
                 }
                 
                 @Override
                 public void edit(ConstructorCall cm) throws CannotCompileException {
-                    JClass clazz = cfgStore.getJInfoStore().getJClass(cm.getClassName());
-                    if (clazz != null) {
-                        JMethod method = clazz.getMethod(cm.getSignature());
-                        if (method != null) {
-                            methods.add(method);
+                    try {
+                        JClass clazz = cfgStore.getJInfoStore().getJClass(cm.getClassName());
+                        if (clazz != null) {
+                            JMethod method = clazz.getMethod(JMethodExternal.getSignature(cm.getMethod()));
+                            if (method != null) {
+                                methods.add(method);
+                            }
                         }
-                    }
+                    } catch (NotFoundException e) { /* empty */ }
                 }
             });
         } catch (CannotCompileException e) { /* empty */ }
