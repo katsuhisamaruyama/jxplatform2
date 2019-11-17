@@ -91,7 +91,7 @@ public class JMethodExternal extends JMethod {
     
     @Override
     protected JMethod[] findAccessedMethods() {
-        List<JMethod> methods = new ArrayList<JMethod>();
+        Set<JMethod> methods = new HashSet<JMethod>();
         try {
             ctMethod.instrument(new ExprEditor() {
                 
@@ -130,7 +130,7 @@ public class JMethodExternal extends JMethod {
     
     @Override
     protected JField[] findAccessedFields() {
-        List<JField> fields = new ArrayList<JField>();
+        Set<JField> fields = new HashSet<JField>();
         try {
             ctMethod.instrument(new ExprEditor() {
                 
@@ -203,7 +203,7 @@ public class JMethodExternal extends JMethod {
         for (JMethod method : getOverridingMethods()) {
             if (!visited.contains(method)) {
                 visited.add(method);
-                method.findDefUseFields(visited);
+                method.findDefUseFields(visited, false);
             }
         }
         
@@ -220,7 +220,7 @@ public class JMethodExternal extends JMethod {
         for (JMethod method : getAccessedMethods()) {
             if (!visited.contains(method)) {
                 visited.add(method);
-                method.findDefUseFields(visited);
+                method.findDefUseFields(visited, false);
             }
         }
         

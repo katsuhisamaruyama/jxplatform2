@@ -41,7 +41,7 @@ public class JMethodInternal extends JMethod {
     
     @Override
     protected JMethod[] findAccessedMethods() {
-        List<JMethod> methods = new ArrayList<JMethod>();
+        Set<JMethod> methods = new HashSet<JMethod>();
         for (JavaMethod jm : jmethod.getCalledMethods()) {
             JClass clazz = cfgStore.getJInfoStore().getJClass(jm.getDeclaringClass().getQualifiedName());
             if (clazz != null) {
@@ -56,7 +56,7 @@ public class JMethodInternal extends JMethod {
     
     @Override
     protected JField[] findAccessedFields() {
-        List<JField> fields = new ArrayList<JField>();
+        Set<JField> fields = new HashSet<JField>();
         for (JavaField jf : jmethod.getAccessedFields()) {
             JClass clazz = cfgStore.getJInfoStore().getJClass(jf.getDeclaringClass().getQualifiedName());
             if (clazz != null) {
@@ -136,7 +136,7 @@ public class JMethodInternal extends JMethod {
         
         for (JMethod method : getOverridingMethods()) {
             if (!visited.contains(method)) {
-                method.findDefUseFields(visited);
+                method.findDefUseFields(visited, false);
             }
         }
         
