@@ -58,6 +58,8 @@ public class SliceTest {
         SDG sdg = builder.getSDG(classes);
         ClDG cldg = sdg.getClDG(jclass.getQualifiedName());
         
+        //sdg.print();
+        
         String code = jclass.getFile().getCode();
         SliceCriterion criterion = SliceCriterion.find(cldg, code, lineNumber, offset);
         if (criterion != null) {
@@ -1661,6 +1663,7 @@ public class SliceTest {
                 "    public void m() {\n" + 
                 "        AAA a = new AAA();\n" + 
                 "        int p = 0;\n" + 
+                "        a.add(p);\n" + 
                 "        int r = a.add(p).getY();\n" + 
                 "    }\n" + 
                 "}\n";
@@ -1705,10 +1708,41 @@ public class SliceTest {
                 "    public void m() {\n" + 
                 "        A3 a = new A3();\n" + 
                 "        int p = 0;\n" + 
+                "        a.setY(2);\n" + 
                 "        int r = n(a.add(p).getY());\n" + 
                 "    }\n" + 
                 "    public int n(int y) {\n" + 
                 "        return y + 4;\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
+    public void testSlice129_1() {
+        String code = getSlicedCode("Test129", 12, 15);
+        //System.out.println(code);
+        String expected = 
+                "class Test129 {\n" + 
+                "    private S s1 = new S();\n" + 
+                "    public void m() {\n" + 
+                "        s1.getP().set1(\"A\", \"AAAA\");\n" + 
+                "        String v1 = s1.getP().get1(\"A\");\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
+    public void testSlice129_2() {
+        String code = getSlicedCode("Test129", 13, 15);
+        //System.out.println(code);
+        String expected = 
+                "class Test129 {\n" + 
+                "    private S s2 = new S();\n" + 
+                "    public void m() {\n" + 
+                "        s2.getP().set2(\"B\", \"BBBB\");\n" + 
+                "        String v2 = s2.getP().get2(\"B\");\n" + 
                 "    }\n" + 
                 "}\n";
         assertEquals(expected, code);
@@ -1976,6 +2010,9 @@ public class SliceTest {
         tester.testSlice127_2();
         
         tester.testSlice128_1();
+        
+        tester.testSlice129_1();
+        tester.testSlice129_2();
         
         tester.testCustomer1();
         tester.testCustomer2();
