@@ -409,9 +409,6 @@ public class ExpressionVisitor extends ASTVisitor {
             for (String use : method.getUseFields()) {
                 JReference ref = createFielReference(node, use, type, receiverName);
                 callNode.addUseVariable(ref);
-                if (receiverNode != null) {
-                    receiverNode.addUseVariable(ref);
-                }
             }
         }
     }
