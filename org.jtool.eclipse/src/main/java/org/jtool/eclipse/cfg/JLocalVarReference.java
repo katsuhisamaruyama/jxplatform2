@@ -31,7 +31,7 @@ public class JLocalVarReference extends JReference {
         name = binding.getName();
         signature = name;
         fqn = declaringMethodName + "!" + name + "$" + String.valueOf(binding.getVariableId());
-        referenceName = declaringMethodName + "!" + name + "$" + String.valueOf(binding.getVariableId());
+        referenceName = name + "$" + String.valueOf(binding.getVariableId());
         type = binding.getType().getQualifiedName();
         isPrimitiveType = binding.getType().isPrimitive();
         modifiers = binding.getModifiers();
