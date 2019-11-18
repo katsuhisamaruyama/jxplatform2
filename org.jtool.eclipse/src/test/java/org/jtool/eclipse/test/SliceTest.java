@@ -57,7 +57,6 @@ public class SliceTest {
         Set<JavaClass> classes = builder.getAllClassesBackward(jclass);
         SDG sdg = builder.getSDG(classes);
         ClDG cldg = sdg.getClDG(jclass.getQualifiedName());
-        
         //sdg.print();
         
         String code = jclass.getFile().getCode();
@@ -1749,6 +1748,42 @@ public class SliceTest {
     }
     
     @Test
+    public void testSlice129_3() {
+        String code = getSlicedCode("Test129", 17, 15);
+        //System.out.println(code);
+        String expected = 
+                "class Test129 {\n" + 
+                "    private S s1 = new S();\n" + 
+                "    public void m() {\n" + 
+                "        s1.getP().set1(\"A\", \"AAAA\");\n" + 
+                "        T t = new T();\n" + 
+                "        t.set1(\"C\", \"CCCC\");\n" + 
+                "        String v3 = t.get1(\"C\");\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
+    public void testSlice129_4() {
+        String code = getSlicedCode("Test129", 21, 15);
+        //System.out.println(code);
+        String expected = 
+                "class Test129 {\n" + 
+                "    private S s1 = new S();\n" + 
+                "    public void m() {\n" + 
+                "        s1.getP().set1(\"A\", \"AAAA\");\n" + 
+                "        T t = new T();\n" + 
+                "        t.set1(\"C\", \"CCCC\");\n" + 
+                "        U u = new U();\n" + 
+                "        u.set1(\"D\", \"DDDD\");\n" + 
+                "        String v4 = u.get1(\"D\");\n" + 
+                "    }\n" + 
+                "}\n";
+        assertEquals(expected, code);
+    }
+    
+    @Test
     public void testCustomer1() {
         String code = getSlicedCode("Customer", 22, 12);
         //System.out.println(code);
@@ -2013,6 +2048,8 @@ public class SliceTest {
         
         tester.testSlice129_1();
         tester.testSlice129_2();
+        tester.testSlice129_3();
+        tester.testSlice129_4();
         
         tester.testCustomer1();
         tester.testCustomer2();
