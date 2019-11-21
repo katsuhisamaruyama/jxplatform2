@@ -126,10 +126,6 @@ The following plug-ins are listed on "Required plug-ins" of the plug-in configur
 * `org.eclipse.text`
 * `jxplatform-1.0.jar`
 
-Also, the following jar files are added in the build path and the runtime classpath. 
-
-* `javassist.jar`
-
 For further information, see [Sample](https://github.com/katsuhisamaruyama/jxplatform2/tree/master/org.jtool.eclipse.plugin.sample).
 
 
