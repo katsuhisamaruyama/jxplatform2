@@ -395,6 +395,7 @@ public class ExpressionVisitor extends ASTVisitor {
     private void setDefUseFields(CFGMethodCall callNode, JMethodReference jcall, CFGStatement receiverNode, String receiverName) {
         ASTNode node = callNode.getASTNode();
         String type = jcall.getDeclaringClassName();
+        
         Set<JMethod> methods = getFieldsInCalledMethod(jcall);
         for (JMethod method : methods) {
             for (String def : method.getDefFields()) {

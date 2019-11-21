@@ -136,7 +136,7 @@ public class JMethodInternal extends JMethod {
         
         for (JMethod method : getOverridingMethods()) {
             if (!visited.contains(method)) {
-                method.findDefUseFields(visited, false);
+                method.findDefUseFields(visited, true);
             }
         }
         
