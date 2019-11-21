@@ -57,7 +57,7 @@ public class ModelBuilderPlugin extends ModelBuilder {
     private JXConsole console = new JXConsole();
     
     public ModelBuilderPlugin() {
-        super(false);
+        super(true);
         resourceChangeListener = new ResourceChangeListener(this);
     }
     
@@ -354,10 +354,6 @@ public class ModelBuilderPlugin extends ModelBuilder {
         } catch (JavaModelException e) {
             return null;
         }
-    }
-    
-    public void setVisible(boolean visible) {
-        Logger.getInstance().setVisible(visible);
     }
     
     private void printError(String mesg) {

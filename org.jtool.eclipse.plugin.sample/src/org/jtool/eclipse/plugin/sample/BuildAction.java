@@ -36,12 +36,12 @@ public class BuildAction extends AbstractHandler {
             Object elem = structured.getFirstElement();
             if (elem instanceof IJavaProject) {
                 ModelBuilderPlugin modelBuilder = Activator.getPlugin().getModelBuilder();
-                modelBuilder.setVisible(true);
+                modelBuilder.setLogVisible(true);
                 JavaProject jproject = modelBuilder.build((IJavaProject)elem);
                 
             } else if (elem instanceof IProject) {
                 ModelBuilderPlugin modelBuilder = new ModelBuilderPlugin();
-                modelBuilder.setVisible(true);
+                modelBuilder.setLogVisible(true);
                 JavaProject jproject = modelBuilder.build(JavaCore.create((IProject)elem));
             }
         }

@@ -55,7 +55,7 @@ class BytecodeCacheManager {
     
     static void writeCache(JavaProject jproject, List<JClass> classes) {
         try {
-            String filename = jproject.getPath() + File.separator + BYTECODE_INFO_FILENAME;
+            String filename = jproject.getDir() + File.separator + BYTECODE_INFO_FILENAME;
             File file = new File(filename);
             
             CacheExporter exporter = new CacheExporter();
