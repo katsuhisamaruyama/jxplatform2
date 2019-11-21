@@ -56,4 +56,10 @@ public class JXConsole {
             consoleStream.println(mesg);
         }
     }
+    
+    public void println() {
+        if (consoleStream != null) {
+            consoleStream.println();
+        }
+    }
 }

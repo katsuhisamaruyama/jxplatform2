@@ -78,6 +78,10 @@ public class ModelBuilderPlugin extends ModelBuilder {
         resourceChangeListener.unregister();
     }
     
+    public JXConsole getConsole() {
+        return console;
+    }
+    
     public void addFileChangeListener(IFileChangeListener listener) {
         resourceChangeListener.addFileChangeListener(listener);
     }
