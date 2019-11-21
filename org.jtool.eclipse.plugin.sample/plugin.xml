@@ -4,15 +4,34 @@
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            allPopups="false"
+            allPopups="true"
             locationURI="popup:org.eclipse.ui.popup.any">
          <separator
-               name="org.eclipse.test.plugin.separator">
+               name="org.eclipse.test.plugin.separator"
+               visible="true">
          </separator>
          <command
                commandId="org.jtool.eclipse.commands.build"
                icon="icons/history_rep.gif"
                label="Build Java Model"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
+                        ifEmpty="false">
+                     <adapt
+                           type="org.eclipse.core.resources.IProject">
+                     </adapt>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="org.jtool.eclipse.commands.cfg"
+               icon="icons/history_rep.gif"
+               label="Build CFG"
                style="push">
             <visibleWhen
                   checkEnabled="false">
@@ -40,12 +59,21 @@
             id="org.jtool.eclipse.commands.build"
             name="Build Java Model">
       </command>
+      <command
+            categoryId="org.jtool.eclipse.commands.category"
+            id="org.jtool.eclipse.commands.cfg"
+            name="Build CFG">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
             class="org.jtool.eclipse.plugin.sample.BuildAction"
             commandId="org.jtool.eclipse.commands.build">
+      </handler>
+      <handler
+            class="org.jtool.eclipse.plugin.sample.CFGAction"
+            commandId="org.jtool.eclipse.commands.cfg">
       </handler>
    </extension>
 
