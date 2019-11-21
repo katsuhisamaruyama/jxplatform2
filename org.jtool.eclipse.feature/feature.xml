@@ -10,7 +10,7 @@
    </description>
 
    <copyright>
-      Copyright 2018
+      Copyright 2018-2019
 Software Science and Technology Lab.
 Department of Computer Science, Ritsumeikan University
    </copyright>
@@ -115,6 +115,7 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <import plugin="org.eclipse.jdt.core"/>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.ui.console"/>
+      <import plugin="org.eclipse.text"/>
    </requires>
 
    <plugin
