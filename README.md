@@ -135,7 +135,7 @@ For further information, see [Sample](https://github.com/katsuhisamaruyama/jxpla
 
 ## Usage
 
-### Building a Java model of source code outside an Eclipse project
+### Building a Java model of source code under the batch-process application
 
 The code building a Java model of source code outside an Eclipse project is describe below. 
 
@@ -165,7 +165,7 @@ The code building a Java model of source code outside an Eclipse project is desc
     
     builder.unbuild();
 
-#### Building a Java model of source code within an Eclipse project
+### Building a Java model of source code under the Eclipse workspace
 
 The following is the typical code for building a Java model of source code within an Eclipse project.
 

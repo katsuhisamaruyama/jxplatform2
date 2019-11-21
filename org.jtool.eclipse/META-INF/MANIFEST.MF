@@ -29,4 +29,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ui.console,
  org.eclipse.text
-Bundle-ClassPath: lib/javassist.jar
+Bundle-ClassPath: .,
+ lib/javassist.jar
