@@ -3,22 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: JxPlatform2
 Bundle-SymbolicName: org.jtool.eclipse;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Export-Package: org.jtool.eclipse.batch;uses:="org.jtool.eclipse.javamodel,org.jtool.eclipse.javamodel.builder",
- org.jtool.eclipse.cfg;
-  uses:="org.jtool.eclipse.graph,
-   org.eclipse.jdt.core.dom,
-   org.jtool.eclipse.pdg,
-   org.jtool.eclipse.javamodel",
- org.jtool.eclipse.cfg.builder;uses:="org.eclipse.jdt.core.dom,org.jtool.eclipse.cfg,org.jtool.eclipse.javamodel",
- org.jtool.eclipse.codemanipulation,
- org.jtool.eclipse.graph,
- org.jtool.eclipse.javamodel;uses:="org.eclipse.jdt.core.dom,org.jtool.eclipse.javamodel.builder",
- org.jtool.eclipse.javamodel.builder;uses:="org.eclipse.jdt.core.dom,org.jtool.eclipse.javamodel,javassist",
- org.jtool.eclipse.pdg;uses:="org.jtool.eclipse.graph,org.jtool.eclipse.cfg,org.jtool.eclipse.javamodel",
- org.jtool.eclipse.pdg.builder;uses:="org.jtool.eclipse.pdg,org.jtool.eclipse.cfg,org.jtool.eclipse.javamodel",
- org.jtool.eclipse.plugin,
- org.jtool.eclipse.slice,
- org.jtool.eclipse.util
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: org.jtool.eclipse
 Bundle-Activator: org.jtool.eclipse.plugin.Activator
@@ -31,3 +15,16 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.text
 Bundle-ClassPath: .,
  lib/javassist.jar
+Export-Package: org.jtool.eclipse.batch,
+ org.jtool.eclipse.cfg,
+ org.jtool.eclipse.cfg.builder,
+ org.jtool.eclipse.codemanipulation,
+ org.jtool.eclipse.graph,
+ org.jtool.eclipse.javamodel,
+ org.jtool.eclipse.javamodel.builder,
+ org.jtool.eclipse.pdg,
+ org.jtool.eclipse.pdg.builder,
+ org.jtool.eclipse.plugin,
+ org.jtool.eclipse.slice,
+ org.jtool.eclipse.test,
+ org.jtool.eclipse.util
