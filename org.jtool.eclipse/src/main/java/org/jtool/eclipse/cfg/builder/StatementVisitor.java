@@ -354,7 +354,7 @@ public class StatementVisitor extends ASTVisitor {
             caseNode = new CFGStatement(node, CFGNode.Kind.switchCaseSt);
             reconnect(caseNode);
             
-            Expression condition = node.getExpression();
+            Expression condition = (Expression)node.expressions().get(0);
             ExpressionVisitor condVisitor = new ExpressionVisitor(this, cfg, caseNode, infoStore, visited);
             condition.accept(condVisitor);
             caseNode.addDefVariables(switchNode.getDefVariables());
