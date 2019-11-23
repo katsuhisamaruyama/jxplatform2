@@ -11,6 +11,7 @@ import org.jtool.eclipse.pdg.PDGStatement;
 import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.javamodel.JavaFile;
 import org.jtool.eclipse.javamodel.JavaClass;
+import org.jtool.eclipse.javamodel.JavaElement;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.builder.ModelBuilder;
@@ -42,6 +43,7 @@ import org.eclipse.jdt.core.dom.ConstructorInvocation;
 import org.eclipse.jdt.core.dom.ContinueStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.EmptyStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -56,6 +58,8 @@ import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
+
 import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
@@ -432,6 +436,18 @@ public class SliceExtractor extends ASTVisitor {
         return null;
     }
     
+    protected String findEnclosingClass(ASTNode node) {
+        TypeDeclaration tnode = (TypeDeclaration)JavaElement.getAncestor(node, ASTNode.TYPE_DECLARATION);
+        if (tnode != null) {
+            return tnode.resolveBinding().getQualifiedName();
+        }
+        EnumDeclaration enode = (EnumDeclaration)JavaElement.getAncestor(node, ASTNode.ENUM_DECLARATION);
+        if (enode != null) {
+            return enode.resolveBinding().getQualifiedName();
+        }
+        return null;
+    }
+    
     @Override
     @SuppressWarnings("unchecked")
     public boolean visit(MethodInvocation node) {
@@ -440,7 +456,13 @@ public class SliceExtractor extends ASTVisitor {
             return false;
         }
         
-        checkMethodCallArguments((List<Expression>)node.arguments());
+        if (node.resolveMethodBinding() != null) {
+            String declaringClassName = node.resolveMethodBinding().getDeclaringClass().getQualifiedName();
+            String enclosingClassName = findEnclosingClass(node);
+            if (declaringClassName.equals(enclosingClassName)) {
+                checkMethodCallArguments((List<Expression>)node.arguments());
+            }
+        }
         return true;
     }
     
