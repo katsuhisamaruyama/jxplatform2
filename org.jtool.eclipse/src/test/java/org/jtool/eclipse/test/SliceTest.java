@@ -1060,7 +1060,6 @@ public class SliceTest {
                 "class Test119 {\n" + 
                 "    public void m() {\n" + 
                 "        A a = new A();\n" + 
-                "        a.setX(1);\n" + 
                 "    }\n" + 
                 "}\n";
         assertEquals(expected, code);
@@ -1089,7 +1088,6 @@ public class SliceTest {
                 "class Test119 {\n" + 
                 "    public void m() {\n" + 
                 "        A a = new A();\n" + 
-                "        a.setX(2);\n" + 
                 "    }\n" + 
                 "}\n";
         assertEquals(expected, code);
@@ -1135,7 +1133,6 @@ public class SliceTest {
                 "class Test119 {\n" + 
                 "    public void m() {\n" + 
                 "        A a = new A();\n" + 
-                "        a.setX(2);\n" + 
                 "    }\n" + 
                 "}\n";
         assertEquals(expected, code);
@@ -1631,6 +1628,7 @@ public class SliceTest {
                 "    public void m() {\n" + 
                 "        AAA a = new AAA();\n" + 
                 "        int p = 0;\n" + 
+                "        a.y = 1;\n" + 
                 "        AAA a2 = a.add(p);\n" + 
                 "    }\n" + 
                 "}\n";
@@ -1646,7 +1644,9 @@ public class SliceTest {
                 "    public void m() {\n" + 
                 "        AAA a = new AAA();\n" + 
                 "        int p = 0;\n" + 
+                "        a.y = 1;\n" + 
                 "        AAA a2 = a.add(p);\n" + 
+                "        a2.y = 2;\n" +
                 "        int q = a2.getY();\n" + 
                 "    }\n" + 
                 "}\n";
@@ -1662,6 +1662,7 @@ public class SliceTest {
                 "    public void m() {\n" + 
                 "        AAA a = new AAA();\n" + 
                 "        int p = 0;\n" + 
+                "        a.y = 1;\n" + 
                 "        a.add(p);\n" + 
                 "        int r = a.add(p).getY();\n" + 
                 "    }\n" + 
@@ -1753,9 +1754,7 @@ public class SliceTest {
         //System.out.println(code);
         String expected = 
                 "class Test129 {\n" + 
-                "    private S s1 = new S();\n" + 
                 "    public void m() {\n" + 
-                "        s1.getP().set1(\"A\", \"AAAA\");\n" + 
                 "        T t = new T();\n" + 
                 "        t.set1(\"C\", \"CCCC\");\n" + 
                 "        String v3 = t.get1(\"C\");\n" + 
@@ -1770,11 +1769,7 @@ public class SliceTest {
         //System.out.println(code);
         String expected = 
                 "class Test129 {\n" + 
-                "    private S s1 = new S();\n" + 
                 "    public void m() {\n" + 
-                "        s1.getP().set1(\"A\", \"AAAA\");\n" + 
-                "        T t = new T();\n" + 
-                "        t.set1(\"C\", \"CCCC\");\n" + 
                 "        U u = new U();\n" + 
                 "        u.set1(\"D\", \"DDDD\");\n" + 
                 "        String v4 = u.get1(\"D\");\n" + 
@@ -1922,11 +1917,13 @@ public class SliceTest {
         assertEquals(expected, code);
     }
     
+    @SuppressWarnings("unused")
     public static void main(String[] args) {
         build();
         
         SliceTest tester = new SliceTest();
         
+        /*
         tester.testSlice101_1();
         tester.testSlice101_1m();
         tester.testSlice101_2();
@@ -2059,6 +2056,7 @@ public class SliceTest {
         tester.testTest200_1();
         tester.testTest200_2();
         tester.testTest200_3();
+        */
         
         unbuild();
     }

@@ -154,17 +154,20 @@ public class PDGModelBuilderTest {
         builder.unbuild();
     }
     
+    @SuppressWarnings("unused")
     public static void main(String[] args) {
         PDGModelBuilderTest tester = new PDGModelBuilderTest();
         
+        /*
         tester.testSimple();
         tester.testDrawTool();
         tester.testLambda();
-        //tester.testJrb();
+        tester.testJrb();
         tester.testTetris();
         tester.testCSClassroom();
         
-        //tester.testApacheAnt();
+        tester.testApacheAnt();
+        */
         
         print();
     }

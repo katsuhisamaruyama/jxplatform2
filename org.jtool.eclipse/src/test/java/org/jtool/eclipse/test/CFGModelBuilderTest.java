@@ -152,18 +152,21 @@ public class CFGModelBuilderTest {
         builder.unbuild();
     }
     
+    @SuppressWarnings("unused")
     public static void main(String[] args) {
         CFGModelBuilderTest tester = new CFGModelBuilderTest();
         
+        /*
         tester.testSimple();
         tester.testSimpleBytecode();
         tester.testDrawTool();
         tester.testLambda();
-        //tester.testJrb();
+        tester.testJrb();
         tester.testTetris();
         tester.testCSClassroom();
         
-        //tester.testApacheAnt();
+        tester.testApacheAnt();
+        */
         
         print();
     }

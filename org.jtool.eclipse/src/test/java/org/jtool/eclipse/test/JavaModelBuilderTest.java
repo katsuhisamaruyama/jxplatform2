@@ -184,16 +184,19 @@ public class JavaModelBuilderTest {
         builder.unbuild();
     }
     
+    @SuppressWarnings("unused")
     public static void main(String[] args) {
         JavaModelBuilderTest tester = new JavaModelBuilderTest();
         
         /* The files are stored inside the workspace */
+        /*
         tester.testSimple();
         tester.testDrawTool();
         tester.testLambda();
         tester.testJrb();
         tester.testTetris();
         tester.testCSClassroom();
+        */
         
         /* The files are stored outside the workspace */
         //tester.testAntlr();
