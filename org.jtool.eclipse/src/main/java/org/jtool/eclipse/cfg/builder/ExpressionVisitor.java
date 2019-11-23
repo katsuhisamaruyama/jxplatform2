@@ -346,7 +346,7 @@ public class ExpressionVisitor extends ASTVisitor {
             List<JReference> uses = curNode.getUseVariables();
             if (uses.size() > 0) {
                 JReference ref = uses.get(uses.size() - 1);
-                receiverName = ref.getQualifiedName();
+                receiverName = ref.getReferenceName();
             }
         }
         
@@ -399,24 +399,24 @@ public class ExpressionVisitor extends ASTVisitor {
         Set<JMethod> methods = getFieldsInCalledMethod(jcall);
         for (JMethod method : methods) {
             for (String def : method.getDefFields()) {
-                JReference ref = createFielReference(node, def, type, receiverName);
+                JReference ref = createFieldReference(node, def, type, receiverName);
                 callNode.addDefVariable(ref);
                 if (receiverNode != null) {
-                    receiverNode.addDefVariables(receiverNode.getUseVariables());
                     receiverNode.addUseVariable(ref);
                 }
             }
             
             for (String use : method.getUseFields()) {
-                JReference ref = createFielReference(node, use, type, receiverName);
+                JReference ref = createFieldReference(node, use, type, receiverName);
                 callNode.addUseVariable(ref);
             }
         }
     }
     
-    private JReference createFielReference(ASTNode node, String var, String type, String receiverName) {
+    private JReference createFieldReference(ASTNode node, String var, String type, String receiverName) {
         String[] elem = var.split(QualifiedNameSeparator);
         String rname = receiverName + "." + elem[1];
+        
         JReference ref;
         if (infoStore.findInternalClass(elem[0]) != null) {
             ref = new JFieldReference(node, elem[0], elem[1], rname, type, false, true);
@@ -645,39 +645,59 @@ public class ExpressionVisitor extends ASTVisitor {
     
     @Override
     public boolean visit(SimpleName node) {
-        registVariable(node, node.getIdentifier());
+        registVariable(node);
         return false;
     }
     
     @Override
     public boolean visit(QualifiedName node) {
-        registVariable(node, node.getFullyQualifiedName());
-        
-        analysisMode.push(AnalysisMode.USE);
-        node.getQualifier().accept(this);
-        analysisMode.pop();
+        IVariableBinding vbinding = getVariableBinding(node);
+        if (vbinding != null && vbinding.isField()) {
+            Name prefix = node.getQualifier();
+            if (prefix.isSimpleName()) {
+                analysisMode.push(AnalysisMode.USE);
+                JReference jvar = registVariable((SimpleName)prefix);
+                analysisMode.pop();
+                
+                JReference fvar;
+                if (jvar != null) {
+                    String name = jvar.getReferenceName() + "." + node.getName().getIdentifier();
+                    fvar = new JFieldReference(node, name, vbinding);
+                } else {
+                    fvar = new JFieldReference(node, node.getFullyQualifiedName(), vbinding);
+                }
+                if (analysisMode.peek() == AnalysisMode.DEF) {
+                    curNode.addDefVariable(fvar);
+                } else {
+                    curNode.addUseVariable(fvar);
+                }
+            } else {
+                analysisMode.push(AnalysisMode.USE);
+                node.getQualifier().accept(this);
+                analysisMode.pop();
+            }
+        }
         return false;
     }
     
-    private void registVariable(Name node, String name) {
+    private JReference registVariable(SimpleName node) {
         IVariableBinding vbinding = getVariableBinding(node);
         if (vbinding != null) {
             JReference jvar;
             if (vbinding.isField()) {
-                if (name.indexOf('.') == -1) {
-                    jvar = new JFieldReference(node, "this." + name, vbinding);
-                } else {
-                    jvar = new JFieldReference(node, name, vbinding);
-                }
+                jvar = new JFieldReference(node, node.getIdentifier(), vbinding);
             } else {
                 jvar = new JLocalVarReference(node, vbinding);
             }
+            
             if (analysisMode.peek() == AnalysisMode.DEF) {
                 curNode.addDefVariable(jvar);
             } else {
                 curNode.addUseVariable(jvar);
             }
+            return jvar;
         }
+        return null;
     }
     
     private IVariableBinding getVariableBinding(Name node) {

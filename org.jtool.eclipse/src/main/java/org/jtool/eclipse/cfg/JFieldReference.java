@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2019
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -40,8 +40,12 @@ public class JFieldReference extends JReference {
         name = binding.getName();
         signature = declaringClassName + QualifiedNameSeparator + name;
         fqn = signature;
-        if (rname.indexOf(QualifiedNameSeparator) == -1) {
-            referenceName = declaringClassName + QualifiedNameSeparator + rname;
+        if (rname.indexOf(".") == -1) {
+            if (Modifier.isStatic(vbinding.getModifiers())) {
+                referenceName = declaringClassName + "." + rname;
+            } else {
+                referenceName = "this." + rname;
+            }
         } else {
             referenceName = rname;
         }
@@ -68,11 +72,7 @@ public class JFieldReference extends JReference {
         this.name = name;
         signature = declaringClassName + QualifiedNameSeparator + name;
         fqn = signature;
-        if (rname.indexOf(QualifiedNameSeparator) == -1) {
-            referenceName = declaringClassName + QualifiedNameSeparator + rname;
-        } else {
-            referenceName = rname;
-        }
+        referenceName = rname;
         this.type = type;
         isPrimitiveType = primitive;
         modifiers = 0;

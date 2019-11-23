@@ -51,7 +51,7 @@ public class CFGFieldBuilder {
         cfg.add(entry);
         
         CFGStatement declNode = new CFGStatement(jfield.getASTNode(), CFGNode.Kind.fieldDeclaration);
-        JReference jvar = new JFieldReference(jfield.getASTNode(), "this." + jfield.getName(), vbinding);
+        JReference jvar = new JFieldReference(jfield.getASTNode(), jfield.getName(), vbinding);
         declNode.addDefVariable(jvar);
         declNode.addUseVariable(jvar);
         entry.setDeclarationNode(declNode);
