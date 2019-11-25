@@ -59,19 +59,19 @@ public class FieldAccessCollector extends ASTVisitor {
     @Override
     public boolean visit(SimpleName node) { 
         addVariableAccess(node, node.resolveBinding());
-        return false;
+        return true;
     }
     
     @Override
     public boolean visit(QualifiedName node) {
         addVariableAccess(node.getName(), node.resolveBinding());
-        return false;
+        return true;
     }
     
     @Override
     public boolean visit(LabeledStatement node) {
         node.getBody().accept(this);
-        return false;
+        return true;
     }
     
     @Override

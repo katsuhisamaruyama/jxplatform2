@@ -62,7 +62,7 @@ public class MethodCallCollector extends ASTVisitor {
         if (node.resolveMethodBinding() != null) {
             addMethodCall(node.resolveMethodBinding());
         }
-        return false;
+        return true;
     }
     
     @Override
@@ -70,7 +70,7 @@ public class MethodCallCollector extends ASTVisitor {
         if (node.resolveMethodBinding() != null) {
             addMethodCall(node.resolveMethodBinding());
         }
-        return false;
+        return true;
     }
     
     @Override
@@ -78,7 +78,7 @@ public class MethodCallCollector extends ASTVisitor {
         if (node.resolveConstructorBinding() != null) {
             addMethodCall(node.resolveConstructorBinding());
         }
-        return false;
+        return true;
     }
     
     @Override
@@ -86,7 +86,7 @@ public class MethodCallCollector extends ASTVisitor {
         if (node.resolveConstructorBinding() != null) {
             addMethodCall(node.resolveConstructorBinding());
         }
-        return false;
+        return true;
     }
     
     @Override
@@ -94,7 +94,7 @@ public class MethodCallCollector extends ASTVisitor {
         if (node.resolveConstructorBinding() != null) {
             addMethodCall(node.resolveConstructorBinding());
         }
-        return false;
+        return true;
     }
     
     private void addMethodCall(IMethodBinding mbinding) {
