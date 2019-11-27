@@ -23,8 +23,12 @@ public class JFieldReference extends JReference {
     private boolean isField;
     private boolean isEnumConstant;
     
-    public JFieldReference(ASTNode node, String rname, IVariableBinding vbinding) {
+    protected ASTNode nameNode;
+    
+    public JFieldReference(ASTNode node, ASTNode nameNode, String rname, IVariableBinding vbinding) {
         super(node);
+        
+        this.nameNode = nameNode;
         
         IVariableBinding binding = vbinding.getVariableDeclaration();
         enclosingClassName = findEnclosingClassName(node);
@@ -64,6 +68,8 @@ public class JFieldReference extends JReference {
     public JFieldReference(ASTNode node, String className, String name, String rname, String type, boolean primitive, boolean inProject) {
         super(node);
         
+        this.nameNode = node;
+        
         enclosingClassName = findEnclosingClassName(node);
         enclosingMethodName = findEnclosingMethodName(enclosingClassName, node);
         declaringClassName = className;
@@ -79,6 +85,10 @@ public class JFieldReference extends JReference {
         this.inProject = inProject;
         isField = true;
         isEnumConstant = false;
+    }
+    
+    public ASTNode getNameNode() {
+        return nameNode;
     }
     
     @Override

@@ -33,9 +33,12 @@ public class JMethodReference extends JReference {
     private List<Boolean> argumentPrimitiveTypes = new ArrayList<Boolean>();
     
     private CFGStatement receiver = null;
+    protected ASTNode nameNode;
     
-    public JMethodReference(ASTNode node, String receiverName, IMethodBinding mbinding, List<Expression> args) {
+    public JMethodReference(ASTNode node, ASTNode nameNode, String receiverName, IMethodBinding mbinding, List<Expression> args) {
         super(node);
+        
+        this.nameNode = nameNode;
         
         IMethodBinding binding = mbinding.getMethodDeclaration();
         enclosingClassName = findEnclosingClassName(node);
@@ -58,13 +61,16 @@ public class JMethodReference extends JReference {
         isMethod = isMethod(binding);
         isConstructor = isConstructor(binding);
         isLocalCall = enclosingClassName.equals(declaringClassName);
-        
         for (ITypeBinding tbinding : mbinding.getExceptionTypes()) {
             exceptionTypes.add(tbinding);
         }
         
         arguments.addAll(args);
         setArgumentTypes(binding);
+    }
+    
+    public ASTNode getNameNode() {
+        return nameNode;
     }
     
     @Override

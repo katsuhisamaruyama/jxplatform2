@@ -17,7 +17,7 @@ import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.cfg.JMethodReference;
 import org.jtool.eclipse.cfg.JFieldReference;
 import org.jtool.eclipse.cfg.JLocalVarReference;
-import org.jtool.eclipse.cfg.JInvisibleVarReference;
+import org.jtool.eclipse.cfg.JSpecialVarReference;
 import org.jtool.eclipse.graph.GraphEdge;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaMethod;
@@ -278,9 +278,9 @@ public class ExpressionVisitor extends ASTVisitor {
         Name name = node.getQualifier();
         JReference jvar;
         if (name != null) {
-            jvar = new JInvisibleVarReference(node, "$this", name.resolveTypeBinding());
+            jvar = new JSpecialVarReference(node, "$this", name.resolveTypeBinding());
         } else {
-            jvar = new JInvisibleVarReference(node, "$this", false);
+            jvar = new JSpecialVarReference(node, "$this", false);
         }
         curNode.addUseVariable(jvar);
         return false;
@@ -350,7 +350,7 @@ public class ExpressionVisitor extends ASTVisitor {
             }
         }
         
-        JMethodReference jcall = new JMethodReference(node, receiverName, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, node.getName(), receiverName, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.methodCall);
         callNode.addUseVariables(curNode.getUseVariables());
         
@@ -383,7 +383,7 @@ public class ExpressionVisitor extends ASTVisitor {
             analysisMode.pop();
         }
         
-        JMethodReference jcall = new JMethodReference(node, null, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, node.getType(), null, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.instanceCreation);
         callNode.addUseVariables(curNode.getUseVariables());
         
@@ -447,7 +447,7 @@ public class ExpressionVisitor extends ASTVisitor {
             return false;
         }
         
-        JMethodReference jcall = new JMethodReference(node, null, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, node.getName(), null, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.methodCall);
         
         setActualNodes(callNode, node.arguments(), null);
@@ -463,7 +463,7 @@ public class ExpressionVisitor extends ASTVisitor {
             return false;
         }
         
-        JMethodReference jcall = new JMethodReference(node, null, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, node.getName(), null, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
         
         setActualNodes(callNode, node.arguments(), null);
@@ -479,7 +479,7 @@ public class ExpressionVisitor extends ASTVisitor {
             return false;
         }
         
-        JMethodReference jcall = new JMethodReference(node, null, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, node, null, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
         
         setActualNodes(callNode, node.arguments(), null);
@@ -495,7 +495,7 @@ public class ExpressionVisitor extends ASTVisitor {
             return false;
         }
         
-        JMethodReference jcall = new JMethodReference(node, null, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, node, null, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
         
         setActualNodes(callNode, node.arguments(), null);
@@ -539,7 +539,7 @@ public class ExpressionVisitor extends ASTVisitor {
         
         String type = callNode.getMethodCall().getArgumentType(ordinal);
         boolean primitive = callNode.getMethodCall().getArgumentPrimitiveType(ordinal);
-        JReference actualIn = new JInvisibleVarReference(node, "$" + String.valueOf(temporaryVariableId), type, primitive);
+        JReference actualIn = new JSpecialVarReference(node, "$" + String.valueOf(temporaryVariableId), type, primitive);
         
         actualInNode.addDefVariable(actualIn);
         temporaryVariableId++;
@@ -588,8 +588,8 @@ public class ExpressionVisitor extends ASTVisitor {
         
         String type = callNode.getReturnType();
         boolean primitive = callNode.isPrimitiveType();
-        JReference actualIn = new JInvisibleVarReference(callNode.getASTNode(), "$" + String.valueOf(temporaryVariableId), type, primitive);
-        JReference actualOut = new JInvisibleVarReference(callNode.getASTNode(), "$" + String.valueOf(temporaryVariableId), type, primitive);
+        JReference actualIn = new JSpecialVarReference(callNode.getASTNode(), "$" + String.valueOf(temporaryVariableId), type, primitive);
+        JReference actualOut = new JSpecialVarReference(callNode.getASTNode(), "$" + String.valueOf(temporaryVariableId), type, primitive);
         returnNode.addDefVariable(actualIn);
         returnNode.addUseVariable(actualOut);
         temporaryVariableId++;
@@ -618,7 +618,7 @@ public class ExpressionVisitor extends ASTVisitor {
         }
         boolean primitive = callNode.isPrimitiveType();
         String name = "$" + String.valueOf(temporaryVariableId);
-        JReference jvar = new JInvisibleVarReference(callNode.getASTNode(), name, type, primitive);
+        JReference jvar = new JSpecialVarReference(callNode.getASTNode(), name, type, primitive);
         
         callNode.addDefVariable(jvar);
         temporaryVariableId++;
@@ -662,9 +662,9 @@ public class ExpressionVisitor extends ASTVisitor {
                 JReference fvar;
                 if (jvar != null) {
                     String name = jvar.getReferenceName() + "." + node.getName().getIdentifier();
-                    fvar = new JFieldReference(node, name, vbinding);
+                    fvar = new JFieldReference(node, node.getName(), name, vbinding);
                 } else {
-                    fvar = new JFieldReference(node, node.getFullyQualifiedName(), vbinding);
+                    fvar = new JFieldReference(node, node.getName(), node.getFullyQualifiedName(), vbinding);
                 }
                 if (analysisMode.peek() == AnalysisMode.DEF) {
                     curNode.addDefVariable(fvar);
@@ -685,7 +685,7 @@ public class ExpressionVisitor extends ASTVisitor {
         if (vbinding != null) {
             JReference jvar;
             if (vbinding.isField()) {
-                jvar = new JFieldReference(node, node.getIdentifier(), vbinding);
+                jvar = new JFieldReference(node, node, node.getIdentifier(), vbinding);
             } else {
                 jvar = new JLocalVarReference(node, vbinding);
             }
