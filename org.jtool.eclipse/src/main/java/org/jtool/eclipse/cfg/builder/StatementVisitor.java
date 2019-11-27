@@ -15,7 +15,7 @@ import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.CFGCatch;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JReference;
-import org.jtool.eclipse.cfg.JInvisibleVarReference;
+import org.jtool.eclipse.cfg.JSpecialVarReference;
 import org.jtool.eclipse.cfg.JLocalVarReference;
 import org.jtool.eclipse.graph.GraphEdge;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -620,7 +620,7 @@ public class StatementVisitor extends ASTVisitor {
             CFGMethodEntry methodNode = (CFGMethodEntry)cfg.getStartNode();
             String type = methodNode.getJavaMethod().getReturnType();
             boolean primitive = methodNode.getJavaMethod().isPrimitiveReturnType();
-            JReference jvar = new JInvisibleVarReference(methodNode.getASTNode(), "$_", type, primitive);
+            JReference jvar = new JSpecialVarReference(methodNode.getASTNode(), "$_", type, primitive);
             returnNode.addDefVariable(jvar);
             
             curNode = exprVisitor.getExitNode();
