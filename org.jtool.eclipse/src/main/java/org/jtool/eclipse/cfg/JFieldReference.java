@@ -9,6 +9,8 @@ package org.jtool.eclipse.cfg;
 import org.jtool.eclipse.javamodel.JavaClass;
 import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -22,8 +24,11 @@ public class JFieldReference extends JReference {
     
     private boolean isField;
     private boolean isEnumConstant;
+    private boolean isLocal;
+    private boolean isSuper;
     
     protected ASTNode nameNode;
+    protected Expression receiverNode;
     
     public JFieldReference(ASTNode node, ASTNode nameNode, String rname, IVariableBinding vbinding) {
         super(node);
@@ -63,6 +68,8 @@ public class JFieldReference extends JReference {
         }
         isField = isField(binding);
         isEnumConstant = isEnumConstant(binding);
+        isLocal = enclosingClassName.equals(declaringClassName);
+        isSuper = node instanceof SuperFieldAccess;
     }
     
     public JFieldReference(ASTNode node, String className, String name, String rname, String type, boolean primitive, boolean inProject) {
@@ -85,10 +92,20 @@ public class JFieldReference extends JReference {
         this.inProject = inProject;
         isField = true;
         isEnumConstant = false;
+        isLocal = enclosingClassName.equals(declaringClassName);
+        isSuper = node instanceof SuperFieldAccess;
     }
     
     public ASTNode getNameNode() {
         return nameNode;
+    }
+    
+    public void setReceiverNode(Expression exp) {
+        receiverNode = exp;
+    }
+    
+    public Expression getReceiverNode() {
+        return receiverNode;
     }
     
     @Override
@@ -102,6 +119,14 @@ public class JFieldReference extends JReference {
     
     public boolean isEnumConstant() {
         return isEnumConstant;
+    }
+    
+    public boolean isLocal() {
+        return isLocal;
+    }
+    
+    public boolean isSuper() {
+        return isSuper;
     }
     
     public boolean isFinal() {

@@ -261,8 +261,7 @@ public class ExpressionVisitor extends ASTVisitor {
         expr.accept(this);
         analysisMode.pop();
         
-        SimpleName name = node.getName();
-        name.accept(this);
+        registVariable(node.getExpression(), node.getName());
         return false;
     }
     
@@ -350,7 +349,7 @@ public class ExpressionVisitor extends ASTVisitor {
             }
         }
         
-        JMethodReference jcall = new JMethodReference(node, node.getName(), receiverName, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, node.getName(), node.getExpression(), receiverName, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.methodCall);
         callNode.addUseVariables(curNode.getUseVariables());
         
@@ -383,7 +382,7 @@ public class ExpressionVisitor extends ASTVisitor {
             analysisMode.pop();
         }
         
-        JMethodReference jcall = new JMethodReference(node, node.getType(), null, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, node.getType(), node.getExpression(), null, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.instanceCreation);
         callNode.addUseVariables(curNode.getUseVariables());
         
@@ -447,7 +446,7 @@ public class ExpressionVisitor extends ASTVisitor {
             return false;
         }
         
-        JMethodReference jcall = new JMethodReference(node, node.getName(), null, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, node.getName(), null, null, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.methodCall);
         
         setActualNodes(callNode, node.arguments(), null);
@@ -463,7 +462,7 @@ public class ExpressionVisitor extends ASTVisitor {
             return false;
         }
         
-        JMethodReference jcall = new JMethodReference(node, node.getName(), null, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, node.getName(), null, null, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
         
         setActualNodes(callNode, node.arguments(), null);
@@ -479,7 +478,7 @@ public class ExpressionVisitor extends ASTVisitor {
             return false;
         }
         
-        JMethodReference jcall = new JMethodReference(node, node, null, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, node, null, null, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
         
         setActualNodes(callNode, node.arguments(), null);
@@ -495,7 +494,7 @@ public class ExpressionVisitor extends ASTVisitor {
             return false;
         }
         
-        JMethodReference jcall = new JMethodReference(node, node, null, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, node, null, null, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
         
         setActualNodes(callNode, node.arguments(), null);
@@ -678,6 +677,16 @@ public class ExpressionVisitor extends ASTVisitor {
             }
         }
         return false;
+    }
+    
+    private JFieldReference registVariable(Expression exp, SimpleName node) {
+        JReference ref = registVariable(node);
+        if (ref != null && ref instanceof JFieldReference) {
+            JFieldReference fref = (JFieldReference)ref;
+            fref.setReceiverNode(exp);
+            return fref;
+        }
+        return null;
     }
     
     private JReference registVariable(SimpleName node) {

@@ -8,6 +8,7 @@ package org.jtool.eclipse.cfg;
 
 import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -24,7 +25,8 @@ public class JMethodReference extends JReference {
     
     private boolean isMethod;
     private boolean isConstructor;
-    private boolean isLocalCall;
+    private boolean isLocal;
+    private boolean isSuper;
     
     private List<ITypeBinding> exceptionTypes = new ArrayList<ITypeBinding>();
     
@@ -34,11 +36,13 @@ public class JMethodReference extends JReference {
     
     private CFGStatement receiver = null;
     protected ASTNode nameNode;
+    protected Expression receiverNode;
     
-    public JMethodReference(ASTNode node, ASTNode nameNode, String receiverName, IMethodBinding mbinding, List<Expression> args) {
+    public JMethodReference(ASTNode node, ASTNode nameNode, Expression receiverNode, String receiverName, IMethodBinding mbinding, List<Expression> args) {
         super(node);
         
         this.nameNode = nameNode;
+        this.receiverNode = receiverNode;
         
         IMethodBinding binding = mbinding.getMethodDeclaration();
         enclosingClassName = findEnclosingClassName(node);
@@ -60,7 +64,8 @@ public class JMethodReference extends JReference {
         inProject = binding.getDeclaringClass().isFromSource();
         isMethod = isMethod(binding);
         isConstructor = isConstructor(binding);
-        isLocalCall = enclosingClassName.equals(declaringClassName);
+        isLocal = enclosingClassName.equals(declaringClassName);
+        isSuper = node instanceof SuperMethodInvocation;
         for (ITypeBinding tbinding : mbinding.getExceptionTypes()) {
             exceptionTypes.add(tbinding);
         }
@@ -86,8 +91,12 @@ public class JMethodReference extends JReference {
         return isConstructor;
     }
     
-    public boolean isLocalCall() {
-        return isLocalCall;
+    public boolean isLocal() {
+        return isLocal;
+    }
+    
+    public boolean isSuper() {
+        return isSuper;
     }
     
     public boolean isFinal() {
@@ -170,6 +179,10 @@ public class JMethodReference extends JReference {
         return receiver;
     }
     
+    public Expression getReceiverNode() {
+        return receiverNode;
+    }
+    
     public boolean callSelfDirectly() {
         String fqn2 = enclosingClassName + QualifiedNameSeparator + enclosingMethodName;
         return fqn.equals(fqn2);
@@ -186,7 +199,7 @@ public class JMethodReference extends JReference {
     
     @Override
     public String toString() {
-        if (isLocalCall()) {
+        if (isLocal()) {
             return signature + "@" + type;
         } else {
             return fqn + "@" + type;
