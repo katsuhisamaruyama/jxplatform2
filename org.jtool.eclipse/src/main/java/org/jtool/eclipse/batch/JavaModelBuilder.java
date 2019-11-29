@@ -22,6 +22,7 @@ public class JavaModelBuilder {
     private String projectName;
     private String projectPath;
     private String srcpath;
+    private String binpath;
     private String classpath;
     
     private ModelBuilderBatch modelBuilder;
@@ -38,8 +39,9 @@ public class JavaModelBuilder {
             projectName = options.get("-name", getProjectName(target, cdir));
             File dir = new File(ModelBuilderBatch.getFullPath(target, cdir));
             projectPath = dir.getCanonicalPath();
-            classpath = options.get("-classpath", ".");
             srcpath = options.get("-srcpath", ".");
+            binpath = options.get("-binpath", ".");
+            classpath = options.get("-classpath", ".");
             
             logfile = options.get("-logfile", "");
             if (logfile.length() > 0) {
@@ -51,19 +53,20 @@ public class JavaModelBuilder {
     }
     
     public JavaModelBuilder(String name, String target) {
-        this(name, target, target, null);
+        this(name, target, target, target, target);
     }
     
     public JavaModelBuilder(String name, String target, String classpath) {
-        this(name, target, null, classpath);
+        this(name, target, classpath, target, target);
     }
     
-    public JavaModelBuilder(String name, String target, String classpath, String srcpath) {
+    public JavaModelBuilder(String name, String target, String classpath, String srcpath, String binpath) {
         try {
             projectName = replaceFileSeparator(name);
             File dir = new File(target);
             projectPath = dir.getCanonicalPath();
             this.srcpath = srcpath;
+            this.binpath = binpath;
             this.classpath = classpath;
         } catch (IOException e) {
             System.err.println("Cannot build a Java model due to the invalid options/settings.");
@@ -95,7 +98,7 @@ public class JavaModelBuilder {
     
     public JavaProject build() {
         modelBuilder = new ModelBuilderBatch();
-        return modelBuilder.build(projectName, projectPath, classpath, srcpath);
+        return modelBuilder.build(projectName, projectPath, classpath, srcpath, binpath);
     }
     
     public void unbuild() {
