@@ -39,9 +39,9 @@ public class JavaModelBuilder {
             projectName = options.get("-name", getProjectName(target, cdir));
             File dir = new File(ModelBuilderBatch.getFullPath(target, cdir));
             projectPath = dir.getCanonicalPath();
-            srcpath = options.get("-srcpath", ".");
-            binpath = options.get("-binpath", ".");
-            classpath = options.get("-classpath", ".");
+            srcpath = getPath(target, options.get("-srcpath", target));
+            binpath = getPath(target, options.get("-binpath", target));
+            classpath = getPath(target, options.get("-classpath", target));
             
             logfile = options.get("-logfile", "");
             if (logfile.length() > 0) {
@@ -58,6 +58,25 @@ public class JavaModelBuilder {
     
     public JavaModelBuilder(String name, String target, String classpath) {
         this(name, target, classpath, target, target);
+    }
+    
+    public String getPath(String target, String option) {
+        if (option == null) {
+            return target;
+        }
+        
+        String path[] = option.split(File.pathSeparator);
+        for (int i = 0; i < path.length; i++) {
+            if (!path[i].startsWith(File.separator)) {
+                path [i] = target + File.separator + path[i];
+            }
+        }
+        StringBuilder buf = new StringBuilder();
+        for (int i = 0; i < path.length; i++) {
+            buf.append(File.pathSeparator);
+            buf.append(path[i]);
+        }
+        return buf.substring(1);
     }
     
     public JavaModelBuilder(String name, String target, String classpath, String srcpath, String binpath) {
