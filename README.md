@@ -114,7 +114,7 @@ JxPlatform2 (`jxplatform-1.0.jar`) and the above jar files must be included in t
 When using the Eclipse update site, select menu items: "Help" -> "Install New Software..." ->  
 Input `https://katsuhisamaruyama.github.io/jxplatform2/org.jtool.eclipse.site/site.xml` in the text field of "Work with:" 
 
-If you prefer to manually install the plug-in, download the latest release of the jar file in the [plug-in directory](<https://github.com/katsuhisamaruyama/jxplatform2/tree/master/org.jtool.eclipse.site/plugins>) and put it in the 'plug-ins' directory under the installed Eclipse. Eclipse needs to be restarted. 
+If you prefer to manually install the plug-in, download the latest release of the jar file in the [plug-in directory](<https://github.com/katsuhisamaruyama/jxplatform2/tree/master/org.jtool.eclipse.site/plugins>) and put it into the 'plug-ins' directory under the installed Eclipse. Eclipse needs to be restarted. 
 
 The following plug-ins are listed on "Required plug-ins" of the plug-in configuration for your application. 
 
@@ -124,7 +124,7 @@ The following plug-ins are listed on "Required plug-ins" of the plug-in configur
 * `org.eclipse.ui`
 * `org.eclipse.ui.console`
 * `org.eclipse.text`
-* `jxplatform-1.0.jar`
+* `org.jtool.eclipse`
 
 For further information, see [Sample](https://github.com/katsuhisamaruyama/jxplatform2/tree/master/org.jtool.eclipse.plugin.sample).
 
