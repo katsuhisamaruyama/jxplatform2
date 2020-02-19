@@ -50,6 +50,8 @@ repositories {
 
 dependencies {
     compile 'org.eclipse.jdt:org.eclipse.jdt.core:3.19.+'
+    compile group: 'org.apache.maven.shared', name: 'maven-invoker', version: '2.1.+'
+    compile group: 'org.apache.maven', name: 'maven-model', version: '3.6.+'
     compile files('lib/javassist.jar')
     testCompile 'junit:junit:4.+'
 }
