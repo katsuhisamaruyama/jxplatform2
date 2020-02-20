@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -45,6 +45,22 @@ public class ModelBuilderBatch extends ModelBuilder {
     
     public boolean isUnderPlugin() {
         return false;
+    }
+    
+    public JavaProject build(String name, String target) {
+        ProjectPathInfo pathInfo = new EclipsePathInfo(target);
+        if (pathInfo.getProjectPath() == null) {
+            pathInfo = new MavenPathInfo(target);
+            if (pathInfo.getProjectPath() == null) {
+                pathInfo = new AntPathInfo(target);
+            }
+        }
+        
+        if (pathInfo.getProjectPath() != null) {
+            return build(name, target, pathInfo.getClassPath(), pathInfo.getSrcPath(), pathInfo.getBinPath());
+        } else {
+            return build(name, target, target, target, target);
+        }
     }
     
     public JavaProject build(String name, String target, String classpath) {
@@ -144,6 +160,9 @@ public class ModelBuilderBatch extends ModelBuilder {
     }
     
     static String getFullPath(String path, String cdir) {
+        if (path == null) {
+            return cdir;
+        }
         if (path.charAt(0) == File.separatorChar) {
             return path;
         } else {
@@ -231,7 +250,7 @@ public class ModelBuilderBatch extends ModelBuilder {
         pm.done();
     }
     
-    private static List<File> collectAllJavaFiles(String[] paths) {
+    static List<File> collectAllJavaFiles(String[] paths) {
         List<File> files = new ArrayList<File>();
         for (String path : paths) {
             files.addAll(collectAllJavaFiles(path));
@@ -239,7 +258,7 @@ public class ModelBuilderBatch extends ModelBuilder {
         return files;
     }
     
-    private static List<File> collectAllJavaFiles(String path) {
+    static List<File> collectAllJavaFiles(String path) {
         List<File> files = new ArrayList<File>();
         File res = new File(path);
         if (res.isFile()) {
