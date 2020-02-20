@@ -70,7 +70,10 @@ class AntPathInfo extends ProjectPathInfo {
                 String name = attr.getValue("name");
                 String value = attr.getValue("value");
                 if (name != null && value != null) {
-                    properties.put(name, value);
+                    String cvalue = replace(value);
+                    if (cvalue != null) {
+                        properties.put(name, cvalue);
+                    }
                 }
                 
             } else if (qname.equals("javac") && attr != null) {
@@ -104,35 +107,42 @@ class AntPathInfo extends ProjectPathInfo {
             }
         }
         
+        private String replace(String value) {
+            int beginIndex = value.indexOf("${", 0);
+            while (beginIndex != -1) {
+                int endIndex = value.indexOf("}", beginIndex + 1);
+                if (endIndex == -1) {
+                    return null;
+                }
+                String key = value.substring(beginIndex + 2, endIndex);
+                String cvalue = properties.get(key);
+                if (cvalue != null) {
+                    value = value.substring(0, beginIndex) + cvalue + value.substring(endIndex + 1);
+                } else {
+                    return null;
+                }
+                beginIndex = value.indexOf("${", 0);
+            }
+            return value;
+        }
+        
         private void setPaths() {
             for (String path : spaths) {
-                path = getConcretePath(path);
+                path = replace(path);
                 srcPaths.add(base.resolve(path).toString());
             }
             for (String path : cpaths) {
-                path = getConcretePath(path);
+                path = replace(path);
                 classPaths.add(base.resolve(path).toString());
             }
             classPaths.add(base.resolve("lib").toString());
             if (bpath != null) {
-                String path = getConcretePath(bpath);
+                String path = replace(bpath);
                 binPath = base.resolve(path).toString();
             }
         }
         
-        private String getConcretePath(String path) {
-            while (path.indexOf("${") != -1) {
-                for (String key : properties.keySet()) {
-                    if (path.indexOf("${" + key + "}") != -1) {
-                        path = path.replace("${" + key + "}", properties.get(key));
-                        break;
-                    }
-                }
-            }
-            return path;
-        }
-        
-        String[] getSrcPaths() {
+        private String[] getSrcPaths() {
             String[] paths;
             if (srcPaths.size() == 0) {
                 paths = new String[1];
@@ -143,7 +153,7 @@ class AntPathInfo extends ProjectPathInfo {
             return paths;
         }
         
-        String getBinPath() {
+        private String getBinPath() {
             if (binPath != null) {
                 return binPath;
             } else {
@@ -151,7 +161,7 @@ class AntPathInfo extends ProjectPathInfo {
             }
         }
         
-        String[] getClassPaths() {
+        private String[] getClassPaths() {
             String[] paths;
             if (classPaths.size() == 0) {
                 paths = ModelBuilderBatch.getClassPath(base.toString() + File.separator + "lib/*");

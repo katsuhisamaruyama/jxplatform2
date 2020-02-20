@@ -88,7 +88,7 @@ class EclipsePathInfo extends ProjectPathInfo {
             }
         }
         
-        String[] getSrcPaths() {
+        private String[] getSrcPaths() {
             String[] paths;
             if (srcPaths.size() == 0) {
                 paths = new String[1];
@@ -99,7 +99,7 @@ class EclipsePathInfo extends ProjectPathInfo {
             return paths;
         }
         
-        String getBinPath() {
+        private String getBinPath() {
             if (binPath != null) {
                 return binPath;
             } else {
@@ -107,7 +107,7 @@ class EclipsePathInfo extends ProjectPathInfo {
             }
         }
         
-        String[] getClassPaths() {
+        private String[] getClassPaths() {
             String[] paths;
             if (classPaths.size() == 0) {
                 paths = ModelBuilderBatch.getClassPath(base.toString() + File.separator + "lib/*");
