@@ -37,7 +37,7 @@ public class JavaProject {
     
     private String[] classPath;
     private String[] sourcePath;
-    private String binaryPath;
+    private String[] binaryPath;
     
     private ModelBuilder modelBuilder;
     
@@ -223,12 +223,14 @@ public class JavaProject {
     }
     
     public void setSourceBinaryPaths(String sourcePath, String binaryPath) {
-        String[] path = new String[1];
-        path[0] = sourcePath;
-        setSourceBinaryPaths(path, binaryPath);
+        String[] srcPath = new String[1];
+        srcPath[0] = sourcePath;
+        String[] binPath = new String[1];
+        binPath[0] = binaryPath;
+        setSourceBinaryPaths(srcPath, binPath);
     }
     
-    public void setSourceBinaryPaths(String[] sourcePath, String binaryPath) {
+    public void setSourceBinaryPaths(String[] sourcePath, String[] binaryPath) {
         this.sourcePath = sourcePath;
         this.binaryPath = binaryPath;
     }
@@ -241,7 +243,7 @@ public class JavaProject {
         return sourcePath;
     }
     
-    public String getBinaryPath() {
+    public String[] getBinaryPath() {
         return binaryPath;
     }
     
