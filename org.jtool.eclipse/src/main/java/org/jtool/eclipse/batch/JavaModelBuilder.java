@@ -68,7 +68,7 @@ public class JavaModelBuilder {
         String path[] = option.split(File.pathSeparator);
         for (int i = 0; i < path.length; i++) {
             if (!path[i].startsWith(File.separator)) {
-                path [i] = target + File.separator + path[i];
+                path[i] = target + File.separator + path[i];
             }
         }
         StringBuilder buf = new StringBuilder();
