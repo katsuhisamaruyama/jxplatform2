@@ -348,13 +348,15 @@ public class StatementVisitor extends ASTVisitor {
         return false;
     }
     
+    @SuppressWarnings("unchecked")
     private void visitSwitchCase(SwitchCase node, SwitchNode switchNode, List<Statement> remaining)  {
         CFGStatement caseNode;
         if (!node.isDefault()) {
             caseNode = new CFGStatement(node, CFGNode.Kind.switchCaseSt);
             reconnect(caseNode);
             
-            Expression condition = (Expression)node.getExpression();
+            List<Expression> conditionExpressions = (List<Expression>)node.getExpression();
+            Expression condition = conditionExpressions.get(0);
             ExpressionVisitor condVisitor = new ExpressionVisitor(this, cfg, caseNode, infoStore, visited);
             condition.accept(condVisitor);
             caseNode.addDefVariables(switchNode.getDefVariables());
