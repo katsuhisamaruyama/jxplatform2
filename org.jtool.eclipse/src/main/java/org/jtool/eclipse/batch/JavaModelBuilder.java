@@ -1,12 +1,11 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
 
 package org.jtool.eclipse.batch;
 
-import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.util.Options;
 import org.jtool.eclipse.util.Logger;
 import java.io.File;
@@ -24,10 +23,10 @@ public class JavaModelBuilder {
     private String srcpath;
     private String binpath;
     private String classpath;
+    private String logfile = "";
+    private String autoCheckEnv;
     
     private ModelBuilderBatch modelBuilder;
-    
-    private String logfile = "";
     
     public JavaModelBuilder(String[] args) {
         try {
@@ -39,9 +38,16 @@ public class JavaModelBuilder {
             projectName = options.get("-name", getProjectName(target, cdir));
             File dir = new File(ModelBuilderBatch.getFullPath(target, cdir));
             projectPath = dir.getCanonicalPath();
-            srcpath = getPath(target, options.get("-srcpath", target));
-            binpath = getPath(target, options.get("-binpath", target));
             classpath = getPath(target, options.get("-classpath", target));
+            
+            autoCheckEnv = options.get("auto-check-env", "no");
+            if (autoCheckEnv.contentEquals("yes")) {
+                srcpath = target;
+                binpath = target;
+            } else {
+                srcpath = getPath(target, options.get("-srcpath", target));
+                binpath = getPath(target, options.get("-binpath", target));
+            }
             
             logfile = options.get("-logfile", "");
             if (logfile.length() > 0) {
@@ -87,6 +93,7 @@ public class JavaModelBuilder {
             this.srcpath = srcpath;
             this.binpath = binpath;
             this.classpath = classpath;
+            autoCheckEnv = "no";
         } catch (IOException e) {
             System.err.println("Cannot build a Java model due to the invalid options/settings.");
         }
@@ -115,9 +122,14 @@ public class JavaModelBuilder {
         return path.replace(File.separatorChar, '.');
     }
     
-    public JavaProject build() {
-        modelBuilder = new ModelBuilderBatch();
-        return modelBuilder.build(projectName, projectPath, classpath, srcpath, binpath);
+    public void build() {
+        if (autoCheckEnv.equals("yes")) {
+            modelBuilder = new ModelBuilderBatch(true);
+            modelBuilder.build(projectName, projectPath, classpath, srcpath, binpath);
+        } else {
+            modelBuilder = new ModelBuilderBatch(true);
+            modelBuilder.build(projectName, projectPath, true);
+        }
     }
     
     public void unbuild() {
