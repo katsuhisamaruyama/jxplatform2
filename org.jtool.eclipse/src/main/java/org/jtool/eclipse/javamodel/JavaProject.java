@@ -6,8 +6,11 @@
 
 package org.jtool.eclipse.javamodel;
 
+import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
 import org.jtool.eclipse.javamodel.builder.ModelBuilder;
 import org.jtool.eclipse.javamodel.builder.ProjectStore;
+import org.jtool.eclipse.cfg.builder.CFGStore;
+import org.jtool.eclipse.pdg.builder.PDGStore;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
@@ -39,16 +42,18 @@ public class JavaProject {
     private String[] sourcePath;
     private String[] binaryPath;
     
+    protected CFGStore cfgStore;
+    protected PDGStore pdgStore;
+    
     private ModelBuilder modelBuilder;
     
     public JavaProject(String name, String path, String dir) {
         this.name = name;
         this.path = path;
         this.dir = dir;
-    }
-    
-    public static JavaProject findProject(String path) {
-        return ProjectStore.getInstance().getProject(path);
+        
+        cfgStore = new CFGStore();
+        pdgStore = new PDGStore(cfgStore);
     }
     
     public void setModelBuilder(ModelBuilder modelBuilder) {
@@ -59,7 +64,18 @@ public class JavaProject {
         return modelBuilder;
     }
     
+    public boolean isUnderPlugin() {
+        return modelBuilder.isUnderPlugin();
+    }
+    
+    public static JavaProject findProject(String path) {
+        return ProjectStore.getInstance().getProject(path);
+    }
+    
     public void clear() {
+        cfgStore.destroy();
+        pdgStore.destroy();
+        
         this.name = null;
         this.path = null;
         this.dir = null;
@@ -181,6 +197,14 @@ public class JavaProject {
         return null;
     }
     
+    public BytecodeClassStore getBytecodeClassStore() {
+        return modelBuilder.getBytecodeClassStore();
+    }
+    
+    public void registerBytecodeClasses() {
+        modelBuilder.resisterBytecodeClasses(this);
+    }
+    
     public void addExternalClass(JavaClass jclass) {
         externalClasseStore.put(jclass.getQualifiedName(), jclass);
     }
@@ -249,6 +273,14 @@ public class JavaProject {
     
     public void collectInfo(JavaClass jclass) {
         jclass.collectInfo();
+    }
+    
+    public CFGStore getCFGStore() {
+        return cfgStore;
+    }
+    
+    public PDGStore getPDGStore() {
+        return pdgStore;
     }
     
     @Override

@@ -6,7 +6,6 @@
 
 package org.jtool.eclipse.javamodel;
 
-import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
@@ -30,21 +29,22 @@ public abstract class JavaElement {
     
     public static final String QualifiedNameSeparator = "#";
     
-    protected JavaElement() {
-    }
-    
     public abstract String getQualifiedName();
     
     public void print() {
         System.out.println(toString());
     }
     
+    public ASTNode getASTNode() {
+        return astNode;
+    }
+    
     public JavaFile getFile() {
         return jfile;
     }
     
-    public ASTNode getASTNode() {
-        return astNode;
+    public JavaProject getJavaProject() {
+        return jfile.getProject();
     }
     
     protected JavaElement(ASTNode node, JavaFile jfile) {
@@ -117,8 +117,7 @@ public abstract class JavaElement {
         return fqn;
     }
     
-    public static JavaClass findDeclaringClass(ITypeBinding tbinding) {
-        JavaProject jproject = ProjectStore.getInstance().getCurrentProject();
+    public static JavaClass findDeclaringClass(JavaProject jproject, ITypeBinding tbinding) {
         if (tbinding != null) {
             tbinding = tbinding.getTypeDeclaration();
             String fqn = retrieveQualifiedName(tbinding);
@@ -139,10 +138,10 @@ public abstract class JavaElement {
         return null;
     }
     
-    public static JavaMethod findDeclaringMethod(IMethodBinding mbinding) {
+    public static JavaMethod findDeclaringMethod(JavaProject jproject, IMethodBinding mbinding) {
         if (mbinding != null) { 
             mbinding = mbinding.getMethodDeclaration();
-            JavaClass jclass = findDeclaringClass(mbinding.getDeclaringClass());
+            JavaClass jclass = findDeclaringClass(jproject, mbinding.getDeclaringClass());
             if (jclass != null) {
                 if (jclass.isInProject()) {
                     return jclass.getMethod(JavaMethod.getSignature(mbinding));
@@ -159,10 +158,10 @@ public abstract class JavaElement {
         return null;
     }
     
-    public static JavaField findDeclaringField(IVariableBinding vbinding) {
+    public static JavaField findDeclaringField(JavaProject jproject, IVariableBinding vbinding) {
         if (vbinding != null && vbinding.isField()) {
             vbinding = vbinding.getVariableDeclaration();
-            JavaClass jclass = findDeclaringClass(vbinding.getDeclaringClass());
+            JavaClass jclass = findDeclaringClass(jproject, vbinding.getDeclaringClass());
             if (jclass != null) {
                 if (jclass.isInProject()) {
                     return jclass.getField(vbinding.getName());
@@ -175,7 +174,7 @@ public abstract class JavaElement {
                     return jfield;
                 }
             } else {
-                jclass = getArrayClass(ProjectStore.getInstance().getCurrentProject());
+                jclass = getArrayClass(jproject);
                 JavaField jfield = jclass.getField(vbinding.getName());
                 if (jfield == null) {
                     jfield = new JavaField(vbinding, jclass, false);
@@ -207,26 +206,26 @@ public abstract class JavaElement {
         return null;
     }
     
-    public static JavaClass findEnclosingClass(ASTNode node) {
+    public static JavaClass findEnclosingClass(JavaProject jproject, ASTNode node) {
         TypeDeclaration tnode = (TypeDeclaration)getAncestor(node, ASTNode.TYPE_DECLARATION);
         if (tnode != null) {
-            return findDeclaringClass(tnode.resolveBinding());
+            return findDeclaringClass(jproject, tnode.resolveBinding());
         }
         EnumDeclaration enode = (EnumDeclaration)getAncestor(node, ASTNode.ENUM_DECLARATION);
         if (enode != null) {
-            return findDeclaringClass(enode.resolveBinding());
+            return findDeclaringClass(jproject, enode.resolveBinding());
         }
         return null;
     }
     
-    public static JavaMethod findEnclosingMethod(ASTNode node) {
+    public static JavaMethod findEnclosingMethod(JavaProject jproject, ASTNode node) {
         MethodDeclaration mnode = (MethodDeclaration)getAncestor(node, ASTNode.METHOD_DECLARATION);
         if (mnode != null) {
-            return findDeclaringMethod(mnode.resolveBinding());
+            return findDeclaringMethod(jproject, mnode.resolveBinding());
         }
         Initializer inode = (Initializer)getAncestor(node, ASTNode.INITIALIZER);
         if (inode != null) {
-            JavaClass jc = findEnclosingClass(inode);
+            JavaClass jc = findEnclosingClass(jproject, inode);
             if (jc != null) {
                 return jc.getInitializer();
             }
