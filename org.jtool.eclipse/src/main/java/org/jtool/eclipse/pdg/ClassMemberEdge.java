@@ -13,10 +13,6 @@ package org.jtool.eclipse.pdg;
  */
 public class ClassMemberEdge extends Dependence {
     
-    protected ClassMemberEdge() {
-        super();
-    }
-    
     public ClassMemberEdge(PDGNode src, PDGNode dst) {
         super(src, dst);
     }

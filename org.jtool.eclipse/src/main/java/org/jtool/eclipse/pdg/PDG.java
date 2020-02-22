@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -17,10 +17,7 @@ import org.jtool.eclipse.cfg.CommonCFG;
  */
 public class PDG extends CommonPDG {
     
-    public PDG() {
-        super();
-    }
-    
+    @Override
     public CFG getCFG() {
         CFGEntry node = (CFGEntry)entry.getCFGNode();
         CommonCFG cfg = node.getCFG();

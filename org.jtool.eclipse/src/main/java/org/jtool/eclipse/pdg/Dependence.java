@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -46,10 +46,6 @@ public class Dependence extends GraphEdge {
         call,                            // Connection between a caller and its callee
         
         undefined,
-    }
-    
-    protected Dependence() {
-        super();
     }
     
     protected Dependence(PDGNode src, PDGNode dst) {
@@ -156,17 +152,11 @@ public class Dependence extends GraphEdge {
     
     @Override
     public boolean equals(GraphElement elem) {
-        if (elem instanceof Dependence) {
-            return equals((Dependence)elem);
-        }
-        return false;
+        return (elem instanceof Dependence) ? equals((Dependence)elem) : false;
     }
     
     public boolean equals(Dependence dependence) {
-        if (dependence == null) {
-            return false;
-        }
-        return super.equals((GraphEdge)dependence) && kind == dependence.kind;
+        return dependence != null && (super.equals((GraphEdge)dependence) && kind == dependence.kind);
     }
     
     @Override

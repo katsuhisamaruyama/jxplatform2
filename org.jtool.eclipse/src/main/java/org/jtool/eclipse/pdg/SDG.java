@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -23,10 +23,6 @@ public class SDG extends CommonPDG {
     
     protected Map<String, ClDG> cldgs = new HashMap<String, ClDG>();
     protected Map<String, PDG> pdgs = new HashMap<String, PDG>();
-    
-    public SDG() {
-        super();
-    }
     
     @Override
     public PDGEntry getEntryNode() {

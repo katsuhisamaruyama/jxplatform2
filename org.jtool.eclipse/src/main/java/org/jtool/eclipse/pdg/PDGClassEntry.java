@@ -15,9 +15,6 @@ import org.jtool.eclipse.cfg.CFGClassEntry;
  */
 public class PDGClassEntry extends PDGEntry {
     
-    protected PDGClassEntry() {
-    }
-    
     public PDGClassEntry(CFGClassEntry node) {
         super(node);
     }

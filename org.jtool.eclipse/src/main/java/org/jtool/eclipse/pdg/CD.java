@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -12,10 +12,6 @@ package org.jtool.eclipse.pdg;
  * @author Katsuhisa Maruyama
  */
 public class CD extends Dependence {
-    
-    protected CD() {
-        super();
-    }
     
     public CD(PDGNode src, PDGNode dst) {
         super(src, dst);

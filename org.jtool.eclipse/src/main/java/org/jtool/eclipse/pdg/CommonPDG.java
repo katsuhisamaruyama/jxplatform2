@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -18,10 +18,6 @@ import org.jtool.eclipse.graph.Graph;
 public class CommonPDG extends Graph<PDGNode, Dependence> {
     
     protected PDGEntry entry;
-    
-    public CommonPDG() {
-        super();
-    }
     
     public void setEntryNode(PDGEntry node) {
         entry = node;
@@ -60,12 +56,7 @@ public class CommonPDG extends Graph<PDGNode, Dependence> {
     }
     
     public PDGNode getNode(int id) {
-        for (PDGNode node : getNodes()) {
-            if (id == node.getId()) {
-                return node;
-            }
-        }
-        return null;
+        return getNodes().stream().filter(node -> node.getId() == id).findFirst().orElse(null);
     }
     
     public boolean isPDG() {
@@ -82,17 +73,11 @@ public class CommonPDG extends Graph<PDGNode, Dependence> {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof CommonPDG) {
-            return equals((CommonPDG)obj);
-        }
-        return false;
+        return (obj instanceof CommonPDG) ? equals((CommonPDG)obj) : false;
     }
     
     public boolean equals(CommonPDG pdg) {
-        if (pdg == null) {
-            return false;
-        }
-        return this == pdg || getQualifiedName().equals(pdg.getQualifiedName());
+        return pdg != null && (this == pdg || getQualifiedName().equals(pdg.getQualifiedName()));
     }
     
     @Override

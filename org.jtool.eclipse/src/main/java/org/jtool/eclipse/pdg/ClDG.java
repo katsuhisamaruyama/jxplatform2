@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -23,15 +23,12 @@ public class ClDG extends CommonPDG {
     
     protected Map<String, PDG> pdgs = new HashMap<String, PDG>();
     
-    public ClDG() {
-        super();
-    }
-    
     @Override
     public PDGClassEntry getEntryNode() {
         return (PDGClassEntry)entry;
     }
     
+    @Override
     public CCFG getCFG() {
         CFGEntry node = (CFGEntry)entry.getCFGNode();
         CommonCFG cfg = node.getCFG();

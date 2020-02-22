@@ -26,10 +26,6 @@ public class PDGNode extends GraphNode {
     
     protected CFGNode cfgnode;
     
-    protected PDGNode() {
-        super();
-    }
-    
     protected PDGNode(CFGNode node) {
         super(node.getId());
         cfgnode = node;
@@ -121,31 +117,15 @@ public class PDGNode extends GraphNode {
     }
     
     public boolean isTrueDominated() {
-        for (CD cd : getIncomingCDEdges()) {
-            if (cd.isTrue()) {
-                return true;
-            }
-        }
-        return false;
+        return getIncomingCDEdges().stream().anyMatch(cd -> cd.isTrue());
     }
     
     public boolean isFalseDominated() {
-        for (CD cd : getIncomingCDEdges()) {
-            if (cd.isFalse()) {
-                return true;
-            }
-        }
-        return false;
+        return getIncomingCDEdges().stream().anyMatch(cd -> cd.isFalse());
     }
     
     public int getNumOfIncomingTrueFalseCDs() {
-        int num = 0;
-        for (CD cd : getIncomingCDEdges()) {
-            if (cd.isTrue() || cd.isFalse()) {
-                num++;
-            }
-        }
-        return num;
+        return (int)getIncomingCDEdges().stream().filter(cd -> cd.isTrue() || cd.isFalse()).count();
     }
     
     public boolean equals(PDGNode node) {
@@ -171,14 +151,10 @@ public class PDGNode extends GraphNode {
     public static List<PDGNode> sortPDGNodes(Collection<? extends PDGNode> co) {
         List<PDGNode> nodes = new ArrayList<PDGNode>(co);
         Collections.sort(nodes, new Comparator<PDGNode>() {
+            
+            @Override
             public int compare(PDGNode node1, PDGNode node2) {
-                if (node2.id == node1.id) {
-                    return 0;
-                } else if (node1.id > node2.id) {
-                    return 1;
-                } else {
-                    return -1;
-                }
+                return (node2.id == node1.id) ? 0 : (node1.id > node2.id) ? 1 : -1;
             }
         });
         return nodes;

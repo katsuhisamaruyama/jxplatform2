@@ -15,10 +15,6 @@ import org.jtool.eclipse.cfg.JReference;
  */
 public class ParameterEdge extends DD {
     
-    protected ParameterEdge() {
-        super();
-    }
-    
     public ParameterEdge(PDGNode src, PDGNode dst) {
         super(src, dst);
     }

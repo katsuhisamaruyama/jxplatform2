@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -16,10 +16,6 @@ import org.jtool.eclipse.cfg.CFGEntry;
 public class PDGEntry extends PDGNode {
     
     private CommonPDG pdg = null;
-    
-    protected PDGEntry() {
-        super();
-    }
     
     public PDGEntry(CFGEntry node) {
         super(node);

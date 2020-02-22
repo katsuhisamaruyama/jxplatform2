@@ -13,10 +13,6 @@ package org.jtool.eclipse.pdg;
  */
 public class CallEdge extends Dependence {
     
-    protected CallEdge() {
-        super();
-    }
-    
     public CallEdge(PDGNode src, PDGNode dst) {
         super(src, dst);
     }

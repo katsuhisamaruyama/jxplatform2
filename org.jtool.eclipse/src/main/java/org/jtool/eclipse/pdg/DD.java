@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -18,10 +18,6 @@ public class DD extends Dependence {
     
     protected JReference jvar;
     private PDGNode loopCarriedNode = null;
-    
-    protected DD() {
-        super();
-    }
     
     public DD(PDGNode src, PDGNode dst) {
         super(src, dst);
@@ -98,17 +94,11 @@ public class DD extends Dependence {
     
     @Override
     public boolean equals(GraphElement elem) {
-        if (elem instanceof DD) {
-            return equals((DD)elem);
-        }
-        return false;
+        return (elem instanceof DD) ? equals((DD)elem) : false;
     }
     
     public boolean equals(DD edge) {
-        if (edge == null) {
-            return false;
-        }
-        return super.equals((Dependence)edge) && jvar.equals(edge.jvar);
+        return edge != null && (super.equals((Dependence)edge) && jvar.equals(edge.jvar));
     }
     
     @Override

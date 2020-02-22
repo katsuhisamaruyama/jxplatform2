@@ -17,10 +17,6 @@ import java.util.List;
  */
 public class PDGStatement extends PDGNode {
     
-    protected PDGStatement() {
-        super();
-    }
-    
     public PDGStatement(CFGStatement node) {
         super(node);
     }
