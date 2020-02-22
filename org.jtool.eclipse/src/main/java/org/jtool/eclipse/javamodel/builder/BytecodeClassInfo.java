@@ -6,14 +6,13 @@
 
 package org.jtool.eclipse.javamodel.builder;
 
-import org.jtool.eclipse.javamodel.JavaClass;
 import javassist.CtClass;
 import javassist.NotFoundException;
 import java.util.Set;
 import java.util.HashSet;
 
 /**
- * An object that represents a class restored from its bytecode.
+ * An object that represents a class restored from its byte-code.
  * This class uses Javassit modules.
  * 
  * All methods of this class are not intended to be directly called by clients.
@@ -29,8 +28,6 @@ class BytecodeClassInfo {
     
     private Set<CtClass> ancestors = new HashSet<CtClass>();
     private Set<CtClass> descendants = new HashSet<CtClass>();
-    
-    private Set<JavaClass> jdescendants = new HashSet<JavaClass>();
     
     BytecodeClassInfo(CtClass ctClass) {
         this.ctClass = ctClass;
@@ -86,14 +83,5 @@ class BytecodeClassInfo {
             descendants.add(child.getCtClass());
             setDescendants(child);
         }
-    }
-    
-    
-    void addJavaDescendant(JavaClass jdescendant) {
-        jdescendants.add(jdescendant);
-    }
-    
-    Set<JavaClass> getJavaDescendants() {
-        return jdescendants;
     }
 }

@@ -20,12 +20,13 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 import java.util.Enumeration;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipEntry;
 
 /**
- * An object that stores classes restored from its bytecode.
+ * An object that stores classes restored from its byte-code.
  * This class uses Javassit modules.
  * 
  * All methods of this class are not intended to be directly called by clients.
@@ -34,76 +35,137 @@ import java.util.zip.ZipEntry;
  */
 public class BytecodeClassStore {
     
-    private Map<String, BytecodeClassInfo> classStore = new HashMap<String, BytecodeClassInfo>();
+    private static List<String> commonLibraryClassPath;
+    private static Set<String> commonLibraryClassNames = new HashSet<String>();
     
-    private Set<String> classNames = new HashSet<String>();
     private ClassPool classPool;
     
-    private JavaProject jproject;
+    private Map<String, Map<String, BytecodeClassInfo>> bytecodeClassInfo = new HashMap<String, Map<String, BytecodeClassInfo>>();
+    private Map<String, BytecodeClassInfo> classInfoMapCache = null;
     
-    public BytecodeClassStore(JavaProject jproject) {
-        this.jproject = jproject;
-        collectBytecodeClassNames();
+    public BytecodeClassStore() {
+        commonLibraryClassPath = getCommonLibraryClassPath();
+        for (String path : commonLibraryClassPath) {
+            commonLibraryClassNames.addAll(collectBytecodeClassNames(path));
+        }
     }
     
-    public Set<String> getBytecodeClassNames() {
-         return classNames;
+    public Set<String> createBytecodeClassStore(JavaProject jproject) {
+        List<String> classPath = getClassPath(jproject);
+        Set<String> classNames = new HashSet<String>();
+        for (String path : classPath) {
+            classNames.addAll(collectBytecodeClassNames(path));
+        }
+        classPath.addAll(commonLibraryClassPath);
+        classNames.addAll(commonLibraryClassNames);
+        
+        String[] classPaths = classPath.toArray(new String[classPath.size()]);
+        try {
+            classPool = getClassPool(classPaths);
+        } catch (NotFoundException e) {
+            try {
+                String[] cclassPaths = commonLibraryClassPath.toArray(new String[commonLibraryClassPath.size()]);
+                classPool = getClassPool(cclassPaths);
+            } catch (NotFoundException e2) { /* empty */ }
+        }
+        return classNames;
     }
     
-    public Set<CtClass> getCtClasses() {
+    public Set<CtClass> getCtClasses(JavaProject jproject) {
         Set<CtClass> classes = new HashSet<CtClass>();
-        for (BytecodeClassInfo classInfo : classStore.values()) {
-            classes.add(classInfo.getCtClass());
+        Map<String, BytecodeClassInfo> classInfoMap = bytecodeClassInfo.get(jproject.getPath());
+        if (classInfoMap != null) {
+            for (BytecodeClassInfo classInfo : classInfoMap.values()) {
+                classes.add(classInfo.getCtClass());
+            }
         }
         return classes;
     }
     
-    public CtClass getCtClass(String fqn) {
-        BytecodeClassInfo classInfo = classStore.get(fqn);
-        if (classInfo != null) {
-            return classInfo.getCtClass();
-        } else {
-            return null;
+    public CtClass getCtClass(JavaProject jproject, String fqn) {
+        Map<String, BytecodeClassInfo> classInfoMap = bytecodeClassInfo.get(jproject.getPath());
+        if (classInfoMap != null) {
+            BytecodeClassInfo classInfo = classInfoMap.get(fqn);
+            if (classInfo != null) {
+                return classInfo.getCtClass();
+            }
         }
+        return null;
     }
     
-    public Set<CtClass> getAncestors(String fqn) {
-        BytecodeClassInfo classInfo = classStore.get(fqn);
-        if (classInfo != null) {
-            return classInfo.getAncestors();
-        } else {
-            return new HashSet<CtClass>();
+    public Set<CtClass> getAncestors(JavaProject jproject, String fqn) {
+        Map<String, BytecodeClassInfo> classInfoMap = bytecodeClassInfo.get(jproject.getPath());
+        if (classInfoMap != null) {
+            BytecodeClassInfo classInfo = classInfoMap.get(fqn);
+            if (classInfo != null) {
+                return classInfo.getAncestors();
+            }
         }
+        return new HashSet<CtClass>();
     }
     
-    public Set<CtClass> getDescendants(String fqn) {
-        BytecodeClassInfo classInfo = classStore.get(fqn);
-        if (classInfo != null) {
-            return classInfo.getDescendants();
-        } else {
-            return new HashSet<CtClass>();
+    public Set<CtClass> getDescendants(JavaProject jproject, String fqn) {
+        Map<String, BytecodeClassInfo> classInfoMap = bytecodeClassInfo.get(jproject.getPath());
+        if (classInfoMap != null) {
+            BytecodeClassInfo classInfo = classInfoMap.get(fqn);
+            if (classInfo != null) {
+                return classInfo.getDescendants();
+            }
         }
+        return new HashSet<CtClass>();
     }
     
-    public Set<JavaClass> getJavaDescendants(String fqn) {
-        BytecodeClassInfo classInfo = classStore.get(fqn);
-        if (classInfo != null) {
-            return classInfo.getJavaDescendants();
-        } else {
-            return new HashSet<JavaClass>();
+    public Set<JavaClass> getJavaDescendants(JavaProject jproject, String fqn) {
+        Map<String, BytecodeClassInfo> classInfoMap = bytecodeClassInfo.get(jproject.getPath());
+        if (classInfoMap != null) {
+            BytecodeClassInfo classInfo = classInfoMap.get(fqn);
+            if (classInfo != null) {
+                return jproject.getClasses().stream()
+                        .filter(jc -> isChildOf(jc, fqn)).collect(Collectors.toCollection(HashSet::new));
+            }
         }
+        return null;
     }
     
-    private void collectBytecodeClassNames() {
-        classStore.clear();
+    private boolean isChildOf(JavaClass jclass, String fqn) {
+        if (jclass.getSuperClassName().equals(fqn)) {
+            return true;
+        }
         
-        String[] classPath = getClassPath();
-        for (String path : classPath) {
-            collectBytecodeClassNames(path);
-        }
+        return jclass.getSuperInterfaceNames().stream().anyMatch(name -> name.equals(fqn));
     }
     
-    private String[] getClassPath() {
+    private List<String> getCommonLibraryClassPath() {
+        List<String> classpaths = new ArrayList<String>();
+        
+        String[] bootClassPath = System.getProperty("sun.boot.class.path").split(File.pathSeparator, 0);
+        for (int i = 0; i < bootClassPath.length; i++) {
+            File file = new File(bootClassPath[i]);
+            if (file.exists()) {
+                classpaths.add(bootClassPath[i]);
+            }
+        }
+        
+        String[] extDirs = System.getProperty("java.ext.dirs").split(File.pathSeparator, 0);
+        for (int i = 0; i < extDirs.length; i++) {
+            File file = new File(extDirs[i]);
+            if (file.exists()) { 
+                classpaths.add(extDirs[i]);
+            }
+        }
+        
+        String[] endorsedDirs = System.getProperty("java.endorsed.dirs").split(File.pathSeparator, 0);
+        for (int i = 0; i < endorsedDirs.length; i++) {
+            File file = new File(endorsedDirs[i]);
+            if (file.exists()) {
+                classpaths.add(endorsedDirs[i]);
+            }
+        }
+        
+        return classpaths;
+    }
+    
+    private List<String> getClassPath(JavaProject jproject) {
         String cdir = new File(".").getAbsoluteFile().getParent();
         String pdir = jproject.getDir();
         String[] projectClassPath = jproject.getClassPath();
@@ -117,38 +179,8 @@ public class BytecodeClassStore {
                 }
             }
         }
-        
-        String[] bootClassPath = System.getProperty("sun.boot.class.path").split(File.pathSeparator, 0);
-        for (int i = 0; i < bootClassPath.length; i++) {
-            File file = new File(bootClassPath[i]);
-            if (file.exists()) {
-                classpaths.add(bootClassPath[i]);
-            }
-        }
-        String[] extDirs = System.getProperty("java.ext.dirs").split(File.pathSeparator, 0);
-        for (int i = 0; i < extDirs.length; i++) {
-            File file = new File(extDirs[i]);
-            if (file.exists()) { 
-                classpaths.add(extDirs[i]);
-            }
-        }
-        String[] endorsedDirs = System.getProperty("java.endorsed.dirs").split(File.pathSeparator, 0);
-        for (int i = 0; i < endorsedDirs.length; i++) {
-            File file = new File(endorsedDirs[i]);
-            if (file.exists()) {
-                classpaths.add(endorsedDirs[i]);
-            }
-        }
-        
-        String[] classPath = classpaths.toArray(new String[classpaths.size()]);
-        try {
-            classPool = getClassPool(classPath);
-            return classPath;
-        } catch (NotFoundException e) {
-            return new String[0];
-        }
+        return classpaths;
     }
-       
     
     private static ClassPool getClassPool(String[] classPath) throws NotFoundException {
         ClassPool classpool = ClassPool.getDefault();
@@ -158,98 +190,91 @@ public class BytecodeClassStore {
         return classpool;
     }
     
-    private void collectBytecodeClassNames(String path) {
+    private Set<String> collectBytecodeClassNames(String path) {
+        Set<String> classNames = new HashSet<String>();
         File file = new File(path);
         if (file.isDirectory()) {
-            collectClassFiles(path, "");
+            collectClassFiles(classNames, path, "");
         } else if (file.isFile() && (path.endsWith(".jar") || path.endsWith(".zip"))) {
-            collectClassFilesInJar(file);
+            collectClassFilesInJar(classNames, file);
         }
+        return classNames;
     }
     
-    private void collectClassFiles(String classPath, String name) {
+    private void collectClassFiles(Set<String> classNames, String classPath, String name) {
         File file = new File(classPath + File.separator + name);
         if (file.isDirectory()) {
             String[] names = file.list();
             for (int i = 0; i < names.length; i++) {
                 if (name.length() == 0) {
-                    collectClassFiles(classPath, names[i]);
+                    collectClassFiles(classNames, classPath, names[i]);
                 } else {
-                    collectClassFiles(classPath, name + File.separatorChar + names[i]);
+                    collectClassFiles(classNames, classPath, name + File.separatorChar + names[i]);
                 }
             }
             
         } else if (file.isFile() && name.endsWith(".class")) {
             name = name.substring(0, name.length() - 6);
             name = name.replace(File.separatorChar, '.');
-            registerClassName(name);
+            registerClassName(classNames, name);
         }
     }
     
-    private void collectClassFilesInJar(File file) {
+    private void collectClassFilesInJar(Set<String> classNames, File file) {
         try (ZipFile zipFile = new ZipFile(file)) {
             for (Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries.hasMoreElements(); ) {
                 ZipEntry entry = entries.nextElement();
                 String name = entry.getName();
                 if (name.endsWith(".class")) {
-                    registerClassName(name);
+                    registerClassName(classNames, name);
                 }
             }
         } catch (IOException e) { /* empty */ }
     }
     
-    private void registerClassName(String name) {
+    private void registerClassName(Set<String> classNames, String name) {
         String className = name.substring(0, name.length() - 6);
         className = className.replace(File.separatorChar, '.');
         classNames.add(className);
     }
     
-    public void registerBytecodeClass(String className) {
+    public boolean existsBytecodeClassInfo(JavaProject jproject) {
+        Map<String, BytecodeClassInfo> classInfoMap = bytecodeClassInfo.get(jproject.getPath());
+        if (classInfoMap != null) {
+            classInfoMapCache = classInfoMap;
+            return true;
+        }
+        classInfoMap = new HashMap<String, BytecodeClassInfo>();
+        bytecodeClassInfo.put(jproject.getPath(), classInfoMap);
+        classInfoMapCache = classInfoMap;
+        return false;
+    }
+    
+    public void registerBytecodeClass(JavaProject jproject, String className) {
         try {
             CtClass ctClass = classPool.get(className);
             if (ctClass.isInterface() || ctClass.getModifiers() != Modifier.PRIVATE) {
                 BytecodeClassInfo classInfo = new BytecodeClassInfo(ctClass);
-                classStore.put(className, classInfo);
+                classInfoMapCache.put(className, classInfo);
             }
         } catch (NotFoundException e) { /* empty */ }
     }
     
-    public void collectBytecodeClassInfo() {
-        for (BytecodeClassInfo classInfo : classStore.values()) {
+    public void collectBytecodeClassInfo(JavaProject jproject) {
+        for (BytecodeClassInfo classInfo : classInfoMapCache.values()) {
             for (BytecodeClassInfo parent : classInfo.getParents()) {
-                BytecodeClassInfo parentInfo = classStore.get(parent.getName());
+                BytecodeClassInfo parentInfo = classInfoMapCache.get(parent.getName());
                 if (parentInfo != null) {
                     parentInfo.addChild(classInfo);
                 }
             }
         }
         
-        for (BytecodeClassInfo classInfo : classStore.values()) {
+        for (BytecodeClassInfo classInfo : classInfoMapCache.values()) {
             classInfo.setAncestors(classInfo);
             classInfo.setDescendants(classInfo);
         }
         
-        collectJavaDescendants();
-    }
-    
-    private void collectJavaDescendants() {
-        for (JavaClass jc : jproject.getClasses()) {
-            for (JavaClass ancestor : jc.getAllSuperClasses()) {
-                if (!ancestor.isInProject()) {
-                    BytecodeClassInfo classInfo = classStore.get(ancestor.getQualifiedName());
-                    if (classInfo != null) {
-                        classInfo.addJavaDescendant(jc);
-                    }
-                }
-            }
-            for (JavaClass ancestor : jc.getAllSuperInterfaces()) {
-                if (!ancestor.isInProject()) {
-                    BytecodeClassInfo classInfo = classStore.get(ancestor.getQualifiedName());
-                    if (classInfo != null) {
-                        classInfo.addJavaDescendant(jc);
-                    }
-                }
-            }
-        }
+        classInfoMapCache = null;
     }
 }

@@ -10,7 +10,6 @@ import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaFile;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaPackage;
-import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
 import org.jtool.eclipse.javamodel.builder.JavaASTVisitor;
 import org.jtool.eclipse.javamodel.builder.ModelBuilder;
 import org.jtool.eclipse.javamodel.builder.ProjectStore;
@@ -66,6 +65,7 @@ public class ModelBuilderPlugin extends ModelBuilder {
         resourceChangeListener = new ResourceChangeListener(this);
     }
     
+    @Override
     public boolean isUnderPlugin() {
         return true;
     }
@@ -134,7 +134,7 @@ public class ModelBuilderPlugin extends ModelBuilder {
         return files;
     }
     
-    private void setPaths(JavaProject jproject, IJavaProject project) {
+    private void setPaths(IJavaProject project, JavaProject jproject) {
         jproject.setClassPath(getClassPath(project));
         jproject.setSourceBinaryPaths(getSourcePath(project), getBinaryPath(project));
     }
@@ -168,30 +168,31 @@ public class ModelBuilderPlugin extends ModelBuilder {
         }
     }
     
-    private String getBinaryPath(IJavaProject project) {
+    private String[] getBinaryPath(IJavaProject project) {
+        String path[] = new String[1];
         try {
             IWorkspaceRoot workSpaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-            return workSpaceRoot.getFolder(project.getOutputLocation()).getLocation().toOSString();
+            path[0] = workSpaceRoot.getFolder(project.getOutputLocation()).getLocation().toOSString();
+            return path;
         } catch (JavaModelException e) {
-            return "";
+            return new String[0];
         }
     }
     
     public void build(IFile file) {
-        IJavaProject project = JavaCore.create(file.getProject());
-        ProjectStore.getInstance().setModelBuilder(this);
+        javaProject = JavaCore.create(file.getProject());
         JavaProject jproject = ProjectStore.getInstance().getProject(file.getProject().getFullPath().toString());
         if (jproject == null || jproject.getFiles().size() == 0) {
-            if (project != null) {
-                buildWhole(project);
+            if (javaProject != null) {
+                buildWhole(javaProject, jproject);
             }
-        } else {
-            Set<ICompilationUnit> compilationUnits = new HashSet<ICompilationUnit>();
-            javaProject = project;
-            currentProject = ProjectStore.getInstance().getProject(project.getPath().toString());
-            setPaths(jproject, project);
             
-            if (project != null) {
+        } else {
+            if (javaProject != null) {
+                jproject = ProjectStore.getInstance().getProject(javaProject.getPath().toString());
+                setPaths(javaProject, jproject);
+                
+                Set<ICompilationUnit> compilationUnits = new HashSet<ICompilationUnit>();
                 compilationUnits.add(JavaCore.createCompilationUnitFrom(file));
                 Set<JavaFile> files = collectDanglingClasses(jproject, file);
                 for (JavaFile jf : files) {
@@ -201,8 +202,8 @@ public class ModelBuilderPlugin extends ModelBuilder {
                         compilationUnitMap.put(icu.getPath().toString(), icu);
                     }
                 }
+                buildJavaModel(compilationUnits, jproject);
             }
-            buildJavaModel(compilationUnits, jproject);
         }
     }
     
@@ -211,16 +212,16 @@ public class ModelBuilderPlugin extends ModelBuilder {
     }
     
     public JavaProject build(IJavaProject project) {
-        ProjectStore.getInstance().setModelBuilder(this);
+        javaProject = project;
         JavaProject jproject = ProjectStore.getInstance().getProject(project.getPath().toString());
+        jproject.setModelBuilder(this);
         if (jproject == null || jproject.getFiles().size() == 0) {
-            return buildWhole(project);
+            return buildWhole(javaProject, jproject);
         }
         
         Set<ICompilationUnit> compilationUnits = new HashSet<ICompilationUnit>();
-        javaProject = project;
-        currentProject = ProjectStore.getInstance().getProject(project.getPath().toString());
-        setPaths(jproject, project);
+        jproject = ProjectStore.getInstance().getProject(project.getPath().toString());
+        setPaths(project, jproject);
         
         for (IFile file : dirtyFiles) {
             compilationUnits.add(JavaCore.createCompilationUnitFrom(file));
@@ -239,28 +240,27 @@ public class ModelBuilderPlugin extends ModelBuilder {
         return jproject;
     }
     
-    public JavaProject update() {
-        cfgStore.create(currentProject, analyzingBytecode);
-        
-        ProjectStore.getInstance().removeProject(currentProject.getPath());
-        return buildWhole(javaProject);
+    @Override
+    public void update(JavaProject jproject) {
+        ProjectStore.getInstance().removeProject(jproject.getPath());
+        buildWhole(javaProject, jproject);
     }
     
-    private JavaProject buildWhole(IJavaProject project) {
-        String name = project.getProject().getName();
-        String path = project.getProject().getFullPath().toString();
-        String dir = project.getProject().getLocation().toString();
+    private JavaProject buildWhole(IJavaProject project, JavaProject jproject) {
         javaProject = project;
-        currentProject = new JavaProject(name, path, dir);
-        currentProject.setModelBuilder(this);
-        setPaths(currentProject, project);
-        ProjectStore.getInstance().addProject(currentProject);
+        String name = javaProject.getProject().getName();
+        String path = javaProject.getProject().getFullPath().toString();
+        String dir = javaProject.getProject().getLocation().toString();
         
-        cfgStore.create(currentProject, analyzingBytecode);
+        jproject = new JavaProject(name, path, dir);
+        jproject.getCFGStore().create(jproject, analyzingBytecode);
+        jproject.setModelBuilder(this);
+        setPaths(javaProject, jproject);
+        ProjectStore.getInstance().addProject(jproject);
         
-        Set<ICompilationUnit> compilationUnits = collectCompilationUnits(project, currentProject);
-        buildJavaModel(compilationUnits, currentProject);
-        return currentProject;
+        Set<ICompilationUnit> compilationUnits = collectCompilationUnits(project, jproject);
+        buildJavaModel(compilationUnits, jproject);
+        return jproject;
     }
     
     private Set<ICompilationUnit> collectCompilationUnits(IJavaProject project, JavaProject jproject) {
@@ -366,20 +366,20 @@ public class ModelBuilderPlugin extends ModelBuilder {
     }
     
     @Override
-    public void resisterBytecodeClasses(BytecodeClassStore bytecodeClassStore) {
+    public void resisterBytecodeClasses(JavaProject jproject) {
         try {
             IWorkbenchWindow workbenchWindow = Activator.getPlugin().getWorkbenchWindow();
             workbenchWindow.run(true, true, new IRunnableWithProgress() {
                 
                 @Override
                 public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-                    int size = bytecodeClassStore.getBytecodeClassNames().size();
-                    monitor.beginTask("Parsing external classes... ", size);
+                    Set<String> names = bytecodeClassStore.createBytecodeClassStore(jproject);
+                    monitor.beginTask("Parsing external classes... ", names.size());
                     int count = 1;
-                    for (String className : bytecodeClassStore.getBytecodeClassNames()) {
-                        monitor.subTask(count + "/" + size + " - " + className);
+                    for (String className : names) {
+                        monitor.subTask(count + "/" + names.size() + " - " + className);
                         try {
-                            bytecodeClassStore.registerBytecodeClass(className);
+                            bytecodeClassStore.registerBytecodeClass(jproject, className);
                         } catch (NullPointerException e) {
                             printError("* Fatal error occurred. Skip the paser of " + className);
                             e.printStackTrace();
@@ -399,5 +399,6 @@ public class ModelBuilderPlugin extends ModelBuilder {
             Throwable cause = e.getCause();
             printError("* InvocationTargetException occurred because " + cause);
         } catch (InterruptedException e) { /* empty */ }
+        bytecodeClassStore.collectBytecodeClassInfo(jproject);
     }
 }

@@ -9,7 +9,6 @@ package org.jtool.eclipse.batch;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaFile;
 import org.jtool.eclipse.javamodel.JavaProject;
-import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
 import org.jtool.eclipse.javamodel.builder.JavaASTVisitor;
 import org.jtool.eclipse.javamodel.builder.ModelBuilder;
 import org.jtool.eclipse.javamodel.builder.ProjectStore;
@@ -22,6 +21,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 import java.util.HashMap;
 import java.io.File;
 import java.io.FileReader;
@@ -43,86 +43,145 @@ public class ModelBuilderBatch extends ModelBuilder {
         super(analyzingBytecode);
     }
     
+    @Override
     public boolean isUnderPlugin() {
         return false;
     }
     
-    public JavaProject build(String name, String target) {
-        ProjectPathInfo pathInfo = new EclipsePathInfo(target);
-        if (pathInfo.getProjectPath() == null) {
-            pathInfo = new MavenPathInfo(target);
-            if (pathInfo.getProjectPath() == null) {
-                pathInfo = new AntPathInfo(target);
+    public List<JavaProject> build(String name, String target, boolean checkSubProject) {
+        ModelBuilderBatch builder = new ModelBuilderBatch(true);
+        if (checkSubProject) {
+            return buildWithSubProject(builder, name, target);
+        } else {
+            return buildWithoutSubProject(builder, name, target);
+        }
+    }
+    
+    private List<JavaProject> buildWithoutSubProject(ModelBuilderBatch builder, String name, String target) {
+        List<JavaProject> projects = new ArrayList<JavaProject>();
+        JavaProject project = builder.build(name, target);
+        projects.add(project);
+        return projects;
+    }
+    
+    private List<JavaProject> buildWithSubProject(ModelBuilderBatch builder, String name, String target) {
+        List<JavaProject> projects = new ArrayList<JavaProject>();
+        List<String> subProjects = getSubProject(new File(target));
+        
+        if (subProjects.size() == 0) {
+            JavaProject project = builder.build(name, target);
+            projects.add(project);
+        } else {
+            for (String subproject : subProjects) {
+                int index = subproject.lastIndexOf(File.separatorChar);
+                String subname = name + "#" + subproject.substring(index + 1);
+                JavaProject project = builder.build(subname, subproject);
+                projects.add(project);
             }
         }
-        
-        if (pathInfo.getProjectPath() != null) {
-            return build(name, target, pathInfo.getClassPath(), pathInfo.getSrcPath(), pathInfo.getBinPath());
+        return projects;
+    }
+    
+    public JavaProject build(String name, String target) {
+        ProjectEnv env = ProjectEnv.getProjectEnv(target);
+        if (env != null) {
+            for (String s : env.getClassPath()) {
+                System.out.println("C="+s);
+            }
+            for (String s : env.getSourcePath()) {
+                System.out.println("S="+s);
+            }
+            for (String s : env.getBinaryPath()) {
+                System.out.println("B="+s);
+            }
+            
+            return build(name, target, env.getClassPath(), env.getSourcePath(), env.getBinaryPath());
         } else {
-            return build(name, target, target, target, target);
+            return build(name, target, target);
         }
     }
     
     public JavaProject build(String name, String target, String classpath) {
-        return build(name, target, classpath, null);
+        return build(name, target, classpath, (String)null, (String)null);
     }
     
     public JavaProject build(String name, String target, String classpath, String srcpath, String binpath) {
-        return build(name, target, classpath, getSrcPath(srcpath, target), binpath);
+        File file = new File(target);
+        String path = file.getAbsolutePath();
+        String[] classpaths = getClassPath(classpath);
+        String[] srcpaths = getSourcePath(srcpath, path);
+        String[] binpaths = getBinaryPath(binpath, path);
+        return build(name, target, path, classpaths, srcpaths, binpaths);
     }
     
-    public JavaProject build(String name, String target, String classpath, String[] srcpaths, String binpath) {
-        return build(name, target, getClassPath(classpath), srcpaths, binpath);
+    public JavaProject build(String name, String target, String[] classpath, String[] srcpath, String[] binpath) {
+        File file = new File(target);
+        String path = file.getAbsolutePath();
+        return build(name, target, path, classpath, srcpath, binpath);
     }
     
-    public JavaProject build(String name, String target, String classpath, String srcpath) {
-        try {
-            File file = new File(target);
-            String path = file.getCanonicalPath();
-            String[] classpaths = getClassPath(classpath);
-            String[] srcpaths = getSrcPath(srcpath, path);
-            String binpath = path + File.separatorChar + "bin";
-            return build(name, target, path, classpaths, srcpaths, binpath);
-        } catch (IOException e) {
-            currentProject = null;
-            return null;
-        }
-    }
-    
-    public JavaProject build(String name, String target, String[] classpaths, String[] srcpaths, String binpath) {
-        try {
-            File file = new File(target);
-            String path = file.getCanonicalPath();
-            return build(name, target, path, classpaths, srcpaths, binpath);
-        } catch (IOException e) {
-            currentProject = null;
-            return null;
-        }
-    }
-    
-    public JavaProject build(String name, String target, String path, String[] classpaths, String[] srcpaths, String binpath) {
-        currentProject = new JavaProject(name, path, path);
-        currentProject.setModelBuilder(this);
-        currentProject.setClassPath(classpaths);
-        currentProject.setSourceBinaryPaths(srcpaths, binpath);
+    private JavaProject build(String name, String target, String path, String[] classpath, String[] srcpath, String[] binpath) {
+        JavaProject jproject = new JavaProject(name, path, path);
+        jproject.getCFGStore().create(jproject, analyzingBytecode);
+        jproject.setModelBuilder(this);
+        jproject.setClassPath(classpath);
+        jproject.setSourceBinaryPaths(srcpath, binpath);
+        ProjectStore.getInstance().addProject(jproject);
         
-        ProjectStore.getInstance().addProject(currentProject);
-        ProjectStore.getInstance().setModelBuilder(this);
-        
-        cfgStore.create(currentProject, analyzingBytecode);
-        
-        run();
+        run(jproject);
         Logger.getInstance().writeLog();
-        return currentProject;
+        return jproject;
     }
     
-    static String[] getSrcPath(String srcpath, String basepath) {
-        if (srcpath == null) {
+    private List<String> getSubProject(File dir) {
+        List<String> projects = new ArrayList<String>();
+        
+        for (File file : dir.listFiles()) {
+            if (file.isDirectory() && isSubProject(file)) {
+                String path = file.getAbsolutePath();
+                if (ModelBuilderBatch.collectAllJavaFiles(path + File.separator + "src").size() > 0) {
+                    projects.add(path);
+                }
+                projects.addAll(getSubProject(new File(file.getAbsolutePath())));
+            }
+        }
+        return projects;
+    }
+    
+    private static boolean isSubProject(File dir) {
+        return isSubProject(dir, "build.xml") || isSubProject(dir, "pom.xml") || isSubProject(dir, "build.gradle");
+    }
+    
+    private static boolean isSubProject(File dir, String configName) {
+        for (File file : dir.listFiles()) {
+            if (file.isFile()) {
+                String name = file.getName();
+                if (name.equals(configName) || name.startsWith(configName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    
+    
+    static String[] getSourcePath(String srcPath, String base) {
+        if (srcPath == null) {
             String[] srcpaths = new String[1];
-            srcpaths[0] = basepath + File.separator + "src";
+            srcpaths[0] = base + File.separator + "src";
             return srcpaths;
         }
-        return srcpath.split(File.pathSeparator);
+        return srcPath.split(File.pathSeparator);
+    }
+    
+    static String[] getBinaryPath(String binPath, String base) {
+        if (binPath == null) {
+            String[] binPaths = new String[1];
+            binPaths[0] = base + File.separator + "bin";
+            return binPaths;
+        }
+        return binPath.split(File.pathSeparator);
     }
     
     static String[] getClassPath(String classpath) {
@@ -170,14 +229,14 @@ public class ModelBuilderBatch extends ModelBuilder {
         }
     }
     
-    public JavaProject update() {
-        ProjectStore.getInstance().removeProject(currentProject.getPath());
-        return build(currentProject.getName(), currentProject.getPath(),
-                currentProject.getClassPath(), currentProject.getSourcePath(), currentProject.getBinaryPath());
+    @Override
+    public void update(JavaProject jproject) {
+        ProjectStore.getInstance().removeProject(jproject.getPath());
+        build(jproject.getName(), jproject.getPath(), jproject.getClassPath(), jproject.getSourcePath(), jproject.getBinaryPath());
     }
     
-    private void run() {
-        List<File> sourceFiles = collectAllJavaFiles(currentProject.getSourcePath());
+    private void run(JavaProject jproject) {
+        List<File> sourceFiles = collectAllJavaFiles(jproject.getSourcePath());
         if (sourceFiles.size() > 0) {
             String[] paths = new String[sourceFiles.size()];
             String[] encodings = new String[sourceFiles.size()];
@@ -198,14 +257,14 @@ public class ModelBuilderBatch extends ModelBuilder {
                 } catch (IOException e) { /* empty */ }
             }
             
-            parse(paths, encodings, sources, charsets);
-            collectInfo();
+            parse(jproject, paths, encodings, sources, charsets);
+            collectInfo(jproject);
         } else {
-            System.err.println("Found no Java source files in " + currentProject.getPath());
+            System.err.println("Found no Java source files in " + jproject.getPath());
         }
     }
     
-    private void parse(String[] paths, String[] encodings, Map<String, String> sources, Map<String, String> charsets) {
+    private void parse(JavaProject jproject, String[] paths, String[] encodings, Map<String, String> sources, Map<String, String> charsets) {
         final int size = paths.length;
         ConsoleProgressMonitor pm = new ConsoleProgressMonitor();
         pm.begin(size);
@@ -213,11 +272,11 @@ public class ModelBuilderBatch extends ModelBuilder {
             private int count = 0;
             
             public void acceptAST(String path, CompilationUnit cu) {
-                JavaFile jfile = new JavaFile(cu, path, sources.get(path), charsets.get(path), currentProject);
+                JavaFile jfile = new JavaFile(cu, path, sources.get(path), charsets.get(path), jproject);
                 JavaASTVisitor visitor = new JavaASTVisitor(jfile);
                 cu.accept(visitor);
                 visitor.terminate();
-                currentProject.addFile(jfile);
+                jproject.addFile(jfile);
                 
                 pm.work(1);
                 count++;
@@ -225,23 +284,23 @@ public class ModelBuilderBatch extends ModelBuilder {
             }
         };
         
-        Logger.getInstance().printMessage("Target = " + currentProject.getPath() + " (" + currentProject.getName() + ")");
+        Logger.getInstance().printMessage("Target = " + jproject.getPath() + " (" + jproject.getName() + ")");
         
         Logger.getInstance().printMessage("** Ready to parse " + size + " files");
         ASTParser parser = getParser();
-        parser.setEnvironment(currentProject.getClassPath(), null, null, true);
+        parser.setEnvironment(jproject.getClassPath(), null, null, true);
         parser.createASTs(paths, encodings, new String[]{ }, requestor, null);
         pm.done();
     }
     
-    public void collectInfo() {
-        int size = currentProject.getClasses().size();
+    public void collectInfo(JavaProject jproject) {
+        int size = jproject.getClasses().size();
         Logger.getInstance().printMessage("** Ready to build java models of " + size + " classes");
         ConsoleProgressMonitor pm = new ConsoleProgressMonitor();
         pm.begin(size);
         int count = 0;
-        for (JavaClass jclass : currentProject.getClasses()) {
-            currentProject.collectInfo(jclass);
+        for (JavaClass jclass : jproject.getClasses()) {
+            jproject.collectInfo(jclass);
             
             pm.work(1);
             count++;
@@ -250,7 +309,7 @@ public class ModelBuilderBatch extends ModelBuilder {
         pm.done();
     }
     
-    static List<File> collectAllJavaFiles(String[] paths) {
+    public static List<File> collectAllJavaFiles(String[] paths) {
         List<File> files = new ArrayList<File>();
         for (String path : paths) {
             files.addAll(collectAllJavaFiles(path));
@@ -258,7 +317,7 @@ public class ModelBuilderBatch extends ModelBuilder {
         return files;
     }
     
-    static List<File> collectAllJavaFiles(String path) {
+    public static List<File> collectAllJavaFiles(String path) {
         List<File> files = new ArrayList<File>();
         File res = new File(path);
         if (res.isFile()) {
@@ -288,15 +347,16 @@ public class ModelBuilderBatch extends ModelBuilder {
     }
     
     @Override
-    public void resisterBytecodeClasses(BytecodeClassStore bytecodeClassStore) {
-        int size = bytecodeClassStore.getBytecodeClassNames().size();
-        Logger.getInstance().printMessage("** Ready to build java models of " + size + " bytecode-classes");
+    public void resisterBytecodeClasses(JavaProject jproject) {
+        Set<String> names = bytecodeClassStore.createBytecodeClassStore(jproject);
+        Logger.getInstance().printMessage("** Ready to build java models of " + names.size() + " bytecode-classes");
         ConsoleProgressMonitor pm = new ConsoleProgressMonitor();
-        pm.begin(size);
-        for (String className : bytecodeClassStore.getBytecodeClassNames()) {
-            bytecodeClassStore.registerBytecodeClass(className);
+        pm.begin(names.size());
+        for (String className : names) {
+            bytecodeClassStore.registerBytecodeClass(jproject, className);
             pm.work(1);
         }
         pm.done();
+        bytecodeClassStore.collectBytecodeClassInfo(jproject);
     }
 }

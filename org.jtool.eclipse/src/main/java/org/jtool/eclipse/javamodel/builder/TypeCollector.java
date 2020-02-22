@@ -97,7 +97,7 @@ public class TypeCollector extends ASTVisitor {
     public boolean visit(SimpleType node) {
         ITypeBinding tbinding = node.resolveBinding();
         if (tbinding != null) {
-            JavaClass jc = JavaElement.findDeclaringClass(tbinding);
+            JavaClass jc = JavaElement.findDeclaringClass(jclass.getJavaProject(), tbinding);
             jclass.addUsedClass(jc);
         }
         return false;
@@ -127,7 +127,7 @@ public class TypeCollector extends ASTVisitor {
     public boolean visit(ParameterizedType node) {
         ITypeBinding tbinding = node.resolveBinding();
         if (tbinding != null) {
-            JavaClass jc = JavaElement.findDeclaringClass(tbinding);
+            JavaClass jc = JavaElement.findDeclaringClass(jclass.getJavaProject(), tbinding);
             if (jc != null) {
                 jclass.addUsedClass(jc);
                 for (ITypeBinding b : tbinding.getTypeArguments()) {
@@ -144,15 +144,16 @@ public class TypeCollector extends ASTVisitor {
     
     private void collectUsedClasses(JavaClass jc, ITypeBinding tbinding) {
         if (tbinding.isRawType()) {
-            JavaClass jc2 = JavaElement.findDeclaringClass(tbinding);
+            JavaClass jc2 = JavaElement.findDeclaringClass(jclass.getJavaProject(), tbinding);
             if (jc2 != null) {
                 jc.addUsedClass(jc2);
             } else {
                 bindingOk = false;
                 Logger.getInstance().printUnresolvedError(tbinding.getQualifiedName());
             }
+            
         } else if (tbinding.isParameterizedType()) {
-            JavaClass jc2 = JavaElement.findDeclaringClass(tbinding);
+            JavaClass jc2 = JavaElement.findDeclaringClass(jclass.getJavaProject(), tbinding);
             if (jc2 != null) {
                 jc.addUsedClass(jc2);
                 for (ITypeBinding b : tbinding.getTypeArguments()) {
@@ -165,7 +166,7 @@ public class TypeCollector extends ASTVisitor {
         } else if (tbinding.isWildcardType()) {
             ITypeBinding b = tbinding.getBound();
             if (b != null && b.isRawType()) {
-                JavaClass jc2 = JavaElement.findDeclaringClass(tbinding.getBound());
+                JavaClass jc2 = JavaElement.findDeclaringClass(jclass.getJavaProject(), tbinding.getBound());
                 if (jc2 != null) {
                     jc.addUsedClass(jc2);
                 } else {

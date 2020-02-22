@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -14,12 +14,10 @@ import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.cfg.CCFG;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CallGraph;
-import org.jtool.eclipse.cfg.builder.CFGStore;
 import org.jtool.eclipse.cfg.builder.CallGraphBuilder;
 import org.jtool.eclipse.pdg.ClDG;
 import org.jtool.eclipse.pdg.PDG;
 import org.jtool.eclipse.pdg.SDG;
-import org.jtool.eclipse.pdg.builder.PDGStore;
 import org.jtool.eclipse.util.Logger;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.compiler.IProblem;
@@ -37,30 +35,22 @@ import java.util.HashSet;
  */
 public abstract class ModelBuilder {
     
-    protected JavaProject currentProject;
-    protected CFGStore cfgStore;
-    protected PDGStore pdgStore;
-    
     protected boolean analyzingBytecode;
+    protected BytecodeClassStore bytecodeClassStore;
+    
+    protected ModelBuilder(boolean analyzingBytecode) {
+        this.analyzingBytecode = analyzingBytecode;
+        bytecodeClassStore = new BytecodeClassStore();
+    }
     
     public abstract boolean isUnderPlugin();
     
-    protected ModelBuilder(boolean analyzingBytecode) {
-        cfgStore = new CFGStore();
-        pdgStore = new PDGStore(cfgStore);
-        this.analyzingBytecode = analyzingBytecode;
-    }
+    public abstract void update(JavaProject jproject);
     
-    public JavaProject getCurrentProject() {
-        return currentProject;
-    }
+    public abstract void resisterBytecodeClasses(JavaProject jproject);
     
-    public CFGStore getCFGStore() {
-        return cfgStore;
-    }
-    
-    public PDGStore getPDGStore() {
-        return pdgStore;
+    public BytecodeClassStore getBytecodeClassStore() {
+        return bytecodeClassStore;
     }
     
     public void setAnalyzingBytecode(boolean analyzingBytecode) {
@@ -72,12 +62,7 @@ public abstract class ModelBuilder {
     }
     
     public void unbuild() {
-        cfgStore.destroy();
-        pdgStore.destroy();
-        if (currentProject != null) {
-            ProjectStore.getInstance().removeProject(currentProject.getPath());
-            currentProject.clear();
-        }
+        ProjectStore.getInstance().clear();
     }
     
     public JavaFile copyJavaFile(JavaFile jfile) {
@@ -210,156 +195,172 @@ public abstract class ModelBuilder {
         }
     }
     
-    public CFG findCFG(String fqn) {
-        return cfgStore.findCFG(fqn);
+    public CFG findCFG(JavaProject jproject, String fqn) {
+        return jproject.getCFGStore().findCFG(fqn);
     }
     
-    public CCFG findCCFG(String fqn) {
-        return cfgStore.findCCFG(fqn);
+    public CCFG findCCFG(JavaProject jproject, String fqn) {
+        return jproject.getCFGStore().findCCFG(fqn);
     }
     
     public CFG getCFG(JavaMethod jmethod, boolean force) {
-        return cfgStore.getCFG(jmethod, force);
+        return jmethod.getJavaProject().getCFGStore().getCFG(jmethod, force);
     }
     
     public CFG getCFG(JavaMethod jmethod) {
-        return cfgStore.getCFG(jmethod, false);
+        return jmethod.getJavaProject().getCFGStore().getCFG(jmethod, false);
     }
     
     public CFG getCFG(JavaField jfield, boolean force) {
-        return cfgStore.getCFG(jfield, force);
+        return jfield.getJavaProject().getCFGStore().getCFG(jfield, force);
     }
     
     public CFG getCFG(JavaField jfield) {
-        return cfgStore.getCFG(jfield, false);
+        return jfield.getJavaProject().getCFGStore().getCFG(jfield, false);
     }
     
     public CCFG getCCFG(JavaClass jclass, boolean force) {
-        return cfgStore.getCCFG(jclass, force);
+        return jclass.getJavaProject().getCFGStore().getCCFG(jclass, force);
     }
     
     public CCFG getCCFG(JavaClass jclass) {
-        return cfgStore.getCCFG(jclass, false);
+        return jclass.getJavaProject().getCFGStore().getCCFG(jclass, false);
     }
     
     public CallGraph getCallGraph(JavaProject jproject) {
-        return CallGraphBuilder.getCallGraph(jproject, cfgStore);
+        return CallGraphBuilder.getCallGraph(jproject);
     }
     
     public CallGraph getCallGraph(JavaClass jclass) {
-        return CallGraphBuilder.getCallGraph(jclass, cfgStore);
+        return CallGraphBuilder.getCallGraph(jclass);
     }
     
     public CallGraph getCallGraph(JavaMethod jmethod) {
-        return CallGraphBuilder.getCallGraph(jmethod, cfgStore);
+        return CallGraphBuilder.getCallGraph(jmethod);
     }
     
-    public PDG findPDG(String fqn) {
-        return pdgStore.findPDG(fqn);
+    public PDG findPDG(JavaProject jproject, String fqn) {
+        return jproject.getPDGStore().findPDG(fqn);
     }
     
-    public ClDG findClDG(String fqn) {
-        return pdgStore.findClDG(fqn);
+    public ClDG findClDG(JavaProject jproject, String fqn) {
+        return jproject.getPDGStore().findClDG(fqn);
     }
     
-    public SDG findSDG() {
-        return pdgStore.findSDG();
+    public SDG findSDG(JavaProject jproject) {
+        return jproject.getPDGStore().findSDG();
     }
     
-    public PDG getPDG(CFG cfg, boolean force) {
-        return pdgStore.getPDG(cfg, force);
+    public PDG getPDG(JavaProject jproject, CFG cfg, boolean force) {
+        return jproject.getPDGStore().getPDG(cfg, force);
     }
     
-    public PDG getPDG(CFG cfg) {
-        return pdgStore.getPDG(cfg, false);
+    public PDG getPDG(JavaProject jproject, CFG cfg) {
+        return jproject.getPDGStore().getPDG(cfg, false);
     }
     
     public PDG getPDG(JavaMethod jmethod, boolean force) {
-        return pdgStore.getPDG(jmethod, force);
+        return jmethod.getJavaProject().getPDGStore().getPDG(jmethod, force);
     }
     
     public PDG getPDG(JavaMethod jmethod) {
-        return pdgStore.getPDG(jmethod, false);
+        return jmethod.getJavaProject().getPDGStore().getPDG(jmethod, false);
     }
     
     public PDG getPDG(JavaField jfield, boolean force) {
-        return pdgStore.getPDG(jfield, force);
+        return jfield.getJavaProject().getPDGStore().getPDG(jfield, force);
     }
     
     public PDG getPDG(JavaField jfield) {
-        return pdgStore.getPDG(jfield, false);
+        return jfield.getJavaProject().getPDGStore().getPDG(jfield, false);
     }
     
     public PDG getPDGWithinSDG(JavaMethod jmethod, boolean force) {
-        return pdgStore.getPDGWithinSDG(jmethod, force);
+        return jmethod.getJavaProject().getPDGStore().getPDGWithinSDG(jmethod, force);
     }
     
     public PDG getPDGWithinSDG(JavaMethod jmethod) {
-        return pdgStore.getPDGWithinSDG(jmethod, false);
+        return jmethod.getJavaProject().getPDGStore().getPDGWithinSDG(jmethod, false);
     }
     
     public PDG getPDGWithinSDG(JavaField jfield, boolean force) {
-        return pdgStore.getPDGWithinSDG(jfield, force);
+        return jfield.getJavaProject().getPDGStore().getPDGWithinSDG(jfield, force);
     }
     
     public PDG getPDGWithinSDG(JavaField jfield) {
-        return pdgStore.getPDGWithinSDG(jfield, false);
+        return jfield.getJavaProject().getPDGStore().getPDGWithinSDG(jfield, false);
     }
     
-    public ClDG getClDG(CCFG ccfg, boolean force) {
-        return pdgStore.getClDG(ccfg, force);
+    public ClDG getClDG(JavaProject jproject, CCFG ccfg, boolean force) {
+        return jproject.getPDGStore().getClDG(ccfg, force);
     }
     
-    public ClDG getClDG(CCFG ccfg) {
-        return pdgStore.getClDG(ccfg, false);
+    public ClDG getClDG(JavaProject jproject, CCFG ccfg) {
+        return jproject.getPDGStore().getClDG(ccfg, false);
     }
     
     public ClDG getClDG(JavaClass jclass, boolean force) {
-        return pdgStore.getClDG(jclass, force);
+        return jclass.getJavaProject().getPDGStore().getClDG(jclass, force);
     }
     
     public ClDG getClDG(JavaClass jclass) {
-        return pdgStore.getClDG(jclass, false);
+        return jclass.getJavaProject().getPDGStore().getClDG(jclass, false);
     }
     
     public ClDG getClDGWithinSDG(JavaClass jclass, boolean force) {
-        return pdgStore.getClDGWithinSDG(jclass, force);
+        return jclass.getJavaProject().getPDGStore().getClDGWithinSDG(jclass, force);
     }
     
     public ClDG getClDGWithinSDG(JavaClass jclass) {
-        return pdgStore.getClDGWithinSDG(jclass, false);
+        return jclass.getJavaProject().getPDGStore().getClDGWithinSDG(jclass, false);
     }
     
     public SDG getSDG(JavaClass jclass, boolean force) {
-        return pdgStore.getSDG(jclass, force);
+        return jclass.getJavaProject().getPDGStore().getSDG(jclass, force);
     }
     
     public SDG getSDG(JavaClass jclass) {
-        return pdgStore.getSDG(jclass, false);
+        return jclass.getJavaProject().getPDGStore().getSDG(jclass, false);
     }
     
     public SDG getSDG(Set<JavaClass> classes, boolean force) {
-        return pdgStore.getSDG(classes, force);
+        if (classes.size() > 0) {
+            JavaClass jclass = classes.iterator().next();
+            return jclass.getJavaProject().getPDGStore().getSDG(classes, force);
+        }
+        return new SDG();
     }
     
     public SDG getSDG(Set<JavaClass> classes) {
-        return pdgStore.getSDG(classes, false);
+        if (classes.size() > 0) {
+            JavaClass jclass = classes.iterator().next();
+            return jclass.getJavaProject().getPDGStore().getSDG(classes, false);
+        }
+        return new SDG();
     }
     
-    public SDG getSDG(boolean force) {
-        return pdgStore.getSDG(force);
+    public SDG getSDG(JavaProject jproject, boolean force) {
+        return jproject.getPDGStore().getSDG(force);
     }
     
-    public SDG getSDG() {
-        return pdgStore.getSDG(false);
+    public SDG getSDG(JavaProject jproject) {
+        return jproject.getPDGStore().getSDG(false);
     }
     
     public SDG getSDGForClasses(Set<JavaClass> classes, boolean force) {
-        return pdgStore.getSDGForClasses(classes, force);
+        if (classes.size() > 0) {
+            JavaClass jclass = classes.iterator().next();
+            return jclass.getJavaProject().getPDGStore().getSDGForClasses(classes, force);
+        }
+        return new SDG();
     }
     
     public SDG getSDGForClasses(Set<JavaClass> classes) {
-        return pdgStore.getSDGForClasses(classes, false);
+        if (classes.size() > 0) {
+            JavaClass jclass = classes.iterator().next();
+            return jclass.getJavaProject().getPDGStore().getSDGForClasses(classes, false);
+        }
+        return new SDG();
     }
     
     public void setLogVisible(boolean visible) {
@@ -369,8 +370,4 @@ public abstract class ModelBuilder {
     public boolean isLogVisible() {
         return Logger.getInstance().isVisible();
     }
-    
-    public abstract JavaProject update();
-    
-    public abstract void resisterBytecodeClasses(BytecodeClassStore bytecodeClassStore);
 }

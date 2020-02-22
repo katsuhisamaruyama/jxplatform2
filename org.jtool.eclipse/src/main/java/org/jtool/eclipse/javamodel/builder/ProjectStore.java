@@ -7,9 +7,10 @@
 package org.jtool.eclipse.javamodel.builder;
 
 import org.jtool.eclipse.javamodel.JavaProject;
-
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * An object holds a collection of all projects.
@@ -23,29 +24,10 @@ public class ProjectStore {
     
     private Map<String, JavaProject> projectStore = new HashMap<String, JavaProject>();
     
-    private ModelBuilder modelBuilder;
-    
-    private ProjectStore() {
-    }
+    protected JavaProject currentProject;
     
     public static ProjectStore getInstance() {
         return instance;
-    }
-    
-    public void setModelBuilder(ModelBuilder modelBuilder) {
-        this.modelBuilder = modelBuilder;
-    }
-    
-    public boolean isUnderPlugin(boolean bool) {
-        return modelBuilder.isUnderPlugin();
-    }
-    
-    public JavaProject getCurrentProject() {
-        return modelBuilder.getCurrentProject();
-    }
-    
-    public JavaProject updateCurrentProject() {
-        return modelBuilder.update();
     }
     
     public void clear() {
@@ -88,9 +70,7 @@ public class ProjectStore {
         return projectStore.get(path);
     }
     
-    public BytecodeClassStore registerBytecodeClasses(JavaProject jproject) {
-        BytecodeClassStore bytecodeClassStore = new BytecodeClassStore(jproject);
-        modelBuilder.resisterBytecodeClasses(bytecodeClassStore);
-        return bytecodeClassStore;
+    public List<JavaProject> getProjects() {
+        return new ArrayList<JavaProject>(projectStore.values());
     }
 }

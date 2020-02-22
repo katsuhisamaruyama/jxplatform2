@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -8,6 +8,7 @@ package org.jtool.eclipse.javamodel.builder;
 
 import org.jtool.eclipse.javamodel.JavaElement;
 import org.jtool.eclipse.javamodel.JavaField;
+import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.util.Logger;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
@@ -38,10 +39,13 @@ import java.util.HashSet;
  */
 public class FieldInitializerCollector extends ASTVisitor {
     
+    private JavaProject jproject;
+    
     private Set<JavaField> accessedFields = new HashSet<JavaField>();
     private boolean bindingOk = true;
     
-    public FieldInitializerCollector() {
+    public FieldInitializerCollector(JavaProject jproject) {
+        this.jproject = jproject;
     }
     
     public Set<JavaField> getAccessedFields() {
@@ -75,7 +79,7 @@ public class FieldInitializerCollector extends ASTVisitor {
             if (binding.getKind() == IBinding.VARIABLE) {
                 IVariableBinding vbinding = (IVariableBinding)binding;
                 if (vbinding.isField() || vbinding.isEnumConstant()) {
-                    JavaField jfield = JavaElement.findDeclaringField(vbinding);
+                    JavaField jfield = JavaElement.findDeclaringField(jproject, vbinding);
                     if (jfield != null) {
                         if (!accessedFields.contains(jfield)) {
                             accessedFields.add(jfield);

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -7,6 +7,7 @@
 package org.jtool.eclipse.javamodel.builder;
 
 import org.jtool.eclipse.javamodel.JavaElement;
+import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.util.Logger;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -43,10 +44,13 @@ import java.util.HashSet;
  */
 public class MethodCallCollector extends ASTVisitor {
     
+    private JavaProject jproject;
+    
     private Set<JavaMethod> calledMethods = new HashSet<JavaMethod>();
     private boolean bindingOk = true;
     
-    public MethodCallCollector() {
+    public MethodCallCollector(JavaProject jproject) {
+        this.jproject = jproject;
     }
     
     public Set<JavaMethod> getCalledMethods() {
@@ -103,7 +107,7 @@ public class MethodCallCollector extends ASTVisitor {
                 return;
             }
             
-            JavaMethod jmethod = JavaElement.findDeclaringMethod(mbinding);
+            JavaMethod jmethod = JavaElement.findDeclaringMethod(jproject, mbinding);
             if (jmethod != null) {
                 if (!calledMethods.contains(jmethod)) {
                     calledMethods.add(jmethod);
