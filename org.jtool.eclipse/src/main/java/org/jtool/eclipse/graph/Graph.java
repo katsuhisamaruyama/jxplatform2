@@ -21,6 +21,7 @@ public class Graph<N extends GraphNode, E extends GraphEdge> {
     public Graph() {
         super();
     }
+    
     public void setNodes(Set<N> set) {
         nodes = set;
     }

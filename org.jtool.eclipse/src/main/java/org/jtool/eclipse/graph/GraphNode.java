@@ -27,9 +27,6 @@ public abstract class GraphNode extends GraphElement {
     private Set<GraphNode> srcNodes = new HashSet<GraphNode>();
     private Set<GraphNode> dstNodes = new HashSet<GraphNode>();
     
-    protected GraphNode() {
-    }
-    
     protected GraphNode(long id) {
         this.id = id;
     }

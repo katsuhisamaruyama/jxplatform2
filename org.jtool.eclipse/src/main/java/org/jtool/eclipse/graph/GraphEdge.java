@@ -21,11 +21,7 @@ public abstract class GraphEdge extends GraphElement {
     protected GraphNode src;
     protected GraphNode dst;
     
-    protected GraphEdge() {
-    }
-    
     protected GraphEdge(GraphNode src, GraphNode dst) {
-        this();
         this.src = src;
         this.dst = dst;
         src.addOutgoingEdge(this);

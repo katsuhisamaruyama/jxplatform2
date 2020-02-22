@@ -15,9 +15,6 @@ import java.util.HashSet;
  */
 public abstract class GraphElement {
     
-    protected GraphElement() {
-    }
-    
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof GraphElement) {
