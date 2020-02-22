@@ -6,12 +6,10 @@
 
 buildscript {
   repositories {
-    maven {
-      url 'https://plugins.gradle.org/m2/'
-    }
+    maven { url 'https://plugins.gradle.org/m2/' }
   }
   dependencies {
-    classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+    classpath 'com.github.jengelman.gradle.plugins:shadow:5.2.0'
   }
 }
 
@@ -19,7 +17,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-group = 'com.jtool.eclipse'
+group = 'org.jtool.eclipse'
 
 eclipse {
     classpath {
@@ -46,18 +44,22 @@ targetCompatibility = '1.8'
 
 repositories {
     mavenCentral()
+    maven { url 'https://plugins.gradle.org/m2/' }
+    //maven { url 'https://repo.gradle.org/gradle/libs-releases' }
 }
 
 dependencies {
-    compile 'org.eclipse.jdt:org.eclipse.jdt.core:3.19.+'
+    compile group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.20.+'
     compile group: 'org.apache.maven.shared', name: 'maven-invoker', version: '2.1.+'
     compile group: 'org.apache.maven', name: 'maven-model', version: '3.6.+'
+    //compile group: 'org.gradle', name: 'gradle-tooling-api', version: '6.2'
     compile files('lib/javassist.jar')
     testCompile 'junit:junit:4.+'
 }
 
 compileJava {
     exclude '**/plugin/*'
+    options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
 }
 
 shadowJar {
@@ -67,7 +69,19 @@ shadowJar {
     }
 }
 
-task copyJar(type: Copy) {
+task copyJar(type:Copy) {
     from 'build/libs'
     into 'releases'
+}
+
+task copyDependencies(type:Copy) {
+    new File('lib-gradle').mkdirs()
+    configurations.compile.each {
+        def fromJarFile = it.absolutePath
+        copy { from fromJarFile into 'lib-gradle' }
+    }
+    configurations.testCompile.each {
+        def fromJarFile = it.absolutePath
+        copy { from fromJarFile into 'lib-gradle' }
+    }
 }
