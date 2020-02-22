@@ -418,13 +418,13 @@ public class JavaClass extends JavaElement {
     }
     
     private List<JavaField> sortFields(List<JavaField> list) {
-        return list.stream()
-                .sorted((jf1, jf2) -> jf1.getName().compareTo(jf2.getName())).collect(Collectors.toCollection(ArrayList::new));
+        return list.stream().sorted((jf1, jf2) -> jf1.getName().compareTo(jf2.getName()))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
     
     private List<JavaMethod> sortMethods(List<JavaMethod> list) {
-        return list.stream()
-                .sorted((jm1, jm2) -> jm1.getName().compareTo(jm2.getName())).collect(Collectors.toCollection(ArrayList::new));
+        return list.stream().sorted((jm1, jm2) -> jm1.getName().compareTo(jm2.getName()))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
     
     protected boolean resolved = false;

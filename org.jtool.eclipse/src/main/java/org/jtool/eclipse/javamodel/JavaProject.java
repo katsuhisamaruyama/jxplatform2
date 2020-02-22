@@ -12,6 +12,7 @@ import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import org.jtool.eclipse.cfg.builder.CFGStore;
 import org.jtool.eclipse.pdg.builder.PDGStore;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
@@ -305,23 +306,13 @@ public class JavaProject {
         return jfiles;
     }
     
-    private List<JavaPackage> sortPackages(Collection<? extends JavaPackage> co) {
-        List<JavaPackage> jpackages = new ArrayList<JavaPackage>(co);
-        Collections.sort(jpackages, new Comparator<JavaPackage>() {
-            public int compare(JavaPackage jp1, JavaPackage jp2) {
-                return jp1.getName().compareTo(jp2.getName());
-            }
-        });
-        return jpackages;
+    private List<JavaPackage> sortPackages(Collection<? extends JavaPackage> collection) {
+        return collection.stream().sorted((jp1, jp2) -> jp1.getName().compareTo(jp2.getName()))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
     
-    private List<JavaClass> sortClasses(Collection<? extends JavaClass> co) {
-        List<JavaClass> jclasses = new ArrayList<JavaClass>(co);
-        Collections.sort(jclasses, new Comparator<JavaClass>() {
-            public int compare(JavaClass jc1, JavaClass jc2) {
-                return jc1.getQualifiedName().compareTo(jc2.getQualifiedName());
-            }
-        });
-        return jclasses;
+    private List<JavaClass> sortClasses(Collection<? extends JavaClass> collection) {
+        return collection.stream().sorted((jc1, jc2) -> jc1.getQualifiedName().compareTo(jc2.getQualifiedName()))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 }
