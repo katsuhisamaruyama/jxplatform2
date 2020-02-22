@@ -20,9 +20,6 @@ public abstract class CFGEntry extends CFGNode {
     private String fqn;
     private CommonCFG cfg = null;
     
-    protected CFGEntry() {
-    }
-    
     protected CFGEntry(ASTNode node, CFGNode.Kind kind, String name, String signature, String fqn) {
         super(node, kind);
         this.name = name;
