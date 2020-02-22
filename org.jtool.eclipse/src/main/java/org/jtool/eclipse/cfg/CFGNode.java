@@ -92,10 +92,9 @@ public class CFGNode extends GraphNode {
         dummy;                      // CFGDummy (for dummy)
     }
     
-    public CFGNode() {
-    }
-    
     public CFGNode(ASTNode node, Kind kind) {
+        super(0);
+        
         this.astNode = node;
         this.kind = kind;
         
