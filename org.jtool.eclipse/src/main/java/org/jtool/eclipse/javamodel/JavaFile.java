@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -31,9 +31,6 @@ public class JavaFile {
     protected Set<JavaClass> classes = new HashSet<JavaClass>();
     
     protected List<ASTNode> imports = new ArrayList<ASTNode>();
-    
-    protected JavaFile() {
-    }
     
     public JavaFile(CompilationUnit cu, String path, String code, String charset, JavaProject jproject) {
         this.compilationUnit = cu;
@@ -109,17 +106,11 @@ public class JavaFile {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof JavaFile) {
-            return equals((JavaFile)obj);
-        }
-        return false;
+        return (obj instanceof JavaFile) ? equals((JavaFile)obj) : false;
     }
     
     public boolean equals(JavaFile jfile) {
-        if (jfile == null) {
-            return false;
-        }
-        return this == jfile || path.equals(jfile.path);
+        return jfile != null && (this == jfile || path.equals(jfile.path));
     }
     
     @Override

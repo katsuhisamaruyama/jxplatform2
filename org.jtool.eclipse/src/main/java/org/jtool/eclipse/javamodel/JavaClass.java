@@ -20,8 +20,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.stream.Collectors;
 
 /**
  * An object representing a class, an interface, an enum, or a lambda expression.
@@ -53,9 +52,6 @@ public class JavaClass extends JavaElement {
     protected List<JavaField> fields = new ArrayList<JavaField>();
     protected List<JavaMethod> methods = new ArrayList<JavaMethod>();
     protected List<JavaClass> innerClasses = new ArrayList<JavaClass>();
-    
-    protected JavaClass() {
-    }
     
     public JavaClass(TypeDeclaration node, JavaFile jfile) {
         this(node, node.resolveBinding(), jfile);
@@ -328,12 +324,7 @@ public class JavaClass extends JavaElement {
     }
     
     public JavaField getField(String name) {
-        for (JavaField jf : fields) {
-            if (jf.getName().equals(name)) {
-                return jf;
-            }
-        }
-        return null;
+        return fields.stream().filter(jf -> jf.getName().equals(name)).findFirst().orElse(null);
     }
     
     public List<JavaField> getFields() {
@@ -351,12 +342,7 @@ public class JavaClass extends JavaElement {
     }
     
     public JavaMethod getMethod(String sig) {
-        for (JavaMethod jm : methods) {
-            if (jm.getSignature().equals(sig)) {
-                return jm;
-            }
-        }
-        return null;
+        return methods.stream().filter(jm -> jm.getSignature().equals(sig)).findFirst().orElse(null);
     }
     
     public JavaMethod getInitializer() {
@@ -383,17 +369,11 @@ public class JavaClass extends JavaElement {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof JavaClass) {
-            return equals((JavaClass)obj);
-        }
-        return false;
+        return (obj instanceof JavaClass) ? equals((JavaClass)obj) : false;
     }
     
     public boolean equals(JavaClass jclass) {
-        if (jclass == null) {
-            return false;
-        }
-        return this == jclass || fqn.equals(jclass.fqn);
+        return jclass != null && (this == jclass || fqn.equals(jclass.fqn));
     }
     
     @Override
@@ -426,48 +406,25 @@ public class JavaClass extends JavaElement {
     }
     
     protected String getFieldInfo() {
-        StringBuilder buf = new StringBuilder();
-        for (JavaField jf : getFields()) {
-            buf.append(jf.toString());
-        }
-        return buf.toString();
+        return getFields().stream().map(jf -> jf.toString()).collect(Collectors.joining());
     }
     
     protected String getMethodInfo() {
-        StringBuilder buf = new StringBuilder();
-        for (JavaMethod jm : getMethods()) {
-            buf.append(jm.toString());
-        }
-        
-        return buf.toString();
+        return getMethods().stream().map(jm -> jm.toString()).collect(Collectors.joining());
     }
     
     public String getInnerClassInfo() {
-        StringBuilder buf = new StringBuilder();
-        for (JavaClass jt : getInnerClasses()) {
-            buf.append(jt.toString());
-        }
-        return buf.toString();
+        return getInnerClasses().stream().map(jc -> jc.toString()).collect(Collectors.joining());
     }
     
     private List<JavaField> sortFields(List<JavaField> list) {
-        List<JavaField> fs = new ArrayList<JavaField>(list);
-        Collections.sort(fs, new Comparator<JavaField>() {
-            public int compare(JavaField jf1, JavaField jf2) {
-                return jf1.getName().compareTo(jf2.getName());
-            }
-        });
-        return fs;
+        return list.stream()
+                .sorted((jf1, jf2) -> jf1.getName().compareTo(jf2.getName())).collect(Collectors.toCollection(ArrayList::new));
     }
     
     private List<JavaMethod> sortMethods(List<JavaMethod> list) {
-        List<JavaMethod> ms = new ArrayList<JavaMethod>(list);
-        Collections.sort(ms, new Comparator<JavaMethod>() {
-            public int compare(JavaMethod jm1, JavaMethod jm2) {
-                return jm1.getName().compareTo(jm2.getName());
-            }
-        });
-        return ms;
+        return list.stream()
+                .sorted((jm1, jm2) -> jm1.getName().compareTo(jm2.getName())).collect(Collectors.toCollection(ArrayList::new));
     }
     
     protected boolean resolved = false;
@@ -535,6 +492,7 @@ public class JavaClass extends JavaElement {
                         }
                     }
                 }
+                
             } else {
                 JavaClass jclass = findDeclaringClass(getJavaProject(), binding);
                 if (jclass != null) {
@@ -641,13 +599,9 @@ public class JavaClass extends JavaElement {
     
     public List<JavaClass> getChildren() {
         collectInfo();
-        List<JavaClass> jclasses = new ArrayList<JavaClass>(); 
-        for (JavaClass jclass : jfile.getProject().getClasses()) {
-            if (jclass.isChildOf(this)) {
-                jclasses.add(jclass);
-            }
-        }
-        return jclasses;
+        
+        return jfile.getProject().getClasses().stream()
+                .filter(jc -> jc.isChildOf(this)).collect(Collectors.toCollection(ArrayList::new));
     }
     
     public boolean isChildOf(JavaClass jclass) {
@@ -655,12 +609,7 @@ public class JavaClass extends JavaElement {
         if (superClass != null && superClass.getQualifiedName().equals(jclass.getQualifiedName())) {
             return true;
         }
-        for (JavaClass jc : superInterfaces) {
-            if (jc.getQualifiedName().equals(jc.getQualifiedName())) {
-                return true;
-            }
-        }
-        return false;
+        return superInterfaces.stream().anyMatch(jc -> jc.getQualifiedName().equals(jclass.getQualifiedName()));
     }
     
     public List<JavaClass> getAllSuperClasses() {
@@ -721,13 +670,7 @@ public class JavaClass extends JavaElement {
     }
     
     public Set<JavaClass> getAfferentClassesInProject() {
-        Set<JavaClass> jclasses = new HashSet<JavaClass>();
-        for (JavaClass jclass : afferentClasses) {
-            if (jclass.isInProject()) {
-                jclasses.add(jclass);
-            }
-        }
-        return jclasses;
+        return afferentClasses.stream().filter(jc -> jc.isInProject()).collect(Collectors.toCollection(HashSet::new));
     }
     
     public Set<JavaClass> getEfferentClasses() {
@@ -735,12 +678,6 @@ public class JavaClass extends JavaElement {
     }
     
     public Set<JavaClass> getEfferentClassesInProject() {
-        Set<JavaClass> jclasses = new HashSet<JavaClass>();
-        for (JavaClass jclass : efferentClasses) {
-            if (jclass.isInProject()) {
-                jclasses.add(jclass);
-            }
-        }
-        return jclasses;
+        return efferentClasses.stream().filter(jc -> jc.isInProject()).collect(Collectors.toCollection(HashSet::new));
     }
 }

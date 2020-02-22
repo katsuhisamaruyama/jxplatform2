@@ -24,9 +24,6 @@ public class JavaPackage extends JavaElement {
     
     private static final String DEFAUL_PACKAGE_NAME = "(default)";
     
-    protected JavaPackage() {
-    }
-    
     private JavaPackage(PackageDeclaration node, JavaFile jfile, String name) {
         super(node, jfile);
         this.name = name;
@@ -92,17 +89,11 @@ public class JavaPackage extends JavaElement {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof JavaPackage) {
-            return equals((JavaPackage)obj);
-        }
-        return false;
+        return (obj instanceof JavaPackage) ? equals((JavaPackage)obj) : false;
     }
     
     public boolean equals(JavaPackage jpackage) {
-        if (jpackage == null) {
-            return false;
-        }
-        return this == jpackage || name.equals(jpackage.name); 
+        return jpackage != null && (this == jpackage || name.equals(jpackage.name)); 
     }
     
     @Override

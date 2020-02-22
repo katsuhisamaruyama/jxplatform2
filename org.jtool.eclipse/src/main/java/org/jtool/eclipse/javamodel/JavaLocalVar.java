@@ -21,9 +21,6 @@ public class JavaLocalVar extends JavaVariable {
     protected IVariableBinding binding;
     protected long variableId;
     
-    protected JavaLocalVar() {
-    }
-    
     public JavaLocalVar(VariableDeclaration node, JavaMethod jmethod) {
         this(node, node.resolveBinding().getVariableDeclaration(), jmethod);
     }
@@ -94,18 +91,12 @@ public class JavaLocalVar extends JavaVariable {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof JavaLocalVar) {
-            return equals((JavaLocalVar)obj);
-        }
-        return false;
+        return (obj instanceof JavaLocalVar) ? equals((JavaLocalVar)obj) : false;
     }
     
     public boolean equals(JavaLocalVar jlocal) {
-        if (jlocal == null || declaringMethod == null) {
-            return false;
-        }
-        return this == jlocal ||
-                (declaringMethod.equals(jlocal.declaringMethod) && name.equals(jlocal.name) && variableId == jlocal.variableId);
+        return jlocal != null && declaringMethod != null &&
+                (this == jlocal || (declaringMethod.equals(jlocal.declaringMethod) && name.equals(jlocal.name) && variableId == jlocal.variableId));
     }
     
     @Override

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 /**
  * An object representing a method, a constructor, or an initializer.
@@ -58,9 +59,6 @@ public class JavaMethod extends JavaElement {
     protected JavaLocalVar returnVariable = null;
     
     protected Map<String, Type> exceptionTypes = new HashMap<String, Type>();
-    
-    protected JavaMethod() {
-    }
     
     protected JavaMethod(JavaFile jfile) {
         super(null, jfile);
@@ -104,6 +102,11 @@ public class JavaMethod extends JavaElement {
             signature = ".UNKNOWN";
             fqn = ".UNKNOWN";
             kind = JavaMethod.Kind.UNKNOWN;
+            
+            if (returnType == null) {
+                System.err.println("NULL RETURN TYPE = " + node.getName());
+                System.err.println(node.getParent());
+            }
         }
         
         jclass.addMethod(this);
@@ -256,19 +259,19 @@ public class JavaMethod extends JavaElement {
     }
     
     public boolean isMethod() {
-        return kind == Kind.J_METHOD;
+        return kind == JavaMethod.Kind.J_METHOD;
     }
     
     public boolean isConstructor() {
-        return kind == Kind.J_CONSTRUCTOR;
+        return kind == JavaMethod.Kind.J_CONSTRUCTOR;
     }
     
     public boolean isInitializer() {
-        return kind == Kind.J_INITIALIZER;
+        return kind == JavaMethod.Kind.J_INITIALIZER;
     }
     
     public boolean isLambda() {
-        return kind == Kind.J_LAMBDA;
+        return kind == JavaMethod.Kind.J_LAMBDA;
     }
     
     public JavaClass getDeclaringClass() {
@@ -321,18 +324,12 @@ public class JavaMethod extends JavaElement {
     }
     
     public JavaLocalVar getParameter(int index) {
-        if (index >= 0 && index < parameters.size()) {
-            return parameters.get(index);
-        }
-        return null;
+        return (index >= 0 && index < parameters.size()) ? parameters.get(index) : null;
     }
     
     public JavaLocalVar getParameter(String name) {
         int index = getParameterOrdinal(name);
-        if (index != -1) {
-            return getParameter(index);
-        }
-        return null;
+        return (index != -1) ? getParameter(index) : null;
     }
     
     public int getParameterOrdinal(String name) {
@@ -350,12 +347,8 @@ public class JavaMethod extends JavaElement {
     }
     
     public JavaLocalVar getLocal(String name, int id) {
-        for (JavaLocalVar jlocal : localDecls) {
-            if (name.equals(jlocal.getName()) && id == jlocal.getVariableId()) {
-                return jlocal;
-            }
-        }
-        return null;
+        return localDecls.stream()
+                .filter(jl -> name.equals(jl.getName()) && id == jl.getVariableId()).findFirst().orElse(null);
     }
     
     public Map<String, Type> getExceptionTypeNodes() {
@@ -420,17 +413,11 @@ public class JavaMethod extends JavaElement {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof JavaMethod) {
-            return equals((JavaMethod)obj);
-        }
-        return false;
+        return (obj instanceof JavaMethod) ? equals((JavaMethod)obj) : false;
     }
     
     public boolean equals(JavaMethod jmethod) {
-        if (jmethod == null) {
-            return false;
-        }
-        return this == jmethod || fqn.equals(jmethod.fqn);
+        return jmethod != null && (this == jmethod || fqn.equals(jmethod.fqn));
     }
     
     @Override
@@ -518,7 +505,7 @@ public class JavaMethod extends JavaElement {
                 break;
             }
             
-            JavaClass jc = findDeclaringClass(tbinding);
+            JavaClass jc = findDeclaringClass(getJavaProject(), tbinding);
             if (jc != null) {
                 exceptions.add(jc);
             } else {
@@ -530,7 +517,7 @@ public class JavaMethod extends JavaElement {
     }
     
     private boolean findCalledMethods() {
-        MethodCallCollector visitor = new MethodCallCollector();
+        MethodCallCollector visitor = new MethodCallCollector(getJavaProject());
         astNode.accept(visitor);
         if (visitor.isBindingOk()) {
             calledMethods.addAll(visitor.getCalledMethods());
@@ -547,7 +534,7 @@ public class JavaMethod extends JavaElement {
     }
     
     private boolean findAccessedFields() {
-        FieldAccessCollector visitor = new FieldAccessCollector();
+        FieldAccessCollector visitor = new FieldAccessCollector(getJavaProject());
         astNode.accept(visitor);
         if (visitor.isBindingOk()) {
             accessedFields.addAll(visitor.getAccessedFields());
@@ -575,13 +562,7 @@ public class JavaMethod extends JavaElement {
     
     public Set<JavaMethod> getCalledMethodsInProject() {
         collectInfo();
-        Set<JavaMethod> methods = new HashSet<JavaMethod>();
-        for (JavaMethod jm : calledMethods) {
-            if (jm.isInProject()) {
-                methods.add(jm);
-            }
-        }
-        return methods;
+        return calledMethods.stream().filter(jm -> jm.isInProject()).collect(Collectors.toCollection(HashSet::new));
     }
     
     public Set<JavaMethod> getAllCalledMethods() {
@@ -608,13 +589,7 @@ public class JavaMethod extends JavaElement {
     
     public Set<JavaMethod> getCallingMethodsInProject() {
         collectInfo();
-        Set<JavaMethod> methods = new HashSet<JavaMethod>();
-        for (JavaMethod jm : callingMethods) {
-            if (jm.isInProject()) {
-                methods.add(jm);
-            }
-        }
-        return methods;
+        return callingMethods.stream().filter(jm -> jm.isInProject()).collect(Collectors.toCollection(HashSet::new));
     }
     
     public Set<JavaField> getAccessedFields() {
@@ -624,13 +599,7 @@ public class JavaMethod extends JavaElement {
     
     public Set<JavaField> getAccessedFieldsInProject() {
         collectInfo();
-        Set<JavaField> fields = new HashSet<JavaField>();
-        for (JavaField jf : accessedFields) {
-            if (jf.isInProject()) {
-                fields.add(jf);
-            }
-        }
-        return fields;
+        return accessedFields.stream().filter(jf -> jf.isInProject()).collect(Collectors.toCollection(HashSet::new));
     }
     
     public Set<JavaField> getAccessingFields() {
@@ -640,13 +609,7 @@ public class JavaMethod extends JavaElement {
     
     public Set<JavaField> getAccessingFieldsInProject() {
         collectInfo();
-        Set<JavaField> fields = new HashSet<JavaField>();
-        for (JavaField jf : accessingFields) {
-            if (jf.isInProject()) {
-                fields.add(jf);
-            }
-        }
-        return fields;
+        return accessingFields.stream().filter(jf -> jf.isInProject()).collect(Collectors.toCollection(HashSet::new));
     }
     
     public Set<JavaMethod> getOverriddenMethods() {

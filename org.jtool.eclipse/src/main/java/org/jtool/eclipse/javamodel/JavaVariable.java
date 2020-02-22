@@ -31,9 +31,6 @@ public class JavaVariable extends JavaElement {
     protected JavaClass declaringClass =  null;
     protected JavaMethod declaringMethod = null;
     
-    protected JavaVariable() {
-    }
-    
     protected JavaVariable(ASTNode node, JavaFile jfile) {
         super(node, jfile);
     }

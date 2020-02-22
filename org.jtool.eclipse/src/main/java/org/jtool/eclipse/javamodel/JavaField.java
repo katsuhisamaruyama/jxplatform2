@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  * An object representing a field.
@@ -27,9 +28,6 @@ public class JavaField extends JavaVariable {
     protected IVariableBinding binding;
     
     protected boolean inProject;
-    
-    protected JavaField() {
-    }
     
     public JavaField(VariableDeclaration node, JavaClass jclass) {
         this(node, node.resolveBinding(), jclass);
@@ -103,17 +101,11 @@ public class JavaField extends JavaVariable {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof JavaField) {
-            return equals((JavaField)obj);
-        }
-        return false;
+        return (obj instanceof JavaField) ? equals((JavaField)obj) : false;
     }
     
     public boolean equals(JavaField jfield) {
-        if (jfield == null) {
-            return false;
-        }
-        return this == jfield || fqn.equals(jfield.fqn);
+        return jfield != null && (this == jfield || fqn.equals(jfield.fqn));
     }
     
     @Override
@@ -162,7 +154,7 @@ public class JavaField extends JavaVariable {
     }
     
     private boolean findCalledMethods() {
-        MethodCallCollector visitor = new MethodCallCollector();
+        MethodCallCollector visitor = new MethodCallCollector(getJavaProject());
         astNode.accept(visitor);
         if (visitor.isBindingOk()) {
             calledMethods.addAll(visitor.getCalledMethods());
@@ -179,7 +171,7 @@ public class JavaField extends JavaVariable {
     }
     
     private boolean findAccessedFields() {
-        FieldInitializerCollector visitor = new FieldInitializerCollector();
+        FieldInitializerCollector visitor = new FieldInitializerCollector(getJavaProject());
         astNode.accept(visitor);
         if (visitor.isBindingOk()) {
             accessedFields.addAll(visitor.getAccessedFields());
@@ -207,24 +199,12 @@ public class JavaField extends JavaVariable {
     
     public Set<JavaField> getAccessedFieldsInProject() {
         collectInfo();
-        Set<JavaField> jfields = new HashSet<JavaField>();
-        for (JavaField jf : accessedFields) {
-            if (jf.isInProject()) {
-                jfields.add(jf);
-            }
-        }
-        return jfields;
+        return accessedFields.stream().filter(jf -> jf.isInProject()).collect(Collectors.toCollection(HashSet::new));
     }
     
     public Set<JavaField> getAccessingFieldsInProject() {
         collectInfo();
-        Set<JavaField> jfields = new HashSet<JavaField>();
-        for (JavaField jf : accessingFields) {
-            if (jf.isInProject()) {
-                jfields.add(jf);
-            }
-        }
-        return jfields;
+        return accessingFields.stream().filter(jf -> jf.isInProject()).collect(Collectors.toCollection(HashSet::new));
     }
     
     public Set<JavaMethod> getCalledMethods() {
@@ -239,23 +219,11 @@ public class JavaField extends JavaVariable {
     
     public Set<JavaMethod> getCalledMethodsInProject() {
         collectInfo();
-        Set<JavaMethod> jmethods = new HashSet<JavaMethod>();
-        for (JavaMethod jm : calledMethods) {
-            if (jm.isInProject()) {
-                jmethods.add(jm);
-            }
-        }
-        return jmethods;
+        return calledMethods.stream().filter(jm -> jm.isInProject()).collect(Collectors.toCollection(HashSet::new));
     }
     
     public Set<JavaMethod> getAccessingMethodsInProject() {
         collectInfo();
-        Set<JavaMethod> jmethods = new HashSet<JavaMethod>();
-        for (JavaMethod jm : accessingMethods) {
-            if (jm.isInProject()) {
-                jmethods.add(jm);
-            }
-        }
-        return jmethods;
+        return accessingMethods.stream().filter(jm -> jm.isInProject()).collect(Collectors.toCollection(HashSet::new));
     }
 }
