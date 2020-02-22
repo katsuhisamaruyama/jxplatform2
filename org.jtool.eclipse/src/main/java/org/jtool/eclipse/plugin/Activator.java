@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -23,9 +23,6 @@ public class Activator extends AbstractUIPlugin implements IStartup {
     public static final String PLUGIN_ID = "org.jtool.eclipse";
     
     private static Activator plugin;
-    
-    public Activator() {
-    }
     
     @Override
     public void earlyStartup() {
