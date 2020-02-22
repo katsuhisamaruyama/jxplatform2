@@ -262,6 +262,7 @@ public class Slice {
         
         CommonCFG cfg = criterion.getPDG().getCFG();
         cfg.backwardReachableNodes(node.getCFGNode(), true, new StopConditionOnReachablePath() {
+            
             @Override
             public boolean isStop(CFGNode node) {
                 if (node.hasDefVariable()) {
