@@ -27,9 +27,6 @@ public class Logger {
     
     private boolean visible = true;
     
-    private Logger() {
-    }
-    
     public static Logger getInstance() {
         return instance;
     }
@@ -93,6 +90,7 @@ public class Logger {
             buf.append(mesg);
             buf.append("\n");
         }
+        
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(new File(logfile), true));
             writer.append(buf.toString());

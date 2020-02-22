@@ -17,9 +17,6 @@ public class ConsoleProgressMonitor {
     private int num;
     private int count;
     
-    public ConsoleProgressMonitor() {
-    }
-    
     public void begin(int size) {
         this.size = size;
         this.count = 0;
