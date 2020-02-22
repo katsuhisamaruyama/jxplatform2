@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -129,6 +129,7 @@ public class CDFinder {
         vars.addAll(cfgnode.getUseVariables());
         for (JReference jv : vars) {
             cfg.backwardReachableNodes(cfgnode, true, new StopConditionOnReachablePath() {
+                
                 @Override
                 public boolean isStop(CFGNode node) {
                     if (node.isLocalDeclaration()) {
