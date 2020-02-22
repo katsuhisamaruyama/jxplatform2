@@ -106,9 +106,6 @@ public class CodeGenerator {
         return code;
     }
     
-    /**
-     * Collects block- and line-comments related to a given set of AST nodes.
-     */
     class CommentVisitor extends ASTVisitor {
         
         private CompilationUnit compilationUnit;
@@ -175,9 +172,6 @@ public class CodeGenerator {
         }
     }
     
-    /**
-     * Restores Java source code from an AST.
-     */
     class CodeRestrationVisitor extends NaiveASTFlattener {
         
         private String contents;
