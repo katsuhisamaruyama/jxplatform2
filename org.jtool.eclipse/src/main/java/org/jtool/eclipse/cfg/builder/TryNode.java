@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -27,9 +27,6 @@ class TryNode extends CFGStatement {
     
     private List<CFGCatch> catchNodes = new ArrayList<CFGCatch>();
     private CFGStatement finallyNode;
-    
-    TryNode() {
-    }
     
     TryNode(ASTNode node, Kind kind) {
         super(node, kind);

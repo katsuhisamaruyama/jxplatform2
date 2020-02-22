@@ -111,9 +111,6 @@ class BytecodeCacheManager {
 
 class CacheExporter {
     
-    CacheExporter() {
-    }
-    
     Document getDocument(JavaProject jproject, List<JClass> classes) {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();

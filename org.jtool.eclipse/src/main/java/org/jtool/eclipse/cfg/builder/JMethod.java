@@ -48,6 +48,7 @@ abstract class JMethod extends JElement {
         this.isPrimitive = isPrimitive;
     }
     
+    @Override
     protected void cache() {
         cacheData = new HashMap<String, String>();
         cacheData.put(FqnAttr, fqn);
@@ -202,19 +203,13 @@ abstract class JMethod extends JElement {
     protected void findDefUseFieldsInAccessedMethods(Set<JMethod> visited, boolean recursivelyCollect) {
     }
     
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof JMethod) {
-            return equals((JMethod)obj);
-        }
-        return false;
+    protected boolean equals(JMethod method) {
+        return method != null && (this == method || getQualifiedName().equals(method.getQualifiedName()));
     }
     
-    protected boolean equals(JMethod method) {
-        if (method == null) {
-            return false;
-        }
-        return this == method || getQualifiedName().equals(method.getQualifiedName());
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof JMethod) ? equals((JMethod)obj) : false;
     }
     
     @Override

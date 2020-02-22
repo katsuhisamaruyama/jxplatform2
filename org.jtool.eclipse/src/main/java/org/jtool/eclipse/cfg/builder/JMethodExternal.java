@@ -106,7 +106,7 @@ public class JMethodExternal extends JMethod {
                             }
                         }
                     } catch (ClassCastException e) {
-                        // javassit's bug related to invocation for Lambda interface methods
+                        // Javassit's bug related to invocation for Lambda interface methods
                         // javassist.bytecode.InterfaceMethodrefInfo cannot be cast to javassist.bytecode.MethodrefInfo
                     } catch (NotFoundException e) { /* empty */ }
                 }

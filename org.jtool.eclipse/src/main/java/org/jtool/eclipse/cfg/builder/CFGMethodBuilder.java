@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -80,7 +80,7 @@ public class CFGMethodBuilder {
         CFGNode tmpExit = new CFGNode();
         cfg.setEndNode(tmpExit);
         
-        Set<CFGCatch> exceptionNodes = createExceptionNodes(jmethod, entry, cfg);
+        Set<CFGCatch> exceptionNodes = createExceptionNodes(jmethod, entry, cfg, infoStore);
         
         CFGNode finalFormalInNode = createFormalIn(params, cfg, entry, entry);
         CFGNode nextNode = new CFGNode();
@@ -148,14 +148,14 @@ public class CFGMethodBuilder {
         }
     }
     
-    private static Set<CFGCatch> createExceptionNodes(JavaMethod jmethod, CFGMethodEntry entry, CFG cfg) {
+    private static Set<CFGCatch> createExceptionNodes(JavaMethod jmethod, CFGMethodEntry entry, CFG cfg, JInfoStore infoStore) {
         Set<CFGCatch> nodes = new HashSet<CFGCatch>();
         for (Type type : jmethod.getExceptionTypeNodes().values()) {
             CFGCatch exceptionNode = createExceptionNode(entry, cfg, type.resolveBinding().getTypeDeclaration());
             nodes.add(exceptionNode);
         }
         
-        ExceptionTypeCollector collector = new ExceptionTypeCollector();
+        ExceptionTypeCollector collector = new ExceptionTypeCollector(infoStore.getJavaProject());
         for (ITypeBinding tbinding : collector.getExceptions(jmethod)) {
             CFGCatch exceptionNode = createExceptionNode(entry, cfg, tbinding);
             nodes.add(exceptionNode);

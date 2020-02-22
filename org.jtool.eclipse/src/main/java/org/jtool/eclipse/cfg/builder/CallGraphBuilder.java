@@ -25,25 +25,26 @@ import org.jtool.eclipse.javamodel.JavaMethod;
  */
 public class CallGraphBuilder {
     
-    public static CallGraph getCallGraph(JavaProject jproject, CFGStore cfgStore) {
+    public static CallGraph getCallGraph(JavaProject jproject) {
         CallGraph callGraph = new CallGraph(jproject.getName());
         for (JavaClass jclass : jproject.getClasses()) {
-            CallGraph graph = getCallGraph(jclass, cfgStore);
+            CallGraph graph = getCallGraph(jclass);
             callGraph.append(graph);
         }
         return callGraph;
     }
     
-    public static CallGraph getCallGraph(JavaClass jclass, CFGStore cfgStore) {
+    public static CallGraph getCallGraph(JavaClass jclass) {
         CallGraph callGraph = new CallGraph(jclass.getQualifiedName());
         for (JavaMethod jmethod : jclass.getMethods()) {
-            CallGraph graph = getCallGraph(jmethod, cfgStore);
+            CallGraph graph = getCallGraph(jmethod);
             callGraph.append(graph);
         }
         return callGraph;
     }
     
-    public static CallGraph getCallGraph(JavaMethod jmethod, CFGStore cfgStore) {
+    public static CallGraph getCallGraph(JavaMethod jmethod) {
+        CFGStore cfgStore = jmethod.getJavaProject().getCFGStore();
         CallGraph callGraph = new CallGraph(jmethod.getQualifiedName());
         CFG cfg = cfgStore.findCFG(jmethod.getQualifiedName());
         if (cfg == null) {

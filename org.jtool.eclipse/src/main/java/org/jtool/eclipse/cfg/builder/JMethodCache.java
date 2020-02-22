@@ -40,10 +40,7 @@ class JMethodCache extends JMethod {
     }
     
     protected String[] convert(String nameStr) {
-        if (nameStr == null || nameStr.indexOf(';') == -1) {
-            return new String[0];
-        }
-        return nameStr.split(";", 0);
+        return (nameStr == null || nameStr.indexOf(';') == -1) ? new String[0] : nameStr.split(";", 0);
     }
     
     @Override

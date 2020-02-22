@@ -79,12 +79,12 @@ public class JClassExternal extends JClass {
     @Override
     protected JClass[] findAncestors() {
         List<JClass> classes = new ArrayList<JClass>();
-        BytecodeClassStore bytecodeClassStore = cfgStore.getJInfoStore().getBytecodeClassStore();
+        BytecodeClassStore bytecodeClassStore = cfgStore.getJavaProject().getBytecodeClassStore();
         if (bytecodeClassStore == null) {
             return emptyClassArray;
         }
         
-        for (CtClass cc : bytecodeClassStore.getAncestors(ctClass.getName())) {
+        for (CtClass cc : bytecodeClassStore.getAncestors(cfgStore.getJavaProject(), ctClass.getName())) {
             JClass clazz = cfgStore.getJInfoStore().getJClass(cc.getName());
             if (clazz != null) {
                 classes.add(clazz);
@@ -96,18 +96,18 @@ public class JClassExternal extends JClass {
     @Override
     protected JClass[] findDescendants() {
         List<JClass> classes = new ArrayList<JClass>();
-        BytecodeClassStore bytecodeClassStore = cfgStore.getJInfoStore().getBytecodeClassStore();
+        BytecodeClassStore bytecodeClassStore = cfgStore.getJavaProject().getBytecodeClassStore();
         if (bytecodeClassStore == null) {
             return emptyClassArray;
         }
         
-        for (CtClass cc : bytecodeClassStore.getDescendants(ctClass.getName())) {
+        for (CtClass cc : bytecodeClassStore.getDescendants(cfgStore.getJavaProject(), ctClass.getName())) {
             JClass clazz = cfgStore.getJInfoStore().getJClass(cc.getName());
             if (clazz != null) {
                 classes.add(clazz);
             }
         }
-        for (JavaClass jc : bytecodeClassStore.getJavaDescendants(ctClass.getName())) {
+        for (JavaClass jc : bytecodeClassStore.getJavaDescendants(cfgStore.getJavaProject(), ctClass.getName())) {
             JClass clazz = cfgStore.getJInfoStore().getJClass(jc.getQualifiedName());
             if (clazz != null) {
                 classes.add(clazz);

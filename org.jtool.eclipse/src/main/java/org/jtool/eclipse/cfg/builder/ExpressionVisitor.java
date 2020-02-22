@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -633,7 +633,7 @@ public class ExpressionVisitor extends ASTVisitor {
             if (jclass != null) {
                 JavaMethod jmethod = jclass.getMethod(jcall.getSignature());
                 if (jmethod != null) {
-                    ExceptionTypeCollector collector = new ExceptionTypeCollector();
+                    ExceptionTypeCollector collector = new ExceptionTypeCollector(infoStore.getJavaProject());
                     for (ITypeBinding type : collector.getExceptions(jmethod)) {
                         statementVisitor.setExceptionFlowOnMethodCall(callNode, type);
                     }

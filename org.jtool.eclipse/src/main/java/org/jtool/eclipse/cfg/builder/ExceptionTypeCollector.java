@@ -8,6 +8,7 @@ package org.jtool.eclipse.cfg.builder;
 
 import org.jtool.eclipse.javamodel.JavaElement;
 import org.jtool.eclipse.javamodel.JavaMethod;
+import org.jtool.eclipse.javamodel.JavaProject;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ConstructorInvocation;
@@ -37,7 +38,13 @@ import java.util.HashSet;
  */
 class ExceptionTypeCollector {
     
+    private JavaProject jproject;
+    
     private Set<ITypeBinding> exceptionTypes = new HashSet<ITypeBinding>();
+    
+    public ExceptionTypeCollector(JavaProject jproject) {
+        this.jproject = jproject;
+    }
     
     Set<ITypeBinding> getExceptions(JavaMethod jmethod) {
         Set<JavaMethod> methods = new HashSet<JavaMethod>();
@@ -123,7 +130,7 @@ class ExceptionTypeCollector {
                     return;
                 }
                 
-                JavaMethod jmethod = JavaElement.findDeclaringMethod(mbinding);
+                JavaMethod jmethod = JavaElement.findDeclaringMethod(jproject, mbinding);
                 if (jmethod != null && jmethod.getASTNode() != null) {
                     calledMethods.add(jmethod);
                 }

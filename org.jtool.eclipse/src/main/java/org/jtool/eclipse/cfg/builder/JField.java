@@ -35,6 +35,7 @@ abstract class JField extends JElement {
         
     }
     
+    @Override
     protected void cache() {
         cacheData = new HashMap<String, String>();
         cacheData.put(FqnAttr, fqn);
@@ -75,18 +76,12 @@ abstract class JField extends JElement {
     }
     
     public boolean equals(JField field) {
-        if (field == null) {
-            return false;
-        }
-        return this == field || getQualifiedName().equals(field.getQualifiedName());
+        return field != null && (this == field || getQualifiedName().equals(field.getQualifiedName()));
     }
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof JField) {
-            return equals((JField)obj);
-        }
-        return false;
+        return (obj instanceof JField) ? equals((JField)obj) : false;
     }
     
     @Override

@@ -9,7 +9,6 @@ package org.jtool.eclipse.cfg.builder;
 import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
-import org.jtool.eclipse.javamodel.builder.ProjectStore;
 import javassist.CtClass;
 import java.util.Map;
 import java.util.HashMap;
@@ -31,11 +30,6 @@ class JInfoStore {
     private Map<String, JClass> internalClassStore = new HashMap<String, JClass>();
     private Map<String, JClass> externalClassStore = new HashMap<String, JClass>();
     
-    private BytecodeClassStore bytecodeClassStore;
-    
-    JInfoStore() {
-    }
-    
     void create(CFGStore cfgStore, JavaProject jproject, boolean analyzingBytecode) {
         this.cfgStore = cfgStore;
         this.jproject = jproject;
@@ -53,8 +47,6 @@ class JInfoStore {
         internalClassStore.clear();
         externalClassStore.clear();
         jproject = null;
-        
-        bytecodeClassStore = null;
     }
     
     JavaProject getJavaProject() {
@@ -63,10 +55,6 @@ class JInfoStore {
     
     CFGStore getCFGStore() {
         return cfgStore;
-    }
-    
-    BytecodeClassStore getBytecodeClassStore() {
-        return bytecodeClassStore;
     }
     
     int analysisLevel() {
@@ -112,13 +100,13 @@ class JInfoStore {
     }
     
     private JClass registerExternalClass(String fqn) {
-        if (bytecodeClassStore == null) {
-            bytecodeClassStore = ProjectStore.getInstance().registerBytecodeClasses(jproject);
-            bytecodeClassStore.collectBytecodeClassInfo();
+        BytecodeClassStore bytecodeClassStore = jproject.getBytecodeClassStore();
+        if (!bytecodeClassStore.existsBytecodeClassInfo(jproject)) {
+            jproject.registerBytecodeClasses();
             analysisLevel = 2;
         }
         
-        CtClass ctClass = bytecodeClassStore.getCtClass(fqn);
+        CtClass ctClass = bytecodeClassStore.getCtClass(jproject, fqn);
         if (ctClass != null) {
             JClassExternal clazz = new JClassExternal(ctClass, cfgStore);
             externalClassStore.put(clazz.getQualifiedName(), clazz);

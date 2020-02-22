@@ -9,7 +9,6 @@ package org.jtool.eclipse.cfg.builder;
 import org.jtool.eclipse.cfg.BasicBlock;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
-import org.jtool.eclipse.cfg.ControlFlow;
 
 /**
  * Calculates and stores basic blocks of a CFG.
@@ -21,8 +20,7 @@ public class BasicBlockBuilder {
     
     public static void create(CFG cfg) {
         CFGNode start = cfg.getStartNode();
-        CFGNode[] nodes = CFGNode.toArray(start.getSuccessors());
-        CFGNode first = (CFGNode)nodes[0];
+        CFGNode first = start.getSuccessors().iterator().next();
         for (CFGNode node : cfg.getNodes()) {
             if (node.equals(first) || node.isJoin() || (node.isNextToBranch() && !node.equals(start))) {
                 BasicBlock block = new BasicBlock(node);
@@ -45,11 +43,6 @@ public class BasicBlockBuilder {
     }
     
     private static CFGNode getTrueSucc(CFGNode node) {
-        for (ControlFlow edge : node.getOutgoingFlows()) {
-            if (edge.isTrue()) {
-                return edge.getDstNode();
-            }
-        }
-        return null;
+        return node.getOutgoingFlows().stream().filter(edge -> edge.isTrue()).map(edge -> edge.getDstNode()).findFirst().orElse(null);
     }
 }

@@ -8,6 +8,7 @@ package org.jtool.eclipse.cfg.builder;
 
 import org.eclipse.jdt.core.dom.Modifier;
 import java.util.HashMap;
+import java.util.Arrays;
 
 /**
  * An abstract class that provides concise information on a class.
@@ -32,6 +33,7 @@ abstract class JClass extends JElement {
         this.modifiers = modifiers;
     }
     
+    @Override
     protected void cache() {
         cacheData = new HashMap<String, String>();
         cacheData.put(FqnAttr, fqn);
@@ -63,12 +65,7 @@ abstract class JClass extends JElement {
     }
     
     protected JField getField(String name) {
-        for (JField field : fields) {
-            if (field.getName().equals(name)) {
-                return field;
-            }
-        }
-        return null;
+        return Arrays.stream(fields).filter(field -> field.getName().equals(name)).findFirst().orElse(null);
     }
     
     protected JMethod[] getMethods() {
@@ -76,12 +73,7 @@ abstract class JClass extends JElement {
     }
     
     protected JMethod getMethod(String sig) {
-        for (JMethod method : methods) {
-            if (method.getSignature().equals(sig)) {
-                return method;
-            }
-        }
-        return null;
+        return Arrays.stream(methods).filter(method -> method.getSignature().equals(sig)).findFirst().orElse(null);
     }
     
     protected JClass[] getAncestors() {
@@ -105,18 +97,12 @@ abstract class JClass extends JElement {
     protected abstract JClass[] findDescendants();
     
     public boolean equals(JClass clazz) {
-        if (clazz == null) {
-            return false;
-        }
-        return this == clazz || getQualifiedName().equals(clazz.getQualifiedName());
+        return clazz != null && (this == clazz || getQualifiedName().equals(clazz.getQualifiedName()));
     }
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof JClass) {
-            return equals((JClass)obj);
-        }
-        return false;
+        return (obj instanceof JClass) ?equals((JClass)obj) : false;
     }
     
     @Override

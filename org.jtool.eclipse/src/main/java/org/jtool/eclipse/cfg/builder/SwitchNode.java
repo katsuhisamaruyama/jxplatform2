@@ -9,7 +9,6 @@ package org.jtool.eclipse.cfg.builder;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.ControlFlow;
-import org.jtool.eclipse.graph.GraphEdge;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 /**
@@ -22,9 +21,6 @@ class SwitchNode extends CFGStatement {
     
     private CFGNode defaultStartNode = null;
     private CFGNode defaultEndNode = null;
-    
-    SwitchNode() {
-    }
     
     SwitchNode(ASTNode node, CFGNode.Kind kind) {
         super(node, kind);
@@ -47,23 +43,13 @@ class SwitchNode extends CFGStatement {
     }
     
     CFGNode getPredecessorOfDefault() {
-        for (GraphEdge edge : defaultStartNode.getIncomingEdges()) {
-            ControlFlow flow = (ControlFlow)edge;
-            if (flow.isFalse()) {
-                return (CFGNode)flow.getSrcNode();
-            }
-        }
-        return null;
+        return defaultStartNode.getIncomingEdges().stream()
+                .filter(edge -> ((ControlFlow)edge).isFalse()).map(flow -> (CFGNode)flow.getSrcNode()).findFirst().orElse(null);
     }
     
     CFGNode getSuccessorOfDefault() {
-        for (GraphEdge edge : defaultStartNode.getOutgoingEdges()) {
-            ControlFlow flow = (ControlFlow)edge;
-            if (flow.isFalse()) {
-                return (CFGNode)flow.getDstNode();
-            }
-        }
-        return null;
+        return defaultStartNode.getOutgoingEdges().stream()
+                .filter(edge -> ((ControlFlow)edge).isFalse()).map(flow -> (CFGNode)flow.getDstNode()).findFirst().orElse(null);
     }
     
     boolean hasDefault() {

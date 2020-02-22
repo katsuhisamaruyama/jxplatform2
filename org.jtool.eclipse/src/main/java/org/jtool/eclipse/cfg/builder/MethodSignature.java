@@ -41,7 +41,7 @@ class MethodSignature {
         }
         int index = 1;
         while (signature.charAt(index) != ')') {
-            String type = fieldSignatureToString(signature.substring(index));
+            String type = variableTypeToString(signature.substring(index));
             buf.append(" ");
             buf.append(type);
             index = index + comsumed_chars_length;
@@ -65,6 +65,10 @@ class MethodSignature {
     }
     
     protected static String fieldSignatureToString(String signature) {
+        return variableTypeToString(signature);
+    }
+    
+    protected static String variableTypeToString(String signature) {
         comsumed_chars_length = 1;
         switch (signature.charAt(0)) {
             case 'B':
