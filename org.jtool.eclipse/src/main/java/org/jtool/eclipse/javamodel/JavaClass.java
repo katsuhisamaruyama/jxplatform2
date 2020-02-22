@@ -88,11 +88,6 @@ public class JavaClass extends JavaElement {
             kind = getKind(binding);
             inProject = true;
             
-            if (!binding.isTopLevel()) {
-                declaringClass = findDeclaringClass(binding.getDeclaringClass());
-            }
-            declaringMethod = findDeclaringMethod(binding.getDeclaringMethod());
-            
             if (binding.getSuperclass() != null) {
                 superClassName = binding.getSuperclass().getTypeDeclaration().getQualifiedName();
             }
@@ -489,6 +484,11 @@ public class JavaClass extends JavaElement {
         
         boolean resolveOk = true;
         if (binding != null) {
+            if (!binding.isTopLevel()) {
+                declaringClass = findDeclaringClass(getJavaProject(), binding.getDeclaringClass());
+            }
+            declaringMethod = findDeclaringMethod(getJavaProject(), binding.getDeclaringMethod());
+            
             resolveOk = resolveOk & findSuperClass();
             resolveOk = resolveOk & findSuperInterfaces();
             if (inProject) {
@@ -510,40 +510,48 @@ public class JavaClass extends JavaElement {
     }
     
     private boolean findSuperClass() {
-        if (!isClass()) {
-            return true;
-        }
-        
-        if (binding.getSuperclass() != null) {
-            superClass = findDeclaringClass(binding.getSuperclass());
-            if (superClass != null) {
-                return true;
-            } else {
-                return false;
+        if (isClass()) {
+            if (binding.getSuperclass() != null) {
+                superClass = findDeclaringClass(getJavaProject(), binding.getSuperclass());
+                if (superClass == null) {
+                    return false;
+                }
             }
-        } else {
-            return true;
         }
+        return true;
     }
     
     private boolean findSuperInterfaces() {
-        if (isLambda()) {
-            JavaClass jclass = findDeclaringClass(binding);
-            if (jclass != null) {
-                superInterfaces.add(jclass);
-                return true;
-            } else {
-                return false;
-            }
-        }
-        
         boolean resolveOk = true;
-        for (ITypeBinding tbinding : binding.getInterfaces()) {
-            JavaClass jclass = findDeclaringClass(tbinding);
-            if (jclass != null) {
-                superInterfaces.add(jclass);
+        if (isLambda()) {
+            if (binding.isIntersectionType()) {
+                for (ITypeBinding tbinding : binding.getTypeBounds()) {
+                    if (tbinding.isInterface()) {
+                        JavaClass jclass = findDeclaringClass(getJavaProject(), tbinding);
+                        if (jclass != null) {
+                            superInterfaces.add(jclass);
+                        } else {
+                            resolveOk = false;
+                        }
+                    }
+                }
             } else {
-                resolveOk = false;
+                JavaClass jclass = findDeclaringClass(getJavaProject(), binding);
+                if (jclass != null) {
+                    superInterfaces.add(jclass);
+                } else {
+                    resolveOk = false;
+                }
+            }
+            
+        } else {
+            for (ITypeBinding tbinding : binding.getInterfaces()) {
+                JavaClass jclass = findDeclaringClass(getJavaProject(), tbinding);
+                if (jclass != null) {
+                    superInterfaces.add(jclass);
+                } else {
+                    resolveOk = false;
+                }
             }
         }
         return resolveOk;
