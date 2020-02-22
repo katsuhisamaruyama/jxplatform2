@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -10,6 +10,7 @@ import org.jtool.eclipse.graph.Graph;
 import org.jtool.eclipse.graph.GraphElement;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  * An object storing information about a control flow graph (CFG).
@@ -78,76 +79,41 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
     }
     
     public ControlFlow getFlow(CFGNode src, CFGNode dst) {
-        if (src != null && dst != null) {
-            for (ControlFlow edge : getEdges()) {
-                if (src.equals(edge.getSrcNode()) && dst.equals(edge.getDstNode())) {
-                    return edge;
-                }
-            }
+        if (src == null || dst == null) {
+            return null;
         }
-        return null;
+        return getEdges().stream()
+                .filter(edge -> src.equals(edge.getSrcNode()) && dst.equals(edge.getDstNode())).findFirst().orElse(null);
     }
     
     public CFGNode getNode(long id) {
-        for (CFGNode node : getNodes()) {
-            if (id == node.getId()) {
-                return node;
-            }
-        }
-        return null;
+        return getNodes().stream().filter(node -> id == node.getId()).findFirst().orElse(null);
     }
     
     public ControlFlow getTrueFlowFrom(CFGNode node) {
-        for (ControlFlow edge : getEdges()) {
-            if (edge.getSrcNode().equals(node) && edge.isTrue()) {
-                return edge;
-            }
-        }
-        return null;
+        return getEdges().stream().filter(edge -> edge.getSrcNode().equals(node) && edge.isTrue()).findFirst().orElse(null);
     }
     
     public ControlFlow getFalseFlowFrom(CFGNode node) {
-        for (ControlFlow edge : getEdges()) {
-            if (edge.getSrcNode().equals(node) && edge.isFalse()) {
-                return edge;
-            }
-        }
-        return null;
+        return getEdges().stream().filter(edge -> edge.getSrcNode().equals(node) && edge.isFalse()).findFirst().orElse(null);
     }
     
     public CFGNode getTrueSuccessor(CFGNode node) {
-        ControlFlow flow = getTrueFlowFrom(node);
-        if (flow != null) {
-            return flow.getDstNode();
-        }
-        return null;
+        ControlFlow flow = getFalseFlowFrom(node);
+        return (flow != null) ? flow.getDstNode() : null;
     }
     
     public CFGNode getFalseSuccessor(CFGNode node) {
         ControlFlow flow = getFalseFlowFrom(node);
-        if (flow != null) {
-            return flow.getDstNode();
-        }
-        return null;
+        return (flow != null) ? flow.getDstNode() : null;
     }
     
     public boolean hasTryStatement(){
-        for (CFGNode node : getNodes()) {
-            if (node.isTry()) {
-                return true;
-            }
-        }
-        return false;
+        return getNodes().stream().anyMatch(node -> node.isTry());
     }
     
     public Set<CFGNode> getCallNodes() {
-        Set<CFGNode> set = new HashSet<CFGNode>();
-        for (CFGNode node : getNodes()) {
-            if (node.isMethodCall()) {
-                set.add(node);
-            }
-        }
-        return set;
+        return getNodes().stream().filter(node -> node.isMethodCall()).collect(Collectors.toCollection(HashSet::new));
     }
     
     public Set<CFGNode> forwardReachableNodes(CFGNode from, boolean loopbackOk, StopConditionOnReachablePath condition) {
@@ -167,21 +133,11 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
     }
     
     public Set<CFGNode> forwardReachableNodes(CFGNode from, boolean loopbackOk) {
-        return forwardReachableNodes(from, loopbackOk, new StopConditionOnReachablePath() {
-            @Override
-            public boolean isStop(CFGNode node) {
-                return false;
-            }
-        });
+        return forwardReachableNodes(from, loopbackOk, node -> { return false; });
     }
     
     public Set<CFGNode> backwardReachableNodes(CFGNode from, boolean loopbackOk) {
-        return backwardReachableNodes(from, loopbackOk, new StopConditionOnReachablePath() {
-            @Override
-            public boolean isStop(CFGNode node) {
-                return false;
-            }
-        });
+        return backwardReachableNodes(from, loopbackOk, node -> { return false; });
     }
     
     public Set<CFGNode> forwardReachableNodes(CFGNode from, CFGNode to, boolean loopbackOk) {
@@ -191,12 +147,7 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
             return track;
         }
         
-        Set<CFGNode> ftrack = forwardReachableNodes(from, loopbackOk, new StopConditionOnReachablePath() {
-            @Override
-            public boolean isStop(CFGNode node) {
-                return node.equals(to);
-            }
-        });
+        Set<CFGNode> ftrack = forwardReachableNodes(from, loopbackOk, node -> node.equals(to));
         track.addAll(ftrack);
         track.add(to);
         return track;
@@ -209,12 +160,7 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
             return track;
         }
         
-        Set<CFGNode> btrack = backwardReachableNodes(from, loopbackOk, new StopConditionOnReachablePath() {
-            @Override
-            public boolean isStop(CFGNode node) {
-                return node.equals(to);
-            }
-        });
+        Set<CFGNode> btrack = backwardReachableNodes(from, loopbackOk, node -> node.equals(to));
         track.addAll(btrack);
         track.add(to);
         return track;
@@ -287,17 +233,11 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof CommonCFG) {
-            return equals((CommonCFG)obj);
-        }
-        return false;
+        return (obj instanceof CommonCFG) ? equals((CommonCFG)obj) : false;
     }
     
     public boolean equals(CommonCFG cfg) {
-        if (cfg == null) {
-            return false;
-        }
-        return this == cfg || getQualifiedName().equals(cfg.getQualifiedName());
+        return cfg != null && (this == cfg || getQualifiedName().equals(cfg.getQualifiedName()));
     }
     
     @Override

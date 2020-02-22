@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -18,9 +18,6 @@ public class CFGCatch extends CFGStatement {
     
     private ITypeBinding type;
     private CFGNode parent;
-    
-    protected CFGCatch() {
-    }
     
     public CFGCatch(ASTNode node, CFGNode.Kind kind, ITypeBinding type) {
         super(node, kind);

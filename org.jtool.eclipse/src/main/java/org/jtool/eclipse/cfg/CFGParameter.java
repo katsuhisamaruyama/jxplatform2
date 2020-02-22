@@ -18,10 +18,6 @@ public class CFGParameter extends CFGStatement {
     private int ordinal;
     private CFGNode parent;
     
-    protected CFGParameter() {
-        super();
-    }
-    
     public CFGParameter(ASTNode node, CFGNode.Kind kind, int ordinal) {
         super(node, kind);
         this.ordinal = ordinal;

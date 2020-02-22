@@ -22,9 +22,6 @@ public class BasicBlock {
     
     private static int num = 0;
     
-    protected BasicBlock() {
-    }
-    
     public BasicBlock(CFGNode node) {
         num++;
         id = num;

@@ -42,9 +42,6 @@ public abstract class JReference {
     
     protected CodeRange codeRange = null;
     
-    protected JReference() {
-    }
-    
     public JReference(ASTNode node) {
         astNode = node;
     }
@@ -154,17 +151,11 @@ public abstract class JReference {
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof JReference) {
-            return equals((JReference)obj);
-        }
-        return false;
+        return (obj instanceof JReference) ? equals((JReference)obj) : false;
     }
     
     public boolean equals(JReference jvar) {
-        if (jvar == null) {
-            return false;
-        }
-        return this == jvar || referenceName.equals(jvar.referenceName);
+        return jvar != null && (this == jvar || referenceName.equals(jvar.referenceName));
     }
     
     @Override
@@ -202,10 +193,7 @@ public abstract class JReference {
     
     protected static String findEnclosingMethodName(String className, ASTNode node) {
         IMethodBinding mbinding = findEnclosingMethod(node);
-        if (mbinding != null) {
-            return getQualifiedMethodName(className, mbinding);
-        }
-        return "";
+        return (mbinding != null) ? getQualifiedMethodName(className, mbinding) : "";
     }
     
     protected static String getQualifiedClassName(ITypeBinding tbinding) {

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -148,11 +148,7 @@ public class JFieldReference extends JReference {
     @Override
     public int getStartPosition() {
         int index = referenceName.lastIndexOf('.');
-        if (index == -1) {
-            return astNode.getStartPosition();
-        } else {
-            return index + astNode.getStartPosition() - 1;
-        }
+        return (index == -1) ? astNode.getStartPosition() : index + astNode.getStartPosition() - 1;
     }
     
     @Override

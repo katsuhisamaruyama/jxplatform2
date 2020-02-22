@@ -17,9 +17,6 @@ public class CFGMerge extends CFGNode {
     
     private CFGStatement branch;
     
-    protected CFGMerge() {
-    }
-    
     public CFGMerge(ASTNode node, CFGStatement branch) {
         super(node, branch.getKind());
         this.branch = branch;

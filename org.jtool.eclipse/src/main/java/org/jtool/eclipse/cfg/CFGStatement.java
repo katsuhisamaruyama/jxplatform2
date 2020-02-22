@@ -20,25 +20,16 @@ public class CFGStatement extends CFGNode {
     private List<JReference> defs = new ArrayList<JReference>();
     private List<JReference> uses = new ArrayList<JReference>();
     
-    protected CFGStatement() {
-    }
-    
     public CFGStatement(ASTNode node, Kind kind) {
         super(node, kind);
     }
     
     public boolean addDefVariable(JReference jvar) {
-        if (jvar!= null && !defineVariable(jvar)) {
-            return defs.add(jvar);
-        }
-        return false;
+        return (jvar!= null && !defineVariable(jvar)) ? defs.add(jvar) : false;
     }
     
     public boolean addUseVariable(JReference jvar) {
-        if (jvar != null && !useVariable(jvar)) {
-            return uses.add(jvar);
-        }
-        return false;
+        return (jvar != null && !useVariable(jvar)) ? uses.add(jvar) : false;
     }
     
     public void addDefVariables(List<JReference> jvars) {
@@ -96,21 +87,11 @@ public class CFGStatement extends CFGNode {
     }
     
     public boolean defineVariable(JReference jvar) {
-        for (JReference jv : defs) {
-            if (jv.equals(jvar)) {
-                return true;
-            }
-        }
-        return false;
+        return defs.stream().anyMatch(jv -> jv.equals(jvar));
     }
     
     public boolean useVariable(JReference jvar) {
-        for (JReference jv : uses) {
-            if (jv.equals(jvar)) {
-                return true;
-            }
-        }
-        return false;
+        return uses.stream().anyMatch(jv -> jv.equals(jvar));
     }
     
     @Override
@@ -124,21 +105,11 @@ public class CFGStatement extends CFGNode {
     }
     
     public JReference getDefVariable(String name) {
-        for (JReference jv : defs) {
-            if (jv.getName().equals(name)) {
-                return jv;
-            }
-        }
-        return null;
+        return defs.stream().filter(jv -> jv.getName().equals(name)).findFirst().orElse(null);
     }
     
     public JReference getUseVariable(String name) {
-        for (JReference jv : uses) {
-            if (jv.getName().equals(name)) {
-                return jv;
-            }
-        }
-        return null;
+        return uses.stream().filter(jv -> jv.getName().equals(name)).findFirst().orElse(null);
     }
     
     public JReference getFirst() {

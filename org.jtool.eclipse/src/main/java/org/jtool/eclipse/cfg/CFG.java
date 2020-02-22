@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -17,10 +17,6 @@ import java.util.ArrayList;
 public class CFG extends CommonCFG {
     
     private List<BasicBlock> basicBlocks = new ArrayList<BasicBlock>();
-    
-    public CFG() {
-        super();
-    }
     
     public void append(CFG cfg) {
         for (CFGNode node : cfg.getNodes()) {

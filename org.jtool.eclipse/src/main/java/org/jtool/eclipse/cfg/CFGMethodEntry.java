@@ -23,9 +23,6 @@ public class CFGMethodEntry extends CFGEntry {
     private List<CFGParameter> formalOuts = new ArrayList<CFGParameter>();
     private List<CFGCatch> exceptionNodes = new ArrayList<CFGCatch>();
     
-    protected CFGMethodEntry() {
-    }
-    
     public CFGMethodEntry(JavaMethod jmethod, CFGNode.Kind kind) {
         super(jmethod.getASTNode(), kind, jmethod.getName(), jmethod.getSignature(), jmethod.getQualifiedName());
         this.jmethod = jmethod;
@@ -68,29 +65,16 @@ public class CFGMethodEntry extends CFGEntry {
     }
     
     public CFGParameter getFormalIn(int ordinal) {
-        if (ordinal < formalIns.size()) {
-            return formalIns.get(ordinal);
-        } else {
-            return null;
-        }
+        return (ordinal < formalIns.size()) ? formalIns.get(ordinal) : null;
     }
     
     public CFGParameter getFormalOut(int ordinal) {
-        if (ordinal < formalOuts.size()) {
-            return formalOuts.get(ordinal);
-        } else {
-            return null;
-        }
+        return (ordinal < formalOuts.size())? formalOuts.get(ordinal) : null;
     }
     
     public CFGParameter getFormalOutForReturn() {
-        for (CFGParameter fout : formalOuts) {
-            JReference use = fout.getUseVariable();
-            if (use.getName().endsWith("$_")) {
-                return fout;
-            }
-        }
-        return null;
+        return formalOuts.stream()
+                .filter(fout -> fout.getUseVariable().getName().endsWith("$_")).findFirst().orElse(null);
     }
     
     public boolean hasParameters() {
@@ -106,12 +90,8 @@ public class CFGMethodEntry extends CFGEntry {
     }
     
     public CFGCatch getExceptionNode(String type) {
-        for (CFGCatch node : exceptionNodes) {
-            if (node.getTypeName().equals(type)) {
-                return node;
-            }
-        }
-        return null;
+        return exceptionNodes.stream()
+                .filter(node -> node.getTypeName().equals(type)).findFirst().orElse(null);
     }
     
     @Override

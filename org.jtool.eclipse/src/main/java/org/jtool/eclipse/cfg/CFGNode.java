@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  * A node of a CFG.
@@ -167,19 +168,11 @@ public class CFGNode extends GraphNode {
     }
     
     private Set<CFGNode> convertNodes(Set<GraphNode> nodes) {
-        Set<CFGNode> set = new HashSet<CFGNode>();
-        for (GraphNode node : nodes) {
-            set.add((CFGNode)node);
-        }
-        return set;
+        return nodes.stream().map(node -> (CFGNode)node).collect(Collectors.toCollection(HashSet::new));
     }
     
     private Set<ControlFlow> convertEdges(Set<GraphEdge> edges) {
-        Set<ControlFlow> set = new HashSet<ControlFlow>();
-        for (GraphEdge edge : edges) {
-            set.add((ControlFlow)edge);
-        }
-        return set;
+        return edges.stream().map(edge -> (ControlFlow)edge).collect(Collectors.toCollection(HashSet::new));
     }
     
     public boolean isBranch() { 
@@ -386,12 +379,7 @@ public class CFGNode extends GraphNode {
     }
     
     public boolean isNextToBranch() {
-        for (CFGNode node : getPredecessors()) {
-            if (node.isBranch()) {
-                return true;
-            }
-        }
-        return false;
+        return getPredecessors().stream().anyMatch(node -> node.isBranch());
     }
     
     public boolean hasDefVariable() {
@@ -428,15 +416,6 @@ public class CFGNode extends GraphNode {
         cloneNode.setBasicBlock(basicBlock);
     }
     
-    public static <E extends GraphNode> CFGNode[] toArray(Set<E> set) {
-        CFGNode[] nodes = new CFGNode[set.size()];
-        int i = 0;
-        for (GraphNode node : set) {
-            nodes[i++] = (CFGNode)node;
-        }
-        return nodes;
-    }
-    
     public void print() {
         System.out.println(toString());
     }
@@ -444,14 +423,10 @@ public class CFGNode extends GraphNode {
     public static List<CFGNode> sortCFGNode(Collection<? extends CFGNode> co) {
         List<CFGNode> nodes = new ArrayList<CFGNode>(co);
         Collections.sort(nodes, new Comparator<CFGNode>() {
+            
+            @Override
             public int compare(CFGNode node1, CFGNode node2) {
-                if (node2.id == node1.id) {
-                    return 0;
-                } else if (node1.id > node2.id) {
-                    return 1;
-                } else {
-                    return -1;
-                }
+                return (node2.id == node1.id) ? 0 : (node1.id > node2.id) ? 1 : -1;
             }
         });
         return nodes;

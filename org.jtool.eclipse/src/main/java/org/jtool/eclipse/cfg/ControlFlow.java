@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -32,10 +32,6 @@ public class ControlFlow extends GraphEdge {
         parameterFlow,                   // Flow representing the relationship between a class/method and its parameter
         exceptionCatchFlow,              // Flow representing the relationship between an exception occurrence and its catch
         undefined,
-    }
-    
-    protected ControlFlow() {
-        super();
     }
     
     public ControlFlow(CFGNode src, CFGNode dst) {
@@ -122,17 +118,11 @@ public class ControlFlow extends GraphEdge {
     
     @Override
     public boolean equals(GraphElement elem) {
-        if (elem instanceof ControlFlow) {
-            return equals((ControlFlow)elem);
-        }
-        return false;
+        return (elem instanceof ControlFlow) ? equals((ControlFlow)elem) : false;
     }
     
     public boolean equals(ControlFlow flow) {
-        if (flow == null) {
-            return false;
-        }
-        return super.equals((GraphEdge)flow) && kind == flow.kind;
+        return flow != null && (super.equals((GraphEdge)flow) && kind == flow.kind);
     }
     
     @Override
@@ -174,6 +164,7 @@ public class ControlFlow extends GraphEdge {
         List<ControlFlow> edges = new ArrayList<ControlFlow>(co);
         Collections.sort(edges, new Comparator<ControlFlow>() {
             
+            @Override
             public int compare(ControlFlow edge1, ControlFlow edge2) {
                 if (edge2.src.getId() == edge1.src.getId()) {
                     if (edge2.dst.getId() == edge1.dst.getId()) {

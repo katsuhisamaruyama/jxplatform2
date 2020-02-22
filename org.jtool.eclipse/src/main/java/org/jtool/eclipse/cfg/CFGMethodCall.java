@@ -22,10 +22,6 @@ public class CFGMethodCall extends CFGStatement {
     private List<CFGParameter> actualIns = new ArrayList<CFGParameter>();
     private List<CFGParameter> actualOuts = new ArrayList<CFGParameter>();
     
-    protected CFGMethodCall() {
-        super();
-    }
-    
     public CFGMethodCall(ASTNode node, JMethodReference jcall, CFGNode.Kind kind) {
         super(node, kind);
         jmethodCall = jcall;
@@ -111,10 +107,7 @@ public class CFGMethodCall extends CFGStatement {
     }
     
     public CFGParameter getActualOut(int pos) {
-        if (pos < 0 || pos >= actualOuts.size()) {
-            return null;
-        }
-        return actualOuts.get(pos);
+        return (pos < 0 || pos >= actualOuts.size()) ? null : actualOuts.get(pos);
     }
     
     public boolean hasParameters() {

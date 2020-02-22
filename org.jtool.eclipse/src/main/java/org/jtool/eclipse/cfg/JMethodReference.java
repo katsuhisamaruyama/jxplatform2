@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -136,11 +136,7 @@ public class JMethodReference extends JReference {
     }
     
     public Expression getArgument(int ordinal) {
-        if (ordinal >= 0 && ordinal < arguments.size()) {
-            return arguments.get(ordinal);
-        } else {
-            return null;
-        }
+        return (ordinal >= 0 && ordinal < arguments.size()) ? arguments.get(ordinal) : null;
     }
     
     private void setArgumentTypes(IMethodBinding mbinding) {
@@ -152,19 +148,11 @@ public class JMethodReference extends JReference {
     }
     
     public String getArgumentType(int ordinal) {
-        if (ordinal >= 0 && ordinal < argumentTypes.size()) {
-            return argumentTypes.get(ordinal);
-        } else {
-            return "";
-        }
+        return (ordinal >= 0 && ordinal < argumentTypes.size()) ? argumentTypes.get(ordinal) : "";
     }
     
     public boolean getArgumentPrimitiveType(int ordinal) {
-        if (ordinal >= 0 && ordinal < argumentPrimitiveTypes.size()) {
-            return argumentPrimitiveTypes.get(ordinal);
-        } else {
-            return false;
-        }
+        return (ordinal >= 0 && ordinal < argumentPrimitiveTypes.size()) ? argumentPrimitiveTypes.get(ordinal): false;
     }
     
     public boolean hasReceiver() {
@@ -184,25 +172,16 @@ public class JMethodReference extends JReference {
     }
     
     public boolean callSelfDirectly() {
-        String fqn2 = enclosingClassName + QualifiedNameSeparator + enclosingMethodName;
-        return fqn.equals(fqn2);
+        return fqn.equals(enclosingClassName + QualifiedNameSeparator + enclosingMethodName);
     }
     
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof JMethodReference) {
-            JMethodReference jcall = (JMethodReference)obj;
-            return equals(jcall);
-        }
-        return false;
+        return (obj instanceof JMethodReference) ? equals((JMethodReference)obj) : false;
     }
     
     @Override
     public String toString() {
-        if (isLocal()) {
-            return signature + "@" + type;
-        } else {
-            return fqn + "@" + type;
-        }
+        return(isLocal()) ? signature + "@" + type : fqn + "@" + type;
     }
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2019
+ *  Copyright 2018
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  * An object storing information about a class control flow graph (CCFG).
@@ -51,20 +52,14 @@ public class CCFG extends CommonCFG {
     
     @Override
     public Set<CFGNode> getNodes() {
-        Set<CFGNode> nodes = new HashSet<CFGNode>();
-        for (CFG cfg : cfgs.values()) {
-            nodes.addAll(cfg.getNodes());
-        }
-        return nodes;
+        return cfgs.values().stream()
+                .map(cfg -> cfg.getNodes()).flatMap(l -> l.stream()).collect(Collectors.toCollection(HashSet::new));
     }
     
     @Override
     public Set<ControlFlow> getEdges() {
-        Set<ControlFlow> edges = new HashSet<ControlFlow>();
-        for (CFG cfg : cfgs.values()) {
-            edges.addAll(cfg.getEdges());
-        }
-        return edges;
+        return cfgs.values().stream()
+                .map(cfg -> cfg.getEdges()).flatMap(l -> l.stream()).collect(Collectors.toCollection(HashSet::new));
     }
     
     @Override

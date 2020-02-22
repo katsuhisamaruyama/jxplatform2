@@ -15,9 +15,6 @@ import org.eclipse.jdt.core.dom.ASTNode;
  */
 public class CFGExit extends CFGNode {
     
-    protected CFGExit() {
-    }
-    
     public CFGExit(ASTNode node, CFGNode.Kind kind) {
         super(node, kind);
     }
