@@ -54,17 +54,11 @@ public abstract class GraphEdge extends GraphElement {
     
     @Override
     public boolean equals(GraphElement elem) {
-        if (elem instanceof GraphEdge) {
-            return equals((GraphEdge)elem);
-        }
-        return false;
+        return (elem instanceof GraphEdge) ? equals((GraphEdge)elem) : false;
     }
     
     public boolean equals(GraphEdge edge) {
-        if (edge == null) {
-            return false;
-        }
-        return this == edge || (src.equals(edge.src) && dst.equals(edge.dst));
+        return edge != null && (this == edge || (src.equals(edge.src) && dst.equals(edge.dst)));
     }
     
     @Override
@@ -87,6 +81,8 @@ public abstract class GraphEdge extends GraphElement {
     protected static List<GraphEdge> sortGrapgEdge(Collection<? extends GraphEdge> co) {
         List<GraphEdge> edges = new ArrayList<GraphEdge>(co);
         Collections.sort(edges, new Comparator<GraphEdge>() {
+            
+            @Override
             public int compare(GraphEdge edge1, GraphEdge edge2) {
                 if (edge2.src.id == edge1.src.id) {
                     if (edge2.dst.id == edge1.dst.id) {

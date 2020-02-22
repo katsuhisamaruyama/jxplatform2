@@ -114,17 +114,11 @@ public abstract class GraphNode extends GraphElement {
     
     @Override
     public boolean equals(GraphElement elem) {
-        if (elem instanceof GraphNode) {
-            return equals((GraphNode)elem);
-        }
-        return false;
+        return (elem instanceof GraphNode) ? equals((GraphNode)elem) : false;
     }
     
     public boolean equals(GraphNode node) {
-        if (node == null) {
-            return false;
-        }
-        return this == node || id == node.id;
+        return node != null && (this == node || id == node.id);
     }
     
     @Override
