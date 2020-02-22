@@ -92,6 +92,10 @@ public class CFGNode extends GraphNode {
         dummy;                      // CFGDummy (for dummy)
     }
     
+    public CFGNode() {
+        super(0);
+    }
+    
     public CFGNode(ASTNode node, Kind kind) {
         super(0);
         
