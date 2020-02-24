@@ -120,8 +120,10 @@ public class BytecodeClassStore {
         if (classInfoMap != null) {
             BytecodeClassInfo classInfo = classInfoMap.get(fqn);
             if (classInfo != null) {
-                return jproject.getClasses().stream()
+                Set<JavaClass> children = jproject.getClasses().stream()
                         .filter(jc -> isChildOf(jc, fqn)).collect(Collectors.toCollection(HashSet::new));
+                children.stream().map(jc -> jc.getDescendants())
+                        .map(list -> list.stream()).collect(Collectors.toCollection(HashSet::new));
             }
         }
         return null;
