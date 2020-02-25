@@ -6,13 +6,17 @@
 
 package org.jtool.eclipse.batch;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.io.File;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.stream.Collectors;
+import org.gradle.tooling.ProjectConnection;
+import org.gradle.tooling.GradleConnector;
+import org.gradle.tooling.model.eclipse.EclipseProject;
 
 /**
  * Obtains path information from the Ant setting.
@@ -21,68 +25,77 @@ import java.util.ArrayList;
  */
 class GradleEnv extends ProjectEnv {
     
+    final static String configName = ".gradle";
+    
     GradleEnv(String target) {
         super(target);
     }
     
     @Override
     boolean isApplicable() {
+        try {
+            String config = getFileName(basePath, GradleEnv.configName);
+            if (config != null) {
+                setPaths(basePath);
+                return true;
+            }
+            return false;
+        } catch (Exception e) { }
         return false;
     }
-    private void setPaths(String configFile) throws Exception {
-        /*
-        String settingFile = getFileName(projectpath, "settings.gradle");
-        List<String> srcPaths = getSrcPaths(settingFile);
-        
-        if (srcPaths.size() == 0) {
-            addSrcPath(projectpath, srcPaths);
+    
+    private String getFileName(Path path, String sufix) {
+        File[] files = path.toFile().listFiles((file, name) -> name.endsWith(sufix));
+        if (files.length > 0) {
+            return files[0].getAbsolutePath();
         }
-        if (srcPaths.size() == 0) {
-            srcpath = new String[1];
-            srcpath[0] = projectpath.toString();
-        } else {
-            srcpath = (String[])srcPaths.toArray(new String[srcPaths.size()]);
-        }
-        
-        classpath = ModelBuilderBatch.getClassPath(projectpath.toString() + File.separator + "lib/*");
-        binpath = projectpath.toString() + File.separator + "bin";
-        */
+        return null;
     }
     
-    private List<String> getSrcPaths(String settingFile) throws IOException {
-        List<String> srcPaths = new ArrayList<String>();
-        if (settingFile == null) {
-            return srcPaths;
-        }
+    private void setPaths(Path path) throws Exception {
+        sourcePath = new HashSet<String>();
+        binaryPath = new HashSet<String>();
+        classPath = new HashSet<String>();
         
-        try (BufferedReader in = new BufferedReader(new FileReader(new File(settingFile)))) {
-            String line;
-            while ((line = in.readLine()) != null) {
-                if (line.startsWith("include")) {
-                    int beginIndex = line.indexOf("\"");
-                    int endIndex = line.lastIndexOf("\"");
-                    String included = line.substring(beginIndex + 1, endIndex);
-                    
-                    Path subproject = basePath.resolve(included);
-                    if (subproject.toFile().exists()) {
-                        addSrcPath(subproject, srcPaths);
-                    }
+        ProjectConnection connection = GradleConnector.newConnector().forProjectDirectory(path.toFile()).connect();
+        try {
+            EclipseProject project = connection.model(EclipseProject.class).get();
+            if (project != null) {
+                sourcePath = project.getSourceDirectories().stream()
+                            .map(elem -> basePath.resolve(elem.getPath()).toString()).collect(Collectors.toCollection(HashSet::new));
+                
+                binaryPath = project.getSourceDirectories().stream()
+                        .map(elem -> basePath.resolve(elem.getOutput()).toString()).collect(Collectors.toCollection(HashSet::new));
+                
+                Set<String> dependencies = project.getClasspath().stream()
+                        .filter(elem -> elem.getSource() != null)
+                        .map(elem -> elem.getSource().getAbsolutePath()).collect(Collectors.toCollection(HashSet::new));
+                
+                final Path libpath = basePath.resolve("lib");
+                if (!libpath.toFile().exists()) {
+                    System.out.println("Copying dependency jar files to " + libpath.toString());
+                    Files.createDirectory(libpath);
+                    copyDependentLibraries(dependencies, libpath);
                 }
+                classPath.add(libpath.toString());
             }
-        } catch (IOException e) {
-            throw e;
+        } finally {
+           connection.close();
         }
-        return srcPaths;
     }
     
-    private void addSrcPath(Path path, List<String> srcPaths) {
-        Path srcPath = path.resolve("src").resolve("main").resolve("java");
-        if (srcPath != null) {
-            srcPaths.add(srcPath.toString());
+    private void copyDependentLibraries(Set<String> dependencies, Path libpath) {
+        for (String dep : dependencies) {
+            try {
+                int index = dep.lastIndexOf(File.separator);
+                String name = dep.substring(index + 1);
+                Files.copy(Paths.get(dep), libpath.resolve(name));
+            } catch (IOException e) { /* empty */ }
         }
-        Path testPath = path.resolve("src").resolve("test").resolve("java");
-        if (testPath != null) {
-            srcPaths.add(testPath.toString());
-        }
+    }
+    
+    @Override
+    public String toString() {
+        return "Gradle (Eclipse) Env " + basePath.toString();
     }
 }

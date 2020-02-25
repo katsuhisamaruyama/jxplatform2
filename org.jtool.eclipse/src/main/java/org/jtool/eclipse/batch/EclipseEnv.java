@@ -24,6 +24,8 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 class EclipseEnv extends ProjectEnv {
     
+    final static String configName = ".classpath";
+    
     EclipseEnv(String target) {
         super(target);
     }
@@ -31,7 +33,7 @@ class EclipseEnv extends ProjectEnv {
     @Override
     boolean isApplicable() {
         try {
-            Path config = basePath.resolve(Paths.get(".classpath"));
+            Path config = basePath.resolve(Paths.get(EclipseEnv.configName));
             if (config.toFile().exists()) {
                 setPaths(config.toString());
                 return true;
@@ -81,5 +83,10 @@ class EclipseEnv extends ProjectEnv {
                 }
             }
         }
+    }
+    
+    @Override
+    public String toString() {
+        return "Eclipse Env " + basePath.toString();
     }
 }

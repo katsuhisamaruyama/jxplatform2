@@ -28,6 +28,8 @@ import org.apache.maven.shared.invoker.DefaultInvoker;
  */
 class MavenEnv extends ProjectEnv {
     
+    final static String configName = "pom.xml";
+    
     MavenEnv(String target) {
         super(target);
     }
@@ -35,7 +37,7 @@ class MavenEnv extends ProjectEnv {
     @Override
     boolean isApplicable() {
         try {
-            Path config = basePath.resolve(Paths.get("pom.xml"));
+            Path config = basePath.resolve(Paths.get(MavenEnv.configName));
             if (config.toFile().exists()) {
                 setPaths(config.toString());
                 return true;
@@ -160,5 +162,10 @@ class MavenEnv extends ProjectEnv {
             return mvn.toString();
         }
         return null;
+    }
+    
+    @Override
+    public String toString() {
+        return "Maven Env " + basePath.toString();
     }
 }

@@ -36,9 +36,11 @@ abstract class ProjectEnv {
         envs.add(new EclipseEnv(target));
         envs.add(new AntEnv(target));
         envs.add(new MavenEnv(target));
+        envs.add(new GradleEnv(target));
         
         for (ProjectEnv env : envs) {
             if (env.isApplicable()) {
+                
                 return env;
             }
         }
@@ -104,64 +106,5 @@ abstract class ProjectEnv {
             resolvedPath = ModelBuilderBatch.getClassPath(classPathStr);
         }
         return resolvedPath;
-    }
-    
-    /*
-    static ProjectPathInfo getProjectPathInfo(String target) {
-        String cdir = new File(".").getAbsoluteFile().getParent();
-        File dir = new File(ModelBuilderBatch.getFullPath(target, cdir));
-        Path path = Paths.get(dir.getAbsolutePath());
-        
-        try {
-            String configFile = isEclipse(path);
-            if (configFile != null) {
-                return new EclipsePathInfo(path, configFile);
-            }
-        } catch (IOException e) {  }
-        
-        try {
-            String configFile = isAnt(path);
-            if (configFile != null) {
-                return new AntPathInfo(path, configFile);
-            }
-        } catch (IOException e) {  }
-        
-        try {
-            String configFile = isGradle(path);
-            if (configFile != null) {
-                return new GradlePathInfo(path, configFile);
-            }
-        } catch (IOException e) {  }
-        
-        try {
-            String configFile = isMaven(path);
-            if (configFile != null) {
-                return new MavenPathInfo(path, configFile);
-            }
-        } catch (IOException e) {  }
-        return null;
-    }
-    */
-    
-    
-    private static String isGradle(Path base) {
-        String configFile = getFileName(base, "build.gradle");
-        if (configFile != null) {
-            return configFile;
-        }
-        configFile = getFileName(base.getParent(), "build.gradle");
-        if (configFile != null) {
-            return configFile;
-        }
-        return null;
-    }
-    
-    protected static String getFileName(Path base, String prefix) {
-        File baseDir = base.toFile();
-        File[] files = baseDir.listFiles((file, name) -> name.startsWith(prefix));
-        if (files != null && files.length == 1) {
-            return files[0].getAbsolutePath();
-        }
-        return null;
     }
 }

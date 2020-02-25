@@ -24,6 +24,8 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 class AntEnv extends ProjectEnv {
     
+    final static String configName = "build.xml";
+    
     AntEnv(String target) {
         super(target);
     }
@@ -31,7 +33,7 @@ class AntEnv extends ProjectEnv {
     @Override
     boolean isApplicable() {
         try {
-            Path config = basePath.resolve(Paths.get("build.xml"));
+            Path config = basePath.resolve(Paths.get(AntEnv.configName));
             if (config.toFile().exists()) {
                 setPaths(config.toString());
                 return true;
@@ -130,5 +132,10 @@ class AntEnv extends ProjectEnv {
             }
             return value;
         }
+    }
+    
+    @Override
+    public String toString() {
+        return "Ant Env " + basePath.toString();
     }
 }

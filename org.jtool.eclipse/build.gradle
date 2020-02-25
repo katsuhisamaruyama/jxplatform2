@@ -45,14 +45,16 @@ targetCompatibility = '1.8'
 repositories {
     mavenCentral()
     maven { url 'https://plugins.gradle.org/m2/' }
-    //maven { url 'https://repo.gradle.org/gradle/libs-releases' }
+    maven { url 'https://repo.gradle.org/gradle/libs-releases' }
 }
 
 dependencies {
-    compile group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.20.+'
+    compile group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.18.+'
     compile group: 'org.apache.maven.shared', name: 'maven-invoker', version: '2.1.+'
     compile group: 'org.apache.maven', name: 'maven-model', version: '3.6.+'
-    //compile group: 'org.gradle', name: 'gradle-tooling-api', version: '6.2'
+    compile group: 'org.gradle', name: 'gradle-tooling-api', version: '6.2'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.+'
+    testCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.+'
     compile files('lib/javassist.jar')
     testCompile 'junit:junit:4.+'
 }
@@ -69,11 +71,13 @@ shadowJar {
     }
 }
 
+/*
 task copyJar(type:Copy) {
     from 'build/libs'
     into 'releases'
 }
-
+*/
+/*
 task copyDependencies(type:Copy) {
     new File('lib-gradle').mkdirs()
     configurations.compile.each {
@@ -85,3 +89,4 @@ task copyDependencies(type:Copy) {
         copy { from fromJarFile into 'lib-gradle' }
     }
 }
+*/

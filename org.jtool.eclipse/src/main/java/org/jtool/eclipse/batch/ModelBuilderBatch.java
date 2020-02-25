@@ -75,6 +75,7 @@ public class ModelBuilderBatch extends ModelBuilder {
             for (String subproject : subProjects) {
                 int index = subproject.lastIndexOf(File.separatorChar);
                 String subname = name + "#" + subproject.substring(index + 1);
+                System.out.println("Checking sub-project " + subproject);
                 JavaProject project = builder.build(subname, subproject);
                 projects.add(project);
             }
@@ -85,6 +86,10 @@ public class ModelBuilderBatch extends ModelBuilder {
     public JavaProject build(String name, String target) {
         ProjectEnv env = ProjectEnv.getProjectEnv(target);
         if (env != null) {
+            
+            System.out.println("Env = " + env.toString());
+            System.out.println("Target = " + target);
+            
             for (String s : env.getClassPath()) {
                 System.out.println("C="+s);
             }
@@ -148,23 +153,11 @@ public class ModelBuilderBatch extends ModelBuilder {
         return projects;
     }
     
-    private static boolean isSubProject(File dir) {
-        return isSubProject(dir, "build.xml") || isSubProject(dir, "pom.xml") || isSubProject(dir, "build.gradle");
+    private boolean isSubProject(File dir) {
+        File[] files = dir.listFiles((file, name)
+                -> (name.equals(AntEnv.configName) || name.equals(MavenEnv.configName) || name.endsWith(GradleEnv.configName)));
+        return files.length > 0;
     }
-    
-    private static boolean isSubProject(File dir, String configName) {
-        for (File file : dir.listFiles()) {
-            if (file.isFile()) {
-                String name = file.getName();
-                if (name.equals(configName) || name.startsWith(configName)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-    
-    
     
     static String[] getSourcePath(String srcPath, String base) {
         if (srcPath == null) {
