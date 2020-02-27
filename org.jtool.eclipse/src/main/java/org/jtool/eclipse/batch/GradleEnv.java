@@ -27,8 +27,8 @@ class GradleEnv extends ProjectEnv {
     
     final static String configName = ".gradle";
     
-    GradleEnv(String target) {
-        super(target);
+    GradleEnv(Path basePath) {
+        super(basePath);
     }
     
     @Override

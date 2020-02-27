@@ -30,8 +30,8 @@ class MavenEnv extends ProjectEnv {
     
     final static String configName = "pom.xml";
     
-    MavenEnv(String target) {
-        super(target);
+    MavenEnv(Path basePath) {
+        super(basePath);
     }
     
     @Override

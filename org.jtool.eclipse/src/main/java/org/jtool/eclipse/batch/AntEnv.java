@@ -26,8 +26,8 @@ class AntEnv extends ProjectEnv {
     
     final static String configName = "build.xml";
     
-    AntEnv(String target) {
-        super(target);
+    AntEnv(Path basePath) {
+        super(basePath);
     }
     
     @Override

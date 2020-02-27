@@ -26,8 +26,8 @@ class EclipseEnv extends ProjectEnv {
     
     final static String configName = ".classpath";
     
-    EclipseEnv(String target) {
-        super(target);
+    EclipseEnv(Path basePath) {
+        super(basePath);
     }
     
     @Override

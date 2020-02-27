@@ -6,9 +6,7 @@
 
 package org.jtool.eclipse.batch;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
@@ -25,18 +23,16 @@ abstract class ProjectEnv {
     protected Set<String> binaryPath;
     protected Set<String> classPath;
     
-    ProjectEnv(String target) {
-        String cdir = new File(".").getAbsoluteFile().getParent();
-        File dir = new File(ModelBuilderBatch.getFullPath(target, cdir));
-        basePath = Paths.get(dir.getAbsolutePath());
+    ProjectEnv(Path basePath) {
+        this.basePath = basePath;
     }
     
-    static ProjectEnv getProjectEnv(String target) {
+    static ProjectEnv getProjectEnv(Path basePath) {
         List<ProjectEnv> envs = new ArrayList<ProjectEnv>();
-        envs.add(new EclipseEnv(target));
-        envs.add(new AntEnv(target));
-        envs.add(new MavenEnv(target));
-        envs.add(new GradleEnv(target));
+        envs.add(new EclipseEnv(basePath));
+        envs.add(new AntEnv(basePath));
+        envs.add(new MavenEnv(basePath));
+        envs.add(new GradleEnv(basePath));
         
         for (ProjectEnv env : envs) {
             if (env.isApplicable()) {
@@ -51,60 +47,19 @@ abstract class ProjectEnv {
         return false;
     }
     
-    String getProjectPath() {
-        return basePath.toString();
+    Path getBasePath() {
+        return basePath;
     }
     
-    String[] getSourcePath() {
-        String[] resolvedPath;
-        if (sourcePath.size() == 0) {
-            resolvedPath = new String[1];
-            Path srcDir = basePath.resolve("src");
-            if (srcDir.toFile().exists()) {
-                resolvedPath[0] = srcDir.toString();
-            } else {
-                resolvedPath[0] = basePath.toString();
-            }
-        } else {
-            resolvedPath = (String[])sourcePath.toArray(new String[sourcePath.size()]);
-        }
-        return resolvedPath;
+    Set<String> getSourcePath() {
+        return sourcePath;
     }
     
-    String[] getBinaryPath() {
-        String[] resolvedPath;
-        if (binaryPath.size() == 0) {
-            Path binDir = basePath.resolve("bin");
-            resolvedPath = new String[1];
-            if (binDir.toFile().exists()) {
-                resolvedPath[0] = binDir.toString();
-            } else {
-                resolvedPath[0] = basePath.toString();
-            }
-        } else {
-            resolvedPath = (String[])binaryPath.toArray(new String[binaryPath.size()]);
-        }
-        return resolvedPath;
+    Set<String> getBinaryPath() {
+        return binaryPath;
     }
     
-    String[] getClassPath() {
-        String[] resolvedPath;
-        if (classPath.size() == 0) {
-            resolvedPath = ModelBuilderBatch.getClassPath(basePath.toString() + File.separator + "lib/*");
-        } else {
-            String classPathStr = "";
-            for (String path : classPath) {
-                if (path.endsWith(".jar")) {
-                    classPathStr = classPathStr + File.pathSeparator + path;
-                } else {
-                    classPathStr = classPathStr + File.pathSeparator + path + "/*";
-                }
-            }
-            if (classPathStr.length() > 0) {
-                classPathStr = classPathStr.substring(1);
-            }
-            resolvedPath = ModelBuilderBatch.getClassPath(classPathStr);
-        }
-        return resolvedPath;
+    Set<String> getClassPath() {
+        return classPath;
     }
 }

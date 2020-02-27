@@ -21,12 +21,16 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.util.stream.Collectors;
 
 /**
  * Builds a Java Model.
@@ -84,26 +88,60 @@ public class ModelBuilderBatch extends ModelBuilder {
     }
     
     public JavaProject build(String name, String target) {
-        ProjectEnv env = ProjectEnv.getProjectEnv(target);
+        String cdir = new File(".").getAbsoluteFile().getParent();
+        Path basePath = Paths.get(getFullPath(target, cdir));
+        
+        ProjectEnv env = ProjectEnv.getProjectEnv(basePath);
         if (env != null) {
             
             System.out.println("Env = " + env.toString());
             System.out.println("Target = " + target);
-            
-            for (String s : env.getClassPath()) {
+            String[] classPath = getClassPath(basePath, env.getClassPath(), "lib");
+            String[] sourcePath = getPath(basePath, env, env.getSourcePath(), "src");
+            String[] binaryPath = getPath(basePath, env, env.getBinaryPath(), "bin");
+                    
+            for (String s : classPath) {
                 System.out.println("C="+s);
             }
-            for (String s : env.getSourcePath()) {
+            for (String s : sourcePath) {
                 System.out.println("S="+s);
             }
-            for (String s : env.getBinaryPath()) {
+            for (String s : binaryPath) {
                 System.out.println("B="+s);
             }
             
-            return build(name, target, env.getClassPath(), env.getSourcePath(), env.getBinaryPath());
+            return build(name, basePath, classPath, sourcePath, binaryPath);
         } else {
-            return build(name, target, target);
+            
+            System.out.println("NO ENV SPECIFIED");
+            
+            return build(name, basePath, target, null, null);
         }
+    }
+    
+    private String[] getPath(Path basePath, ProjectEnv env, Set<String> pathSet, String dirname) {
+        if (pathSet.size() == 0) {
+            String[] srcpaths = new String[1];
+            srcpaths[0] = basePath.resolve(dirname).toString();
+            return srcpaths;
+        }
+        return (String[])pathSet.toArray(new String[pathSet.size()]);
+    }
+    
+    private String[] getClassPath(Path basePath, Set<String> pathSet, String dirname) {
+        String classPathStr;
+        if (pathSet.size() == 0) {
+            classPathStr = basePath.toString() + File.separator + dirname + File.separator + "*";
+        } else {
+            Set<String> libPath = pathSet.stream()
+                        .map(path -> getLibrarryPath(path)).collect(Collectors.toCollection(HashSet::new));
+            classPathStr = String.join(File.pathSeparator, libPath);
+        }
+        return getClassPath(classPathStr);
+    }
+    
+    private String getLibrarryPath(String path) {
+        return (path.endsWith(".jar")) ? path : path + File.separator + "*";
     }
     
     public JavaProject build(String name, String target, String classpath) {
@@ -111,22 +149,26 @@ public class ModelBuilderBatch extends ModelBuilder {
     }
     
     public JavaProject build(String name, String target, String classpath, String srcpath, String binpath) {
-        File file = new File(target);
-        String path = file.getAbsolutePath();
-        String[] classpaths = getClassPath(classpath);
-        String[] srcpaths = getSourcePath(srcpath, path);
-        String[] binpaths = getBinaryPath(binpath, path);
-        return build(name, target, path, classpaths, srcpaths, binpaths);
+        String cdir = new File(".").getAbsoluteFile().getParent();
+        Path basePath = Paths.get(getFullPath(target, cdir));
+        return build(name, basePath, classpath, srcpath, binpath);
     }
     
     public JavaProject build(String name, String target, String[] classpath, String[] srcpath, String[] binpath) {
-        File file = new File(target);
-        String path = file.getAbsolutePath();
-        return build(name, target, path, classpath, srcpath, binpath);
+        String cdir = new File(".").getAbsoluteFile().getParent();
+        Path basePath = Paths.get(getFullPath(target, cdir));
+        return build(name, basePath, classpath, srcpath, binpath);
     }
     
-    private JavaProject build(String name, String target, String path, String[] classpath, String[] srcpath, String[] binpath) {
-        JavaProject jproject = new JavaProject(name, path, path);
+    private JavaProject build(String name, Path basePath, String classpath, String srcpath, String binpath) {
+        String[] classpaths = getClassPath(classpath);
+        String[] srcpaths = getSourcePath(srcpath, basePath);
+        String[] binpaths = getBinaryPath(binpath, basePath);
+        return build(name, basePath, classpaths, srcpaths, binpaths);
+    }
+    
+    private JavaProject build(String name, Path basePath, String[] classpath, String[] srcpath, String[] binpath) {
+        JavaProject jproject = new JavaProject(name, basePath.toString(), basePath.toString());
         jproject.getCFGStore().create(jproject, analyzingBytecode);
         jproject.setModelBuilder(this);
         jproject.setClassPath(classpath);
@@ -159,19 +201,21 @@ public class ModelBuilderBatch extends ModelBuilder {
         return files.length > 0;
     }
     
-    static String[] getSourcePath(String srcPath, String base) {
+    private String[] getSourcePath(String srcPath, Path basePath) {
         if (srcPath == null) {
             String[] srcpaths = new String[1];
-            srcpaths[0] = base + File.separator + "src";
+            srcpaths[0] = basePath.resolve("src").toString();
             return srcpaths;
         }
         return srcPath.split(File.pathSeparator);
     }
     
-    static String[] getBinaryPath(String binPath, String base) {
+    
+    
+    private String[] getBinaryPath(String binPath, Path basePath) {
         if (binPath == null) {
             String[] binPaths = new String[1];
-            binPaths[0] = base + File.separator + "bin";
+            binPaths[0] = basePath.resolve("bin").toString();
             return binPaths;
         }
         return binPath.split(File.pathSeparator);

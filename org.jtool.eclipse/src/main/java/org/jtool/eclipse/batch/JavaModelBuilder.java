@@ -33,13 +33,11 @@ public class JavaModelBuilder {
             String cdir = new File(".").getAbsoluteFile().getParent();
             Options options = new Options(args);
             String target = removeLastFileSeparator(options.get("-target", "."));
-            target = removeLastFileSeparator(target);
             
             projectName = options.get("-name", getProjectName(target, cdir));
             File dir = new File(ModelBuilderBatch.getFullPath(target, cdir));
             projectPath = dir.getCanonicalPath();
             classpath = getPath(target, options.get("-classpath", target));
-            
             autoCheckEnv = options.get("auto-check-env", "no");
             if (autoCheckEnv.contentEquals("yes")) {
                 srcpath = target;
