@@ -98,7 +98,7 @@ public class JavaModelBuilderTest {
         builder.unbuild();
     }
     
-    private final static String testDirOutside = "/Users/maru/Desktop/TestGenExp/";
+    private final static String testDirOutside = "/Users/maru/Desktop/TestSamples/";
     
     private void run(String name) {
         String target = testDirOutside + name + "/";
@@ -134,17 +134,38 @@ public class JavaModelBuilderTest {
         //tester.run("apache-ant-1.10.7");  // Ant
         //tester.run("apache-log4j-2.13.0");  // Maven
         //tester.run("bcel-6.4.1");  // Maven
-                    //tester.run("cassandra-3.11.6");  // ?
         //tester.run("findbugs-3.0.1");  // Eclipse / Maven
         //tester.run("commons-collections4-4.4");  // Maven
         //tester.run("commons-math3-3.6.1");  // Maven
-                    // Unknown ERROR tester.run("guava-28.2");  // Maven
+                    //tester.run("guava-28.2");  // Maven // NULL RETURN TYPE
         //tester.run("jfreechart-1.0.19");  // Maven
         //tester.run("jsoup-1.12.2");  // Maven
         //tester.run("junit4-4.13");  // Maven
         //tester.run("pmd-6.21.0");
-                    //tester.run("RxJava-3");  // Gradle
-                    // Unknown ERROR tester.run("Twitter4J-2.2");  // Maven
-                    //tester.run("spring-framework-5.2");  // Gradle
+                    //tester.run("RxJava-3.x");  // Gradle  // NULL RETURN TYPE
+                    //tester.run("Twitter4J-2.2");  // Maven // NULL RETURN TYPE
+        
+                //tester.run("spring-framework-5.2");  // Gradle
+                //tester.run("spring-framework-5.2/spring-aop");  // Unresolved
+        //tester.run("spring-framework-5.2/spring-aspects");
+                //tester.run("spring-framework-5.2/spring-beans");  // Unresolved
+                //tester.run("spring-framework-5.2/spring-context");  // NULL RETURN TYPE
+        //tester.run("spring-framework-5.2/spring-context-indexer");
+                //tester.run("spring-framework-5.2/spring-context-support");  // NULL RETURN TYPE
+                //tester.run("spring-framework-5.2/spring-core");  // NULL RETURN TYPE
+        //tester.run("spring-framework-5.2/spring-expression");
+        //tester.run("spring-framework-5.2/spring-instrument");
+        //tester.run("spring-framework-5.2/spring-jcl");
+                //tester.run("spring-framework-5.2/spring-jdbc");  // NULL RETURN TYPE
+                //tester.run("spring-framework-5.2/spring-jms");  // Unresolved
+                //tester.run("spring-framework-5.2/spring-messaging");  / NULL RETURN TYPE Unresolved
+                //tester.run("spring-framework-5.2/spring-orm");  // NULL RETURN TYPE Unresolved
+                //tester.run("spring-framework-5.2/spring-oxm");  // Unresolved
+                //tester.run("spring-framework-5.2/spring-test");  // Unresolved
+                //tester.run("spring-framework-5.2/spring-tx");  // NULL RETURN TYPE Unresolved
+                //tester.run("spring-framework-5.2/spring-web");  // NULL RETURN TYPE Unresolved
+                //ester.run("spring-framework-5.2/spring-webflux");  // NULL RETURN TYPE Unresolved
+                //tester.run("spring-framework-5.2/spring-webmvc");  // NULL RETURN TYPE Unresolved
+                //tester.run("spring-framework-5.2/spring-websocket");  // NULL RETURN TYPE Unresolved
     }
 }
