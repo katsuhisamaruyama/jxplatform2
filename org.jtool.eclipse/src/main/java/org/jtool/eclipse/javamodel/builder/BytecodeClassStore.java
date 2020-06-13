@@ -126,7 +126,7 @@ public class BytecodeClassStore {
                         .map(list -> list.stream()).collect(Collectors.toCollection(HashSet::new));
             }
         }
-        return null;
+        return new HashSet<JavaClass>();
     }
     
     private boolean isChildOf(JavaClass jclass, String fqn) {
