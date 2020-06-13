@@ -107,6 +107,7 @@ public class JClassExternal extends JClass {
                 classes.add(clazz);
             }
         }
+        
         for (JavaClass jc : bytecodeClassStore.getJavaDescendants(cfgStore.getJavaProject(), ctClass.getName())) {
             JClass clazz = cfgStore.getJInfoStore().getJClass(jc.getQualifiedName());
             if (clazz != null) {
