@@ -18,6 +18,10 @@ import java.util.Set;
  */
 abstract class ProjectEnv {
     
+    private static final String DEFAULT_SOURCEPATH = "srb";
+    private static final String DEFAULT_BINARYPATH = "bin";
+    private static final String DEFAULT_CLASSPATH = "lib";
+    
     protected Path basePath;
     protected Set<String> sourcePath;
     protected Set<String> binaryPath;
@@ -40,7 +44,7 @@ abstract class ProjectEnv {
                 return env;
             }
         }
-        return null;
+        return new SimpleEnv(basePath);
     }
     
     boolean isApplicable() {
@@ -52,14 +56,23 @@ abstract class ProjectEnv {
     }
     
     Set<String> getSourcePath() {
+        if (sourcePath.size() == 0) {
+            sourcePath.add(basePath.resolve(DEFAULT_SOURCEPATH).toString());
+        }
         return sourcePath;
     }
     
     Set<String> getBinaryPath() {
+        if (binaryPath.size() == 0) {
+            binaryPath.add(basePath.resolve(DEFAULT_BINARYPATH).toString());
+        }
         return binaryPath;
     }
     
     Set<String> getClassPath() {
+        if (classPath.size() == 0) {
+            classPath.add(basePath.resolve(DEFAULT_CLASSPATH).toString());
+        }
         return classPath;
     }
 }

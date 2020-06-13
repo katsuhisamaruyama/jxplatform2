@@ -108,18 +108,20 @@ class MavenEnv extends ProjectEnv {
     }
     
     private void copyDependentLibraries(String configFile, Path libpath) throws Exception {
-        if (libpath.toFile().exists()) {
+        if (libpath.toFile().exists() && libpath.toFile().list().length > 0) {
             return;
         }
         
         Path userHome = Paths.get(System.getProperty("user.home"));
         String mvnCommand = findMvnCommand(userHome);
         if (mvnCommand == null) {
-            System.out.println("****************************************************************************************");
-            System.out.println("Please execute Maven command -- mvn dependency:copy-dependencies -DoutputDirectory=lib");
-            System.out.println("****************************************************************************************");
+            System.err.println("****************************************************************************************");
+            System.err.println("Please execute Maven command -- mvn dependency:copy-dependencies -DoutputDirectory=lib");
+            System.err.println("****************************************************************************************");
             throw new Exception();
         }
+        
+       
         
         System.out.println("Copying dependency jar files to " + libpath.toString());
         Files.createDirectory(libpath);

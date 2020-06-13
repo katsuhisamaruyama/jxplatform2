@@ -56,6 +56,7 @@ class AntEnv extends ProjectEnv {
     private class ConfigParser extends DefaultHandler {
         private Map<String, String> properties = new HashMap<String, String>();
         private boolean isClasspathElem = false;
+        private boolean isJavacElem = false;
         
         private Set<String> srcpath = new HashSet<String>();
         private Set<String> binpath = new HashSet<String>();
@@ -74,6 +75,7 @@ class AntEnv extends ProjectEnv {
                 }
                 
             } else if (qname.equals("javac") && attr != null) {
+                isJavacElem = true;
                 String srcdir = attr.getValue("srcdir");
                 if (srcdir != null) {
                     Path path = basePath.resolve(replace(srcdir));
@@ -89,7 +91,7 @@ class AntEnv extends ProjectEnv {
                     }
                 }
                 
-            } else if (qname.contentEquals("path") && attr != null) {
+            } else if (isJavacElem && qname.contentEquals("path") && attr != null) {
                 String id = attr.getValue("id");
                 if (id != null && id.equals("classpath")) {
                     isClasspathElem = true;
@@ -104,13 +106,21 @@ class AntEnv extends ProjectEnv {
                     }
                     classpath.add(basePath.resolve("lib").toString());
                 }
+            } else if (qname.equals("src") && attr != null) {
+                String srcdir = attr.getValue("path");
+                Path path = basePath.resolve(replace(srcdir));
+                if (path.toFile().exists()) {
+                    srcpath.add(path.toString());
+                }
             }
         }
         
         @Override
-        public void endElement (String uri, String lname, String qname) {
+        public void endElement(String uri, String lname, String qname) {
             if (isClasspathElem && qname.equals("path")) {
                 isClasspathElem = false;
+            } else if (isJavacElem && qname.equals("javac")) {
+                isJavacElem = false;
             }
         }
         

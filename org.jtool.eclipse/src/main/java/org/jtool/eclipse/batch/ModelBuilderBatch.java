@@ -53,74 +53,51 @@ public class ModelBuilderBatch extends ModelBuilder {
         return false;
     }
     
-    public List<JavaProject> build(String name, String target, boolean checkSubProject) {
-        ModelBuilderBatch builder = new ModelBuilderBatch(true);
-        if (checkSubProject) {
-            return buildWithSubProject(builder, name, target);
-        } else {
-            return buildWithoutSubProject(builder, name, target);
-        }
-    }
-    
-    private List<JavaProject> buildWithoutSubProject(ModelBuilderBatch builder, String name, String target) {
-        List<JavaProject> projects = new ArrayList<JavaProject>();
-        JavaProject project = builder.build(name, target);
-        projects.add(project);
-        return projects;
-    }
-    
-    private List<JavaProject> buildWithSubProject(ModelBuilderBatch builder, String name, String target) {
-        List<JavaProject> projects = new ArrayList<JavaProject>();
-        List<String> subProjects = getSubProject(new File(target));
-        
+    public List<JavaProject> build(String name, String target) {
+        List<String> subProjects = getSubProjects(new File(target));
         if (subProjects.size() == 0) {
-            JavaProject project = builder.build(name, target);
-            projects.add(project);
+            List<JavaProject> projects = new ArrayList<JavaProject>();
+            JavaProject jproject = buildSingleTarget(name, target);
+            projects.add(jproject);
+            return projects;
         } else {
-            for (String subproject : subProjects) {
-                int index = subproject.lastIndexOf(File.separatorChar);
-                String subname = name + "#" + subproject.substring(index + 1);
-                System.out.println("Checking sub-project " + subproject);
-                JavaProject project = builder.build(subname, subproject);
-                projects.add(project);
-            }
+            return buildMultiTargets(name, subProjects);
         }
-        return projects;
     }
     
-    public JavaProject build(String name, String target) {
+    private JavaProject buildSingleTarget(String name, String target) {
         String cdir = new File(".").getAbsoluteFile().getParent();
         Path basePath = Paths.get(getFullPath(target, cdir));
         
         ProjectEnv env = ProjectEnv.getProjectEnv(basePath);
-        if (env != null) {
-            String[] classPath = getClassPath(basePath, env.getClassPath(), "lib");
-            String[] sourcePath = getPath(basePath, env, env.getSourcePath(), "src");
-            String[] binaryPath = getPath(basePath, env, env.getBinaryPath(), "bin");
-            return build(name, basePath, classPath, sourcePath, binaryPath);
-        } else {
-            return build(name, basePath, target, null, null);
-        }
+        String[] classPath = getClassPath(env.getClassPath());
+        String[] sourcePath = getPath(env.getSourcePath());
+        String[] binaryPath = getPath(env.getBinaryPath());
+        JavaProject jproject = build(name, basePath, classPath, sourcePath, binaryPath);
+        return jproject;
     }
     
-    private String[] getPath(Path basePath, ProjectEnv env, Set<String> pathSet, String dirname) {
-        if (pathSet.size() == 0) {
-            String[] srcpaths = new String[1];
-            srcpaths[0] = basePath.resolve(dirname).toString();
-            return srcpaths;
+    private List<JavaProject> buildMultiTargets(String name, List<String> subProjects) {
+        List<JavaProject> projects = new ArrayList<JavaProject>();
+        for (String subproject : subProjects) {
+            int index = subproject.lastIndexOf(File.separatorChar);
+            String subname = name + "#" + subproject.substring(index + 1);
+            System.out.println("Checking sub-project " + subproject);
+            JavaProject project = buildSingleTarget(subname, subproject);
+            projects.add(project);
         }
+        return projects;
+    }
+    
+    private String[] getPath(Set<String> pathSet) {
         return (String[])pathSet.toArray(new String[pathSet.size()]);
     }
     
-    private String[] getClassPath(Path basePath, Set<String> pathSet, String dirname) {
+    private String[] getClassPath(Set<String> pathSet) {
         String classPathStr;
-        if (pathSet.size() == 0) {
-            classPathStr = basePath.toString() + File.separator + dirname + File.separator + "*";
-        } else {
-            Set<String> libPath = pathSet.stream()
-                        .map(path -> getLibrarryPath(path)).collect(Collectors.toCollection(HashSet::new));
-            classPathStr = String.join(File.pathSeparator, libPath);
-        }
+        Set<String> libPath = pathSet.stream()
+                .map(path -> getLibrarryPath(path)).collect(Collectors.toSet());
+        classPathStr = String.join(File.pathSeparator, libPath);
         return getClassPath(classPathStr);
     }
     
@@ -164,22 +141,22 @@ public class ModelBuilderBatch extends ModelBuilder {
         return jproject;
     }
     
-    private List<String> getSubProject(File dir) {
-        List<String> projects = new ArrayList<String>();
+    private List<String> getSubProjects(File dir) {
+        List<String> targets = new ArrayList<String>();
         
         for (File file : dir.listFiles()) {
-            if (file.isDirectory() && isSubProject(file)) {
+            if (file.isDirectory() && isProject(file)) {
                 String path = file.getAbsolutePath();
                 if (ModelBuilderBatch.collectAllJavaFiles(path + File.separator + "src").size() > 0) {
-                    projects.add(path);
+                    targets.add(path);
                 }
-                projects.addAll(getSubProject(new File(file.getAbsolutePath())));
+                targets.addAll(getSubProjects(new File(file.getAbsolutePath())));
             }
         }
-        return projects;
+        return targets;
     }
     
-    private boolean isSubProject(File dir) {
+    private boolean isProject(File dir) {
         File[] files = dir.listFiles((file, name)
                 -> (name.equals(AntEnv.configName) || name.equals(MavenEnv.configName) || name.endsWith(GradleEnv.configName)));
         return files.length > 0;

@@ -121,12 +121,12 @@ public class JavaModelBuilder {
     }
     
     public void build() {
-        if (autoCheckEnv.equals("yes")) {
+        if (!autoCheckEnv.equals("yes")) {
             modelBuilder = new ModelBuilderBatch(true);
             modelBuilder.build(projectName, projectPath, classpath, srcpath, binpath);
         } else {
             modelBuilder = new ModelBuilderBatch(true);
-            modelBuilder.build(projectName, projectPath, true);
+            modelBuilder.build(projectName, projectPath);
         }
     }
     

@@ -102,11 +102,6 @@ public class JavaMethod extends JavaElement {
             signature = ".UNKNOWN";
             fqn = ".UNKNOWN";
             kind = JavaMethod.Kind.UNKNOWN;
-            
-            if (returnType == null) {
-                System.err.println("NULL RETURN TYPE = " + node.getName());
-                System.err.println(node.getParent());
-            }
         }
         
         jclass.addMethod(this);
