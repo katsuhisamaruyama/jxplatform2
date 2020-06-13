@@ -49,7 +49,7 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.18.+'
+    implementation group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.core', version: '3.21.+'
     implementation group: 'org.apache.maven.shared', name: 'maven-invoker', version: '2.1.+'
     implementation group: 'org.apache.maven', name: 'maven-model', version: '3.6.+'
     implementation group: 'org.gradle', name: 'gradle-tooling-api', version: '6.2'
