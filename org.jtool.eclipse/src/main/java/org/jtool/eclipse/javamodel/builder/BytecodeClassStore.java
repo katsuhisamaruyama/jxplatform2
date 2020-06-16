@@ -121,16 +121,16 @@ public class BytecodeClassStore {
             BytecodeClassInfo classInfo = classInfoMap.get(fqn);
             if (classInfo != null) {
                 Set<JavaClass> children = jproject.getClasses().stream()
-                        .filter(jc -> isChildOf(jc, fqn)).collect(Collectors.toCollection(HashSet::new));
+                        .filter(jc -> isChildOf(jc, fqn)).collect(Collectors.toSet());
                 children.stream().map(jc -> jc.getDescendants())
-                        .map(list -> list.stream()).collect(Collectors.toCollection(HashSet::new));
+                        .map(list -> list.stream()).collect(Collectors.toSet());
             }
         }
         return new HashSet<JavaClass>();
     }
     
     private boolean isChildOf(JavaClass jclass, String fqn) {
-        if (jclass.getSuperClassName().equals(fqn)) {
+        if (jclass.getSuperClassName() != null && jclass.getSuperClassName().equals(fqn)) {
             return true;
         }
         
