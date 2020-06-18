@@ -106,6 +106,7 @@ class AntEnv extends ProjectEnv {
                     }
                     classpath.add(basePath.resolve("lib").toString());
                 }
+                
             } else if (qname.equals("src") && attr != null) {
                 String srcdir = attr.getValue("path");
                 Path path = basePath.resolve(replace(srcdir));
@@ -131,6 +132,7 @@ class AntEnv extends ProjectEnv {
                 if (endIndex == -1) {
                     return null;
                 }
+                
                 String key = value.substring(beginIndex + 2, endIndex);
                 String cvalue = properties.get(key);
                 if (cvalue != null) {
