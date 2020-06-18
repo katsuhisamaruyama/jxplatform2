@@ -187,6 +187,10 @@ abstract class JMethod extends JElement {
             useFields = new HashSet<String>();
         }
         
+        if (visited.contains(this)) {
+            return;
+        }
+        
         if (visited.size() > MaxNumberOfVisitedMethods) {
             addDefField(UNKNOWN_FIELD_NAME);
             addUseField(UNKNOWN_FIELD_NAME);
