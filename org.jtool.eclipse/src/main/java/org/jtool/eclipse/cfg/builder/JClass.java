@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -90,11 +90,17 @@ abstract class JClass extends JElement {
         return descendants;
     }
     
-    protected abstract boolean isTopLevelClass();
+    protected boolean isTopLevelClass() {
+        return true;
+    }
     
-    protected abstract JClass[] findAncestors();
+    protected JClass[] findAncestors() {
+        return emptyClassArray;
+    }
     
-    protected abstract JClass[] findDescendants();
+    protected JClass[] findDescendants() {
+        return emptyClassArray;
+    }
     
     public boolean equals(JClass clazz) {
         return clazz != null && (this == clazz || getQualifiedName().equals(clazz.getQualifiedName()));

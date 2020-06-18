@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -38,20 +38,5 @@ class JClassCache extends JClass {
     @Override
     protected boolean isInProject() {
         return false;
-    }
-    
-    @Override
-    protected boolean isTopLevelClass() {
-        return true;
-    }
-    
-    @Override
-    protected JClass[] findAncestors() {
-        return emptyClassArray;
-    }
-    
-    @Override
-    protected JClass[] findDescendants() {
-        return emptyClassArray;
     }
 }
