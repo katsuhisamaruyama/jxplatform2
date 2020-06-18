@@ -6,7 +6,6 @@
 
 package org.jtool.eclipse.cfg.builder;
 
-import org.jtool.eclipse.cfg.builder.CFGStore;
 import java.util.Map;
 
 /**
