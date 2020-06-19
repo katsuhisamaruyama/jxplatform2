@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -11,6 +11,7 @@ import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  * An object that represents a class inside the project.
@@ -26,16 +27,22 @@ public class JClassInternal extends JClass {
         super(jclass.getQualifiedName(), cfgStore, jclass.getName(), jclass.getModifiers());
         this.jclass = jclass;
         
+        List<JavaMethod> jms = jclass.getMethods().stream()
+                                                  .filter(jmethod -> jmethod.getKind() != JavaMethod.Kind.UNKNOWN)
+                                                  .collect(Collectors.toList());
         int num = 0;
-        methods = new JMethodInternal[jclass.getMethods().size()];
-        for (JavaMethod jmethod: jclass.getMethods()) {
+        methods = new JMethodInternal[jms.size()];
+        for (JavaMethod jmethod : jms ) {
             methods[num] = new JMethodInternal(jmethod, this, cfgStore);
             num++;
         }
         
+        List<JavaField> jfs = jclass.getFields().stream()
+                                                .filter(jfield -> jfield.getKind() != JavaField.Kind.UNKNOWN)
+                                                .collect(Collectors.toList());
         num = 0;
-        fields = new JFieldInternal[jclass.getFields().size()];
-        for (JavaField jfield : jclass.getFields()) {
+        fields = new JFieldInternal[jfs.size()];
+        for (JavaField jfield : jfs) {
             fields[num] = new JFieldInternal(jfield, this, cfgStore);
             num++;
         }

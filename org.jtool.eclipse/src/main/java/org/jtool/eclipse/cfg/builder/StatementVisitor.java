@@ -703,7 +703,7 @@ public class StatementVisitor extends ASTVisitor {
         expression.accept(exprVisitor);
         CFGNode curNode = exprVisitor.getExitNode();
         
-        setExceptionFlowOnThrow(throwNode, expression.resolveTypeBinding().getTypeDeclaration());
+        setExceptionFlowOnThrow(throwNode, expression.resolveTypeBinding());
         
         ControlFlow fallEdge = createFlow(curNode, nextNode);
         fallEdge.setFallThrough();
@@ -769,23 +769,28 @@ public class StatementVisitor extends ASTVisitor {
         }
     }
     
-    void setExceptionFlowOnMethodCall(CFGStatement node, ITypeBinding type) {
-        setExceptionFlow(node, type, true);
+    void setExceptionFlowOnMethodCall(CFGStatement node, ITypeBinding tbinding) {
+        setExceptionFlow(node, tbinding.getTypeDeclaration(), true);
     }
     
-    private void setExceptionFlowOnThrow(CFGStatement node, ITypeBinding type) {
-        setExceptionFlow(node, type, false);
+    private void setExceptionFlowOnThrow(CFGStatement node, ITypeBinding tbinding) {
+        setExceptionFlow(node, tbinding, false);
     }
     
-    private void setExceptionFlow(CFGStatement node, ITypeBinding type, boolean methodCall) {
+    private void setExceptionFlow(CFGStatement node, ITypeBinding tbinding, boolean methodCall) {
+        if (tbinding == null) {
+            System.err.println("Unknown type in exception " + node.getASTNode());
+            return;
+        }
+        
         if (tryNodeStack.size() > 0) {
-            tryNodeStack.peek().addExceptionOccurrence(node, type, methodCall);
+            tryNodeStack.peek().addExceptionOccurrence(node, tbinding.getTypeDeclaration(), methodCall);
         } else {
-            setExceptionFlowOnMethod(node, type, methodCall);
+            setExceptionFlowOnMethod(node, tbinding.getTypeDeclaration(), methodCall);
         }
     }
     
-    private void setExceptionFlowOnMethod(CFGStatement node, ITypeBinding type, boolean methodCall) {
+    private void setExceptionFlowOnMethod(CFGStatement node, ITypeBinding tbinding, boolean methodCall) {
         if (!cfg.isMethod()) {
             return;
         }
@@ -796,7 +801,7 @@ public class StatementVisitor extends ASTVisitor {
             return;
         }
         
-        for (CFGCatch catchNode : getCatchNodes(type, entry.getExceptionNodes())) {
+        for (CFGCatch catchNode : getCatchNodes(tbinding, entry.getExceptionNodes())) {
             ControlFlow exceptionEdge = createFlow(node, catchNode);
             if (methodCall) {
                 exceptionEdge.setExceptionCatch();
@@ -806,16 +811,16 @@ public class StatementVisitor extends ASTVisitor {
         }
     }
     
-    private Set<CFGCatch> getCatchNodes(ITypeBinding type, List<? extends CFGNode> catchNodes) {
+    private Set<CFGCatch> getCatchNodes(ITypeBinding tbinding, List<? extends CFGNode> catchNodes) {
         Set<CFGCatch> nodes = new HashSet<CFGCatch>();
-        while (type != null) {
+        while (tbinding != null) {
             for (CFGNode node : catchNodes) {
                 CFGCatch catchNode = (CFGCatch)node;
-                if (type.getQualifiedName().equals(catchNode.getTypeName())) {
+                if (tbinding.getQualifiedName().equals(catchNode.getTypeName())) {
                     nodes.add(catchNode);
                 }
             }
-            type = type.getSuperclass();
+            tbinding = tbinding.getSuperclass();
         }
         return nodes;
     }

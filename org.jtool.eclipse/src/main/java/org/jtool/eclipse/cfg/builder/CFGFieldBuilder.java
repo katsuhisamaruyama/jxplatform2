@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -31,10 +31,16 @@ import java.util.HashSet;
 public class CFGFieldBuilder {
     
     public static CFG build(JavaField jfield, JInfoStore infoStore) {
+        if (jfield.getVariableBinding() == null) {
+            return null;
+        }
         return build(jfield, infoStore, new HashSet<JMethod>());
     }
     
     public static CFG build(JavaField jfield, JInfoStore infoStore, Set<JMethod> visited) {
+        if (jfield.getVariableBinding() == null) {
+            return null;
+        }
         return build(jfield, jfield.getVariableBinding(), infoStore, visited);
     }
     

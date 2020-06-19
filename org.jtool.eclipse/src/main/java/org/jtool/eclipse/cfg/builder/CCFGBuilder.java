@@ -53,20 +53,18 @@ public class CCFGBuilder {
         
         for (JavaMethod jmethod : jclass.getMethods()) {
             CFG cfg = infoStore.getCFGStore().getCFG(jmethod, force);
-            if (cfg == null) {
-                cfg = CFGMethodBuilder.build(jmethod, infoStore);
+            if (cfg != null) {
+                ccfg.add(cfg);
+                entry.addMethod(cfg);
             }
-            ccfg.add(cfg);
-            entry.addMethod(cfg);
         }
         
-        for (JavaField jfild : jclass.getFields()) {
-            CFG cfg = infoStore.getCFGStore().getCFG(jfild, force);
-            if (cfg == null) {
-                cfg = CFGFieldBuilder.build(jfild, infoStore);
+        for (JavaField jfield : jclass.getFields()) {
+            CFG cfg = infoStore.getCFGStore().getCFG(jfield, force);
+            if (cfg != null) {
+                ccfg.add(cfg);
+                entry.addField(cfg);
             }
-            ccfg.add(cfg);
-            entry.addField(cfg);
         }
         
         for (JavaClass jc : jclass.getInnerClasses()) {

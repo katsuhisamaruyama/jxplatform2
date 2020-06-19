@@ -78,7 +78,7 @@ public class CFGStore {
     }
     
     public CFG getCFG(JavaField jfield, boolean force) {
-        return  getCFG(jfield, new HashSet<JMethod>(), force);
+        return getCFG(jfield, new HashSet<JMethod>(), force);
     }
     
     public CCFG getCCFG(JavaClass jclass, boolean force) {
@@ -109,7 +109,9 @@ public class CFGStore {
             }
         }
         CFG cfg = CFGMethodBuilder.build(jmethod, infoStore, visited);
-        addCFG(cfg);
+        if (cfg != null) {
+            addCFG(cfg);
+        }
         return cfg;
     }
     
@@ -122,7 +124,9 @@ public class CFGStore {
         }
         
         CFG cfg = CFGFieldBuilder.build(jfield, infoStore, visited);
-        addCFG(cfg);
+        if (cfg != null) {
+            addCFG(cfg);
+        }
         return cfg;
     }
 }
