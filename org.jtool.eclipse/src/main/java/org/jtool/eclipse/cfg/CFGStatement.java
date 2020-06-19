@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -33,15 +33,11 @@ public class CFGStatement extends CFGNode {
     }
     
     public void addDefVariables(List<JReference> jvars) {
-        for (JReference jvar : jvars) {
-            addDefVariable(jvar);
-        }
+        jvars.forEach(jvar -> addDefVariable(jvar));
     }
     
     public void addUseVariables(List<JReference> jvars) {
-        for (JReference jvar : jvars) {
-            addUseVariable(jvar);
-        }
+        jvars.forEach(jvar -> addUseVariable(jvar));
     }
     
     public boolean removeDefVariable(JReference jvar) {
@@ -132,14 +128,10 @@ public class CFGStatement extends CFGNode {
     
     protected String toString(List<JReference> jvars) {
         StringBuffer buf = new StringBuffer();
-        for (JReference jvar : jvars) {
+        jvars.forEach(jvar -> {
             buf.append(jvar.getReferenceName());
             buf.append(", ");
-        }
-        if (buf.length() != 0) {
-            return buf.substring(0, buf.length() - 2);
-        } else {
-            return "";
-        }
+        });
+        return buf.length() != 0 ? buf.substring(0, buf.length() - 2) : "";
     }
 }

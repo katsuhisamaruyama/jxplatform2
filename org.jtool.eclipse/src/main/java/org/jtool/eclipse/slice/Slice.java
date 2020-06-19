@@ -1,5 +1,5 @@
 /*
- *  Copyright 2019
+ *  Copyright 2019-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -49,9 +49,7 @@ public class Slice {
         allNodesInTargetMethod = pdgForTargetMethod.getCFG().getNodes();
         reachableNodesToCriterion = criterion.getPDG().getCFG().backwardReachableNodes(criterion.getNode().getCFGNode(), true);
         
-        for (JReference var : criterion.getnVariables()) {
-            extract(criterion.getNode(), var);
-        }
+        criterion.getnVariables().forEach(var -> extract(criterion.getNode(), var));
     }
     
     private PDG getPDGForMethod() {
@@ -96,26 +94,19 @@ public class Slice {
         }
         
         if (node.getCFGNode().isActual()) {
-            for (CD call : node.getIncomingCDEdges()) {
-                for (CD edge : call.getSrcNode().getIncomingCDEdges()) {
-                    if (edge.isTrue() || edge.isFalse() || edge.isFallThrough()) {
-                        traverseBackward(edge.getSrcNode());
-                    }
-                }
-            }
+            node.getIncomingCDEdges().stream()
+                                     .flatMap(call -> call.getSrcNode().getIncomingCDEdges().stream())
+                                     .filter(edge -> edge.isTrue() || edge.isFalse() || edge.isFallThrough())
+                                     .forEach(edge -> traverseBackward(edge.getSrcNode()));
         } else {
-            for (CD edge : node.getIncomingCDEdges()) {
-                if (edge.isTrue() || edge.isFalse() || edge.isFallThrough()) {
-                    traverseBackward(edge.getSrcNode());
-                }
-            }
+            node.getIncomingCDEdges().stream()
+                                     .filter(edge -> edge.isTrue() || edge.isFalse() || edge.isFallThrough())
+                                     .forEach(edge -> traverseBackward(edge.getSrcNode()));
         }
         
-        for (PDGNode start : findStartNode(node, jv)) {
-            for (CD edge : start.getIncomingCDEdges()) {
-                traverseBackward(edge.getSrcNode());
-            }
-        }
+        findStartNode(node, jv).stream()
+                               .map(start -> (CD)start.getIncomingCDEdges())
+                               .forEach(edge -> traverseBackward(edge.getSrcNode()));
         
         eliminateReceiverNodes(nodesInSlice);
     }
@@ -127,6 +118,7 @@ public class Slice {
                 receiverNodes.add(node);
             }
         }
+        
         for (PDGNode node : receiverNodes) {
             PDGNode callNode = this.getDominantNode(node);
             if (!nodes.contains(callNode)) {
@@ -356,19 +348,17 @@ public class Slice {
     
     private String getNodeInfo() {
         StringBuilder buf = new StringBuilder();
-        for (GraphNode node : GraphNode.sortGraphNode(nodesInSlice)) {
+        GraphNode.sortGraphNode(nodesInSlice).forEach(node -> {
             PDGNode pdgnode = (PDGNode)node;
             buf.append(node.toString() + "@" + pdgnode.getCFGNode().getASTNode().getStartPosition());
             buf.append("\n");
-        }
+        });
         return buf.toString();
     }
     
     private String getVariableNames(Set<JReference> jvs) {
         StringBuilder buf = new StringBuilder();
-        for (JReference jv : jvs) {
-            buf.append(" " + jv.getName() + "@" + jv.getASTNode().getStartPosition());
-        }
+        jvs.forEach(jv -> buf.append(" " + jv.getName() + "@" + jv.getASTNode().getStartPosition()));
         return buf.toString();
     }
 }

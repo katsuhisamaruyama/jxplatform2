@@ -1,5 +1,5 @@
 /*
- *  Copyright 2019
+ *  Copyright 2019-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -34,11 +34,7 @@ public class SliceCriterion {
     public SliceCriterion(CommonPDG pdg, PDGNode node, Set<JReference> vars) {
         this.pdg = pdg;
         this.node = node;
-        for (JReference var : vars) {
-            if (var.isVariableAccess()) {
-                variables.add(var);
-            }
-        }
+        vars.stream().filter(var -> var.isVariableAccess()).forEach(var -> variables.add(var));
     }
     
     public CommonPDG getPDG() {
@@ -101,9 +97,7 @@ public class SliceCriterion {
             return "Unspecified";
         }
         StringBuilder buf = new StringBuilder();
-        for (JReference var : vars) {
-            buf.append(" " + var.getName() + "@" + var.getASTNode().getStartPosition());
-        }
+        vars.forEach(var -> buf.append(" " + var.getName() + "@" + var.getASTNode().getStartPosition()));
         return buf.toString();
     }
 }

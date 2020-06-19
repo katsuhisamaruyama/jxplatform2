@@ -312,7 +312,8 @@ public class JavaProject {
     }
     
     private List<JavaClass> sortClasses(Collection<? extends JavaClass> collection) {
-        return collection.stream().sorted((jc1, jc2) -> jc1.getQualifiedName().compareTo(jc2.getQualifiedName()))
-                .collect(Collectors.toCollection(ArrayList::new));
+        return collection.stream()
+                         .sorted((jc1, jc2) -> jc1.getQualifiedName().compareTo(jc2.getQualifiedName()))
+                         .collect(Collectors.toList());
     }
 }

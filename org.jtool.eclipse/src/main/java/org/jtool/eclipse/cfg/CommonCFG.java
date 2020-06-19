@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -83,19 +83,26 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
             return null;
         }
         return getEdges().stream()
-                .filter(edge -> src.equals(edge.getSrcNode()) && dst.equals(edge.getDstNode())).findFirst().orElse(null);
+                         .filter(edge -> src.equals(edge.getSrcNode()) && dst.equals(edge.getDstNode()))
+                         .findFirst().orElse(null);
     }
     
     public CFGNode getNode(long id) {
-        return getNodes().stream().filter(node -> id == node.getId()).findFirst().orElse(null);
+        return getNodes().stream()
+                         .filter(node -> id == node.getId())
+                         .findFirst().orElse(null);
     }
     
     public ControlFlow getTrueFlowFrom(CFGNode node) {
-        return getEdges().stream().filter(edge -> edge.getSrcNode().equals(node) && edge.isTrue()).findFirst().orElse(null);
+        return getEdges().stream()
+                         .filter(edge -> edge.getSrcNode().equals(node) && edge.isTrue())
+                         .findFirst().orElse(null);
     }
     
     public ControlFlow getFalseFlowFrom(CFGNode node) {
-        return getEdges().stream().filter(edge -> edge.getSrcNode().equals(node) && edge.isFalse()).findFirst().orElse(null);
+        return getEdges().stream()
+                         .filter(edge -> edge.getSrcNode().equals(node) && edge.isFalse())
+                         .findFirst().orElse(null);
     }
     
     public CFGNode getTrueSuccessor(CFGNode node) {
@@ -113,7 +120,8 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
     }
     
     public Set<CFGNode> getCallNodes() {
-        return getNodes().stream().filter(node -> node.isMethodCall()).collect(Collectors.toCollection(HashSet::new));
+        return getNodes().stream()
+                         .filter(node -> node.isMethodCall()).collect(Collectors.toSet());
     }
     
     public Set<CFGNode> forwardReachableNodes(CFGNode from, boolean loopbackOk, StopConditionOnReachablePath condition) {
@@ -252,10 +260,10 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
     @Override
     protected String getNodeInfo() {
         StringBuilder buf = new StringBuilder();
-        for (CFGNode node : CFGNode.sortCFGNode(getNodes())) {
+        CFGNode.sortCFGNode(getNodes()).forEach(node -> {
             buf.append(node.toString());
             buf.append("\n");
-        }
+        });
         return buf.toString();
     }
     

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -85,13 +85,7 @@ public abstract class GraphEdge extends GraphElement {
             @Override
             public int compare(GraphEdge edge1, GraphEdge edge2) {
                 if (edge2.src.id == edge1.src.id) {
-                    if (edge2.dst.id == edge1.dst.id) {
-                        return 0;
-                    } else if (edge1.dst.id > edge2.dst.id) {
-                        return 1;
-                    } else {
-                        return -1;
-                    }
+                    return edge2.dst.id == edge1.dst.id ? 0 : edge1.dst.id > edge2.dst.id ? 1 : -1;
                 } else if (edge1.src.id > edge2.src.id) {
                     return 1;
                 } else {

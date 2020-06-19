@@ -1,5 +1,5 @@
 /*
- *  Copyright 2019
+ *  Copyright 2019-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -7,7 +7,6 @@
 package org.jtool.eclipse.slice;
 
 import org.jtool.eclipse.pdg.PDGNode;
-import org.jtool.eclipse.pdg.CD;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -30,10 +29,10 @@ public class CDClosure {
         }
         nodes.add(node);
         
-        for (CD edge : node.getOutgoingCDEdges()) {
+        node.getOutgoingCDEdges().forEach(edge -> {
             PDGNode next = edge.getSrcNode();
             traverseForwardCD(next, nodes);
-        }
+        });
     }
     
     public static List<PDGNode> getBackwardCDClosure(PDGNode anchor) {
@@ -48,9 +47,9 @@ public class CDClosure {
         }
         nodes.add(node);
         
-        for (CD edge : node.getIncomingCDEdges()) {
+        node.getIncomingCDEdges().forEach(edge -> {
             PDGNode next = edge.getSrcNode();
             traverseBackwardCD(next, nodes);
-        }
+        });
     }
 }

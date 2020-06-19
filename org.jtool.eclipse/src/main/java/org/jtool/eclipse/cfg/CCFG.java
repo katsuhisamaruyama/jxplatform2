@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -53,13 +53,13 @@ public class CCFG extends CommonCFG {
     @Override
     public Set<CFGNode> getNodes() {
         return cfgs.values().stream()
-                .map(cfg -> cfg.getNodes()).flatMap(l -> l.stream()).collect(Collectors.toCollection(HashSet::new));
+                            .flatMap(cfg -> cfg.getNodes().stream()).collect(Collectors.toSet());
     }
     
     @Override
     public Set<ControlFlow> getEdges() {
         return cfgs.values().stream()
-                .map(cfg -> cfg.getEdges()).flatMap(l -> l.stream()).collect(Collectors.toCollection(HashSet::new));
+                            .flatMap(cfg -> cfg.getEdges().stream()).collect(Collectors.toSet());
     }
     
     @Override
@@ -68,12 +68,8 @@ public class CCFG extends CommonCFG {
         buf.append("----- CCFG (from here) -----\n");
         buf.append("Class Name = " + getQualifiedName());
         buf.append("\n");
-        for (CFG cfg : cfgs.values()) {
-            buf.append(cfg.getNodeInfo());
-        }
-        for (CFG cfg : cfgs.values()) {
-            buf.append(cfg.getEdgeInfo());
-        }
+        cfgs.values().forEach(cfg -> buf.append(cfg.getNodeInfo()));
+        cfgs.values().forEach(cfg -> buf.append(cfg.getEdgeInfo()));
         buf.append("----- CCFG (to here) -----\n");
         return buf.toString();
     }

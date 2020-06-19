@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -36,9 +36,7 @@ public abstract class GraphElement {
     public static <E extends GraphElement> Set<E> difference(Set<E> s1, Set<E> s2) {
         Set<E> s = new HashSet<E>();
         s.addAll(s1);
-        for (E e : s2) {
-            s.remove(e);
-        }
+        s2.forEach(e -> s.remove(e));
         return s;
     }
     
@@ -52,17 +50,9 @@ public abstract class GraphElement {
     public static <E extends GraphElement> Set<E> intersection(Set<E> s1, Set<E> s2) {
         Set<E> s = new HashSet<E>();
         if (s1.size() > s2.size()) {
-            for (E e : s2) {
-                if (s1.contains(e)) {
-                    s.add(e);
-                }
-            }
+            s2.parallelStream().filter(e -> s1.contains(e)).forEach(e -> s.add(e));
         } else {
-            for (E e : s1) {
-                if (s2.contains(e)) {
-                    s.add(e);
-                }
-            }
+            s1.parallelStream().filter(e -> s2.contains(e)).forEach(e -> s.add(e));
         }
         return s;
     }

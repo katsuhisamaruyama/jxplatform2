@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -100,10 +100,7 @@ public class CFGMethodCall extends CFGStatement {
     }
     
     public CFGParameter getActualIn(int pos) {
-        if (pos < 0 || pos >= actualIns.size()) {
-            return null;
-        }
-        return actualIns.get(pos);
+        return (pos < 0 || pos >= actualIns.size()) ? null : actualIns.get(pos);
     }
     
     public CFGParameter getActualOut(int pos) {

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -19,12 +19,8 @@ public class CFG extends CommonCFG {
     private List<BasicBlock> basicBlocks = new ArrayList<BasicBlock>();
     
     public void append(CFG cfg) {
-        for (CFGNode node : cfg.getNodes()) {
-            add(node);
-        }
-        for (ControlFlow edge : cfg.getEdges()) {
-            add(edge);
-        }
+        cfg.getNodes().forEach(node -> add(node));
+        cfg.getEdges().forEach(edge -> add(edge));
     }
     
     public void add(BasicBlock block) {

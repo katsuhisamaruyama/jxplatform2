@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -64,10 +64,10 @@ public class BasicBlock {
     
     private String printNodes() {
         StringBuilder buf = new StringBuilder();
-        for (CFGNode node : getNodes()) {
+        getNodes().forEach(node -> {
             buf.append(node.toString());
             buf.append("\n");
-        }
+        });
         return buf.toString();
     }
 }

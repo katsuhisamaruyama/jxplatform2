@@ -1,5 +1,5 @@
 /*
- *  Copyright 2019
+ *  Copyright 2019-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -36,10 +36,10 @@ public class DDClosure {
         }
         nodes.add(node);
         
-        for (DD edge : node.getOutgoingDDEdges()) {
+        node.getOutgoingDDEdges().forEach(edge -> {
             PDGNode next = edge.getSrcNode();
             traverseForwardDD(next, nodes);
-        }
+        });
     }
     
     public static List<PDGNode> getBackwardCDClosure(PDGNode anchor, JReference jv) {
@@ -59,9 +59,9 @@ public class DDClosure {
         }
         nodes.add(node);
         
-        for (DD edge : node.getIncomingDDEdges()) {
+        node.getIncomingDDEdges().forEach(edge -> {
             PDGNode next = edge.getSrcNode();
             traverseBackwardDD(next, nodes);
-        }
+        });
     }
 }

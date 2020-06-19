@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -92,18 +92,12 @@ public class CFGStore {
         CCFG ccfg = CCFGBuilder.build(jclass, force, infoStore);
         addCCFG(ccfg);
         
-        for (CFG cfg : ccfg.getStartNode().getMethods()) {
-            addCFG(cfg);
-        }
-        for (CFG cfg : ccfg.getStartNode().getFields()) {
-            addCFG(cfg);
-        }
-        for (CCFG ccfg2 : ccfg.getStartNode().getTypes()) {
+        ccfg.getStartNode().getMethods().forEach(cfg -> addCFG(cfg));
+        ccfg.getStartNode().getFields().forEach(cfg -> addCFG(cfg));
+        ccfg.getStartNode().getTypes().forEach(ccfg2 -> {
             addCCFG(ccfg2);
-            for (CFG cfg : ccfg2.getCFGs()) {
-                addCFG(cfg);
-            }
-        }
+            ccfg2.getCFGs().forEach(cfg -> addCFG(cfg));
+        });
         return ccfg;
     }
     

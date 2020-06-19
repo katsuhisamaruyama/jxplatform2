@@ -1,5 +1,5 @@
 /*
- *  Copyright 2019
+ *  Copyright 2019-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -27,19 +27,13 @@ public class CallGraphBuilder {
     
     public static CallGraph getCallGraph(JavaProject jproject) {
         CallGraph callGraph = new CallGraph(jproject.getName());
-        for (JavaClass jclass : jproject.getClasses()) {
-            CallGraph graph = getCallGraph(jclass);
-            callGraph.append(graph);
-        }
+        jproject.getClasses().forEach(jclass -> callGraph.append(getCallGraph(jclass)));
         return callGraph;
     }
     
     public static CallGraph getCallGraph(JavaClass jclass) {
         CallGraph callGraph = new CallGraph(jclass.getQualifiedName());
-        for (JavaMethod jmethod : jclass.getMethods()) {
-            CallGraph graph = getCallGraph(jmethod);
-            callGraph.append(graph);
-        }
+        jclass.getMethods().forEach(jmethod -> callGraph.append(getCallGraph(jmethod)));
         return callGraph;
     }
     

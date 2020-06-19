@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -41,15 +41,11 @@ public class CFGMethodEntry extends CFGEntry {
     }
     
     public void setFormalIns(List<CFGParameter> params) {
-        for (CFGParameter param : params) {
-            addFormalIn(param);
-        }
+        params.forEach(param -> addFormalIn(param));
     }
     
     public void setFormalOuts(List<CFGParameter> params) {
-        for (CFGParameter param : params) {
-            addFormalOut(param);
-        }
+        params.forEach(param -> addFormalOut(param));
     }
     
     public List<CFGParameter> getFormalIns() {
@@ -74,7 +70,7 @@ public class CFGMethodEntry extends CFGEntry {
     
     public CFGParameter getFormalOutForReturn() {
         return formalOuts.stream()
-                .filter(fout -> fout.getUseVariable().getName().endsWith("$_")).findFirst().orElse(null);
+                         .filter(fout -> fout.getUseVariable().getName().endsWith("$_")).findFirst().orElse(null);
     }
     
     public boolean hasParameters() {
@@ -91,7 +87,7 @@ public class CFGMethodEntry extends CFGEntry {
     
     public CFGCatch getExceptionNode(String type) {
         return exceptionNodes.stream()
-                .filter(node -> node.getTypeName().equals(type)).findFirst().orElse(null);
+                             .filter(node -> node.getTypeName().equals(type)).findFirst().orElse(null);
     }
     
     @Override

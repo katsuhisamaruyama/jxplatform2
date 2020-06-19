@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -59,15 +59,11 @@ public abstract class GraphNode extends GraphElement {
     }
     
     public void addIncomingEdges(Set<GraphEdge> edges) {
-        for (GraphEdge edge : edges) {
-            addIncomingEdge(edge);
-        }
+        edges.forEach(edge -> addIncomingEdge(edge));
     }
     
     public void addOutgoingEdges(Set<GraphEdge> edges) {
-        for (GraphEdge edge : edges) {
-            addOutgoingEdge(edge);
-        }
+        edges.forEach(edge -> addOutgoingEdge(edge));
     }
     
     public void removeIncomingEdge(GraphEdge edge) {
@@ -136,15 +132,11 @@ public abstract class GraphNode extends GraphElement {
         buf.append("Node: " + getIdString() + "\n");
         Set<GraphEdge> outgoing = getOutgoingEdges();
         buf.append("  Outgoing :");
-        for (GraphEdge edge : outgoing) {
-            buf.append("  " + edge.getDstNode().getId());
-        }
+        outgoing.forEach(edge -> buf.append("  " + edge.getDstNode().getId()));
         buf.append("\n");
         Set<GraphEdge> incoming = getIncomingEdges();
         buf.append("  Incoming :");
-        for(GraphEdge edge : incoming) {
-            buf.append("  " + edge.getSrcNode().getId());
-        }
+        incoming.forEach(edge -> buf.append("  " + edge.getSrcNode().getId()));
         return buf.toString();
     }
     
@@ -166,13 +158,7 @@ public abstract class GraphNode extends GraphElement {
         List<GraphNode> nodes = new ArrayList<GraphNode>(co);
         Collections.sort(nodes, new Comparator<GraphNode>() {
             public int compare(GraphNode node1, GraphNode node2) {
-                if (node2.id == node1.id) {
-                    return 0;
-                } else if (node1.id > node2.id) {
-                    return 1;
-                } else {
-                    return -1;
-                }
+                return node2.id == node1.id ? 0 : node1.id > node2.id ? 1 : -1;
             }
         });
         return nodes;

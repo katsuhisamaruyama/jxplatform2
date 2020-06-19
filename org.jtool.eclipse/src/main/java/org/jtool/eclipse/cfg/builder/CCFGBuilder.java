@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -12,7 +12,6 @@ import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGClassEntry;
 import org.jtool.eclipse.cfg.CFGMethodCall;
 import org.jtool.eclipse.cfg.CFGStatement;
-import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaField;
@@ -28,9 +27,7 @@ public class CCFGBuilder {
     
     public static CCFG build(JavaProject jproject, boolean force, JInfoStore infoStore) {
         CCFG ccfg = new CCFG();
-        for (JavaClass jclass : jproject.getClasses()) {
-            build(ccfg, jclass, force, infoStore);
-        }
+        jproject.getClasses().forEach(jclass -> build(ccfg, jclass, force, infoStore));
         addFiledAccesses(ccfg);
         return ccfg;
     }
@@ -84,19 +81,16 @@ public class CCFGBuilder {
                 CFGMethodCall callnode = (CFGMethodCall)cfgnode;
                 CFG cfg = ccfg.getCFG(callnode.getQualifiedName());
                 if (cfg != null) {
+                    
                     for (CFGNode node : cfg.getNodes()) {
                         if (node.isStatement()) {
                             CFGStatement st = (CFGStatement)node;
-                            for (JReference def : st.getDefVariables()) {
-                                if (def.isFieldAccess()) {
-                                    callnode.addDefVariable(def);
-                                }
-                            }
-                            for (JReference def : st.getUseVariables()) {
-                                if (def.isFieldAccess()) {
-                                    callnode.addUseVariable(def);
-                                }
-                            }
+                            st.getDefVariables().stream()
+                                                .filter(v -> v.isFieldAccess())
+                                                .forEach(v -> callnode.addDefVariable(v));
+                            st.getUseVariables().stream()
+                                                .filter(v -> v.isFieldAccess())
+                                                .forEach(v -> callnode.addUseVariable(v));
                         }
                     }
                 }

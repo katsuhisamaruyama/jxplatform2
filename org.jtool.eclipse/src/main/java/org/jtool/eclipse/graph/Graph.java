@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -53,11 +53,9 @@ public class Graph<N extends GraphNode, E extends GraphEdge> {
     
     public void remove(N node) {
         nodes.remove(node);
-        for (E edge : new HashSet<E>(getEdges())) {
-            if (edge.getSrcNode().equals(node) || edge.getDstNode().equals(node)) {
-                remove(edge);
-            }
-        } 
+        new HashSet<E>(getEdges()).stream()
+                                  .filter(edge -> edge.getSrcNode().equals(node) || edge.getDstNode().equals(node))
+                                  .forEach(edge -> remove(edge));
     }
     
     public void remove(E edge) {
@@ -86,19 +84,19 @@ public class Graph<N extends GraphNode, E extends GraphEdge> {
     
     protected String getNodeInfo() {
         StringBuilder buf = new StringBuilder();
-        for (GraphNode node : GraphNode.sortGraphNode(getNodes())) {
+        GraphNode.sortGraphNode(getNodes()).forEach(node -> {
             buf.append(node.toString());
             buf.append("\n");
-        }
+        });
         return buf.toString();
     }
     
     protected String getEdgeInfo() {
         StringBuilder buf = new StringBuilder();
-        for (GraphEdge edge : GraphEdge.sortGrapgEdge(getEdges())) {
+        GraphEdge.sortGrapgEdge(getEdges()).forEach(edge -> {
             buf.append(edge.toString());
             buf.append("\n");
-        }
+        });
         return buf.toString();
     }
 }

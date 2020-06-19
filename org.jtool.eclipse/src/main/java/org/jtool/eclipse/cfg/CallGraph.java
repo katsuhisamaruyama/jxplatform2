@@ -1,5 +1,5 @@
 /*
- *  Copyright 2019
+ *  Copyright 2019-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -41,9 +41,7 @@ public class CallGraph extends Graph<CFGNode, ControlFlow> {
     
     public void append(CallGraph callGraph) {
         if (callGraph != null) {
-            for (ControlFlow edge : callGraph.getEdges()) {
-                add(edge);
-            }
+            callGraph.getEdges().forEach(edge -> add(edge));
         }
     }
     

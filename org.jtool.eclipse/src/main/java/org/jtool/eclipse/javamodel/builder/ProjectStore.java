@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -31,9 +31,7 @@ public class ProjectStore {
     }
     
     public void clear() {
-        for (JavaProject jproject : projectStore.values()) {
-            jproject.clear();
-        }
+        projectStore.values().forEach(jproject -> jproject.clear());
         projectStore.clear();
     }
     
