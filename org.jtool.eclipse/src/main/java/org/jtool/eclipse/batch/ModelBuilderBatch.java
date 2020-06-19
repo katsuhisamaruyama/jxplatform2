@@ -54,14 +54,26 @@ public class ModelBuilderBatch extends ModelBuilder {
     
     public List<JavaProject> build(String name, String target) {
         List<String> subProjects = getSubProjects(new File(target));
-        if (subProjects.size() == 0) {
+        if (subProjects.size() > 0) {
+            return buildMultiTargets(name, subProjects);
+        } else {
             List<JavaProject> projects = new ArrayList<JavaProject>();
             JavaProject jproject = buildSingleTarget(name, target);
             projects.add(jproject);
             return projects;
-        } else {
-            return buildMultiTargets(name, subProjects);
         }
+    }
+    
+    private List<JavaProject> buildMultiTargets(String name, List<String> subProjects) {
+        List<JavaProject> projects = new ArrayList<JavaProject>();
+        for (String subproject : subProjects) {
+            int index = subproject.lastIndexOf(File.separatorChar);
+            String subname = name + "#" + subproject.substring(index + 1);
+            System.out.println("Checking sub-project " + subproject);
+            JavaProject project = buildSingleTarget(subname, subproject);
+            projects.add(project);
+        }
+        return projects;
     }
     
     private JavaProject buildSingleTarget(String name, String target) {
@@ -76,17 +88,6 @@ public class ModelBuilderBatch extends ModelBuilder {
         return jproject;
     }
     
-    private List<JavaProject> buildMultiTargets(String name, List<String> subProjects) {
-        List<JavaProject> projects = new ArrayList<JavaProject>();
-        for (String subproject : subProjects) {
-            int index = subproject.lastIndexOf(File.separatorChar);
-            String subname = name + "#" + subproject.substring(index + 1);
-            System.out.println("Checking sub-project " + subproject);
-            JavaProject project = buildSingleTarget(subname, subproject);
-            projects.add(project);
-        }
-        return projects;
-    }
     
     private String[] getPath(Set<String> pathSet) {
         return (String[])pathSet.toArray(new String[pathSet.size()]);
