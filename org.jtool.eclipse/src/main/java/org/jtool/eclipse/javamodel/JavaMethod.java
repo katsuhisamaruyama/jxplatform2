@@ -291,11 +291,11 @@ public class JavaMethod extends JavaElement {
     }
     
     public boolean isPrimitiveReturnType() {
-        return isPrimitiveType(returnType);
+        return returnType != null ? isPrimitiveType(returnType) : false;
     }
     
     public boolean isVoid() {
-        return JavaElement.isVoid(returnType);
+        return returnType != null ? JavaElement.isVoid(returnType) : false;
     }
     
     public List<JavaLocalVar> getLocalVariables() {
