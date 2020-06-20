@@ -1,5 +1,5 @@
 /*
- *  Copyright 2019
+ *  Copyright 2019-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -74,11 +74,7 @@ public class JavaClass extends JavaElement {
         
         if (tbinding != null) {
             binding = tbinding.getTypeDeclaration();
-            if (binding.getName().length() != 0) {
-                name = binding.getName();
-            } else {
-                name = ".AnonymousClass";
-            }
+            name = binding.getName();
             fqn = retrieveQualifiedName(binding);
             modifiers = binding.getModifiers();
             kind = getKind(binding);
