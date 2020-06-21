@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -28,7 +28,9 @@ public class JClassExternal extends JClass {
     private CtClass ctClass;
     
     JClassExternal(CtClass ctClass, CFGStore cfgStore) {
-        super(ctClass.getName(), cfgStore, ctClass.getSimpleName(), getModfifiers(ctClass));
+        super(BytecodeClassStore.getCanonicalClassName(ctClass),
+                BytecodeClassStore.getCanonicalSimpleClassName(ctClass),
+                getModfifiers(ctClass), cfgStore);
         this.ctClass = ctClass;
         
         int num = 0;
@@ -63,17 +65,17 @@ public class JClassExternal extends JClass {
     }
     
     @Override
+    public boolean isInProject() {
+        return false;
+    }
+    
+    @Override
     public boolean isTopLevelClass() {
         try {
             return ctClass.getDeclaringClass() == null;
         } catch (NotFoundException e) {
             return false;
         }
-    }
-    
-    @Override
-    public boolean isInProject() {
-        return false;
     }
     
     @Override
@@ -84,8 +86,9 @@ public class JClassExternal extends JClass {
             return emptyClassArray;
         }
         
-        for (CtClass cc : bytecodeClassStore.getAncestors(cfgStore.getJavaProject(), ctClass.getName())) {
-            JClass clazz = cfgStore.getJInfoStore().getJClass(cc.getName());
+        String cname = BytecodeClassStore.getCanonicalClassName(ctClass);
+        for (CtClass cc : bytecodeClassStore.getAncestors(cfgStore.getJavaProject(), cname)) {
+            JClass clazz = cfgStore.getJInfoStore().getJClass(BytecodeClassStore.getCanonicalClassName(cc));
             if (clazz != null) {
                 classes.add(clazz);
             }
@@ -101,14 +104,15 @@ public class JClassExternal extends JClass {
             return emptyClassArray;
         }
         
-        for (CtClass cc : bytecodeClassStore.getDescendants(cfgStore.getJavaProject(), ctClass.getName())) {
-            JClass clazz = cfgStore.getJInfoStore().getJClass(cc.getName());
+        String cname = BytecodeClassStore.getCanonicalClassName(ctClass);
+        for (CtClass cc : bytecodeClassStore.getDescendants(cfgStore.getJavaProject(), cname)) {
+            JClass clazz = cfgStore.getJInfoStore().getJClass(BytecodeClassStore.getCanonicalClassName(cc));
             if (clazz != null) {
                 classes.add(clazz);
             }
         }
         
-        for (JavaClass jc : bytecodeClassStore.getJavaDescendants(cfgStore.getJavaProject(), ctClass.getName())) {
+        for (JavaClass jc : bytecodeClassStore.getJavaDescendants(cfgStore.getJavaProject(), cname)) {
             JClass clazz = cfgStore.getJInfoStore().getJClass(jc.getQualifiedName());
             if (clazz != null) {
                 classes.add(clazz);

@@ -24,7 +24,7 @@ public class JClassInternal extends JClass {
     private JavaClass jclass;
     
     JClassInternal(JavaClass jclass, CFGStore cfgStore) {
-        super(jclass.getQualifiedName(), cfgStore, jclass.getName(), jclass.getModifiers());
+        super(jclass.getQualifiedName(), jclass.getName(), jclass.getModifiers(), cfgStore);
         this.jclass = jclass;
         
         List<JavaMethod> jms = jclass.getMethods().stream()

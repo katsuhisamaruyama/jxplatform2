@@ -18,7 +18,7 @@ import java.util.Map;
 class JClassCache extends JClass {
     
     protected JClassCache(CFGStore cfgStore, Map<String, String> cacheData) {
-        super(cacheData.get(FqnAttr), cfgStore, cacheData.get(NameAttr), 0);
+        super(cacheData.get(FqnAttr), cacheData.get(NameAttr), 0, cfgStore);
         this.cacheData = cacheData;
     }
     

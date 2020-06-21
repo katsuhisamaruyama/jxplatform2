@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -19,8 +19,8 @@ public class JFieldInternal extends JField {
     protected JavaField jfield;
     
     JFieldInternal(JavaField jfield, JClass declaringClass, CFGStore cfgStore) {
-        super(jfield.getQualifiedName(), cfgStore, jfield.getDeclaringClass().getQualifiedName(), jfield.getName(),
-              jfield.getModifiers(), jfield.getType(), jfield.isPrimitiveType());
+        super(jfield.getQualifiedName(), jfield.getDeclaringClass().getQualifiedName(), jfield.getName(),
+              jfield.getModifiers(), jfield.getType(), jfield.isPrimitiveType(), cfgStore);
         this.declaringClass = declaringClass;
         this.jfield = jfield;
     }

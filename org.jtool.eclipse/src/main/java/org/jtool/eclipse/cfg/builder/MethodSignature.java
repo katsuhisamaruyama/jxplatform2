@@ -1,11 +1,12 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
 
 package org.jtool.eclipse.cfg.builder;
 
+import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
 import java.io.File;
 
 /**
@@ -32,16 +33,17 @@ class MethodSignature {
     
     static final String INVALID_SIGNATURE = "!";
     
-    protected static String methodSignatureToString(String signature) {
+    protected static String methodSignatureToString(String signature, CFGStore cfgStore) {
         StringBuilder buf = new StringBuilder();
         if (signature.charAt(0) == '(') {
             buf.append("(");
         } else {
             return INVALID_SIGNATURE;
         }
+        
         int index = 1;
         while (signature.charAt(index) != ')') {
-            String type = variableTypeToString(signature.substring(index));
+            String type = variableTypeToString(signature.substring(index), cfgStore);
             buf.append(" ");
             buf.append(type);
             index = index + comsumed_chars_length;
@@ -50,12 +52,12 @@ class MethodSignature {
         
         /*
          * Without a return type
-         * 
+         *
         index++;
         if (signature.charAt(index) != 'V') {
             buf.append(": void");
         } else {
-            String type = fieldSignatureToString(signature.substring(index));
+            String type = fieldSignatureToString(signature.substring(index), cfgStore);
             buf.append(":");
             buf.append(type);
         }
@@ -64,11 +66,11 @@ class MethodSignature {
         return buf.toString();
     }
     
-    protected static String fieldSignatureToString(String signature) {
-        return variableTypeToString(signature);
+    private static String fieldSignatureToString(String signature, CFGStore cfgStore) {
+        return variableTypeToString(signature, cfgStore);
     }
     
-    protected static String variableTypeToString(String signature) {
+    private static String variableTypeToString(String signature, CFGStore cfgStore) {
         comsumed_chars_length = 1;
         switch (signature.charAt(0)) {
             case 'B':
@@ -94,7 +96,8 @@ class MethodSignature {
                     return INVALID_SIGNATURE;
                 }
                 comsumed_chars_length = index + 1;
-                return signature.substring(1, index).replace(File.separatorChar, '.');
+                String className = signature.substring(1, index).replace(File.separatorChar, '.');
+                return getCanonicalClassName(className, cfgStore);
                 
             case '[':
                 StringBuilder brackets = new StringBuilder();
@@ -102,12 +105,23 @@ class MethodSignature {
                 for (count = 0; signature.charAt(count) == '['; count++) {
                     brackets.append("[]");
                 }
-                String type = fieldSignatureToString(signature.substring(count));
+                String type = fieldSignatureToString(signature.substring(count), cfgStore);
                 comsumed_chars_length = comsumed_chars_length + count;
                 return type + brackets.toString();
                 
             default:
                 return INVALID_SIGNATURE;
         }
+    }
+    
+    private static String getCanonicalClassName(String className, CFGStore cfgStore) {
+        BytecodeClassStore bytecodeClassStore = cfgStore.getJavaProject().getBytecodeClassStore();
+        if (bytecodeClassStore != null) {
+            String cname = bytecodeClassStore.getCanonicalClassName(cfgStore.getJavaProject(), className);
+            if (cname != null) {
+                return cname;
+            }
+        }
+        return INVALID_SIGNATURE;
     }
 }

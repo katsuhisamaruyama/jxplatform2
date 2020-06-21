@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -17,7 +17,8 @@ import java.util.Map;
 class JFieldCache extends JField {
     
     protected JFieldCache(JClass declaringClass, CFGStore cfgStore, Map<String, String> cacheData) {
-        super(cacheData.get(FqnAttr), cfgStore, cacheData.get(ClassNameAttr), cacheData.get(NameAttr), 0, "N/A", false);
+        super(cacheData.get(FqnAttr), cacheData.get(ClassNameAttr), cacheData.get(NameAttr),
+                0, "N/A", false, cfgStore);
         this.declaringClass = declaringClass;
         this.cacheData = cacheData;
     }

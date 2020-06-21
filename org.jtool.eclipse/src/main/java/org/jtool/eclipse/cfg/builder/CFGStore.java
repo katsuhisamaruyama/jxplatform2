@@ -6,13 +6,14 @@
 
 package org.jtool.eclipse.cfg.builder;
 
+import org.jtool.eclipse.javamodel.builder.ModelBuilder;
 import org.jtool.eclipse.javamodel.JavaProject;
-import org.jtool.eclipse.cfg.CCFG;
-import org.jtool.eclipse.cfg.CFG;
-import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaField;
 import org.jtool.eclipse.javamodel.JavaMethod;
+import org.jtool.eclipse.cfg.CCFG;
+import org.jtool.eclipse.cfg.CFG;
+import org.jtool.eclipse.cfg.CFGNode;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
@@ -36,8 +37,8 @@ public class CFGStore {
         CFGNode.resetId();
     }
     
-    public void create(JavaProject jproject, boolean analyzingBytecode) {
-        infoStore.create(this, jproject, analyzingBytecode);
+    public void create(JavaProject jproject, ModelBuilder builder) {
+        infoStore.create(this, jproject, builder);
     }
     
     public void destroy() {

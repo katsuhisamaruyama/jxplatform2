@@ -27,7 +27,7 @@ abstract class JClass extends JElement {
     protected JField[] fields;
     protected JMethod[] methods;
     
-    protected JClass(String fqn, CFGStore cfgStore, String name, int modifiers) {
+    protected JClass(String fqn, String name, int modifiers, CFGStore cfgStore) {
         super(fqn, cfgStore);
         this.name = name;
         this.modifiers = modifiers;

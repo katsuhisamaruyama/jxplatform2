@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -24,6 +24,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -53,7 +54,7 @@ class BytecodeCacheManager {
     static final String PathAttr = "path";
     static final String TimeAttr = "time";
     
-    static void writeCache(JavaProject jproject, List<JClass> classes) {
+    static void writeCache(JavaProject jproject, Collection<JClass> classes) {
         try {
             String filename = jproject.getDir() + File.separator + BYTECODE_INFO_FILENAME;
             File file = new File(filename);
@@ -111,7 +112,7 @@ class BytecodeCacheManager {
 
 class CacheExporter {
     
-    Document getDocument(JavaProject jproject, List<JClass> classes) {
+    Document getDocument(JavaProject jproject, Collection<JClass> classes) {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document doc = builder.newDocument();
@@ -121,9 +122,7 @@ class CacheExporter {
             doc.appendChild(projectElem);
             
             for (JClass clazz : classes) {
-                if (clazz.isTopLevelClass()) {
-                    export(doc, projectElem, clazz);
-                }
+                export(doc, projectElem, clazz);
             }
             return doc;
             

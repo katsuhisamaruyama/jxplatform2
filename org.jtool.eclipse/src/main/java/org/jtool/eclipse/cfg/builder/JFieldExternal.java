@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -22,9 +22,9 @@ public class JFieldExternal extends JField {
     protected CtField ctField;
     
     JFieldExternal(CtField ctField, JClass declaringClass, CFGStore cfgStore) {
-        super(declaringClass.getQualifiedName() + JavaElement.QualifiedNameSeparator + ctField.getName(), cfgStore,
+        super(declaringClass.getQualifiedName() + JavaElement.QualifiedNameSeparator + ctField.getName(),
               declaringClass.getQualifiedName(), ctField.getName(),
-              getModfifiers(ctField), findType(ctField), checkPrimitiveType(ctField));
+              getModfifiers(ctField), findType(ctField), checkPrimitiveType(ctField), cfgStore);
         this.declaringClass = declaringClass;
         this.ctField = ctField;
     }

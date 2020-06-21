@@ -28,8 +28,8 @@ public class JMethodInternal extends JMethod {
     protected JavaMethod jmethod;
     
     JMethodInternal(JavaMethod jmethod, JClass declaringClass, CFGStore cfgStore) {
-        super(jmethod.getQualifiedName(), cfgStore, jmethod.getDeclaringClass().getQualifiedName(), jmethod.getSignature(),
-              jmethod.getModifiers(), jmethod.getSignature(), jmethod.isPrimitiveReturnType());
+        super(jmethod.getQualifiedName(), jmethod.getDeclaringClass().getQualifiedName(), jmethod.getSignature(),
+              jmethod.getModifiers(), jmethod.getSignature(), jmethod.isPrimitiveReturnType(), cfgStore);
         this.declaringClass = declaringClass;
         this.jmethod = jmethod;
     }

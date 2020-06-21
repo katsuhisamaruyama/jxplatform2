@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -35,40 +35,38 @@ import java.util.zip.ZipEntry;
  */
 public class BytecodeClassStore {
     
-    private static List<String> commonLibraryClassPath;
-    private static Set<String> commonLibraryClassNames = new HashSet<String>();
+    private Map<String, ClassPool> classPools = new HashMap<>();
     
-    private ClassPool classPool;
-    
-    private Map<String, Map<String, BytecodeClassInfo>> bytecodeClassInfo = new HashMap<String, Map<String, BytecodeClassInfo>>();
-    private Map<String, BytecodeClassInfo> classInfoMapCache = null;
+    private Map<String, Map<String, BytecodeClassInfo>> bytecodeClassInfo = new HashMap<>();
     
     public BytecodeClassStore() {
-        commonLibraryClassPath = getCommonLibraryClassPath();
-        for (String path : commonLibraryClassPath) {
-            commonLibraryClassNames.addAll(collectBytecodeClassNames(path));
-        }
     }
     
     public Set<String> createBytecodeClassStore(JavaProject jproject) {
+        List<String> commonLibraryClassPath = getCommonLibraryClassPath();
         List<String> classPath = getClassPath(jproject);
-        Set<String> classNames = new HashSet<String>();
-        for (String path : classPath) {
-            classNames.addAll(collectBytecodeClassNames(path));
-        }
         classPath.addAll(commonLibraryClassPath);
-        classNames.addAll(commonLibraryClassNames);
-        
         String[] classPaths = classPath.toArray(new String[classPath.size()]);
         try {
-            classPool = getClassPool(classPaths);
+            classPools.put(jproject.getPath(), getClassPool(classPaths));
         } catch (NotFoundException e) {
             try {
-                String[] cclassPaths = commonLibraryClassPath.toArray(new String[commonLibraryClassPath.size()]);
-                classPool = getClassPool(cclassPaths);
+                classPaths = commonLibraryClassPath.toArray(new String[commonLibraryClassPath.size()]);
+                classPools.put(jproject.getPath(), getClassPool(classPaths));
             } catch (NotFoundException e2) { /* empty */ }
         }
-        return classNames;
+        
+        return classPath.stream()
+                        .flatMap(path -> collectBytecodeClassNames(path).stream())
+                        .collect(Collectors.toSet());
+    }
+    
+    private static ClassPool getClassPool(String[] classPath) throws NotFoundException {
+        ClassPool classpool = new ClassPool(true);
+        for (String path : classPath) {
+            classpool.insertClassPath(path);
+        }
+        return classpool;
     }
     
     public Set<CtClass> getCtClasses(JavaProject jproject) {
@@ -82,10 +80,10 @@ public class BytecodeClassStore {
         return classes;
     }
     
-    public CtClass getCtClass(JavaProject jproject, String fqn) {
+    public CtClass getCtClassByCanonicalClassName(JavaProject jproject, String className) {
         Map<String, BytecodeClassInfo> classInfoMap = bytecodeClassInfo.get(jproject.getPath());
         if (classInfoMap != null) {
-            BytecodeClassInfo classInfo = classInfoMap.get(fqn);
+            BytecodeClassInfo classInfo = classInfoMap.get(className);
             if (classInfo != null) {
                 return classInfo.getCtClass();
             }
@@ -133,7 +131,6 @@ public class BytecodeClassStore {
         if (jclass.getSuperClassName() != null && jclass.getSuperClassName().equals(fqn)) {
             return true;
         }
-        
         return jclass.getSuperInterfaceNames().stream().anyMatch(name -> name.equals(fqn));
     }
     
@@ -168,28 +165,15 @@ public class BytecodeClassStore {
     }
     
     private List<String> getClassPath(JavaProject jproject) {
-        String cdir = new File(".").getAbsoluteFile().getParent();
-        String pdir = jproject.getDir();
         String[] projectClassPath = jproject.getClassPath();
-        
         List<String> classpaths = new ArrayList<String>();
         for (int i = 0; i < projectClassPath.length; i++) {
-            if (!projectClassPath[i].startsWith(cdir) && !projectClassPath[i].startsWith(pdir)) {
-                File file = new File(projectClassPath[i]);
-                if (file.exists()) {
-                    classpaths.add(projectClassPath[i]);
-                }
+            File file = new File(projectClassPath[i]);
+            if (file.exists()) {
+                classpaths.add(projectClassPath[i]);
             }
         }
         return classpaths;
-    }
-    
-    private static ClassPool getClassPool(String[] classPath) throws NotFoundException {
-        ClassPool classpool = ClassPool.getDefault();
-        for (String path : classPath) {
-            classpool.insertClassPath(path);
-        }
-        return classpool;
     }
     
     private Set<String> collectBytecodeClassNames(String path) {
@@ -243,40 +227,86 @@ public class BytecodeClassStore {
     public boolean existsBytecodeClassInfo(JavaProject jproject) {
         Map<String, BytecodeClassInfo> classInfoMap = bytecodeClassInfo.get(jproject.getPath());
         if (classInfoMap != null) {
-            classInfoMapCache = classInfoMap;
             return true;
         }
         classInfoMap = new HashMap<String, BytecodeClassInfo>();
         bytecodeClassInfo.put(jproject.getPath(), classInfoMap);
-        classInfoMapCache = classInfoMap;
         return false;
     }
     
     public void registerBytecodeClass(JavaProject jproject, String className) {
         try {
-            CtClass ctClass = classPool.get(className);
-            if (ctClass.isInterface() || ctClass.getModifiers() != Modifier.PRIVATE) {
-                BytecodeClassInfo classInfo = new BytecodeClassInfo(ctClass);
-                classInfoMapCache.put(className, classInfo);
+            Map<String, BytecodeClassInfo> classInfoMap = bytecodeClassInfo.get(jproject.getPath());
+            if (classInfoMap == null) {
+                return;
+            }
+            ClassPool classPool = classPools.get(jproject.getPath());
+            if (classPool != null) {
+                CtClass ctClass = classPool.get(className);
+                if (ctClass.isInterface() || ctClass.getModifiers() != Modifier.PRIVATE) {
+                    BytecodeClassInfo classInfo = new BytecodeClassInfo(ctClass);
+                    classInfoMap.put(getCanonicalClassName(ctClass), classInfo);
+                }
             }
         } catch (NotFoundException e) { /* empty */ }
     }
     
     public void collectBytecodeClassInfo(JavaProject jproject) {
-        for (BytecodeClassInfo classInfo : classInfoMapCache.values()) {
+        Map<String, BytecodeClassInfo> classInfoMap = bytecodeClassInfo.get(jproject.getPath());
+        for (BytecodeClassInfo classInfo : classInfoMap.values()) {
             for (BytecodeClassInfo parent : classInfo.getParents()) {
-                BytecodeClassInfo parentInfo = classInfoMapCache.get(parent.getName());
+                BytecodeClassInfo parentInfo = classInfoMap.get(parent.getName());
                 if (parentInfo != null) {
                     parentInfo.addChild(classInfo);
                 }
             }
         }
         
-        for (BytecodeClassInfo classInfo : classInfoMapCache.values()) {
+        for (BytecodeClassInfo classInfo : classInfoMap.values()) {
             classInfo.setAncestors(classInfo);
             classInfo.setDescendants(classInfo);
         }
-        
-        classInfoMapCache = null;
+    }
+    
+    public String getCanonicalClassName(JavaProject jproject, String className) {
+        try {
+            ClassPool classPool = classPools.get(jproject.getPath());
+            if (classPool != null) {
+                CtClass ctClass = classPool.get(className);
+                return getCanonicalClassName(ctClass);
+            }
+            return null;
+        } catch (NotFoundException e) {
+            return null;
+        }
+    }
+    
+    public static String getCanonicalClassName(CtClass ctClass) {
+        String className = ctClass.getName();
+        try {
+            CtClass parent = ctClass.getDeclaringClass();
+            while (parent != null) {
+                String pname = parent.getName();
+                String iname = className.substring(pname.length() + 1);
+                if (isAnonymousClass(iname)) {
+                    className = pname + "$" + iname;
+                } else {
+                    className = pname + "." + iname;
+                }
+                parent = parent.getDeclaringClass();
+            }
+            return className;
+        } catch (NotFoundException e) {
+            return className;
+        }
+    }
+    
+    private static boolean isAnonymousClass(String className) {
+        return className.matches("\\d+?");
+    }
+    
+    public static String getCanonicalSimpleClassName(CtClass ctClass) {
+        String className = getCanonicalClassName(ctClass); 
+        return className.substring(ctClass.getName().length() - ctClass.getSimpleName().length());
     }
 }

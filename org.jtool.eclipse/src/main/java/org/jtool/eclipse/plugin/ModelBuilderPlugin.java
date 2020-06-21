@@ -56,12 +56,17 @@ public class ModelBuilderPlugin extends ModelBuilder {
     private JXConsole console = new JXConsole();
     
     public ModelBuilderPlugin() {
-        super(true);
+        super(false, false);
         resourceChangeListener = new ResourceChangeListener(this);
     }
     
     public ModelBuilderPlugin(boolean analyzingBytecode) {
-        super(analyzingBytecode);
+        super(analyzingBytecode, false);
+        resourceChangeListener = new ResourceChangeListener(this);
+    }
+    
+    public ModelBuilderPlugin(boolean analyzingBytecode, boolean useBytecodeCache) {
+        super(analyzingBytecode, useBytecodeCache);
         resourceChangeListener = new ResourceChangeListener(this);
     }
     
@@ -253,7 +258,7 @@ public class ModelBuilderPlugin extends ModelBuilder {
         String dir = javaProject.getProject().getLocation().toString();
         
         jproject = new JavaProject(name, path, dir);
-        jproject.getCFGStore().create(jproject, analyzingBytecode);
+        jproject.getCFGStore().create(jproject, this);
         jproject.setModelBuilder(this);
         setPaths(javaProject, jproject);
         ProjectStore.getInstance().addProject(jproject);

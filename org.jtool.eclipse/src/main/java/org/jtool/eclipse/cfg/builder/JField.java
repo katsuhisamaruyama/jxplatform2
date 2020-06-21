@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -25,8 +25,8 @@ abstract class JField extends JElement {
     
     protected JClass declaringClass;
     
-    protected JField(String fqn, CFGStore cfgStore, String className, String name,
-            int modifiers, String returnType, boolean isPrimitive) {
+    protected JField(String fqn, String className, String name,
+            int modifiers, String returnType, boolean isPrimitive, CFGStore cfgStore) {
         super(fqn, cfgStore);
         this.className = className;
         this.name = name;

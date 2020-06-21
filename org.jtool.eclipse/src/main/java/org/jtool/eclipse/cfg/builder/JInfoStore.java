@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -9,11 +9,10 @@ package org.jtool.eclipse.cfg.builder;
 import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.builder.BytecodeClassStore;
+import org.jtool.eclipse.javamodel.builder.ModelBuilder;
 import javassist.CtClass;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * An object that stores information on internal and external classes in the project.
@@ -30,19 +29,24 @@ class JInfoStore {
     private Map<String, JClass> internalClassStore = new HashMap<String, JClass>();
     private Map<String, JClass> externalClassStore = new HashMap<String, JClass>();
     
-    void create(CFGStore cfgStore, JavaProject jproject, boolean analyzingBytecode) {
+    void create(CFGStore cfgStore, JavaProject jproject, ModelBuilder builder) {
         this.cfgStore = cfgStore;
         this.jproject = jproject;
         analysisLevel = 0;
         
-        if (analyzingBytecode) {
-            BytecodeCacheManager.loadCache(jproject, cfgStore);
+        if (builder.isAnalyzingBytecode()) {
             analysisLevel = 1;
+            if (builder.useBytecodeCache()) {
+                BytecodeCacheManager.loadCache(jproject, cfgStore);
+                analysisLevel = 2;
+            }
         }
     }
     
     void destory() {
-        writeCache();
+        if (analysisLevel > 1) {
+            BytecodeCacheManager.writeCache(jproject, externalClassStore.values());
+        }
         
         internalClassStore.clear();
         externalClassStore.clear();
@@ -61,24 +65,36 @@ class JInfoStore {
         return analysisLevel;
     }
     
-    void writeCache() {
-        if (analysisLevel > 0) {
-            List<JClass> classes = new ArrayList<JClass>();
-            for (JavaClass jclass : jproject.getClasses()) {
-                JClass clazz = externalClassStore.get(jclass.getQualifiedName());
-                if (clazz != null && !classes.contains(clazz)) {
-                    classes.add(clazz);
-                }
-                for (JavaClass jc : jclass.getEfferentClasses()) {
-                    clazz = externalClassStore.get(jc.getQualifiedName());
-                    if (clazz != null && !classes.contains(clazz)) {
-                        classes.add(clazz);
-                    }
-                }
-            }
-            
-            BytecodeCacheManager.writeCache(jproject, classes);
+    JClass getJClass(String className) {
+        JClass clazz = internalClassStore.get(className);
+        if (clazz == null) {
+            clazz = registerInternalClass(className);
         }
+        if (analysisLevel == 0 || clazz != null) {
+            return clazz;
+        }
+        
+        clazz = externalClassStore.get(className);
+        if (clazz == null) {
+            clazz = registerExternalClass(className);
+        }
+        return clazz;
+    }
+    
+    JMethod getJMethod(String className, String signature) {
+        JClass clazz = getJClass(className);
+        if (clazz != null) {
+            return clazz.getMethod(signature);
+        }
+        return null;
+    }
+    
+    JField getJField(String className, String name) {
+        JClass clazz = getJClass(className);
+        if (clazz != null) {
+            return clazz.getField(name);
+        }
+        return null;
     }
     
     JClass findInternalClass(String fqn) {
@@ -103,10 +119,10 @@ class JInfoStore {
         BytecodeClassStore bytecodeClassStore = jproject.getBytecodeClassStore();
         if (!bytecodeClassStore.existsBytecodeClassInfo(jproject)) {
             jproject.registerBytecodeClasses();
-            analysisLevel = 2;
+            analysisLevel = 3;
         }
         
-        CtClass ctClass = bytecodeClassStore.getCtClass(jproject, fqn);
+        CtClass ctClass = bytecodeClassStore.getCtClassByCanonicalClassName(jproject, fqn);
         if (ctClass != null) {
             JClassExternal clazz = new JClassExternal(ctClass, cfgStore);
             externalClassStore.put(clazz.getQualifiedName(), clazz);
@@ -121,37 +137,5 @@ class JInfoStore {
     
     void unregisterJClassCache(String fqn) {
         externalClassStore.remove(fqn);
-    }
-    
-    JClass getJClass(String fqn) {
-        JClass clazz = internalClassStore.get(fqn);
-        if (clazz == null) {
-            clazz = registerInternalClass(fqn);
-        }
-        if (analysisLevel == 0 || clazz != null) {
-            return clazz;
-        }
-        
-        clazz = externalClassStore.get(fqn);
-        if (clazz == null) {
-            clazz = registerExternalClass(fqn);
-        }
-        return clazz;
-    }
-    
-    JMethod getJMethod(String className, String signature) {
-        JClass clazz = getJClass(className);
-        if (clazz != null) {
-            return clazz.getMethod(signature);
-        }
-        return null;
-    }
-    
-    JField getJField(String className, String name) {
-        JClass clazz = getJClass(className);
-        if (clazz != null) {
-            return clazz.getField(name);
-        }
-        return null;
     }
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -35,11 +35,14 @@ import java.util.HashSet;
  */
 public abstract class ModelBuilder {
     
-    protected boolean analyzingBytecode;
     protected BytecodeClassStore bytecodeClassStore;
     
-    protected ModelBuilder(boolean analyzingBytecode) {
+    protected boolean analyzingBytecode;
+    protected boolean useBytecodeCache;
+    
+    protected ModelBuilder(boolean analyzingBytecode, boolean useBytecodeCache) {
         this.analyzingBytecode = analyzingBytecode;
+        this.useBytecodeCache = useBytecodeCache;
         bytecodeClassStore = new BytecodeClassStore();
     }
     
@@ -53,12 +56,20 @@ public abstract class ModelBuilder {
         return bytecodeClassStore;
     }
     
-    public void setAnalyzingBytecode(boolean analyzingBytecode) {
-        this.analyzingBytecode = analyzingBytecode;
+    public void setAnalyzingBytecode(boolean bool) {
+        analyzingBytecode = bool;
     }
     
     public boolean isAnalyzingBytecode() {
         return analyzingBytecode;
+    }
+    
+    public void useBytecodeCache(boolean bool) {
+        useBytecodeCache = bool;
+    }
+    
+    public boolean useBytecodeCache() {
+        return useBytecodeCache;
     }
     
     public void unbuild() {

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -39,8 +39,8 @@ abstract class JMethod extends JElement {
     private static int MaxNumberOfVisitedMethods = 1000000;
     protected static final String UNKNOWN_FIELD_NAME = "*";
     
-    protected JMethod(String fqn, CFGStore cfgStore, String className, String signature,
-                      int modifiers, String returnType, boolean isPrimitive) {
+    protected JMethod(String fqn, String className, String signature,
+                      int modifiers, String returnType, boolean isPrimitive, CFGStore cfgStore) {
         super(fqn, cfgStore);
         this.className = className;
         this.signature = signature;

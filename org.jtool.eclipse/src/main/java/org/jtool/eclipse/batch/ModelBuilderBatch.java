@@ -40,11 +40,15 @@ import java.util.stream.Collectors;
 public class ModelBuilderBatch extends ModelBuilder {
     
     public ModelBuilderBatch() {
-        super(false);
+        super(false, false);
     }
     
     public ModelBuilderBatch(boolean analyzingBytecode) {
-        super(analyzingBytecode);
+        super(analyzingBytecode, false);
+    }
+    
+    public ModelBuilderBatch(boolean analyzingBytecode, boolean useBytecodeCache) {
+        super(analyzingBytecode, useBytecodeCache);
     }
     
     @Override
@@ -130,7 +134,7 @@ public class ModelBuilderBatch extends ModelBuilder {
     
     private JavaProject build(String name, Path basePath, String[] classpath, String[] srcpath, String[] binpath) {
         JavaProject jproject = new JavaProject(name, basePath.toString(), basePath.toString());
-        jproject.getCFGStore().create(jproject, analyzingBytecode);
+        jproject.getCFGStore().create(jproject, this);
         jproject.setModelBuilder(this);
         jproject.setClassPath(getClassPath(classpath));
         jproject.setSourceBinaryPaths(srcpath, binpath);
