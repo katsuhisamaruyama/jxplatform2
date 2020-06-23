@@ -54,8 +54,8 @@ dependencies {
     implementation group: 'org.apache.maven', name: 'maven-model', version: '3.6.+'
     implementation group: 'org.gradle', name: 'gradle-tooling-api', version: '6.2'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.+'
+    implementation group: 'org.javassist', name: 'javassist', version: '3.27.0-GA'
     testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.+'
-    implementation files('lib/javassist.jar')
     testImplementation 'junit:junit:4.+'
 }
 

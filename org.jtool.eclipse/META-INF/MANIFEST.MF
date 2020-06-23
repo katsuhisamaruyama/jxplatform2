@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: JxPlatform2
 Bundle-SymbolicName: org.jtool.eclipse;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: org.jtool.eclipse
 Bundle-Activator: org.jtool.eclipse.plugin.Activator
 Bundle-ActivationPolicy: lazy

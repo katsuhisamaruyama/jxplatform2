@@ -243,9 +243,13 @@ public class BytecodeClassStore {
             ClassPool classPool = classPools.get(jproject.getPath());
             if (classPool != null) {
                 CtClass ctClass = classPool.get(className);
-                if (ctClass.isInterface() || ctClass.getModifiers() != Modifier.PRIVATE) {
-                    BytecodeClassInfo classInfo = new BytecodeClassInfo(ctClass);
-                    classInfoMap.put(getCanonicalClassName(ctClass), classInfo);
+                
+                if (!ctClass.getName().startsWith("META-INF.")) { // javassist does not support multi-release JARs
+                    
+                    if (ctClass.isInterface() || ctClass.getModifiers() != Modifier.PRIVATE) {
+                        BytecodeClassInfo classInfo = new BytecodeClassInfo(ctClass);
+                        classInfoMap.put(getCanonicalClassName(ctClass), classInfo);
+                    }
                 }
             }
         } catch (NotFoundException e) { /* empty */ }
@@ -306,7 +310,8 @@ public class BytecodeClassStore {
     }
     
     public static String getCanonicalSimpleClassName(CtClass ctClass) {
-        String className = getCanonicalClassName(ctClass); 
-        return className.substring(ctClass.getName().length() - ctClass.getSimpleName().length());
+        String className = getCanonicalClassName(ctClass);
+        return className.substring(ctClass.getPackageName().length() + 1);
+        //return className.substring(ctClass.getName().length() - ctClass.getSimpleName().length());
     }
 }
