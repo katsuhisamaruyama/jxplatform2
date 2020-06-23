@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -25,6 +25,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.AssertStatement;
 import org.eclipse.jdt.core.dom.Block;
@@ -50,6 +51,7 @@ import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import java.util.List;
 import java.util.ArrayList;
@@ -703,7 +705,12 @@ public class StatementVisitor extends ASTVisitor {
         expression.accept(exprVisitor);
         CFGNode curNode = exprVisitor.getExitNode();
         
-        setExceptionFlowOnThrow(throwNode, expression.resolveTypeBinding());
+        if (expression instanceof MethodInvocation) {
+            IMethodBinding mbinding = ((MethodInvocation)expression).resolveMethodBinding();
+            setExceptionFlowOnThrow(throwNode, mbinding.getReturnType());
+        } else {
+            setExceptionFlowOnThrow(throwNode, expression.resolveTypeBinding());
+        }
         
         ControlFlow fallEdge = createFlow(curNode, nextNode);
         fallEdge.setFallThrough();
