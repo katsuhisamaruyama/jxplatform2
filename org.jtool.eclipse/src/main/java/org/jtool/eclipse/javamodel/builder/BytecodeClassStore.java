@@ -291,6 +291,10 @@ public class BytecodeClassStore {
             CtClass parent = ctClass.getDeclaringClass();
             while (parent != null) {
                 String pname = parent.getName();
+                if (pname.length() >= className.length()) {
+                    break;
+                }
+                
                 String iname = className.substring(pname.length() + 1);
                 if (isAnonymousClass(iname)) {
                     className = pname + "$" + iname;
@@ -312,6 +316,5 @@ public class BytecodeClassStore {
     public static String getCanonicalSimpleClassName(CtClass ctClass) {
         String className = getCanonicalClassName(ctClass);
         return className.substring(ctClass.getPackageName().length() + 1);
-        //return className.substring(ctClass.getName().length() - ctClass.getSimpleName().length());
     }
 }
