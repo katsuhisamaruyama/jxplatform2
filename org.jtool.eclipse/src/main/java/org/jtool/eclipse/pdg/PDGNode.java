@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -7,14 +7,13 @@
 package org.jtool.eclipse.pdg;
 
 import org.jtool.eclipse.cfg.CFGNode;
-import org.jtool.eclipse.graph.GraphEdge;
 import org.jtool.eclipse.graph.GraphNode;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -53,63 +52,47 @@ public class PDGNode extends GraphNode {
     }
     
     public Set<Dependence> getIncomingDependeceEdges() {
-        Set<Dependence> edges = new HashSet<Dependence>();
-        for (GraphEdge edge : getIncomingEdges()) {
-            edges.add((Dependence)edge);
-        }
-        return edges;
+        return getIncomingEdges().stream()
+                                 .map(edge -> (Dependence)edge)
+                                 .collect(Collectors.toSet());
     }
     
     public Set<Dependence> getOutgoingDependeceEdges() {
-        Set<Dependence> edges = new HashSet<Dependence>();
-        for (GraphEdge edge : getOutgoingEdges()) {
-            edges.add((Dependence)edge);
-        }
-        return edges;
+        return getOutgoingEdges().stream()
+                                 .map(edge -> (Dependence)edge)
+                                 .collect(Collectors.toSet());
     }
     
     public Set<CD> getIncomingCDEdges() {
-        Set<CD> edges = new HashSet<CD>();
-        for (GraphEdge edge : getIncomingEdges()) {
-            Dependence dependence = (Dependence)edge;
-            if (dependence.isCD()) {
-                edges.add((CD)dependence);
-            }
-        }
-        return edges;
+        return getIncomingEdges().stream()
+                                 .map(edge -> (Dependence)edge)
+                                 .filter(edge -> edge.isCD())
+                                 .map(edge -> (CD)edge)
+                                 .collect(Collectors.toSet());
     }
     
     public Set<CD> getOutgoingCDEdges() {
-        Set<CD> edges = new HashSet<CD>();
-        for (GraphEdge edge : getOutgoingEdges()) {
-            Dependence dependence = (Dependence)edge;
-            if (dependence.isCD()) {
-                edges.add((CD)dependence);
-            }
-        }
-        return edges;
+        return getOutgoingEdges().stream()
+                                 .map(edge -> (Dependence)edge)
+                                 .filter(edge -> edge.isCD())
+                                 .map(edge -> (CD)edge)
+                                 .collect(Collectors.toSet());
     }
     
     public Set<DD> getIncomingDDEdges() {
-        Set<DD> edges = new HashSet<DD>();
-        for (GraphEdge edge : getIncomingEdges()) {
-            Dependence dependence = (Dependence)edge;
-            if (dependence.isDD()) {
-                edges.add((DD)dependence);
-            }
-        }
-        return edges;
+        return getIncomingEdges().stream()
+                                 .map(edge -> (Dependence)edge)
+                                 .filter(edge -> edge.isDD())
+                                 .map(edge -> (DD)edge)
+                                 .collect(Collectors.toSet());
     }
     
     public Set<DD> getOutgoingDDEdges() {
-        Set<DD> edges = new HashSet<DD>();
-        for (GraphEdge edge : getOutgoingEdges()) {
-            Dependence dependence = (Dependence)edge;
-            if (dependence.isDD()) {
-                edges.add((DD)dependence);
-            }
-        }
-        return edges;
+        return getOutgoingEdges().stream()
+                                 .map(edge -> (Dependence)edge)
+                                 .filter(edge -> edge.isDD())
+                                 .map(edge -> (DD)edge)
+                                 .collect(Collectors.toSet());
     }
     
     public boolean isDominated() {

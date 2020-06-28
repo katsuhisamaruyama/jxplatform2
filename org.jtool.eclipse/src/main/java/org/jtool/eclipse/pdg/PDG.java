@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -28,12 +28,8 @@ public class PDG extends CommonPDG {
     }
     
     public void append(PDG pdg) {
-        for (PDGNode node : pdg.getNodes()) {
-            add(node);
-        }
-        for (Dependence edge : pdg.getEdges()) {
-            add(edge);
-        }
+        pdg.getNodes().forEach(node -> add(node));
+        pdg.getEdges().forEach(edge -> add(edge));
     }
     
     @Override

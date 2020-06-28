@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -189,15 +189,12 @@ public class Dependence extends GraphEdge {
         List<Dependence> edges = new ArrayList<Dependence>(co);
         Collections.sort(edges, new Comparator<Dependence>() {
             
+            @Override
             public int compare(Dependence edge1, Dependence edge2) {
                 if (edge2.src.getId() == edge1.src.getId()) {
-                    if (edge2.dst.getId() == edge1.dst.getId()) {
-                        return edge2.kind.toString().compareTo(edge1.kind.toString());
-                    } else if (edge1.dst.getId() > edge2.dst.getId()) {
-                        return 1;
-                    } else {
-                        return -1;
-                    }
+                    return edge2.dst.getId() == edge1.dst.getId() ?
+                           edge2.kind.toString().compareTo(edge1.kind.toString()) :
+                           edge1.dst.getId() > edge2.dst.getId() ? 1 : -1;
                 } else if (edge1.src.getId() > edge2.src.getId()) {
                     return 1;
                 } else {

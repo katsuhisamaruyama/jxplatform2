@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -20,13 +20,7 @@ public class ParameterEdge extends DD {
     }
     
     public ParameterEdge(PDGNode src, PDGNode dst, JReference jvar) {
-        super(src, dst);
-        this.jvar = jvar;
-    }
-    
-    @Override
-    public JReference getVariable() {
-        return jvar;
+        super(src, dst, jvar);
     }
     
     @Override

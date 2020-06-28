@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -12,6 +12,7 @@ import org.jtool.eclipse.javamodel.JavaClass;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.HashSet;
 
 /**
@@ -51,10 +52,7 @@ public class SDG extends CommonPDG {
     
     public void add(ClDG cldg) {
         cldgs.put(cldg.getQualifiedName(), cldg);
-        
-        for (PDG pdg : cldg.getPDGs()) {
-            pdgs.put(pdg.getQualifiedName(), pdg);
-        }
+        cldg.getPDGs().forEach(pdg -> pdgs.put(pdg.getQualifiedName(), pdg));
     }
     
     public Set<ClDG> getClDGs() {
@@ -84,20 +82,16 @@ public class SDG extends CommonPDG {
     
     @Override
     public Set<PDGNode> getNodes() {
-        Set<PDGNode> nodes = new HashSet<PDGNode>();
-        for (PDG pdg : pdgs.values()) {
-            nodes.addAll(pdg.getNodes());
-        }
-        return nodes;
+        return pdgs.values().stream()
+                            .flatMap(pdg -> pdg.getNodes().stream())
+                            .collect(Collectors.toSet());
     }
     
     @Override
     public Set<Dependence> getEdges() {
-        Set<Dependence> edges = new HashSet<Dependence>();
-        for (PDG pdg : pdgs.values()) {
-            edges.addAll(pdg.getEdges());
-        }
-        return edges;
+        return pdgs.values().stream()
+                            .flatMap(pdg -> pdg.getEdges().stream())
+                            .collect(Collectors.toSet());
     }
     
     @Override

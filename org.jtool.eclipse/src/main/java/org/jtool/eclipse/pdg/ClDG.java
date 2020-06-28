@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -12,6 +12,7 @@ import org.jtool.eclipse.cfg.CommonCFG;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.HashSet;
 
 /**
@@ -32,10 +33,7 @@ public class ClDG extends CommonPDG {
     public CCFG getCFG() {
         CFGEntry node = (CFGEntry)entry.getCFGNode();
         CommonCFG cfg = node.getCFG();
-        if (cfg instanceof CCFG) {
-            return (CCFG)cfg;
-        }
-        return null;
+        return cfg instanceof CCFG ? (CCFG)cfg : null;
     }
     
     public void add(PDG pdg) {
@@ -59,20 +57,14 @@ public class ClDG extends CommonPDG {
     
     @Override
     public Set<PDGNode> getNodes() {
-        Set<PDGNode> nodes = new HashSet<PDGNode>();
-        for (PDG pdg : pdgs.values()) {
-            nodes.addAll(pdg.getNodes());
-        }
-        return nodes;
+        return pdgs.values().stream()
+                            .flatMap(pdg -> pdg.getNodes().stream()).collect(Collectors.toSet());
     }
     
     @Override
     public Set<Dependence> getEdges() {
-        Set<Dependence> edges = new HashSet<Dependence>();
-        for (PDG pdg : pdgs.values()) {
-            edges.addAll(pdg.getEdges());
-        }
-        return edges;
+        return pdgs.values().stream()
+                            .flatMap(pdg -> pdg.getEdges().stream()).collect(Collectors.toSet());
     }
     
     @Override
