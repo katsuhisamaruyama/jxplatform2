@@ -50,7 +50,7 @@ public class CallGraphBuilder {
                 CFGMethodCall call = (CFGMethodCall)cfgNode;
                 CFG methodCFG = cfgStore.findCFG(call.getQualifiedName());
                 if (methodCFG != null) {
-                    ControlFlow flow = new ControlFlow(cfg.getStartNode(), methodCFG.getStartNode());
+                    ControlFlow flow = new ControlFlow(cfg.getEntryNode(), methodCFG.getEntryNode());
                     callGraph.add(flow);
                 }
             } else if (cfgNode.isStatement()) {
@@ -59,7 +59,7 @@ public class CallGraphBuilder {
                     if (def.isFieldAccess()) {
                         CFG fieldCFG = cfgStore.findCFG(def.getQualifiedName());
                         if (fieldCFG != null) {
-                            ControlFlow flow = new ControlFlow(cfg.getStartNode(), fieldCFG.getStartNode());
+                            ControlFlow flow = new ControlFlow(cfg.getEntryNode(), fieldCFG.getEntryNode());
                             callGraph.add(flow);
                         }
                     }
@@ -68,7 +68,7 @@ public class CallGraphBuilder {
                     if (use.isFieldAccess()) {
                         CFG fieldCFG = cfgStore.findCFG(use.getQualifiedName());
                         if (fieldCFG != null) {
-                            ControlFlow flow = new ControlFlow(cfg.getStartNode(), fieldCFG.getStartNode());
+                            ControlFlow flow = new ControlFlow(cfg.getEntryNode(), fieldCFG.getEntryNode());
                             callGraph.add(flow);
                         }
                     }

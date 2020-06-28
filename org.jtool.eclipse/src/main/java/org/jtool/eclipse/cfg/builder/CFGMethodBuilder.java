@@ -81,7 +81,7 @@ public class CFGMethodBuilder {
         cfg.add(entry);
         
         CFGNode tmpExit = new CFGNode();
-        cfg.setEndNode(tmpExit);
+        cfg.setExitNode(tmpExit);
         
         Set<CFGCatch> exceptionNodes = createExceptionNodes(jmethod, entry, cfg, infoStore);
         
@@ -106,7 +106,7 @@ public class CFGMethodBuilder {
                 exit = new CFGExit(jmethod.getASTNode(), CFGNode.Kind.methodExit);
             }
         }
-        cfg.setEndNode(exit);
+        cfg.setExitNode(exit);
         cfg.add(exit);
         
         if (entry.getJavaMethod().isVoid() && !entry.getJavaMethod().isConstructor()) {

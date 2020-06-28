@@ -91,7 +91,7 @@ public class CFGFieldBuilder {
         } else {
             exit = new CFGExit(jfield.getASTNode(), CFGNode.Kind.fieldExit);
         }
-        cfg.setEndNode(exit);
+        cfg.setExitNode(exit);
         cfg.add(exit);
         
         edge = new ControlFlow(curNode, exit);

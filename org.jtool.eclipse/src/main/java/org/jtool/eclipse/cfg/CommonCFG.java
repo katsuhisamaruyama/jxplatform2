@@ -19,51 +19,51 @@ import java.util.stream.Collectors;
  */
 public class CommonCFG extends Graph<CFGNode, ControlFlow> {
     
-    protected CFGEntry start;
-    protected CFGNode end;
+    protected CFGEntry entry;
+    protected CFGNode exit;
     
     public CommonCFG() {
     }
     
     public void setStartNode(CFGEntry node) {
-        start = node;
-        start.setCFG(this);
+        entry = node;
+        entry.setCFG(this);
     }
     
-    public CFGEntry getStartNode() {
-        return start;
+    public CFGEntry getEntryNode() {
+        return entry;
     }
     
-    public void setEndNode(CFGNode node) {
-        end = node;
+    public void setExitNode(CFGNode node) {
+        exit = node;
     }
     
-    public CFGNode getEndNode() {
-        return end;
+    public CFGNode getExitNode() {
+        return exit;
     }
     
     public long getId() {
-        return start.getId();
+        return entry.getId();
     }
     
     public String getName() {
-        return start.getName();
+        return entry.getName();
     }
     
     public String getQualifiedName() {
-        return start.getQualifiedName();
+        return entry.getQualifiedName();
     }
     
     public boolean isMethod() {
-        return start instanceof CFGMethodEntry;
+        return entry instanceof CFGMethodEntry;
     }
     
     public boolean isField() {
-        return start instanceof CFGFieldEntry;
+        return entry instanceof CFGFieldEntry;
     }
     
     public boolean isClass() {
-        return start instanceof CFGClassEntry;
+        return entry instanceof CFGClassEntry;
     }
     
     public boolean isBranch(CFGNode node) {
@@ -186,7 +186,7 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
         for (CFGNode node : getNodes()) {
             if (!anchor.equals(node)) {
                 Set<CFGNode> track = forwardReachableNodes(anchor, node, true);
-                if (track.contains(node) && !track.contains(getEndNode())) {
+                if (track.contains(node) && !track.contains(getExitNode())) {
                     postDominator.add(node);
                 }
             }
@@ -196,11 +196,11 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
     
     public Set<CFGNode> constrainedReachableNodes(CFGNode from, CFGNode to) {
         Set<CFGNode> btrackf = backwardReachableNodes(to, from, true);
-        Set<CFGNode> ftrackf = forwardReachableNodes(from, getEndNode(), true);
+        Set<CFGNode> ftrackf = forwardReachableNodes(from, getExitNode(), true);
         Set<CFGNode> fCRP = GraphElement.intersection(btrackf, ftrackf);
         
         Set<CFGNode> ftrackb = forwardReachableNodes(from, to, true);
-        Set<CFGNode> btrackb = backwardReachableNodes(to, getStartNode(), true);
+        Set<CFGNode> btrackb = backwardReachableNodes(to, getExitNode(), true);
         Set<CFGNode> bCRP = GraphElement.intersection(ftrackb, btrackb);
         
         Set<CFGNode> CRP = GraphElement.union(fCRP, bCRP);

@@ -22,18 +22,18 @@ public class CCFG extends CommonCFG {
     protected Map<String, CFG> cfgs = new HashMap<String, CFG>();
     
     @Override
-    public CFGClassEntry getStartNode() {
-        return (CFGClassEntry)start;
+    public CFGClassEntry getEntryNode() {
+        return (CFGClassEntry)entry;
     }
     
     @Override
     public String getName() {
-        return start.getName();
+        return entry.getName();
     }
     
     @Override
     public String getQualifiedName() {
-        return start.getQualifiedName();
+        return entry.getQualifiedName();
     }
     
     public void add(CFG cfg) {

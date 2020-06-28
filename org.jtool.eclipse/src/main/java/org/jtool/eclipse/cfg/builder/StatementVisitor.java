@@ -621,7 +621,7 @@ public class StatementVisitor extends ASTVisitor {
             ExpressionVisitor exprVisitor = new ExpressionVisitor(this, cfg, returnNode, infoStore, visited);
             expression.accept(exprVisitor);
             
-            CFGMethodEntry methodNode = (CFGMethodEntry)cfg.getStartNode();
+            CFGMethodEntry methodNode = (CFGMethodEntry)cfg.getEntryNode();
             String type = methodNode.getJavaMethod().getReturnType();
             boolean primitive = methodNode.getJavaMethod().isPrimitiveReturnType();
             JReference jvar = new JSpecialVarReference(methodNode.getASTNode(), "$_", type, primitive);
@@ -630,7 +630,7 @@ public class StatementVisitor extends ASTVisitor {
             curNode = exprVisitor.getExitNode();
         }
         
-        ControlFlow trueEdge = createFlow(curNode, cfg.getEndNode());
+        ControlFlow trueEdge = createFlow(curNode, cfg.getExitNode());
         trueEdge.setTrue();
         
         ControlFlow fallEdge = createFlow(curNode, nextNode);
@@ -672,7 +672,7 @@ public class StatementVisitor extends ASTVisitor {
         Statement body = node.getBody();
         body.accept(this);
         
-        ControlFlow jumpEdge = createFlow(labelNode, cfg.getEndNode());
+        ControlFlow jumpEdge = createFlow(labelNode, cfg.getExitNode());
         jumpEdge.setTrue();
         return false;
     }
@@ -802,7 +802,7 @@ public class StatementVisitor extends ASTVisitor {
             return;
         }
         
-        CFGMethodEntry entry = (CFGMethodEntry)cfg.getStartNode();
+        CFGMethodEntry entry = (CFGMethodEntry)cfg.getEntryNode();
         JavaMethod jmethod = entry.getJavaMethod();
         if (jmethod.isInitializer()) {
             return;

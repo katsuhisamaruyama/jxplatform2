@@ -93,9 +93,9 @@ public class CFGStore {
         CCFG ccfg = CCFGBuilder.build(jclass, force, infoStore);
         addCCFG(ccfg);
         
-        ccfg.getStartNode().getMethods().forEach(cfg -> addCFG(cfg));
-        ccfg.getStartNode().getFields().forEach(cfg -> addCFG(cfg));
-        ccfg.getStartNode().getTypes().forEach(ccfg2 -> {
+        ccfg.getEntryNode().getMethods().forEach(cfg -> addCFG(cfg));
+        ccfg.getEntryNode().getFields().forEach(cfg -> addCFG(cfg));
+        ccfg.getEntryNode().getTypes().forEach(ccfg2 -> {
             addCCFG(ccfg2);
             ccfg2.getCFGs().forEach(cfg -> addCFG(cfg));
         });
