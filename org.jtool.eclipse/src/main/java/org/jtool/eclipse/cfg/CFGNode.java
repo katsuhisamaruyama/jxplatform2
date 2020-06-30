@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.stream.Collectors;
 
 /**
@@ -171,11 +170,11 @@ public class CFGNode extends GraphNode {
     }
     
     private Set<CFGNode> convertNodes(Set<GraphNode> nodes) {
-        return nodes.stream().map(node -> (CFGNode)node).collect(Collectors.toCollection(HashSet::new));
+        return nodes.stream().map(node -> (CFGNode)node).collect(Collectors.toSet());
     }
     
     private Set<ControlFlow> convertEdges(Set<GraphEdge> edges) {
-        return edges.stream().map(edge -> (ControlFlow)edge).collect(Collectors.toCollection(HashSet::new));
+        return edges.stream().map(edge -> (ControlFlow)edge).collect(Collectors.toSet());
     }
     
     public boolean isBranch() { 
