@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -18,6 +18,7 @@ import org.jtool.eclipse.javamodel.JavaMethod;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.HashSet;
 
 /**
@@ -175,18 +176,16 @@ public class PDGStore {
             return;
         }
         classes.add(jclass);
+        classes.addAll(collectDescendantClasses(jclass));
         
         for (JavaClass jc : jclass.getEfferentClassesInProject()) {
             collectEfferentClasses(jc, classes);
         }
     }
     
-    @SuppressWarnings("unused")
-    private void collectDescendantClasses(JavaClass jclass, Set<JavaClass> jclasses) {
-        for (JavaClass descendant : jclass.getDescendants()) {
-            if (descendant.isInProject() && !jclasses.contains(descendant)) {
-                jclasses.add(descendant);
-            }
-        }
+    private Set<JavaClass> collectDescendantClasses(JavaClass jclass) {
+        return jclass.getDescendants().stream()
+                     .filter(descendant -> descendant.isInProject())
+                     .collect(Collectors.toSet());
     }
 }

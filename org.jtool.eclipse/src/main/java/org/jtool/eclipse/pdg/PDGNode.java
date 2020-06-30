@@ -100,15 +100,18 @@ public class PDGNode extends GraphNode {
     }
     
     public boolean isTrueDominated() {
-        return getIncomingCDEdges().stream().anyMatch(cd -> cd.isTrue());
+        return getIncomingCDEdges().stream()
+                                   .anyMatch(cd -> cd.isTrue());
     }
     
     public boolean isFalseDominated() {
-        return getIncomingCDEdges().stream().anyMatch(cd -> cd.isFalse());
+        return getIncomingCDEdges().stream()
+                                   .anyMatch(cd -> cd.isFalse());
     }
     
     public int getNumOfIncomingTrueFalseCDs() {
-        return (int)getIncomingCDEdges().stream().filter(cd -> cd.isTrue() || cd.isFalse()).count();
+        return (int)getIncomingCDEdges().stream()
+                                        .filter(cd -> cd.isTrue() || cd.isFalse()).count();
     }
     
     public boolean equals(PDGNode node) {

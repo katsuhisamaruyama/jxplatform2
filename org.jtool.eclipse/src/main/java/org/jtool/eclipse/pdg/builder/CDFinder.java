@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -94,11 +94,11 @@ public class CDFinder {
     }
     
     private static void findCDsFromEntry(PDG pdg, CFG cfg) {
-        CFGNode startNode = cfg.getStartNode();
-        Set<CFGNode> postDominator = cfg.postDominator(startNode);
+        CFGNode entryNode = cfg.getEntryNode();
+        Set<CFGNode> postDominator = cfg.postDominator(entryNode);
         for (CFGNode cfgnode : postDominator) {
             if ((cfgnode.isStatementNotParameter() && !cfgnode.isMethodCallReceiver()) || cfgnode.isFormal()) {
-                CD edge = new CD(startNode.getPDGNode(), cfgnode.getPDGNode());
+                CD edge = new CD(entryNode.getPDGNode(), cfgnode.getPDGNode());
                 edge.setTrue();
                 pdg.add(edge);
             }
