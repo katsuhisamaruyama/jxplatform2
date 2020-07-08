@@ -137,27 +137,47 @@ public class BytecodeClassStore {
     private List<String> getCommonLibraryClassPath() {
         List<String> classpaths = new ArrayList<String>();
         
-        String[] bootClassPath = System.getProperty("sun.boot.class.path").split(File.pathSeparator, 0);
-        for (int i = 0; i < bootClassPath.length; i++) {
-            File file = new File(bootClassPath[i]);
-            if (file.exists()) {
-                classpaths.add(bootClassPath[i]);
+        String bootClassPath = System.getProperty("sun.boot.class.path");
+        if (bootClassPath != null) {
+            String[] bootClassPaths = bootClassPath.split(File.pathSeparator, 0);
+            for (int i = 0; i < bootClassPaths.length; i++) {
+                File file = new File(bootClassPaths[i]);
+                if (file.exists()) {
+                    classpaths.add(bootClassPaths[i]);
+                }
             }
         }
         
-        String[] extDirs = System.getProperty("java.ext.dirs").split(File.pathSeparator, 0);
-        for (int i = 0; i < extDirs.length; i++) {
-            File file = new File(extDirs[i]);
-            if (file.exists()) { 
-                classpaths.add(extDirs[i]);
+        String extDir = System.getProperty("java.ext.dirs");
+        if (extDir != null) {
+            String[] extDirs = extDir.split(File.pathSeparator, 0);
+            for (int i = 0; i < extDirs.length; i++) {
+                File file = new File(extDirs[i]);
+                if (file.exists()) { 
+                    classpaths.add(extDirs[i]);
+                }
             }
         }
         
-        String[] endorsedDirs = System.getProperty("java.endorsed.dirs").split(File.pathSeparator, 0);
-        for (int i = 0; i < endorsedDirs.length; i++) {
-            File file = new File(endorsedDirs[i]);
-            if (file.exists()) {
-                classpaths.add(endorsedDirs[i]);
+        String endorsedDir = System.getProperty("java.endorsed.dirs");
+        if (endorsedDir != null) {
+            String[] endorsedDirs = endorsedDir.split(File.pathSeparator, 0);
+            for (int i = 0; i < endorsedDirs.length; i++) {
+                File file = new File(endorsedDirs[i]);
+                if (file.exists()) {
+                    classpaths.add(endorsedDirs[i]);
+                }
+            }
+        }
+        
+        String javaClassPath = System.getProperty("sun.boot.class.path");
+        if (javaClassPath != null ) {
+            String[] javaClassPaths = javaClassPath.split(File.pathSeparator, 0);
+            for (int i = 0; i < javaClassPaths.length; i++) {
+                File file = new File(javaClassPaths[i]);
+                if (file.exists()) {
+                    classpaths.add(javaClassPaths[i]);
+                }
             }
         }
         
