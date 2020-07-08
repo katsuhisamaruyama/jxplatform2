@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -74,9 +74,11 @@ public class DDFinder {
                 if (anchor.isFormalIn()) {
                     edge = new DD(anchor.getPDGNode(), candidate.getPDGNode(), jvar);
                     edge.setLIDD();
+                
                 } else if (candidate.isFormalOut()) {
                     edge = new DD(anchor.getPDGNode(), candidate.getPDGNode(), jvar);
                     edge.setLIDD();
+                
                 } else {
                     PDGNode lc = getLoopCarried(pdg, cfg, anchor, candidate);
                     edge = new DD(anchor.getPDGNode(), candidate.getPDGNode(), jvar);
