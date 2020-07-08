@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -9,7 +9,6 @@ package org.jtool.eclipse.cfg.builder;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGMethodCall;
-import org.jtool.eclipse.cfg.CFGParameter;
 import org.jtool.eclipse.cfg.JFieldReference;
 import org.jtool.eclipse.cfg.JReference;
 import java.util.List;
@@ -47,8 +46,9 @@ class ReceiverCollector {
                         JReference var = new JFieldReference(receiver.getASTNode(), type, ExternalFieldName, ExternalFieldName, type, false, false);
                         callNode.addDefVariable(var);
                         
-                        for (CFGParameter param : callNode.getActualOuts()) {
-                            param.addDefVariable(receiver);
+                        callNode.getActualOuts().forEach(param -> param.addDefVariable(receiver));
+                        if (callNode.getActualOutForReturn() != null) {
+                            callNode.getActualOutForReturn().addDefVariable(receiver);
                         }
                     }
                 }

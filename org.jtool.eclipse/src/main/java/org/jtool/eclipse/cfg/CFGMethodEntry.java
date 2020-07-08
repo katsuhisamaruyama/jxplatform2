@@ -21,6 +21,7 @@ public class CFGMethodEntry extends CFGEntry {
     
     private List<CFGParameter> formalIns = new ArrayList<CFGParameter>();
     private List<CFGParameter> formalOuts = new ArrayList<CFGParameter>();
+    private CFGParameter formalOutForReturn = null;
     private List<CFGCatch> exceptionNodes = new ArrayList<CFGCatch>();
     
     public CFGMethodEntry(JavaMethod jmethod, CFGNode.Kind kind) {
@@ -41,11 +42,15 @@ public class CFGMethodEntry extends CFGEntry {
     }
     
     public void setFormalIns(List<CFGParameter> params) {
-        params.forEach(param -> addFormalIn(param));
+        formalIns.addAll(params);
     }
     
     public void setFormalOuts(List<CFGParameter> params) {
-        params.forEach(param -> addFormalOut(param));
+        formalOuts.addAll(params);
+    }
+    
+    public void setFormalOutForReturn(CFGParameter param) {
+        formalOutForReturn = param;
     }
     
     public List<CFGParameter> getFormalIns() {
@@ -69,8 +74,7 @@ public class CFGMethodEntry extends CFGEntry {
     }
     
     public CFGParameter getFormalOutForReturn() {
-        return formalOuts.stream()
-                         .filter(fout -> fout.getUseVariable().getName().endsWith("$_")).findFirst().orElse(null);
+        return formalOutForReturn;
     }
     
     public boolean hasParameters() {

@@ -707,7 +707,9 @@ public class StatementVisitor extends ASTVisitor {
         
         if (expression instanceof MethodInvocation) {
             IMethodBinding mbinding = ((MethodInvocation)expression).resolveMethodBinding();
-            setExceptionFlowOnThrow(throwNode, mbinding.getReturnType());
+            if (mbinding != null) {
+                setExceptionFlowOnThrow(throwNode, mbinding.getReturnType());
+            }
         } else {
             setExceptionFlowOnThrow(throwNode, expression.resolveTypeBinding());
         }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -37,6 +37,7 @@ import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.HashSet;
 
 /**
@@ -55,12 +56,10 @@ public class PDGBuilder {
     }
     
     private static void createNodes(PDG pdg, CFG cfg) {
-        for (CFGNode cfgnode : cfg.getNodes()) {
-            PDGNode pdgnode = createNode(pdg, cfgnode);
-            if (pdgnode != null) {
-                pdg.add(pdgnode);
-            }
-        }
+        cfg.getNodes().stream()
+           .map(cfgnode -> createNode(pdg, cfgnode))
+           .filter(pdgnode -> pdgnode != null)
+           .forEach(pdgnode -> pdg.add(pdgnode));
     }
     
     private static PDGNode createNode(PDG pdg, CFGNode node) {
@@ -84,7 +83,7 @@ public class PDGBuilder {
     
     public static ClDG buildClDG(CCFG ccfg) {
         ClDG cldg = new ClDG();
-        PDGClassEntry entry = new PDGClassEntry(ccfg.getStartNode());
+        PDGClassEntry entry = new PDGClassEntry(ccfg.getEntryNode());
         cldg.setEntryNode(entry);
         cldg.add(entry);
         
@@ -100,6 +99,12 @@ public class PDGBuilder {
     }
     
     public static void connectFieldAccesses(SDG sdg) {
+        Set<CFGFieldEntry> fieldEntries = sdg.getPDGs().stream()
+                                             .map(pdg -> pdg.getCFG())
+                                             .filter(cfg -> cfg.isField())
+                                             .map(cfg -> (CFGFieldEntry)cfg.getEntryNode())
+                                             .collect(Collectors.toSet());
+        
         for (PDG pdg : sdg.getPDGs()) {
             CFG cfg = pdg.getCFG();
             for (CFGNode node : cfg.getNodes()) {
@@ -109,17 +114,15 @@ public class PDGBuilder {
                     for (JReference var : stNode.getDefVariables()) {
                         if (var.isFieldAccess()) {
                             JFieldReference fvar = (JFieldReference)var;
-                            for (PDG graph : sdg.getPDGs()) {
-                                PDGEntry entry = graph.getEntryNode();
-                                if (entry.getQualifiedName().equals(fvar.getQualifiedName())) {
-                                    CFGFieldEntry fieldEntry = (CFGFieldEntry)entry.getCFGEntry();
-                                    
+                            
+                            for (CFGFieldEntry fieldEntry : fieldEntries) {
+                                if (fieldEntry.getQualifiedName().equals(fvar.getQualifiedName())) {
                                     DD edge = new DD(node.getPDGNode(), fieldEntry.getDeclarationNode().getPDGNode(), fvar);
                                     edge.setFieldAccess();
                                     pdg.add(edge);
                                     
                                     if (cfg.isMethod()) {
-                                        CFGMethodEntry cfgEntry = (CFGMethodEntry)cfg.getStartNode();
+                                        CFGMethodEntry cfgEntry = (CFGMethodEntry)cfg.getEntryNode();
                                         if (cfgEntry.isConstructorEntry()) {
                                             CFGParameter foutForInstance = cfgEntry.getFormalOutForReturn();
                                             
@@ -136,10 +139,9 @@ public class PDGBuilder {
                     for (JReference var : stNode.getUseVariables()) {
                         if (var.isFieldAccess()) {
                             JFieldReference fvar = (JFieldReference)var;
-                            for (PDG graph : sdg.getPDGs()) {
-                                PDGEntry entry = graph.getEntryNode();
-                                if (entry.getQualifiedName().equals(fvar.getQualifiedName())) {
-                                    CFGFieldEntry fieldEntry = (CFGFieldEntry)entry.getCFGEntry();
+                            
+                            for (CFGFieldEntry fieldEntry : fieldEntries) {
+                                if (fieldEntry.getQualifiedName().equals(fvar.getQualifiedName())) {
                                     DD edge = new DD(fieldEntry.getDeclarationNode().getPDGNode(), node.getPDGNode(), fvar);
                                     edge.setFieldAccess();
                                     pdg.add(edge);
@@ -164,8 +166,8 @@ public class PDGBuilder {
                         edge.setCall();
                         pdg.add(edge);
                         
-                        connectParameters(pdg, callnode, (CFGMethodEntry)callee.getCFG().getStartNode());
-                        connectExceptionCatch(pdg, callnode, (CFGMethodEntry)callee.getCFG().getStartNode());
+                        connectParameters(pdg, callnode, (CFGMethodEntry)callee.getCFG().getEntryNode());
+                        connectExceptionCatch(pdg, callnode, (CFGMethodEntry)callee.getCFG().getEntryNode());
                     }
                 }
             }
@@ -187,8 +189,8 @@ public class PDGBuilder {
                         edge.setCall();
                         pdg.add(edge);
                         
-                        connectParameters(pdg, callnode, (CFGMethodEntry)callee.getCFG().getStartNode());
-                        connectExceptionCatch(pdg, callnode, (CFGMethodEntry)callee.getCFG().getStartNode());
+                        connectParameters(pdg, callnode, (CFGMethodEntry)callee.getCFG().getEntryNode());
+                        connectExceptionCatch(pdg, callnode, (CFGMethodEntry)callee.getCFG().getEntryNode());
                     }
                     for (JavaMethod jm : findOverrindingMethods(classes, callnode)) {
                         PDG callee2 = sdg.getPDG(jm.getQualifiedName());
@@ -197,8 +199,8 @@ public class PDGBuilder {
                             edge.setCall();
                             pdg.add(edge);
                             
-                            connectParameters(pdg, callnode, (CFGMethodEntry)callee2.getCFG().getStartNode());
-                            connectExceptionCatch(pdg, callnode, (CFGMethodEntry)callee.getCFG().getStartNode());
+                            connectParameters(pdg, callnode, (CFGMethodEntry)callee2.getCFG().getEntryNode());
+                            connectExceptionCatch(pdg, callnode, (CFGMethodEntry)callee.getCFG().getEntryNode());
                         }
                     }
                 }
@@ -223,32 +225,44 @@ public class PDGBuilder {
     }
     
     private static void connectParameters(PDG pdg, CFGMethodCall caller, CFGMethodEntry callee) {
+        CFGParameter lastFormalIn = null;
         for (int ordinal = 0; ordinal < caller.getActualIns().size(); ordinal++) {
             CFGParameter actualIn = caller.getActualIn(ordinal);
             CFGParameter formalIn = callee.getFormalIn(ordinal);
-            if (formalIn != null) {
-                JReference jvar = formalIn.getUseVariables().get(0);
-                ParameterEdge edge = new ParameterEdge(actualIn.getPDGNode(), formalIn.getPDGNode(), jvar);
-                edge.setParameterIn();
-                pdg.add(edge);
+            if (formalIn == null) {
+                formalIn = lastFormalIn;
             }
+            
+            JReference jvar = formalIn.getUseVariables().get(0);
+            ParameterEdge edge = new ParameterEdge(actualIn.getPDGNode(), formalIn.getPDGNode(), jvar);
+            edge.setParameterIn();
+            pdg.add(edge);
+            
+            lastFormalIn = formalIn;
         }
         
-        for (int ordinal = 0; ordinal < caller.getActualIns().size(); ordinal++) {
+        for (int ordinal = 0; ordinal < caller.getActualOuts().size(); ordinal++) {
+            CFGParameter lastFormalOut = null;
             CFGParameter actualOut = caller.getActualOut(ordinal);
-            CFGParameter formalOut = callee.getFormalOut(ordinal);
-            if (formalOut != null && actualOut.getDefVariables().size() == 1) {
+            if (actualOut.getDefVariables().size() == 1) {
+                CFGParameter formalOut = callee.getFormalOut(ordinal);
+                if (formalOut == null) {
+                    formalOut = lastFormalOut;
+                }
+                
                 JReference jvar = formalOut.getUseVariables().get(0);
                 ParameterEdge edge = new ParameterEdge(formalOut.getPDGNode(), actualOut.getPDGNode(), jvar);
                 edge.setParameterOut();
                 pdg.add(edge);
+                
+                lastFormalOut = formalOut;
             }
         }
         
         if (!caller.isVoidType() || caller.isConstructorCall()) {
-            int ordinal = caller.getActualOuts().size() - 1;
-            CFGParameter actualOut = caller.getActualOut(ordinal);
-            CFGParameter formalOut = callee.getFormalOut(ordinal);
+            CFGParameter actualOut = caller.getActualOutForReturn();
+            CFGParameter formalOut = callee.getFormalOutForReturn();
+            
             JReference jvar = formalOut.getUseVariables().get(0);
             ParameterEdge edge = new ParameterEdge(formalOut.getPDGNode(), actualOut.getPDGNode(), jvar);
             edge.setParameterOut();
@@ -277,19 +291,15 @@ public class PDGBuilder {
     }
     
     static Set<PDGStatement> findActualIns(CFGMethodCall callnode) {
-        Set<PDGStatement> nodes = new HashSet<PDGStatement>();
-        for (CFGNode node : callnode.getActualIns()) {
-            nodes.add((PDGStatement)node.getPDGNode());
-        }
-        return nodes;
+        return callnode.getActualIns().stream()
+                       .map(node -> (PDGStatement)node.getPDGNode())
+                       .collect(Collectors.toSet());
     }
     
     static Set<PDGStatement> findActualOuts(CFGMethodCall callnode) {
-        Set<PDGStatement> nodes = new HashSet<PDGStatement>();
-        for (CFGNode node : callnode.getActualOuts()) {
-            nodes.add((PDGStatement)node.getPDGNode());
-        }
-        return nodes;
+        return callnode.getActualOuts().stream()
+                .map(node -> (PDGStatement)node.getPDGNode())
+                .collect(Collectors.toSet());
     }
     
     private static void connectExceptionCatch(PDG pdg, CFGMethodCall caller, CFGMethodEntry callee) {

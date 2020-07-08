@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -583,7 +583,7 @@ public class ExpressionVisitor extends ASTVisitor {
         
         CFGParameter returnNode = new CFGParameter(callNode.getASTNode(), CFGNode.Kind.actualOut, 0);
         returnNode.setParent(callNode);
-        callNode.addActualOut(returnNode);
+        callNode.setActualOutForReturn(returnNode);
         
         String type = callNode.getReturnType();
         boolean primitive = callNode.isPrimitiveType();

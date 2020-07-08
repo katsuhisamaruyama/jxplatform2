@@ -85,6 +85,13 @@ public class CDFinder {
             pdg.add(edge);
         }
         
+        CFGParameter returnNode = callNode.getActualOutForReturn();
+        if (returnNode != null) {
+            CD edge = new CD(callNode.getPDGNode(), returnNode.getPDGNode());
+            edge.setTrue();
+            pdg.add(edge);
+        }
+        
         CFGNode receiverNode = callNode.getReceiver();
         if (receiverNode != null) {
             CD edge = new CD(callNode.getPDGNode(), receiverNode.getPDGNode());

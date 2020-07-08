@@ -230,7 +230,7 @@ public class CFGMethodBuilder {
     private static CFGNode createFormalOutForReturn(ASTNode node, CFG cfg, CFGMethodEntry entry, int ordinal) {
         CFGParameter formalOutNode = new CFGParameter(node, CFGNode.Kind.formalOut, ordinal);
         formalOutNode.setParent(entry);
-        entry.addFormalOut(formalOutNode);
+        entry.setFormalOutForReturn(formalOutNode);
         cfg.add(formalOutNode);
         
         String returnType = entry.getJavaMethod().getReturnType();
