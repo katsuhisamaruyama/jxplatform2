@@ -105,7 +105,7 @@ public class Slice {
         }
         
         findStartNode(node, jv).stream()
-                               .map(start -> (CD)start.getIncomingCDEdges())
+                               .flatMap(start -> start.getIncomingCDEdges().stream())
                                .forEach(edge -> traverseBackward(edge.getSrcNode()));
         
         eliminateReceiverNodes(nodesInSlice);
