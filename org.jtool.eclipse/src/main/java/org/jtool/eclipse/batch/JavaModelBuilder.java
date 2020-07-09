@@ -7,9 +7,12 @@
 package org.jtool.eclipse.batch;
 
 import org.jtool.eclipse.util.Options;
+import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.util.Logger;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Builds a Java Model for stand-alone use.
@@ -120,13 +123,15 @@ public class JavaModelBuilder {
         return path.replace(File.separatorChar, '.');
     }
     
-    public void build() {
+    public List<JavaProject> build() {
         if (!autoCheckEnv.equals("yes")) {
             modelBuilder = new ModelBuilderBatch(true);
-            modelBuilder.build(projectName, projectPath, classpath, srcpath, binpath);
+            List<JavaProject> projects = new ArrayList<>();
+            projects.add(modelBuilder.build(projectName, projectPath, classpath, srcpath, binpath));
+            return projects;
         } else {
             modelBuilder = new ModelBuilderBatch(true);
-            modelBuilder.build(projectName, projectPath);
+            return modelBuilder.build(projectName, projectPath);
         }
     }
     
