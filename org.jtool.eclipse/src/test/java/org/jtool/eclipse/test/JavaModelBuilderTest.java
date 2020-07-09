@@ -11,7 +11,11 @@ import org.jtool.eclipse.javamodel.JavaProject;
 import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.javamodel.JavaField;
+import org.jtool.eclipse.util.TimeInfo;
 import java.io.File;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+
 import org.junit.Test;
 
 /**
@@ -80,7 +84,7 @@ public class JavaModelBuilderTest {
         builder.unbuild();
     }
     
-    public static void print() {
+    static void print() {
         String target = testDirInside + "Simple/";
         ModelBuilderBatch builder = new ModelBuilderBatch();
         JavaProject jproject = builder.build(target, target, target, target, target);
@@ -98,7 +102,7 @@ public class JavaModelBuilderTest {
         builder.unbuild();
     }
     
-    private final static String testDirOutside = "/Users/maru/Desktop/TestSamples/";
+    private final static String testDirOutside = "/Users/maru/Desktop/TestGenExp/";
     
     private void run(String name) {
         String target = testDirOutside + name + "/";
@@ -109,9 +113,15 @@ public class JavaModelBuilderTest {
             return;
         }
         
+        ZonedDateTime startTime = TimeInfo.getCurrentTime();
         ModelBuilderBatch builder = new ModelBuilderBatch(true);
-        builder.build(name, target, true);
-        System.out.println("Fin.");
+        builder.build(name, target);
+        ZonedDateTime endTime = TimeInfo.getCurrentTime();
+        builder.unbuild();
+        
+        System.out.println("** Execution time (" + name + ") = " +
+                ChronoUnit.MILLIS.between(startTime, endTime) +
+                " (" + TimeInfo.getFormatedTime(startTime) + " - " + TimeInfo.getFormatedTime(endTime) + ")");
     }
     
     public static void main(String[] args) {
@@ -129,43 +139,33 @@ public class JavaModelBuilderTest {
         //print();
         
         /* The files are stored outside the workspace */
-        //tester.run("antlr4-4.8");  // Maven
-        //tester.run("apache-ant-1.9.14");  // Ant
-        //tester.run("apache-ant-1.10.7");  // Ant
-        //tester.run("apache-log4j-2.13.0");  // Maven
-        //tester.run("bcel-6.4.1");  // Maven
-        //tester.run("findbugs-3.0.1");  // Eclipse / Maven
-        //tester.run("commons-collections4-4.4");  // Maven
-        //tester.run("commons-math3-3.6.1");  // Maven
-                    //tester.run("guava-28.2");  // Maven // NULL RETURN TYPE
-        //tester.run("jfreechart-1.0.19");  // Maven
-        //tester.run("jsoup-1.12.2");  // Maven
-        //tester.run("junit4-4.13");  // Maven
-        //tester.run("pmd-6.21.0");
-                    //tester.run("RxJava-3.x");  // Gradle  // NULL RETURN TYPE
-                    //tester.run("Twitter4J-2.2");  // Maven // NULL RETURN TYPE
+        tester.run("ant-1.9.14");                     // Ant
+        //tester.run("ant-1.10.8");                     // Ant
+        //tester.run("antlr4-4.8");                     // Maven
+        //tester.run("closure-compiler-v20200614");     // Maven
+        //tester.run("commons-bcel-6.5.0");             // Maven
+        //tester.run("commons-cli-1.4");                // Maven
+        //tester.run("commons-codec-1.14");             // Maven
+        //tester.run("commons-collections-4.4");        // Maven
+        //tester.run("commons-compress-1.20");          // Maven
+        //tester.run("commons-csv-1.8");                // Maven
+        //tester.run("commons-jxpath-1.3");             // Maven
+        //tester.run("commons-lang-3.10");              // Maven
+        //tester.run("commons-math-3.6.1");             // Maven
+        //tester.run("findbugs-3.0.1");                 // Maven/Eclipse
+        //tester.run("gson-2.8.6");                     // Maven
+        //tester.run("jackson-core-2.10.4");            // Maven
+        //tester.run("jackson-databind-2.10.4");        // Maven
+        //tester.run("jackson-dataformat-xml-2.10.4");  // Maven
+        //tester.run("jfreechart-1.5.0");               // Maven
+        //tester.run("joda-time-2.10.6");               // Maven
+        //tester.run("jsoup-1.13.1");                   // Maven
+        //tester.run("junit-4.13");                     // Maven
+        //tester.run("log4j-2.13.3");                   // Maven
+        //tester.run("mockito-3.3.13");                 // Gradle
+        //tester.run("pmd-6.24.0");                     // Maven
         
-                //tester.run("spring-framework-5.2");  // Gradle
-                //tester.run("spring-framework-5.2/spring-aop");  // Unresolved
-        //tester.run("spring-framework-5.2/spring-aspects");
-                //tester.run("spring-framework-5.2/spring-beans");  // Unresolved
-                //tester.run("spring-framework-5.2/spring-context");  // NULL RETURN TYPE
-        //tester.run("spring-framework-5.2/spring-context-indexer");
-                //tester.run("spring-framework-5.2/spring-context-support");  // NULL RETURN TYPE
-                //tester.run("spring-framework-5.2/spring-core");  // NULL RETURN TYPE
-        //tester.run("spring-framework-5.2/spring-expression");
-        //tester.run("spring-framework-5.2/spring-instrument");
-        //tester.run("spring-framework-5.2/spring-jcl");
-                //tester.run("spring-framework-5.2/spring-jdbc");  // NULL RETURN TYPE
-                //tester.run("spring-framework-5.2/spring-jms");  // Unresolved
-                //tester.run("spring-framework-5.2/spring-messaging");  / NULL RETURN TYPE Unresolved
-                //tester.run("spring-framework-5.2/spring-orm");  // NULL RETURN TYPE Unresolved
-                //tester.run("spring-framework-5.2/spring-oxm");  // Unresolved
-                //tester.run("spring-framework-5.2/spring-test");  // Unresolved
-                //tester.run("spring-framework-5.2/spring-tx");  // NULL RETURN TYPE Unresolved
-                //tester.run("spring-framework-5.2/spring-web");  // NULL RETURN TYPE Unresolved
-                //ester.run("spring-framework-5.2/spring-webflux");  // NULL RETURN TYPE Unresolved
-                //tester.run("spring-framework-5.2/spring-webmvc");  // NULL RETURN TYPE Unresolved
-                //tester.run("spring-framework-5.2/spring-websocket");  // NULL RETURN TYPE Unresolved
+            //tester.run("spotbugs-4.0.4");                 // Gradle  // Unresolved
+            //tester.run("guava-29.0");                     // Maven  // Unresolved
     }
 }

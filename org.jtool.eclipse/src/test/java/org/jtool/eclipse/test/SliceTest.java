@@ -1095,21 +1095,6 @@ public class SliceTest {
     
     @Test
     public void testSlice119_5() {
-        String code = getSlicedCode("Test119", 10, 12); 
-        //System.out.println(code);
-        String expected = 
-                "class Test119 {\n" + 
-                "    public void m() {\n" + 
-                "        A a = new A();\n" + 
-                "        a.setX(2);\n" + 
-                "        int c = a.getX();\n" + 
-                "    }\n" + 
-                "}\n";
-        assertEquals(expected, code);
-    }
-    
-    @Test
-    public void testSlice119_6() {
         String code = getSlicedCode("Test119", 11, 12); 
         //System.out.println(code);
         String expected = 
@@ -1126,7 +1111,7 @@ public class SliceTest {
     }
     
     @Test
-    public void testSlice119_7() {
+    public void testSlice119_6() {
         String code = getSlicedCode("Test119", 11, 16); 
         //System.out.println(code);
         String expected = 
@@ -1139,7 +1124,7 @@ public class SliceTest {
     }
     
     @Test
-    public void testSlice119_8() {
+    public void testSlice119_7() {
         String code = getSlicedCode("Test119", 11, 18); 
         //System.out.println(code);
         String expected = 
@@ -1153,7 +1138,7 @@ public class SliceTest {
     }
     
     @Test
-    public void testSlice119_9() {
+    public void testSlice119_8() {
         String code = getSlicedCode("Test119", 12, 12); 
         //System.out.println(code);
         String expected = 
@@ -2004,7 +1989,6 @@ public class SliceTest {
         tester.testSlice119_6();
         tester.testSlice119_7();
         tester.testSlice119_8();
-        tester.testSlice119_9();
         
         tester.testSlice120_1();
         tester.testSlice120_2();
