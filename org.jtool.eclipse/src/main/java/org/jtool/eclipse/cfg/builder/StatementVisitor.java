@@ -350,7 +350,7 @@ public class StatementVisitor extends ASTVisitor {
         return false;
     }
     
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("deprecation")
     private void visitSwitchCase(SwitchCase node, SwitchNode switchNode, List<Statement> remaining)  {
         CFGStatement caseNode;
         if (!node.isDefault()) {
@@ -358,9 +358,9 @@ public class StatementVisitor extends ASTVisitor {
             reconnect(caseNode);
             
             ExpressionVisitor condVisitor = new ExpressionVisitor(this, cfg, caseNode, infoStore, visited);
-            for (Expression condition : (List<Expression>)node.expressions()) {
-                condition.accept(condVisitor);
-            }
+            Expression condition = node.getExpression();
+            condition.accept(condVisitor);
+            
             caseNode.addDefVariables(switchNode.getDefVariables());
             caseNode.addUseVariables(switchNode.getUseVariables());
             CFGNode curNode = condVisitor.getExitNode();
