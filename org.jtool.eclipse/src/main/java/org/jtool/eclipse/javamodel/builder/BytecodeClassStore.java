@@ -22,8 +22,11 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.Enumeration;
+import java.util.Optional;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipEntry;
+import java.lang.module.ModuleFinder;
+import java.lang.module.ModuleReference;
 
 /**
  * An object that stores classes restored from its byte-code.
@@ -43,30 +46,114 @@ public class BytecodeClassStore {
     }
     
     public Set<String> createBytecodeClassStore(JavaProject jproject) {
-        List<String> commonLibraryClassPath = getCommonLibraryClassPath();
-        List<String> classPath = getClassPath(jproject);
-        classPath.addAll(commonLibraryClassPath);
-        String[] classPaths = classPath.toArray(new String[classPath.size()]);
+        ClassPool classpool = new ClassPool(true);
         try {
-            classPools.put(jproject.getPath(), getClassPool(classPaths));
+            List<String> commonLibraryClassPaths = getCommonLibraryClassPath();
+            for (String path : commonLibraryClassPaths) {
+                classpool.insertClassPath(path);
+            }
+            classPools.put(jproject.getPath(), classpool);
+            
+            List<String> classPaths = getClassPath(jproject);
+            for (String path : classPaths) {
+                classpool.insertClassPath(path);
+            }
+            
+            Set<String> classNames = collectBytecodeClassNames();
+            classNames.addAll(commonLibraryClassPaths
+                      .stream()
+                      .flatMap(path -> collectBytecodeClassNames(path).stream())
+                      .collect(Collectors.toSet()));
+            classNames.addAll(classPaths
+                      .stream()
+                      .flatMap(path -> collectBytecodeClassNames(path).stream())
+                      .collect(Collectors.toSet()));
+            return classNames;
         } catch (NotFoundException e) {
-            try {
-                classPaths = commonLibraryClassPath.toArray(new String[commonLibraryClassPath.size()]);
-                classPools.put(jproject.getPath(), getClassPool(classPaths));
-            } catch (NotFoundException e2) { /* empty */ }
+            return new HashSet<String>();
         }
-        
-        return classPath.stream()
-                        .flatMap(path -> collectBytecodeClassNames(path).stream())
-                        .collect(Collectors.toSet());
     }
     
-    private static ClassPool getClassPool(String[] classPath) throws NotFoundException {
-        ClassPool classpool = new ClassPool(true);
-        for (String path : classPath) {
-            classpool.insertClassPath(path);
+    private List<String> getClassPath(JavaProject jproject) {
+        String[] projectClassPath = jproject.getClassPath();
+        List<String> classpaths = new ArrayList<String>();
+        for (int i = 0; i < projectClassPath.length; i++) {
+            File file = new File(projectClassPath[i]);
+            if (file.exists()) {
+                classpaths.add(projectClassPath[i]);
+            }
         }
-        return classpool;
+        return classpaths;
+    }
+    
+    private List<String> getCommonLibraryClassPath() {
+        List<String> classpaths = new ArrayList<String>();
+        
+        String bootClassPath = System.getProperty("sun.boot.class.path");
+        if (bootClassPath != null) {
+            String[] bootClassPaths = bootClassPath.split(File.pathSeparator, 0);
+            for (int i = 0; i < bootClassPaths.length; i++) {
+                File file = new File(bootClassPaths[i]);
+                if (file.exists()) {
+                    classpaths.add(bootClassPaths[i]);
+                }
+            }
+        }
+        
+        String extDir = System.getProperty("java.ext.dirs");
+        if (extDir != null) {
+            String[] extDirs = extDir.split(File.pathSeparator, 0);
+            for (int i = 0; i < extDirs.length; i++) {
+                File file = new File(extDirs[i]);
+                if (file.exists()) { 
+                    classpaths.add(extDirs[i]);
+                }
+            }
+        }
+        
+        String endorsedDir = System.getProperty("java.endorsed.dirs");
+        if (endorsedDir != null) {
+            String[] endorsedDirs = endorsedDir.split(File.pathSeparator, 0);
+            for (int i = 0; i < endorsedDirs.length; i++) {
+                File file = new File(endorsedDirs[i]);
+                if (file.exists()) {
+                    classpaths.add(endorsedDirs[i]);
+                }
+            }
+        }
+        return classpaths;
+    }
+    
+    private Set<String> collectBytecodeClassNames(String path) {
+        Set<String> classNames = new HashSet<String>();
+        File file = new File(path);
+        if (file.isDirectory()) {
+            collectClassFiles(classNames, path, "");
+        } else if (file.isFile() && (path.endsWith(".jar") || path.endsWith(".zip"))) {
+            collectClassFilesInJar(classNames, file);
+        }
+        return classNames;
+    }
+    
+    private Set<String> collectBytecodeClassNames() {
+        ModuleFinder finder = ModuleFinder.ofSystem();
+        Set<String> classNames = new HashSet<String>();
+        ModuleLayer.boot().modules()
+                .stream()
+                .map(module -> module.getName())
+                .forEach(name -> {
+                    Optional<ModuleReference> modref = finder.find(name);
+                    modref.ifPresent(ref -> {
+                        try {
+                            ref.open().list()
+                                      .filter(n -> n.endsWith(".class"))
+                                      .map(n -> n.substring(0, n.length() - 6))
+                                      .map(n -> n.replaceAll(File.separator, "."))
+                                      .forEach(n -> classNames.add(n));
+                        } catch (IOException e) { /* empty */ }
+                    });
+                });
+        return classNames;
     }
     
     public Set<CtClass> getCtClasses(JavaProject jproject) {
@@ -83,7 +170,12 @@ public class BytecodeClassStore {
     public CtClass getCtClassByCanonicalClassName(JavaProject jproject, String className) {
         Map<String, BytecodeClassInfo> classInfoMap = bytecodeClassInfo.get(jproject.getPath());
         if (classInfoMap != null) {
+            
             BytecodeClassInfo classInfo = classInfoMap.get(className);
+            if (classInfo == null) {
+                registerBytecodeClass(jproject, className);
+                classInfo = classInfoMap.get(className);
+            }
             if (classInfo != null) {
                 return classInfo.getCtClass();
             }
@@ -134,78 +226,9 @@ public class BytecodeClassStore {
         return jclass.getSuperInterfaceNames().stream().anyMatch(name -> name.equals(fqn));
     }
     
-    private List<String> getCommonLibraryClassPath() {
-        List<String> classpaths = new ArrayList<String>();
-        
-        String bootClassPath = System.getProperty("sun.boot.class.path");
-        if (bootClassPath != null) {
-            String[] bootClassPaths = bootClassPath.split(File.pathSeparator, 0);
-            for (int i = 0; i < bootClassPaths.length; i++) {
-                File file = new File(bootClassPaths[i]);
-                if (file.exists()) {
-                    classpaths.add(bootClassPaths[i]);
-                }
-            }
-        }
-        
-        String extDir = System.getProperty("java.ext.dirs");
-        if (extDir != null) {
-            String[] extDirs = extDir.split(File.pathSeparator, 0);
-            for (int i = 0; i < extDirs.length; i++) {
-                File file = new File(extDirs[i]);
-                if (file.exists()) { 
-                    classpaths.add(extDirs[i]);
-                }
-            }
-        }
-        
-        String endorsedDir = System.getProperty("java.endorsed.dirs");
-        if (endorsedDir != null) {
-            String[] endorsedDirs = endorsedDir.split(File.pathSeparator, 0);
-            for (int i = 0; i < endorsedDirs.length; i++) {
-                File file = new File(endorsedDirs[i]);
-                if (file.exists()) {
-                    classpaths.add(endorsedDirs[i]);
-                }
-            }
-        }
-        
-        String javaClassPath = System.getProperty("sun.boot.class.path");
-        if (javaClassPath != null ) {
-            String[] javaClassPaths = javaClassPath.split(File.pathSeparator, 0);
-            for (int i = 0; i < javaClassPaths.length; i++) {
-                File file = new File(javaClassPaths[i]);
-                if (file.exists()) {
-                    classpaths.add(javaClassPaths[i]);
-                }
-            }
-        }
-        
-        return classpaths;
-    }
     
-    private List<String> getClassPath(JavaProject jproject) {
-        String[] projectClassPath = jproject.getClassPath();
-        List<String> classpaths = new ArrayList<String>();
-        for (int i = 0; i < projectClassPath.length; i++) {
-            File file = new File(projectClassPath[i]);
-            if (file.exists()) {
-                classpaths.add(projectClassPath[i]);
-            }
-        }
-        return classpaths;
-    }
     
-    private Set<String> collectBytecodeClassNames(String path) {
-        Set<String> classNames = new HashSet<String>();
-        File file = new File(path);
-        if (file.isDirectory()) {
-            collectClassFiles(classNames, path, "");
-        } else if (file.isFile() && (path.endsWith(".jar") || path.endsWith(".zip"))) {
-            collectClassFilesInJar(classNames, file);
-        }
-        return classNames;
-    }
+    
     
     private void collectClassFiles(Set<String> classNames, String classPath, String name) {
         File file = new File(classPath + File.separator + name);
@@ -220,7 +243,7 @@ public class BytecodeClassStore {
             }
             
         } else if (file.isFile() && name.endsWith(".class")) {
-            name = name.substring(0, name.length() - 6);
+            name = name.substring(0, name.length() - ".class".length());
             name = name.replace(File.separatorChar, '.');
             registerClassName(classNames, name);
         }
@@ -239,7 +262,7 @@ public class BytecodeClassStore {
     }
     
     private void registerClassName(Set<String> classNames, String name) {
-        String className = name.substring(0, name.length() - 6);
+        String className = name.substring(0, name.length() - ".class".length());
         className = className.replace(File.separatorChar, '.');
         classNames.add(className);
     }
