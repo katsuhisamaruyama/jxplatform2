@@ -18,7 +18,7 @@ import java.util.Set;
  */
 abstract class ProjectEnv {
     
-    private static final String DEFAULT_SOURCEPATH = "srb";
+    private static final String DEFAULT_SOURCEPATH = "src";
     private static final String DEFAULT_BINARYPATH = "bin";
     private static final String DEFAULT_CLASSPATH = "lib";
     
