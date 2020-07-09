@@ -395,7 +395,7 @@ public class ExpressionVisitor extends ASTVisitor {
         ASTNode node = callNode.getASTNode();
         String type = jcall.getDeclaringClassName();
         
-        Set<JMethod> methods = getFieldsInCalledMethod(jcall);
+        Set<JMethod> methods = setDefUseFieldsInCalledMethod(jcall);
         for (JMethod method : methods) {
             for (String def : method.getDefFields()) {
                 JReference ref = createFieldReference(node, def, type, receiverName);
@@ -425,13 +425,13 @@ public class ExpressionVisitor extends ASTVisitor {
         return ref;
     }
     
-    private Set<JMethod> getFieldsInCalledMethod(JMethodReference jcall) {
+    private Set<JMethod> setDefUseFieldsInCalledMethod(JMethodReference jcall) {
         Set<JMethod> methods = new HashSet<JMethod>();
         JMethod method = infoStore.getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
         if (method != null) {
             if (!method.defuseDecided() && visited != null && !visited.contains(method)) {
-                visited.add(method);
                 method.findDefUseFields(visited, true);
+                visited.add(method);
             }
             methods.add(method);
         }

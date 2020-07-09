@@ -212,8 +212,8 @@ public class JMethodExternal extends JMethod {
         
         for (JMethod method : getOverridingMethods()) {
             if (!visited.contains(method)) {
-                visited.add(method);
                 method.findDefUseFields(visited, false);
+                visited.add(method);
             }
         }
         
@@ -229,8 +229,8 @@ public class JMethodExternal extends JMethod {
         
         for (JMethod method : getAccessedMethods()) {
             if (!visited.contains(method)) {
-                visited.add(method);
                 method.findDefUseFields(visited, false);
+                visited.add(method);
             }
         }
         

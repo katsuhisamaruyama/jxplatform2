@@ -58,7 +58,7 @@ abstract class JMethod extends JElement {
         cacheData.put(UseAttr, convert(useFields));
     }
     
-    protected String getClasName() {
+    protected String getClassName() {
         return className;
     }
     
