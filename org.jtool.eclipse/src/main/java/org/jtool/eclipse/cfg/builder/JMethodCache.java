@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -21,8 +21,7 @@ class JMethodCache extends JMethod {
     protected static final char QualifiedNameSeparatorChar = QualifiedNameSeparator.charAt(0);
     
     protected JMethodCache(JClass declaringClass, CFGStore cfgStore, Map<String, String> cacheData) {
-        super(cacheData.get(FqnAttr), cacheData.get(ClassNameAttr), cacheData.get(SignatureAttr), 0,
-                "N/A", false, cfgStore);
+        super(cfgStore, cacheData);
         this.declaringClass = declaringClass;
         this.cacheData = cacheData;
         

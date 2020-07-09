@@ -17,8 +17,7 @@ import java.util.Map;
 class JFieldCache extends JField {
     
     protected JFieldCache(JClass declaringClass, CFGStore cfgStore, Map<String, String> cacheData) {
-        super(cacheData.get(FqnAttr), cacheData.get(ClassNameAttr), cacheData.get(NameAttr),
-                0, "N/A", false, cfgStore);
+        super(cfgStore, cacheData);
         this.declaringClass = declaringClass;
         this.cacheData = cacheData;
     }

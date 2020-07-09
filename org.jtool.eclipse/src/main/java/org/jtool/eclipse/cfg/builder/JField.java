@@ -7,6 +7,7 @@
 package org.jtool.eclipse.cfg.builder;
 
 import org.eclipse.jdt.core.dom.Modifier;
+import java.util.Map;
 import java.util.HashMap;
 
 /**
@@ -18,21 +19,29 @@ import java.util.HashMap;
 abstract class JField extends JElement {
     
     protected String className;
-    protected String name;
+    protected String signature;
     protected int modifiers;
     protected String type;
     protected boolean isPrimitive;
     
     protected JClass declaringClass;
     
-    protected JField(String fqn, String className, String name,
+    protected JField(String fqn, String className, String signature,
             int modifiers, String returnType, boolean isPrimitive, CFGStore cfgStore) {
         super(fqn, cfgStore);
         this.className = className;
-        this.name = name;
+        this.signature = signature;
         this.type = returnType;
         this.isPrimitive = isPrimitive;
         
+    }
+    
+    protected JField(CFGStore cfgStore, Map<String, String> cacheData) {
+        super(cacheData.get(FqnAttr), cfgStore);
+        this.className = cacheData.get(ClassNameAttr);
+        this.signature = cacheData.get(SignatureAttr);
+        this.type = "N/A";
+        this.isPrimitive = false;
     }
     
     @Override
@@ -40,11 +49,11 @@ abstract class JField extends JElement {
         cacheData = new HashMap<String, String>();
         cacheData.put(FqnAttr, fqn);
         cacheData.put(ClassNameAttr, className);
-        cacheData.put(SignatureAttr, name);
+        cacheData.put(SignatureAttr, signature);
     }
     
-    protected String getName() {
-        return name;
+    protected String getSignature() {
+        return signature;
     }
     
     protected String getType() {

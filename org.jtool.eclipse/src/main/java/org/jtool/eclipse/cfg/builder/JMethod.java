@@ -9,6 +9,7 @@ package org.jtool.eclipse.cfg.builder;
 import org.eclipse.jdt.core.dom.Modifier;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.HashMap;
 
 /**
@@ -46,6 +47,14 @@ abstract class JMethod extends JElement {
         this.signature = signature;
         this.returnType = returnType;
         this.isPrimitive = isPrimitive;
+    }
+    
+    protected JMethod(CFGStore cfgStore, Map<String, String> cacheData) {
+        super(cacheData.get(FqnAttr), cfgStore);
+        this.className = cacheData.get(ClassNameAttr);
+        this.signature = cacheData.get(SignatureAttr);
+        this.returnType = "N/A";
+        this.isPrimitive = false;
     }
     
     @Override

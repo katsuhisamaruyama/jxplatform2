@@ -161,6 +161,10 @@ public class JMethodExternal extends JMethod {
     
     @Override
     protected JMethod[] findOverridingMethods() {
+        if (!getDeclaringClass().isInterface()) {
+            return new JMethod[0];
+        }
+        
         List<JMethod> methods = new ArrayList<JMethod>();
         for (JClass clazz : declaringClass.getDescendants()) {
             for (JMethod method : clazz.getMethods()) {

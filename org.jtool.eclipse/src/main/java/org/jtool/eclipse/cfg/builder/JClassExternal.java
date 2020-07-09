@@ -30,7 +30,7 @@ public class JClassExternal extends JClass {
     JClassExternal(CtClass ctClass, CFGStore cfgStore) {
         super(BytecodeClassStore.getCanonicalClassName(ctClass),
                 BytecodeClassStore.getCanonicalSimpleClassName(ctClass),
-                getModfifiers(ctClass), cfgStore);
+                getModfifiers(ctClass), ctClass.isInterface(), cfgStore);
         this.ctClass = ctClass;
         
         int num = 0;

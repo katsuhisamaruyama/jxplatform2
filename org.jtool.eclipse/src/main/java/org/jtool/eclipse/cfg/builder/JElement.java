@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -20,7 +20,8 @@ abstract class JElement {
     protected static final String ClassNameAttr = "cname";
     protected static final String SignatureAttr = "sig";
     protected static final String NameAttr = "name";
-    
+    protected static final String ModifierAttr = "mod";
+    protected static final String InterfaceAttr = "inf";
     protected static final String DefAttr = "def";
     protected static final String UseAttr = "use";
     

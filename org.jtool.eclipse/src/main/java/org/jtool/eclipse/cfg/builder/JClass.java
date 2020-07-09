@@ -8,6 +8,7 @@ package org.jtool.eclipse.cfg.builder;
 
 import org.eclipse.jdt.core.dom.Modifier;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Arrays;
 
 /**
@@ -19,7 +20,8 @@ import java.util.Arrays;
 abstract class JClass extends JElement {
     
     protected String name;
-    protected int modifiers;
+    protected int modifier;
+    protected boolean isInterface;
     
     protected JClass[] ancestors = null;
     protected JClass[] descendants = null;
@@ -27,10 +29,18 @@ abstract class JClass extends JElement {
     protected JField[] fields;
     protected JMethod[] methods;
     
-    protected JClass(String fqn, String name, int modifiers, CFGStore cfgStore) {
+    protected JClass(String fqn, String name, int modifier, boolean isInterface, CFGStore cfgStore) {
         super(fqn, cfgStore);
         this.name = name;
-        this.modifiers = modifiers;
+        this.modifier = modifier;
+        this.isInterface = isInterface;
+    }
+    
+    protected JClass(CFGStore cfgStore, Map<String, String> cacheData) {
+        super(cacheData.get(FqnAttr), cfgStore);
+        this.name = cacheData.get(NameAttr);
+        this.modifier = Integer.parseInt(cacheData.get(ModifierAttr));
+        this.isInterface = Boolean.parseBoolean(cacheData.get(InterfaceAttr));
     }
     
     @Override
@@ -38,6 +48,8 @@ abstract class JClass extends JElement {
         cacheData = new HashMap<String, String>();
         cacheData.put(FqnAttr, fqn);
         cacheData.put(NameAttr, name);
+        cacheData.put(ModifierAttr, String.valueOf(modifier));
+        cacheData.put(InterfaceAttr, String.valueOf(isInterface));
     }
     
     protected String getName() {
@@ -45,19 +57,23 @@ abstract class JClass extends JElement {
     }
     
     protected boolean isPublic() {
-        return Modifier.isPublic(modifiers);
+        return Modifier.isPublic(modifier);
     }
     
     protected boolean isProtected() {
-        return Modifier.isProtected(modifiers);
+        return Modifier.isProtected(modifier);
     }
     
     protected boolean isPrivate() {
-        return Modifier.isPrivate(modifiers);
+        return Modifier.isPrivate(modifier);
     }
     
     protected boolean isDefault() {
         return !isPublic() && !isProtected() && !isPrivate();
+    }
+    
+    protected boolean isInterface() {
+        return isInterface;
     }
     
     protected JField[] getFields() {
@@ -65,7 +81,7 @@ abstract class JClass extends JElement {
     }
     
     protected JField getField(String name) {
-        return Arrays.stream(fields).filter(field -> field.getName().equals(name)).findFirst().orElse(null);
+        return Arrays.stream(fields).filter(field -> field.getSignature().equals(name)).findFirst().orElse(null);
     }
     
     protected JMethod[] getMethods() {
