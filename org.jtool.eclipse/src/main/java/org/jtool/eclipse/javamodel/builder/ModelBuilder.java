@@ -107,13 +107,13 @@ public abstract class ModelBuilder {
         return null;
     }
     
+    @SuppressWarnings("deprecation")
     protected ASTParser getParser() {
-        ASTParser parser = ASTParser.newParser(AST.JLS13);
+        ASTParser parser = ASTParser.newParser(AST.JLS11);
         Map<String, String> options = JavaCore.getOptions();
-        options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_13);
-        options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_13);
-        options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_13);
-        options.put(JavaCore.COMPILER_PB_ENABLE_PREVIEW_FEATURES, JavaCore.ENABLED);
+        options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_11);
+        options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_11);
+        options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_11);
         options.put(JavaCore.COMPILER_DOC_COMMENT_SUPPORT, JavaCore.ENABLED);
         parser.setCompilerOptions(options);
         
