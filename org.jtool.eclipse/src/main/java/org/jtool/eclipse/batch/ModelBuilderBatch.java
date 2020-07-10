@@ -319,6 +319,10 @@ public class ModelBuilderBatch extends ModelBuilder {
     
     public static List<File> collectAllJavaFiles(String path) {
         List<File> files = new ArrayList<File>();
+        if (path == null) {
+            return files;
+        }
+        
         File res = new File(path);
         if (res.isFile()) {
             if (path.endsWith(".java")) {
