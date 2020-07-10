@@ -12,8 +12,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ui.console,
  org.eclipse.text
-Bundle-ClassPath: .,
- lib/javassist.jar
+Bundle-ClassPath: .
 Export-Package: org.jtool.eclipse.batch,
  org.jtool.eclipse.cfg,
  org.jtool.eclipse.cfg.builder,

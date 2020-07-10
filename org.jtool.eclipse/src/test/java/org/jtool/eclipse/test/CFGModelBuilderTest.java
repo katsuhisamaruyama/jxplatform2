@@ -27,6 +27,8 @@ public class CFGModelBuilderTest {
     
     private final static String testDirInside = new File(".").getAbsoluteFile().getParent() + "/test_target/";
     
+    private final static String testDirOutside = "/Users/maru/Desktop/JxPlatformTestTarget/";
+    
     private CCFG[] buildCFGsForTest(ModelBuilderBatch builder, JavaProject jproject) {
         int size = jproject.getClasses().size();
         CCFG[] ccfgs = new CCFG[size];
@@ -142,8 +144,6 @@ public class CFGModelBuilderTest {
         
         builder.unbuild();
     }
-    
-    private final static String testDirOutside = "/Users/maru/Desktop/TestGenExp/";
     
     private void run(String name) {
         String target = testDirOutside + name + "/";

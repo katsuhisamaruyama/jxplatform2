@@ -27,6 +27,8 @@ public class PDGModelBuilderTest {
     
     private final static String testDirInside = new File(".").getAbsoluteFile().getParent() + "/test_target/";
     
+    private final static String testDirOutside = "/Users/maru/Desktop/JxPlatformTestTarget/";
+    
     private ClDG[] buildPDGsForTest(ModelBuilderBatch builder, JavaProject jproject) {
         int size = jproject.getClasses().size();
         ClDG[] cldgs = new ClDG[size];
@@ -132,8 +134,6 @@ public class PDGModelBuilderTest {
         
         builder.unbuild();
     }
-    
-    private final static String testDirOutside = "/Users/maru/Desktop/TestGenExp/";
     
     private void run(String name) {
         String target = testDirOutside + name + "/";

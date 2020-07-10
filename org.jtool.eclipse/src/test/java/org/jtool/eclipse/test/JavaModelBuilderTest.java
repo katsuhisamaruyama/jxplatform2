@@ -27,6 +27,8 @@ public class JavaModelBuilderTest {
     
     private final static String testDirInside = new File(".").getAbsoluteFile().getParent() + "/test_target/";
     
+    private final static String testDirOutside = "/Users/maru/Desktop/JxPlatformTestTarget/";
+    
     @Test
     public void testSimple() {
         String target = testDirInside + "Simple/";
@@ -101,8 +103,6 @@ public class JavaModelBuilderTest {
         
         builder.unbuild();
     }
-    
-    private final static String testDirOutside = "/Users/maru/Desktop/TestGenExp/";
     
     private void run(String name) {
         String target = testDirOutside + name + "/";
