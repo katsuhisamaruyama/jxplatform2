@@ -1,5 +1,5 @@
 /*
- *  Copyright 2019
+ *  Copyright 2019-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -19,7 +19,7 @@ import java.util.ArrayList;
  */
 public class MethodInvocationCollector extends ASTVisitor {
     
-    private List<MethodInvocation> nodes = new ArrayList<MethodInvocation>();
+    private List<MethodInvocation> nodes = new ArrayList<>();
     
     public MethodInvocationCollector(ASTNode node) {
         node.accept(this);

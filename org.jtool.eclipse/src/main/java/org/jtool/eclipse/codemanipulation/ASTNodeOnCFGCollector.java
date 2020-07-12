@@ -1,5 +1,5 @@
 /*
- *  Copyright 2019
+ *  Copyright 2019-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -23,7 +23,7 @@ import java.util.HashSet;
  */
 public class ASTNodeOnCFGCollector extends ASTVisitor {
     
-    private Map<Integer, ASTNode> nodeMap = new HashMap<Integer, ASTNode>();
+    private Map<String, ASTNode> nodeMap = new HashMap<>();
     
     public ASTNodeOnCFGCollector(ASTNode node) {
         node.accept(this);
@@ -33,15 +33,19 @@ public class ASTNodeOnCFGCollector extends ASTVisitor {
         return new HashSet<ASTNode>(nodeMap.values());
     }
     
-    public Map<Integer, ASTNode> getNodeMap() {
-        return nodeMap;
+    public ASTNode get(ASTNode node) {
+        return nodeMap.get(key(node));
     }
     
     @Override
     public void preVisit(ASTNode node) {
         if (isCFGNode(node)) {
-            nodeMap.put(node.getStartPosition(), node);
+            nodeMap.put(key(node), node);
         }
+    }
+    
+    private String key(ASTNode node) {
+        return String.valueOf(node.getStartPosition() + "-" + node.getLength());
     }
     
     private boolean isCFGNode(ASTNode node) {

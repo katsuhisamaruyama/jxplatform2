@@ -29,9 +29,9 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import java.util.Set;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Generates Java source code from an AST.
@@ -84,7 +84,7 @@ public class CodeGenerator {
         try {
             IDocument document = new Document(code);
             if (options == null) {
-                options = new HashMap<String, String>();
+                options = new HashMap<>();
                 options.put(DefaultCodeFormatterConstants.FORMATTER_TAB_CHAR, JavaCore.SPACE);
                 options.put(DefaultCodeFormatterConstants.FORMATTER_INDENTATION_SIZE, "4");
                 options.put(DefaultCodeFormatterConstants.FORMATTER_BLANK_LINES_AFTER_PACKAGE, "1");
@@ -110,7 +110,7 @@ public class CodeGenerator {
         private CompilationUnit compilationUnit;
         private Set<ASTNode> nodes;
         
-        private Set<Comment> comments = new HashSet<Comment>();
+        private Set<Comment> comments = new HashSet<>();
         
         CommentVisitor(CompilationUnit cu) {
             this(cu, null);
@@ -174,7 +174,7 @@ public class CodeGenerator {
     class CodeRestrationVisitor extends NaiveASTFlattener {
         
         private String contents;
-        private Set<Comment> comments = new HashSet<Comment>();
+        private Set<Comment> comments = new HashSet<>();
         private int pos = 0;
         
         CodeRestrationVisitor(Set<Comment> comments, String contents) {
@@ -201,7 +201,7 @@ public class CodeGenerator {
         }
         
         private void insertCommentBefore(ASTNode node) {
-            Set<Comment> removedComments = new HashSet<Comment>();
+            Set<Comment> removedComments = new HashSet<>();
             for (Comment comment : comments) {
                 int start = comment.getStartPosition();
                 int end = start + comment.getLength();
@@ -220,7 +220,7 @@ public class CodeGenerator {
         }
         
         private void insertCommentAfter(ASTNode node) {
-            Set<Comment> removedComments = new HashSet<Comment>();
+            Set<Comment> removedComments = new HashSet<>();
             for (Comment comment : comments) {
                 int start = comment.getStartPosition();
                 int end = start + comment.getLength();
