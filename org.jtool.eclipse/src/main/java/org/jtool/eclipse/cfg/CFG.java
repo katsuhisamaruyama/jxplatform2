@@ -16,7 +16,7 @@ import java.util.ArrayList;
  */
 public class CFG extends CommonCFG {
     
-    private List<BasicBlock> basicBlocks = new ArrayList<BasicBlock>();
+    private List<BasicBlock> basicBlocks = new ArrayList<>();
     
     public void append(CFG cfg) {
         cfg.getNodes().forEach(node -> add(node));

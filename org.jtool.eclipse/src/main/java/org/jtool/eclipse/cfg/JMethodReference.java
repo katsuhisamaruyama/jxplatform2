@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -28,17 +28,18 @@ public class JMethodReference extends JReference {
     private boolean isLocal;
     private boolean isSuper;
     
-    private List<ITypeBinding> exceptionTypes = new ArrayList<ITypeBinding>();
+    private List<ITypeBinding> exceptionTypes = new ArrayList<>();
     
-    private List<Expression> arguments = new ArrayList<Expression>();
-    private List<String> argumentTypes = new ArrayList<String>();
-    private List<Boolean> argumentPrimitiveTypes = new ArrayList<Boolean>();
+    private List<Expression> arguments = new ArrayList<>();
+    private List<String> argumentTypes = new ArrayList<>();
+    private List<Boolean> argumentPrimitiveTypes = new ArrayList<>();
     
     private CFGStatement receiver = null;
     protected ASTNode nameNode;
     protected Expression receiverNode;
     
-    public JMethodReference(ASTNode node, ASTNode nameNode, Expression receiverNode, String receiverName, IMethodBinding mbinding, List<Expression> args) {
+    public JMethodReference(ASTNode node, ASTNode nameNode, 
+            Expression receiverNode, String receiverName, IMethodBinding mbinding, List<Expression> args) {
         super(node);
         
         this.nameNode = nameNode;
@@ -152,7 +153,8 @@ public class JMethodReference extends JReference {
     }
     
     public boolean getArgumentPrimitiveType(int ordinal) {
-        return (ordinal >= 0 && ordinal < argumentPrimitiveTypes.size()) ? argumentPrimitiveTypes.get(ordinal): false;
+        return (ordinal >= 0 && ordinal < argumentPrimitiveTypes.size())
+                ? argumentPrimitiveTypes.get(ordinal) : false;
     }
     
     public boolean hasReceiver() {

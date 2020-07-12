@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  */
 public class CCFG extends CommonCFG {
     
-    protected Map<String, CFG> cfgs = new HashMap<String, CFG>();
+    protected Map<String, CFG> cfgs = new HashMap<>();
     
     @Override
     public CFGClassEntry getEntryNode() {
@@ -52,14 +52,16 @@ public class CCFG extends CommonCFG {
     
     @Override
     public Set<CFGNode> getNodes() {
-        return cfgs.values().stream()
-                            .flatMap(cfg -> cfg.getNodes().stream()).collect(Collectors.toSet());
+        return cfgs.values()
+                .stream()
+                .flatMap(cfg -> cfg.getNodes().stream()).collect(Collectors.toSet());
     }
     
     @Override
     public Set<ControlFlow> getEdges() {
-        return cfgs.values().stream()
-                            .flatMap(cfg -> cfg.getEdges().stream()).collect(Collectors.toSet());
+        return cfgs.values()
+                .stream()
+                .flatMap(cfg -> cfg.getEdges().stream()).collect(Collectors.toSet());
     }
     
     @Override

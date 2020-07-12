@@ -19,8 +19,8 @@ public class CFGMethodCall extends CFGStatement {
     
     private JMethodReference jmethodCall;
     
-    private List<CFGParameter> actualIns = new ArrayList<CFGParameter>();
-    private List<CFGParameter> actualOuts = new ArrayList<CFGParameter>();
+    private List<CFGParameter> actualIns = new ArrayList<>();
+    private List<CFGParameter> actualOuts = new ArrayList<>();
     private CFGParameter actualOutForReturn = null;
     
     public CFGMethodCall(ASTNode node, JMethodReference jcall, CFGNode.Kind kind) {

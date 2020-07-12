@@ -82,27 +82,31 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
         if (src == null || dst == null) {
             return null;
         }
-        return getEdges().stream()
-                         .filter(edge -> src.equals(edge.getSrcNode()) && dst.equals(edge.getDstNode()))
-                         .findFirst().orElse(null);
+        return getEdges()
+                .stream()
+                .filter(edge -> src.equals(edge.getSrcNode()) && dst.equals(edge.getDstNode()))
+                .findFirst().orElse(null);
     }
     
     public CFGNode getNode(long id) {
-        return getNodes().stream()
-                         .filter(node -> id == node.getId())
-                         .findFirst().orElse(null);
+        return getNodes()
+                .stream()
+                .filter(node -> id == node.getId())
+                .findFirst().orElse(null);
     }
     
     public ControlFlow getTrueFlowFrom(CFGNode node) {
-        return getEdges().stream()
-                         .filter(edge -> edge.getSrcNode().equals(node) && edge.isTrue())
-                         .findFirst().orElse(null);
+        return getEdges()
+                .stream()
+                .filter(edge -> edge.getSrcNode().equals(node) && edge.isTrue())
+                .findFirst().orElse(null);
     }
     
     public ControlFlow getFalseFlowFrom(CFGNode node) {
-        return getEdges().stream()
-                         .filter(edge -> edge.getSrcNode().equals(node) && edge.isFalse())
-                         .findFirst().orElse(null);
+        return getEdges()
+                .stream()
+                .filter(edge -> edge.getSrcNode().equals(node) && edge.isFalse())
+                .findFirst().orElse(null);
     }
     
     public CFGNode getTrueSuccessor(CFGNode node) {
@@ -125,7 +129,7 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
     }
     
     public Set<CFGNode> forwardReachableNodes(CFGNode from, boolean loopbackOk, StopConditionOnReachablePath condition) {
-        Set<CFGNode> track = new HashSet<CFGNode>();
+        Set<CFGNode> track = new HashSet<>();
         if (from != null) {
             walkForward(from, condition, loopbackOk, track);
         }
@@ -133,7 +137,7 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
     }
     
     public Set<CFGNode> backwardReachableNodes(CFGNode from, boolean loopbackOk, StopConditionOnReachablePath condition) {
-        Set<CFGNode> track = new HashSet<CFGNode>();
+        Set<CFGNode> track = new HashSet<>();
         if (from != null) {
             walkBackward(from, condition, loopbackOk, track);
         }
@@ -162,7 +166,7 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
     }
     
     public Set<CFGNode> backwardReachableNodes(CFGNode from, CFGNode to, boolean loopbackOk) {
-        Set<CFGNode> track = new HashSet<CFGNode>();
+        Set<CFGNode> track = new HashSet<>();
         if (from.equals(to)) {
             track.add(from);
             return track;
@@ -182,7 +186,7 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
     }
     
     public Set<CFGNode> postDominator(CFGNode anchor) {
-        Set<CFGNode> postDominator = new HashSet<CFGNode>();
+        Set<CFGNode> postDominator = new HashSet<>();
         for (CFGNode node : getNodes()) {
             if (!anchor.equals(node)) {
                 Set<CFGNode> track = forwardReachableNodes(anchor, node, true);

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -19,9 +19,9 @@ public class CFGClassEntry extends CFGEntry {
     
     private JavaClass jclass;
     
-    private Set<CFG> methods = new HashSet<CFG>();
-    private Set<CFG> fields = new HashSet<CFG>();
-    private Set<CCFG> types = new HashSet<CCFG>();
+    private Set<CFG> methods = new HashSet<>();
+    private Set<CFG> fields = new HashSet<>();
+    private Set<CCFG> types = new HashSet<>();
     
     public CFGClassEntry(JavaClass jclass, CFGNode.Kind kind) {
         super(jclass.getASTNode(), kind, jclass.getName(), jclass.getQualifiedName(), jclass.getQualifiedName());

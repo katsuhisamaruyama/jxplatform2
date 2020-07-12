@@ -423,8 +423,8 @@ public class CFGNode extends GraphNode {
     }
     
     public static List<CFGNode> sortCFGNode(Collection<? extends CFGNode> co) {
-        List<CFGNode> nodes = new ArrayList<CFGNode>(co);
-        Collections.sort(nodes, new Comparator<CFGNode>() {
+        List<CFGNode> nodes = new ArrayList<>(co);
+        Collections.sort(nodes, new Comparator<>() {
             
             @Override
             public int compare(CFGNode node1, CFGNode node2) {

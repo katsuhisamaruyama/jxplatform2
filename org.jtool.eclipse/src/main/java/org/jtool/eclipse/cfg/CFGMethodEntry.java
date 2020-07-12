@@ -19,10 +19,10 @@ public class CFGMethodEntry extends CFGEntry {
     
     private JavaMethod jmethod;
     
-    private List<CFGParameter> formalIns = new ArrayList<CFGParameter>();
-    private List<CFGParameter> formalOuts = new ArrayList<CFGParameter>();
+    private List<CFGParameter> formalIns = new ArrayList<>();
+    private List<CFGParameter> formalOuts = new ArrayList<>();
     private CFGParameter formalOutForReturn = null;
-    private List<CFGCatch> exceptionNodes = new ArrayList<CFGCatch>();
+    private List<CFGCatch> exceptionNodes = new ArrayList<>();
     
     public CFGMethodEntry(JavaMethod jmethod, CFGNode.Kind kind) {
         super(jmethod.getASTNode(), kind, jmethod.getName(), jmethod.getSignature(), jmethod.getQualifiedName());
@@ -90,8 +90,9 @@ public class CFGMethodEntry extends CFGEntry {
     }
     
     public CFGCatch getExceptionNode(String type) {
-        return exceptionNodes.stream()
-                             .filter(node -> node.getTypeName().equals(type)).findFirst().orElse(null);
+        return exceptionNodes
+                .stream()
+                .filter(node -> node.getTypeName().equals(type)).findFirst().orElse(null);
     }
     
     @Override

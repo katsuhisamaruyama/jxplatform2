@@ -17,8 +17,8 @@ import java.util.ArrayList;
  */
 public class CFGStatement extends CFGNode {
     
-    private List<JReference> defs = new ArrayList<JReference>();
-    private List<JReference> uses = new ArrayList<JReference>();
+    private List<JReference> defs = new ArrayList<>();
+    private List<JReference> uses = new ArrayList<>();
     
     public CFGStatement(ASTNode node, Kind kind) {
         super(node, kind);

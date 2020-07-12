@@ -161,8 +161,8 @@ public class ControlFlow extends GraphEdge {
     }
     
     public static List<ControlFlow> sortControlFlow(Collection<? extends ControlFlow> co) {
-        List<ControlFlow> edges = new ArrayList<ControlFlow>(co);
-        Collections.sort(edges, new Comparator<ControlFlow>() {
+        List<ControlFlow> edges = new ArrayList<>(co);
+        Collections.sort(edges, new Comparator<>() {
             
             @Override
             public int compare(ControlFlow edge1, ControlFlow edge2) {
