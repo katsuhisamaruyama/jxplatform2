@@ -18,8 +18,8 @@ import org.jtool.eclipse.javamodel.JavaMethod;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  * An object that stores information on PDGs in the project.
@@ -30,8 +30,8 @@ public class PDGStore {
     
     private CFGStore cfgStore;
     
-    private Map<String, PDG> pdgMap = new HashMap<String, PDG>();
-    private Map<String, ClDG> cldgMap = new HashMap<String, ClDG>();
+    private Map<String, PDG> pdgMap = new HashMap<>();
+    private Map<String, ClDG> cldgMap = new HashMap<>();
     
     private SDG currentSDG;
     
@@ -115,13 +115,13 @@ public class PDGStore {
     }
     
     public SDG getSDG(JavaClass jclass, boolean force) {
-        Set<JavaClass> classes = new HashSet<JavaClass>();
+        Set<JavaClass> classes = new HashSet<>();
         classes.add(jclass);
         return getSDG(classes, force);
     }
     
     public SDG getSDG(Set<JavaClass> classes, boolean force) {
-        Set<JavaClass> allClasses = new HashSet<JavaClass>();
+        Set<JavaClass> allClasses = new HashSet<>();
         for (JavaClass jc : classes) {
             collectEfferentClasses(jc, allClasses);
         }
@@ -134,7 +134,7 @@ public class PDGStore {
         if (!force && currentSDG != null) {
             return currentSDG;
         }
-        Set<JavaClass> classes = new HashSet<JavaClass>(cfgStore.getJavaProject().getClasses());
+        Set<JavaClass> classes = new HashSet<>(cfgStore.getJavaProject().getClasses());
         currentSDG = getSDGForClasses(classes, force);
         return currentSDG;
     }

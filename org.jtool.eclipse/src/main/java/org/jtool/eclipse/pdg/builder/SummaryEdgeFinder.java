@@ -31,7 +31,7 @@ public class SummaryEdgeFinder {
                           Set<PDGStatement> ains = PDGBuilder.findActualIns(callnode);
                           Set<PDGStatement> aouts = PDGBuilder.findActualOuts(callnode);
                           
-                          Set<PDGStatement> nodes = new HashSet<PDGStatement>();
+                          Set<PDGStatement> nodes = new HashSet<>();
                           for (PDGStatement aout : aouts) {
                               traverseBackward(nodes, aout, ains);
                               

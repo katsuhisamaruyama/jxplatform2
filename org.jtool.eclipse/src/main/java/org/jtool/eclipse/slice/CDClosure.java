@@ -18,7 +18,7 @@ import java.util.ArrayList;
 public class CDClosure {
     
     public static List<PDGNode> getForwardCDClosure(PDGNode anchor) {
-        List<PDGNode> nodes = new ArrayList<PDGNode>();
+        List<PDGNode> nodes = new ArrayList<>();
         traverseForwardCD(anchor, nodes);
         return nodes;
     }
@@ -36,7 +36,7 @@ public class CDClosure {
     }
     
     public static List<PDGNode> getBackwardCDClosure(PDGNode anchor) {
-        List<PDGNode> nodes = new ArrayList<PDGNode>();
+        List<PDGNode> nodes = new ArrayList<>();
         traverseBackwardCD(anchor, nodes);
         return nodes;
     }

@@ -37,8 +37,8 @@ import org.jtool.eclipse.javamodel.JavaClass;
 import org.jtool.eclipse.javamodel.JavaMethod;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  * Builds a PDG for a class member (a method, constructor, initializer, or field).
@@ -99,11 +99,12 @@ public class PDGBuilder {
     }
     
     public static void connectFieldAccesses(SDG sdg) {
-        Set<CFGFieldEntry> fieldEntries = sdg.getPDGs().stream()
-                                             .map(pdg -> pdg.getCFG())
-                                             .filter(cfg -> cfg.isField())
-                                             .map(cfg -> (CFGFieldEntry)cfg.getEntryNode())
-                                             .collect(Collectors.toSet());
+        Set<CFGFieldEntry> fieldEntries = sdg.getPDGs()
+                .stream()
+                .map(pdg -> pdg.getCFG())
+                .filter(cfg -> cfg.isField())
+                .map(cfg -> (CFGFieldEntry)cfg.getEntryNode())
+                .collect(Collectors.toSet());
         
         for (PDG pdg : sdg.getPDGs()) {
             CFG cfg = pdg.getCFG();
@@ -221,7 +222,7 @@ public class PDGBuilder {
                 }
             }
         }
-        return new HashSet<JavaMethod>();
+        return new HashSet<>();
     }
     
     private static void connectParameters(PDG pdg, CFGMethodCall caller, CFGMethodEntry callee) {
@@ -318,7 +319,7 @@ public class PDGBuilder {
     }
     
     private static Set<String> getCatchTypes(ITypeBinding type) {
-        Set<String> types = new HashSet<String>();
+        Set<String> types = new HashSet<>();
         while (type != null) {
             types.add(type.getQualifiedName());
             type = type.getSuperclass();

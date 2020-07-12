@@ -8,12 +8,11 @@ package org.jtool.eclipse.pdg;
 
 import org.jtool.eclipse.cfg.CommonCFG;
 import org.jtool.eclipse.javamodel.JavaClass;
-
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 /**
  * An object storing information about a system dependence graph (SDG).
@@ -22,8 +21,8 @@ import java.util.HashSet;
  */
 public class SDG extends CommonPDG {
     
-    protected Map<String, ClDG> cldgs = new HashMap<String, ClDG>();
-    protected Map<String, PDG> pdgs = new HashMap<String, PDG>();
+    protected Map<String, ClDG> cldgs = new HashMap<>();
+    protected Map<String, PDG> pdgs = new HashMap<>();
     
     @Override
     public PDGEntry getEntryNode() {
@@ -82,16 +81,18 @@ public class SDG extends CommonPDG {
     
     @Override
     public Set<PDGNode> getNodes() {
-        return pdgs.values().stream()
-                   .flatMap(pdg -> pdg.getNodes().stream())
-                   .collect(Collectors.toSet());
+        return pdgs.values()
+                .stream()
+                .flatMap(pdg -> pdg.getNodes().stream())
+                .collect(Collectors.toSet());
     }
     
     @Override
     public Set<Dependence> getEdges() {
-        return pdgs.values().stream()
-                   .flatMap(pdg -> pdg.getEdges().stream())
-                   .collect(Collectors.toSet());
+        return pdgs.values()
+                .stream()
+                .flatMap(pdg -> pdg.getEdges().stream())
+                .collect(Collectors.toSet());
     }
     
     @Override

@@ -23,7 +23,7 @@ public class SliceCriterion {
     
     private CommonPDG pdg;
     private PDGNode node;
-    private Set<JReference> variables = new HashSet<JReference>();
+    private Set<JReference> variables = new HashSet<>();
     
     public SliceCriterion(CommonPDG pdg, PDGNode node, JReference var) {
         this.pdg = pdg;

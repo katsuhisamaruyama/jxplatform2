@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -22,7 +22,7 @@ public class Logger {
     
     private static Logger instance = new Logger();
     
-    private List<String> logMessages = new ArrayList<String>();
+    private List<String> logMessages = new ArrayList<>();
     private String logfile;
     
     private boolean visible = true;

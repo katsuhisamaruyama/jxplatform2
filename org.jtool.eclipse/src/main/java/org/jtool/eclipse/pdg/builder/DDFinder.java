@@ -17,8 +17,8 @@ import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JReference;
 import java.util.List;
-import java.util.Map;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
@@ -32,7 +32,7 @@ import java.util.HashSet;
  */
 public class DDFinder {
     
-    private static Map<PDGNode, List<PDGNode>> dominatorMap = new HashMap<PDGNode, List<PDGNode>>();
+    private static Map<PDGNode, List<PDGNode>> dominatorMap = new HashMap<>();
     
     public static void find(PDG pdg, CFG cfg) {
         dominatorMap.clear();
@@ -58,7 +58,7 @@ public class DDFinder {
     private static void findDDs(PDG pdg, CFG cfg, CFGStatement anchor, JReference jvar) {
         for (ControlFlow flow : anchor.getOutgoingFlows()) {
             if (!flow.isFallThrough()) {
-                Set<CFGNode> track = new HashSet<CFGNode>();
+                Set<CFGNode> track = new HashSet<>();
                 CFGNode cfgnode = (CFGNode)flow.getDstNode();
                 findDD(pdg, cfg, anchor, cfgnode, jvar, track);
             }
@@ -137,8 +137,8 @@ public class DDFinder {
     }
     
     private static List<PDGNode> findDominators(PDGNode pdgnode) {
-        Set<PDGNode> track = new HashSet<PDGNode>();
-        List<PDGNode> dominators = new ArrayList<PDGNode>();
+        Set<PDGNode> track = new HashSet<>();
+        List<PDGNode> dominators = new ArrayList<>();
         findDominators(pdgnode, dominators, track);
         return dominators;
     }

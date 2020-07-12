@@ -9,12 +9,12 @@ package org.jtool.eclipse.pdg;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.graph.GraphNode;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A node of PDGs, ClDGs, and SDG.
@@ -52,47 +52,53 @@ public class PDGNode extends GraphNode {
     }
     
     public Set<Dependence> getIncomingDependeceEdges() {
-        return getIncomingEdges().stream()
-                                 .map(edge -> (Dependence)edge)
-                                 .collect(Collectors.toSet());
+        return getIncomingEdges()
+                .stream()
+                .map(edge -> (Dependence)edge)
+                .collect(Collectors.toSet());
     }
     
     public Set<Dependence> getOutgoingDependeceEdges() {
-        return getOutgoingEdges().stream()
-                                 .map(edge -> (Dependence)edge)
-                                 .collect(Collectors.toSet());
+        return getOutgoingEdges()
+                .stream()
+                .map(edge -> (Dependence)edge)
+                .collect(Collectors.toSet());
     }
     
     public Set<CD> getIncomingCDEdges() {
-        return getIncomingEdges().stream()
-                                 .map(edge -> (Dependence)edge)
-                                 .filter(edge -> edge.isCD())
-                                 .map(edge -> (CD)edge)
-                                 .collect(Collectors.toSet());
+        return getIncomingEdges()
+                .stream()
+                .map(edge -> (Dependence)edge)
+                .filter(edge -> edge.isCD())
+                .map(edge -> (CD)edge)
+                .collect(Collectors.toSet());
     }
     
     public Set<CD> getOutgoingCDEdges() {
-        return getOutgoingEdges().stream()
-                                 .map(edge -> (Dependence)edge)
-                                 .filter(edge -> edge.isCD())
-                                 .map(edge -> (CD)edge)
-                                 .collect(Collectors.toSet());
+        return getOutgoingEdges()
+                .stream()
+                .map(edge -> (Dependence)edge)
+                .filter(edge -> edge.isCD())
+                .map(edge -> (CD)edge)
+                .collect(Collectors.toSet());
     }
     
     public Set<DD> getIncomingDDEdges() {
-        return getIncomingEdges().stream()
-                                 .map(edge -> (Dependence)edge)
-                                 .filter(edge -> edge.isDD())
-                                 .map(edge -> (DD)edge)
-                                 .collect(Collectors.toSet());
+        return getIncomingEdges()
+                .stream()
+                .map(edge -> (Dependence)edge)
+                .filter(edge -> edge.isDD())
+                .map(edge -> (DD)edge)
+                .collect(Collectors.toSet());
     }
     
     public Set<DD> getOutgoingDDEdges() {
-        return getOutgoingEdges().stream()
-                                 .map(edge -> (Dependence)edge)
-                                 .filter(edge -> edge.isDD())
-                                 .map(edge -> (DD)edge)
-                                 .collect(Collectors.toSet());
+        return getOutgoingEdges()
+                .stream()
+                .map(edge -> (Dependence)edge)
+                .filter(edge -> edge.isDD())
+                .map(edge -> (DD)edge)
+                .collect(Collectors.toSet());
     }
     
     public boolean isDominated() {
@@ -100,18 +106,21 @@ public class PDGNode extends GraphNode {
     }
     
     public boolean isTrueDominated() {
-        return getIncomingCDEdges().stream()
-                                   .anyMatch(cd -> cd.isTrue());
+        return getIncomingCDEdges()
+                .stream()
+                .anyMatch(cd -> cd.isTrue());
     }
     
     public boolean isFalseDominated() {
-        return getIncomingCDEdges().stream()
-                                   .anyMatch(cd -> cd.isFalse());
+        return getIncomingCDEdges()
+                .stream()
+                .anyMatch(cd -> cd.isFalse());
     }
     
     public int getNumOfIncomingTrueFalseCDs() {
-        return (int)getIncomingCDEdges().stream()
-                                        .filter(cd -> cd.isTrue() || cd.isFalse()).count();
+        return (int)getIncomingCDEdges()
+                .stream()
+                .filter(cd -> cd.isTrue() || cd.isFalse()).count();
     }
     
     public boolean equals(PDGNode node) {
@@ -135,8 +144,8 @@ public class PDGNode extends GraphNode {
     }
     
     public static List<PDGNode> sortPDGNodes(Collection<? extends PDGNode> co) {
-        List<PDGNode> nodes = new ArrayList<PDGNode>(co);
-        Collections.sort(nodes, new Comparator<PDGNode>() {
+        List<PDGNode> nodes = new ArrayList<>(co);
+        Collections.sort(nodes, new Comparator<>() {
             
             @Override
             public int compare(PDGNode node1, PDGNode node2) {

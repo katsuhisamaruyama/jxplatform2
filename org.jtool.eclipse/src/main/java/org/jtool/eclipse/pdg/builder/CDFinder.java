@@ -131,7 +131,7 @@ public class CDFinder {
     }
     
     private static void findCDsOnDeclarations(PDG pdg, CFG cfg, CFGStatement cfgnode) {
-        Set<JReference> vars = new HashSet<JReference>();
+        Set<JReference> vars = new HashSet<>();
         vars.addAll(cfgnode.getDefVariables());
         vars.addAll(cfgnode.getUseVariables());
         for (JReference jv : vars) {

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 public class DDClosure {
     
     public static List<PDGNode> getForwardCDClosure(PDGNode anchor, JReference jv) {
-        List<PDGNode> nodes = new ArrayList<PDGNode>();
+        List<PDGNode> nodes = new ArrayList<>();
         for (DD edge : anchor.getOutgoingDDEdges()) {
             if (edge.getVariable().equals(jv)) {
                 PDGNode next = edge.getSrcNode();
@@ -43,7 +43,7 @@ public class DDClosure {
     }
     
     public static List<PDGNode> getBackwardCDClosure(PDGNode anchor, JReference jv) {
-        List<PDGNode> nodes = new ArrayList<PDGNode>();
+        List<PDGNode> nodes = new ArrayList<>();
         for (DD edge : anchor.getIncomingDDEdges()) {
             if (edge.getVariable().equals(jv)) {
                 PDGNode next = edge.getSrcNode();

@@ -37,10 +37,9 @@ public class Slice {
     private PDG pdgForTargetMethod;
     private Set<CFGNode> allNodesInTargetMethod;
     private Set<CFGNode> reachableNodesToCriterion;
+    private Set<PDGNode> callNodes = new HashSet<>();
     
-    private Set<PDGNode> callNodes = new HashSet<PDGNode>();
-    
-    private Set<PDGNode> nodesInSlice = new HashSet<PDGNode>();
+    private Set<PDGNode> nodesInSlice = new HashSet<>();
     
     public Slice(SliceCriterion criterion) {
         this.criterion = criterion;
@@ -94,25 +93,28 @@ public class Slice {
         }
         
         if (node.getCFGNode().isActual()) {
-            node.getIncomingCDEdges().stream()
-                                     .flatMap(call -> call.getSrcNode().getIncomingCDEdges().stream())
-                                     .filter(edge -> edge.isTrue() || edge.isFalse() || edge.isFallThrough())
-                                     .forEach(edge -> traverseBackward(edge.getSrcNode()));
+            node.getIncomingCDEdges()
+                .stream()
+                .flatMap(call -> call.getSrcNode().getIncomingCDEdges().stream())
+                .filter(edge -> edge.isTrue() || edge.isFalse() || edge.isFallThrough())
+                .forEach(edge -> traverseBackward(edge.getSrcNode()));
         } else {
-            node.getIncomingCDEdges().stream()
-                                     .filter(edge -> edge.isTrue() || edge.isFalse() || edge.isFallThrough())
-                                     .forEach(edge -> traverseBackward(edge.getSrcNode()));
+            node.getIncomingCDEdges()
+                .stream()
+                .filter(edge -> edge.isTrue() || edge.isFalse() || edge.isFallThrough())
+                .forEach(edge -> traverseBackward(edge.getSrcNode()));
         }
         
-        findStartNode(node, jv).stream()
-                               .flatMap(start -> start.getIncomingCDEdges().stream())
-                               .forEach(edge -> traverseBackward(edge.getSrcNode()));
+        findStartNode(node, jv)
+            .stream()
+            .flatMap(start -> start.getIncomingCDEdges().stream())
+            .forEach(edge -> traverseBackward(edge.getSrcNode()));
         
         eliminateReceiverNodes(nodesInSlice);
     }
     
     private void eliminateReceiverNodes(Set<PDGNode> nodes) {
-        Set<PDGNode> receiverNodes = new HashSet<PDGNode>();
+        Set<PDGNode> receiverNodes = new HashSet<>();
         for (PDGNode node : nodes) {
             if (node.getCFGNode().isMethodCallReceiver()) {
                 receiverNodes.add(node);
@@ -234,7 +236,7 @@ public class Slice {
     }
     
     private Set<PDGNode> findStartNode(PDGNode node, JReference jv) {
-        Set<PDGNode> pdgnodes = new HashSet<PDGNode>();
+        Set<PDGNode> pdgnodes = new HashSet<>();
         if (node.isStatement()) {
             PDGStatement pdgnode = (PDGStatement)node;
             if (pdgnode.definesVariable(jv)) {
@@ -290,7 +292,7 @@ public class Slice {
     }
     
     private Set<PDGNode> getMethodCalls(PDGNode node) {
-        Set<PDGNode> nodes = new HashSet<PDGNode>();
+        Set<PDGNode> nodes = new HashSet<>();
         for (Dependence edge : node.getIncomingDependeceEdges()) {
             if (edge.isCall()) {
                 nodes.add(edge.getSrcNode());
@@ -300,7 +302,7 @@ public class Slice {
     }
     
     private Set<PDGNode> getTraversableMethodCalls(PDGNode node, JReference jv) {
-        Set<PDGNode> nodes = new HashSet<PDGNode>();
+        Set<PDGNode> nodes = new HashSet<>();
         PDGNode methodEntry = getMethodEntry(node);
         if (methodEntry == null) {
             return nodes;
@@ -320,7 +322,9 @@ public class Slice {
         }
         
         for (DD edge : callNode.getOutgoingDDEdges()) {
-            if (edge.isOutput() && jv.getQualifiedName().equals(edge.getVariable().getQualifiedName()) && reachable(edge.getDstNode())) {
+            if (edge.isOutput() &&
+                    jv.getQualifiedName().equals(edge.getVariable().getQualifiedName()) &&
+                    reachable(edge.getDstNode())) {
                 return false;
             }
         }
@@ -328,7 +332,8 @@ public class Slice {
     }
     
     private boolean reachable(PDGNode node) {
-        return !allNodesInTargetMethod.contains(node.getCFGNode()) || reachableNodesToCriterion.contains(node.getCFGNode());
+        return !allNodesInTargetMethod.contains(node.getCFGNode()) ||
+                reachableNodesToCriterion.contains(node.getCFGNode());
     }
     
     public void print() {
@@ -339,7 +344,8 @@ public class Slice {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("----- Slice (from here) -----\n");
-        buf.append("Node = " + getCriterionNode().getId() + "; Variable = " + getVariableNames(getCriterionVariables()));
+        buf.append("Node = " + getCriterionNode().getId() +
+                   "; Variable = " + getVariableNames(getCriterionVariables()));
         buf.append("\n");
         buf.append(getNodeInfo());
         buf.append("----- Slice (to here) -----\n");

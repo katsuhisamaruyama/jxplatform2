@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -50,8 +50,8 @@ public class ModelBuilderPlugin extends ModelBuilder {
     
     private ResourceChangeListener resourceChangeListener;
     
-    private Map<String, ICompilationUnit> compilationUnitMap = new HashMap<String, ICompilationUnit>();
-    private Set<IFile> dirtyFiles = new HashSet<IFile>();
+    private Map<String, ICompilationUnit> compilationUnitMap = new HashMap<>();
+    private Set<IFile> dirtyFiles = new HashSet<>();
     
     private JXConsole console = new JXConsole();
     
@@ -127,12 +127,13 @@ public class ModelBuilderPlugin extends ModelBuilder {
     
     private Set<JavaFile> collectDanglingClasses(JavaProject jproject, IFile file) {
         JavaFile jfile = jproject.getFile(file.getFullPath().toString());
-        Set<JavaClass> classes = new HashSet<JavaClass>();
+        
+        Set<JavaClass> classes = new HashSet<>();
         for (JavaClass jclass : jfile.getClasses()) {
             classes.addAll(jfile.getProject().collectDanglingClasses(jclass));
         }
         
-        Set<JavaFile> files = new HashSet<JavaFile>();
+        Set<JavaFile> files = new HashSet<>();
         for (JavaClass jclass : classes) {
             files.add(jclass.getFile());
         }
@@ -146,7 +147,7 @@ public class ModelBuilderPlugin extends ModelBuilder {
     
     private String[] getClassPath(IJavaProject project) {
         try {
-            List<String> classPathList = new ArrayList<String>();
+            List<String> classPathList = new ArrayList<>();
             for (IClasspathEntry entry : project.getResolvedClasspath(true)) {
                 if (entry.getEntryKind() != IClasspathEntry.CPE_SOURCE) {
                     classPathList.add(entry.getPath().makeAbsolute().toOSString());
@@ -161,7 +162,7 @@ public class ModelBuilderPlugin extends ModelBuilder {
     private String[] getSourcePath(IJavaProject project) {
         try {
             IWorkspaceRoot workSpaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-            List<String> sourcePathList = new ArrayList<String>();
+            List<String> sourcePathList = new ArrayList<>();
             for (IPackageFragmentRoot root : project.getAllPackageFragmentRoots()) {
                 if (root.getKind() == IPackageFragmentRoot.K_SOURCE) {
                     sourcePathList.add(workSpaceRoot.getFolder(root.getPath()).getLocation().toOSString());
@@ -197,7 +198,7 @@ public class ModelBuilderPlugin extends ModelBuilder {
                 jproject = ProjectStore.getInstance().getProject(javaProject.getPath().toString());
                 setPaths(javaProject, jproject);
                 
-                Set<ICompilationUnit> compilationUnits = new HashSet<ICompilationUnit>();
+                Set<ICompilationUnit> compilationUnits = new HashSet<>();
                 compilationUnits.add(JavaCore.createCompilationUnitFrom(file));
                 Set<JavaFile> files = collectDanglingClasses(jproject, file);
                 for (JavaFile jf : files) {
@@ -269,7 +270,7 @@ public class ModelBuilderPlugin extends ModelBuilder {
     }
     
     private Set<ICompilationUnit> collectCompilationUnits(IJavaProject project, JavaProject jproject) {
-        Set<ICompilationUnit> compilationUnits = new HashSet<ICompilationUnit>();
+        Set<ICompilationUnit> compilationUnits = new HashSet<>();
         if (project.getElementName().equals("RemoteSystemsTempFiles")) {
             return compilationUnits;
         }

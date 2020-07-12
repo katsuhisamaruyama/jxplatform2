@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -16,7 +16,7 @@ import java.util.HashMap;
  */
 public class Options {
     
-    private Map<String, String> options = new HashMap<String, String>();
+    private Map<String, String> options = new HashMap<>();
     
     public Options(String[] args) {
         for (int count = 0; count < args.length; ) {

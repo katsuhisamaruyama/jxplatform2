@@ -186,8 +186,8 @@ public class Dependence extends GraphEdge {
     }
     
     public static List<Dependence> sortDependenceEdges(Collection<? extends Dependence> co) {
-        List<Dependence> edges = new ArrayList<Dependence>(co);
-        Collections.sort(edges, new Comparator<Dependence>() {
+        List<Dependence> edges = new ArrayList<>(co);
+        Collections.sort(edges, new Comparator<>() {
             
             @Override
             public int compare(Dependence edge1, Dependence edge2) {

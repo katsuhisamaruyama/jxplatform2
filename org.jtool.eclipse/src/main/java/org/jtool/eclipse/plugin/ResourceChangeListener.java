@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -24,7 +24,7 @@ import java.util.HashSet;
  */
 public class ResourceChangeListener implements IResourceChangeListener {
     
-    private Set<IFileChangeListener> fileChangeListeners = new HashSet<IFileChangeListener>();
+    private Set<IFileChangeListener> fileChangeListeners = new HashSet<>();
     
     private ModelBuilderPlugin modelBuilder;
     
@@ -71,9 +71,9 @@ public class ResourceChangeListener implements IResourceChangeListener {
     
     class ResourceDeltaVisitor implements IResourceDeltaVisitor {
         
-        Set<IFile> addedFiles = new HashSet<IFile>();
-        Set<IFile> removedFiles = new HashSet<IFile>();
-        Set<IFile> changedFiles = new HashSet<IFile>();
+        Set<IFile> addedFiles = new HashSet<>();
+        Set<IFile> removedFiles = new HashSet<>();
+        Set<IFile> changedFiles = new HashSet<>();
         
         @Override
         public boolean visit(IResourceDelta delta) throws CoreException {
