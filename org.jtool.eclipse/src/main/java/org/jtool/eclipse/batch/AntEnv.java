@@ -54,7 +54,7 @@ class AntEnv extends ProjectEnv {
     }
     
     private class ConfigParser extends DefaultHandler {
-        private Map<String, String> properties = new HashMap<String, String>();
+        private Map<String, String> properties = new HashMap<>();
         private boolean isClasspathElem = false;
         private boolean isJavacElem = false;
         

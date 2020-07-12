@@ -61,7 +61,7 @@ public class ModelBuilderBatch extends ModelBuilder {
         if (subProjects.size() > 0) {
             return buildMultiTargets(name, subProjects);
         } else {
-            List<JavaProject> projects = new ArrayList<JavaProject>();
+            List<JavaProject> projects = new ArrayList<>();
             JavaProject jproject = buildSingleTarget(name, target);
             projects.add(jproject);
             return projects;
@@ -69,7 +69,7 @@ public class ModelBuilderBatch extends ModelBuilder {
     }
     
     private List<JavaProject> buildMultiTargets(String name, List<String> subProjects) {
-        List<JavaProject> projects = new ArrayList<JavaProject>();
+        List<JavaProject> projects = new ArrayList<>();
         for (String subproject : subProjects) {
             int index = subproject.lastIndexOf(File.separatorChar);
             String subname = name + "#" + subproject.substring(index + 1);
@@ -146,7 +146,7 @@ public class ModelBuilderBatch extends ModelBuilder {
     }
     
     private List<String> getSubProjects(File dir) {
-        List<String> targets = new ArrayList<String>();
+        List<String> targets = new ArrayList<>();
         
         for (File file : dir.listFiles()) {
             if (file.isDirectory() && isProject(file)) {
@@ -177,7 +177,7 @@ public class ModelBuilderBatch extends ModelBuilder {
     }
     
     static String[] getClassPath(String[] classpath) {
-        List<String> classpaths = new ArrayList<String>();
+        List<String> classpaths = new ArrayList<>();
         for (int i = 0 ; i < classpath.length; i++) {
             classpaths.addAll(Arrays.asList(getClassPath(classpath[i])));
         }
@@ -185,7 +185,7 @@ public class ModelBuilderBatch extends ModelBuilder {
     }
     
     static String[] getClassPath(String classpath) {
-        List<String> classpaths = new ArrayList<String>();
+        List<String> classpaths = new ArrayList<>();
         try {
             String cdir = new File(".").getAbsoluteFile().getParent();
             if (classpath != null && classpath.length() != 0) {
@@ -240,8 +240,8 @@ public class ModelBuilderBatch extends ModelBuilder {
         if (sourceFiles.size() > 0) {
             String[] paths = new String[sourceFiles.size()];
             String[] encodings = new String[sourceFiles.size()];
-            Map<String, String> sources = new HashMap<String, String>();
-            Map<String, String> charsets = new HashMap<String, String>();
+            Map<String, String> sources = new HashMap<>();
+            Map<String, String> charsets = new HashMap<>();
             
             int count = 0;
             for (File file : sourceFiles) {
@@ -310,7 +310,7 @@ public class ModelBuilderBatch extends ModelBuilder {
     }
     
     public static List<File> collectAllJavaFiles(String[] paths) {
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         for (String path : paths) {
             files.addAll(collectAllJavaFiles(path));
         }
@@ -318,7 +318,7 @@ public class ModelBuilderBatch extends ModelBuilder {
     }
     
     public static List<File> collectAllJavaFiles(String path) {
-        List<File> files = new ArrayList<File>();
+        List<File> files = new ArrayList<>();
         if (path == null) {
             return files;
         }

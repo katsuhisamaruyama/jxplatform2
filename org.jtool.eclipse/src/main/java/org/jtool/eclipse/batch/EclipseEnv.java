@@ -54,9 +54,9 @@ class EclipseEnv extends ProjectEnv {
     }
     
     private class ConfigParser extends DefaultHandler {
-        Set<String> srcpath = new HashSet<String>();
-        Set<String> binpath = new HashSet<String>();
-        Set<String> classpath = new HashSet<String>();
+        Set<String> srcpath = new HashSet<>();
+        Set<String> binpath = new HashSet<>();
+        Set<String> classpath = new HashSet<>();
         
         @Override
         public void startElement(String uri, String lname, String qname, Attributes attr) {

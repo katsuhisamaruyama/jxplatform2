@@ -47,9 +47,9 @@ class MavenEnv extends ProjectEnv {
     }
     
     private void setPaths(String configFile) throws Exception {
-        sourcePath = new HashSet<String>();
-        binaryPath = new HashSet<String>();
-        classPath = new HashSet<String>();
+        sourcePath = new HashSet<>();
+        binaryPath = new HashSet<>();
+        classPath = new HashSet<>();
         
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model model = reader.read(Files.newBufferedReader(Paths.get(configFile)));

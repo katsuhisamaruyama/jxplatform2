@@ -53,9 +53,9 @@ class GradleEnv extends ProjectEnv {
     }
     
     private void setPaths(Path path) throws Exception {
-        sourcePath = new HashSet<String>();
-        binaryPath = new HashSet<String>();
-        classPath = new HashSet<String>();
+        sourcePath = new HashSet<>();
+        binaryPath = new HashSet<>();
+        classPath = new HashSet<>();
         
         ProjectConnection connection = GradleConnector.newConnector().forProjectDirectory(path.toFile()).connect();
         try {
