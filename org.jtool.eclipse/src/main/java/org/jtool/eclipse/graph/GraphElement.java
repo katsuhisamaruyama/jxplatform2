@@ -34,21 +34,21 @@ public abstract class GraphElement {
     }
     
     public static <E extends GraphElement> Set<E> difference(Set<E> s1, Set<E> s2) {
-        Set<E> s = new HashSet<E>();
+        Set<E> s = new HashSet<>();
         s.addAll(s1);
         s2.forEach(e -> s.remove(e));
         return s;
     }
     
     public static <E extends GraphElement> Set<E> union(Set<E> s1, Set<E> s2) {
-        Set<E> s = new HashSet<E>();
+        Set<E> s = new HashSet<>();
         s.addAll(s1);
         s.addAll(s2);
         return s;
     }
     
     public static <E extends GraphElement> Set<E> intersection(Set<E> s1, Set<E> s2) {
-        Set<E> s = new HashSet<E>();
+        Set<E> s = new HashSet<>();
         if (s1.size() > s2.size()) {
             s2.parallelStream().filter(e -> s1.contains(e)).forEach(e -> s.add(e));
         } else {

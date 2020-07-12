@@ -15,8 +15,8 @@ import java.util.HashSet;
  */
 public class Graph<N extends GraphNode, E extends GraphEdge> {
     
-    private Set<N> nodes = new HashSet<N>();
-    private Set<E> edges = new HashSet<E>();
+    private Set<N> nodes = new HashSet<>();
+    private Set<E> edges = new HashSet<>();
     
     public Graph() {
         super();

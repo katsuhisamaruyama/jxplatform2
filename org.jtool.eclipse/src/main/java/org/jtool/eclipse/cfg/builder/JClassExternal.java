@@ -80,7 +80,7 @@ public class JClassExternal extends JClass {
     
     @Override
     protected JClass[] findAncestors() {
-        List<JClass> classes = new ArrayList<JClass>();
+        List<JClass> classes = new ArrayList<>();
         BytecodeClassStore bytecodeClassStore = cfgStore.getJavaProject().getBytecodeClassStore();
         if (bytecodeClassStore == null) {
             return emptyClassArray;
@@ -98,7 +98,7 @@ public class JClassExternal extends JClass {
     
     @Override
     protected JClass[] findDescendants() {
-        List<JClass> classes = new ArrayList<JClass>();
+        List<JClass> classes = new ArrayList<>();
         BytecodeClassStore bytecodeClassStore = cfgStore.getJavaProject().getBytecodeClassStore();
         if (bytecodeClassStore == null) {
             return emptyClassArray;

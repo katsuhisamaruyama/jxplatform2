@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -23,9 +23,9 @@ import java.util.HashSet;
  */
 class TryNode extends CFGStatement {
     
-    private Set<ExceptionOccurrence> exceptionOccurrences = new HashSet<ExceptionOccurrence>();
+    private Set<ExceptionOccurrence> exceptionOccurrences = new HashSet<>();
     
-    private List<CFGCatch> catchNodes = new ArrayList<CFGCatch>();
+    private List<CFGCatch> catchNodes = new ArrayList<>();
     private CFGStatement finallyNode;
     
     TryNode(ASTNode node, Kind kind) {

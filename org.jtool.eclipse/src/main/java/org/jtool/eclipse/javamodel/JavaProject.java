@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -33,11 +33,11 @@ public class JavaProject {
     protected String path;
     protected String dir;
     
-    protected Map<String, JavaFile> fileStore = new HashMap<String, JavaFile>();
-    protected Map<String, JavaPackage> packageStore = new HashMap<String, JavaPackage>();
-    protected Map<String, JavaClass> classStore = new HashMap<String, JavaClass>();
+    protected Map<String, JavaFile> fileStore = new HashMap<>();
+    protected Map<String, JavaPackage> packageStore = new HashMap<>();
+    protected Map<String, JavaClass> classStore = new HashMap<>();
     
-    private Map<String, JavaClass> externalClasseStore = new HashMap<String, JavaClass>();
+    private Map<String, JavaClass> externalClasseStore = new HashMap<>();
     
     private String[] classPath;
     private String[] sourcePath;
@@ -143,7 +143,7 @@ public class JavaProject {
     }
     
     public List<JavaFile> getFiles() {
-        return new ArrayList<JavaFile>(fileStore.values());
+        return new ArrayList<>(fileStore.values());
     }
     
     public List<JavaFile> getSortedFiles() {
@@ -160,7 +160,7 @@ public class JavaProject {
     }
     
     public List<JavaPackage> getPackages() {
-        return new ArrayList<JavaPackage>(packageStore.values());
+        return new ArrayList<>(packageStore.values());
     }
     
     public List<JavaPackage> getSortedPackages() {
@@ -184,7 +184,7 @@ public class JavaProject {
     }
     
     public List<JavaClass> getClasses() {
-        return new ArrayList<JavaClass>(classStore.values());
+        return new ArrayList<>(classStore.values());
     }
     
     public List<JavaClass> getSortedClasses() {
@@ -218,7 +218,7 @@ public class JavaProject {
     }
     
     public Set<JavaClass> collectDanglingClasses(JavaClass jclass) {
-        Set<JavaClass> classes = new HashSet<JavaClass>();
+        Set<JavaClass> classes = new HashSet<>();
         collectDanglingClasses(jclass, classes);
         return classes;
     }
@@ -297,8 +297,8 @@ public class JavaProject {
     }
     
     private List<JavaFile> sortFiles(Collection<? extends JavaFile> co) {
-        List<JavaFile> jfiles = new ArrayList<JavaFile>(co);
-        Collections.sort(jfiles, new Comparator<JavaFile>() {
+        List<JavaFile> jfiles = new ArrayList<>(co);
+        Collections.sort(jfiles, new Comparator<>() {
             public int compare(JavaFile jf1, JavaFile jf2) {
                 return jf1.getPath().compareTo(jf2.getPath());
             }
@@ -307,13 +307,16 @@ public class JavaProject {
     }
     
     private List<JavaPackage> sortPackages(Collection<? extends JavaPackage> collection) {
-        return collection.stream().sorted((jp1, jp2) -> jp1.getName().compareTo(jp2.getName()))
-                .collect(Collectors.toCollection(ArrayList::new));
+        return collection
+                .stream()
+                .sorted((jp1, jp2) -> jp1.getName().compareTo(jp2.getName()))
+                .collect(Collectors.toList());
     }
     
     private List<JavaClass> sortClasses(Collection<? extends JavaClass> collection) {
-        return collection.stream()
-                         .sorted((jc1, jc2) -> jc1.getQualifiedName().compareTo(jc2.getQualifiedName()))
-                         .collect(Collectors.toList());
+        return collection
+                .stream()
+                .sorted((jc1, jc2) -> jc1.getQualifiedName().compareTo(jc2.getQualifiedName()))
+                .collect(Collectors.toList());
     }
 }

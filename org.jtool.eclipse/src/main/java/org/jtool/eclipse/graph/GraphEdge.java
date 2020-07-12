@@ -79,8 +79,8 @@ public abstract class GraphEdge extends GraphElement {
     }
     
     protected static List<GraphEdge> sortGrapgEdge(Collection<? extends GraphEdge> co) {
-        List<GraphEdge> edges = new ArrayList<GraphEdge>(co);
-        Collections.sort(edges, new Comparator<GraphEdge>() {
+        List<GraphEdge> edges = new ArrayList<>(co);
+        Collections.sort(edges, new Comparator<>() {
             
             @Override
             public int compare(GraphEdge edge1, GraphEdge edge2) {

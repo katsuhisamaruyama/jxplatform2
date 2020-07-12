@@ -7,8 +7,8 @@
 package org.jtool.eclipse.cfg.builder;
 
 import org.eclipse.jdt.core.dom.Modifier;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Arrays;
 
 /**
@@ -45,7 +45,7 @@ abstract class JClass extends JElement {
     
     @Override
     protected void cache() {
-        cacheData = new HashMap<String, String>();
+        cacheData = new HashMap<>();
         cacheData.put(FqnAttr, fqn);
         cacheData.put(NameAttr, name);
         cacheData.put(ModifierAttr, String.valueOf(modifier));

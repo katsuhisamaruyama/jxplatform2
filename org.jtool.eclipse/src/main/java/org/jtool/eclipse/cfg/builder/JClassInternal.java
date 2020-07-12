@@ -60,7 +60,7 @@ public class JClassInternal extends JClass {
     
     @Override
     protected JClass[] findAncestors() {
-        List<JClass> classes = new ArrayList<JClass>();
+        List<JClass> classes = new ArrayList<>();
         for (JavaClass jc : jclass.getAncestors()) {
             JClass clazz = cfgStore.getJInfoStore().getJClass(jc.getQualifiedName());
             if (clazz != null) {

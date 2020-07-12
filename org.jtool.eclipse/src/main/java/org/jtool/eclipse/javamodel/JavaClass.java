@@ -44,14 +44,14 @@ public class JavaClass extends JavaElement {
     protected boolean inProject;
     
     protected String superClassName = "";
-    protected Set<String> superInterfaceNames = new HashSet<String>();
+    protected Set<String> superInterfaceNames = new HashSet<>();
     
     protected JavaClass declaringClass = null;
     protected JavaMethod declaringMethod = null;
     
-    protected List<JavaField> fields = new ArrayList<JavaField>();
-    protected List<JavaMethod> methods = new ArrayList<JavaMethod>();
-    protected List<JavaClass> innerClasses = new ArrayList<JavaClass>();
+    protected List<JavaField> fields = new ArrayList<>();
+    protected List<JavaMethod> methods = new ArrayList<>();
+    protected List<JavaClass> innerClasses = new ArrayList<>();
     
     public JavaClass(TypeDeclaration node, JavaFile jfile) {
         this(node, node.resolveBinding(), jfile);
@@ -414,21 +414,25 @@ public class JavaClass extends JavaElement {
     }
     
     private List<JavaField> sortFields(List<JavaField> list) {
-        return list.stream().sorted((jf1, jf2) -> jf1.getName().compareTo(jf2.getName()))
-                .collect(Collectors.toCollection(ArrayList::new));
+        return list
+                .stream()
+                .sorted((jf1, jf2) -> jf1.getName().compareTo(jf2.getName()))
+                .collect(Collectors.toList());
     }
     
     private List<JavaMethod> sortMethods(List<JavaMethod> list) {
-        return list.stream().sorted((jm1, jm2) -> jm1.getName().compareTo(jm2.getName()))
-                .collect(Collectors.toCollection(ArrayList::new));
+        return list
+                .stream()
+                .sorted((jm1, jm2) -> jm1.getName().compareTo(jm2.getName()))
+                .collect(Collectors.toList());
     }
     
     protected boolean resolved = false;
     protected JavaClass superClass = null;
-    protected Set<JavaClass> superInterfaces = new HashSet<JavaClass>();
-    protected Set<JavaClass> usedClasses = new HashSet<JavaClass>();
-    protected Set<JavaClass> afferentClasses = new HashSet<JavaClass>();
-    protected Set<JavaClass> efferentClasses = new HashSet<JavaClass>();
+    protected Set<JavaClass> superInterfaces = new HashSet<>();
+    protected Set<JavaClass> usedClasses = new HashSet<>();
+    protected Set<JavaClass> afferentClasses = new HashSet<>();
+    protected Set<JavaClass> efferentClasses = new HashSet<>();
     
     protected void collectInfo() {
         if (!inProject || resolved) {
@@ -525,10 +529,10 @@ public class JavaClass extends JavaElement {
     
     private void findEfferentClasses() {
         if (efferentClasses == null) {
-            efferentClasses = new HashSet<JavaClass>();
+            efferentClasses = new HashSet<>();
         }
         if (afferentClasses == null) {
-            afferentClasses = new HashSet<JavaClass>();
+            afferentClasses = new HashSet<>();
         }
         for (JavaClass jclass : usedClasses) {
             if (!jclass.equals(this)) {
@@ -596,8 +600,10 @@ public class JavaClass extends JavaElement {
     public List<JavaClass> getChildren() {
         collectInfo();
         
-        return jfile.getProject().getClasses().stream()
-                .filter(jc -> jc.isChildOf(this)).collect(Collectors.toCollection(ArrayList::new));
+        return jfile.getProject().getClasses()
+                .stream()
+                .filter(jc -> jc.isChildOf(this))
+                .collect(Collectors.toList());
     }
     
     public boolean isChildOf(JavaClass jclass) {
@@ -605,12 +611,14 @@ public class JavaClass extends JavaElement {
         if (superClass != null && superClass.getQualifiedName().equals(jclass.getQualifiedName())) {
             return true;
         }
-        return superInterfaces.stream().anyMatch(jc -> jc.getQualifiedName().equals(jclass.getQualifiedName()));
+        return superInterfaces
+                .stream()
+                .anyMatch(jc -> jc.getQualifiedName().equals(jclass.getQualifiedName()));
     }
     
     public List<JavaClass> getAllSuperClasses() {
         collectInfo();
-        List<JavaClass> types = new ArrayList<JavaClass>();
+        List<JavaClass> types = new ArrayList<>();
         JavaClass parent = this.getSuperClass();
         while (parent != null) {
             types.add(parent);
@@ -621,7 +629,7 @@ public class JavaClass extends JavaElement {
     
     public List<JavaClass> getAllSuperInterfaces() {
         collectInfo();
-        List<JavaClass> jclasses = new ArrayList<JavaClass>();
+        List<JavaClass> jclasses = new ArrayList<>();
         getAllSuperInterfaces(this, jclasses);
         return jclasses;
     }
@@ -648,7 +656,7 @@ public class JavaClass extends JavaElement {
     
     public List<JavaClass> getAncestors() {
         collectInfo();
-        List<JavaClass> jclasses = new ArrayList<JavaClass>();
+        List<JavaClass> jclasses = new ArrayList<>();
         jclasses.addAll(getAllSuperClasses());
         jclasses.addAll(getAllSuperInterfaces());
         return jclasses;
@@ -656,7 +664,7 @@ public class JavaClass extends JavaElement {
     
     public List<JavaClass> getDescendants() {
         collectInfo();
-        List<JavaClass> jclasses = new ArrayList<JavaClass>();
+        List<JavaClass> jclasses = new ArrayList<>();
         getAllChildren(this, jclasses);
         return jclasses;
     }
@@ -666,7 +674,10 @@ public class JavaClass extends JavaElement {
     }
     
     public Set<JavaClass> getAfferentClassesInProject() {
-        return afferentClasses.stream().filter(jc -> jc.isInProject()).collect(Collectors.toCollection(HashSet::new));
+        return afferentClasses
+                .stream()
+                .filter(jc -> jc.isInProject())
+                .collect(Collectors.toSet());
     }
     
     public Set<JavaClass> getEfferentClasses() {
@@ -674,6 +685,9 @@ public class JavaClass extends JavaElement {
     }
     
     public Set<JavaClass> getEfferentClassesInProject() {
-        return efferentClasses.stream().filter(jc -> jc.isInProject()).collect(Collectors.toCollection(HashSet::new));
+        return efferentClasses
+                .stream()
+                .filter(jc -> jc.isInProject())
+                .collect(Collectors.toSet());
     }
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -20,7 +20,7 @@ public class JavaPackage extends JavaElement {
     
     protected String name;
     
-    protected Set<JavaClass> classes = new HashSet<JavaClass>();
+    protected Set<JavaClass> classes = new HashSet<>();
     
     private static final String DEFAUL_PACKAGE_NAME = "(default)";
     
@@ -130,10 +130,10 @@ public class JavaPackage extends JavaElement {
     
     private void findEfferentPackages() {
         if (efferentPackages == null) {
-            efferentPackages = new HashSet<JavaPackage>();
+            efferentPackages = new HashSet<>();
         }
         if (afferentPackages == null) {
-            afferentPackages = new HashSet<JavaPackage>();
+            afferentPackages = new HashSet<>();
         }
         for (JavaClass jclass : classes) {
             for (JavaClass jc : jclass.getEfferentClassesInProject()) {
@@ -148,7 +148,7 @@ public class JavaPackage extends JavaElement {
     
     private void addAfferentPackage(JavaPackage jpackage) {
         if (afferentPackages == null) {
-            afferentPackages = new HashSet<JavaPackage>();
+            afferentPackages = new HashSet<>();
         }
         if (jpackage != null && !afferentPackages.contains(jpackage)) {
             afferentPackages.add(jpackage);

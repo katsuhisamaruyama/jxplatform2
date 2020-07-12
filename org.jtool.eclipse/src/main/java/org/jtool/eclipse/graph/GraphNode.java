@@ -22,10 +22,10 @@ public abstract class GraphNode extends GraphElement {
     
     protected long id = 0;
     
-    private Set<GraphEdge> incomingEdges = new HashSet<GraphEdge>();
-    private Set<GraphEdge> outgoingEdges = new HashSet<GraphEdge>();
-    private Set<GraphNode> srcNodes = new HashSet<GraphNode>();
-    private Set<GraphNode> dstNodes = new HashSet<GraphNode>();
+    private Set<GraphEdge> incomingEdges = new HashSet<>();
+    private Set<GraphEdge> outgoingEdges = new HashSet<>();
+    private Set<GraphNode> srcNodes = new HashSet<>();
+    private Set<GraphNode> dstNodes = new HashSet<>();
     
     protected GraphNode(long id) {
         this.id = id;
@@ -155,8 +155,10 @@ public abstract class GraphNode extends GraphElement {
     }
     
     public static List<GraphNode> sortGraphNode(Collection<? extends GraphNode> co) {
-        List<GraphNode> nodes = new ArrayList<GraphNode>(co);
-        Collections.sort(nodes, new Comparator<GraphNode>() {
+        List<GraphNode> nodes = new ArrayList<>(co);
+        Collections.sort(nodes, new Comparator<>() {
+            
+            @Override
             public int compare(GraphNode node1, GraphNode node2) {
                 return node2.id == node1.id ? 0 : node1.id > node2.id ? 1 : -1;
             }

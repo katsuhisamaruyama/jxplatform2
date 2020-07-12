@@ -26,8 +26,8 @@ class JInfoStore {
     private JavaProject jproject;
     private int analysisLevel;
     
-    private Map<String, JClass> internalClassStore = new HashMap<String, JClass>();
-    private Map<String, JClass> externalClassStore = new HashMap<String, JClass>();
+    private Map<String, JClass> internalClassStore = new HashMap<>();
+    private Map<String, JClass> externalClassStore = new HashMap<>();
     
     void create(CFGStore cfgStore, JavaProject jproject, ModelBuilder builder) {
         this.cfgStore = cfgStore;

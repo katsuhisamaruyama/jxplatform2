@@ -43,7 +43,7 @@ public class CCFG extends CommonCFG {
     }
     
     public Set<CFG> getCFGs() {
-        return new HashSet<CFG>(cfgs.values());
+        return new HashSet<>(cfgs.values());
     }
     
     public CFG getCFG(String fqn) {

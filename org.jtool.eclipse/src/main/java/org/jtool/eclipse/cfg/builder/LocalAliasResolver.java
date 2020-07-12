@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -63,7 +63,7 @@ class LocalAliasResolver {
     }
     
     private static void walkForward(CFGNode node, Alias alias) {
-        Set<CFGNode> track = new HashSet<CFGNode>();
+        Set<CFGNode> track = new HashSet<>();
         track.add(node);
         for (ControlFlow flow : node.getOutgoingFlows()) {
             CFGNode succ = flow.getDstNode();

@@ -7,8 +7,8 @@
 package org.jtool.eclipse.cfg.builder;
 
 import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
-import java.util.HashSet;
 import java.util.Map;
+import java.util.HashSet;
 
 /**
  * An object that represents the cached data of a method.
@@ -25,13 +25,13 @@ class JMethodCache extends JMethod {
         this.declaringClass = declaringClass;
         this.cacheData = cacheData;
         
-        defFields = new HashSet<String>();
+        defFields = new HashSet<>();
         for (String name : convert(cacheData.get(DefAttr))) {
             if (name.indexOf(QualifiedNameSeparatorChar) != -1) {
                 defFields.add(name);
             }
         }
-        useFields = new HashSet<String>();
+        useFields = new HashSet<>();
         for (String name : convert(cacheData.get(UseAttr))) {
             if (name.indexOf(QualifiedNameSeparatorChar) != -1) {
                 useFields.add(name);

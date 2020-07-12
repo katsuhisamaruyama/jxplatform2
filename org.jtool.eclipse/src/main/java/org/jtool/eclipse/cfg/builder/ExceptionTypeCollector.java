@@ -1,5 +1,5 @@
 /*
- *  Copyright 2019
+ *  Copyright 2019-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -40,7 +40,7 @@ class ExceptionTypeCollector {
     
     private JavaProject jproject;
     
-    private Set<ITypeBinding> exceptionTypes = new HashSet<ITypeBinding>();
+    private Set<ITypeBinding> exceptionTypes = new HashSet<>();
     
     public ExceptionTypeCollector(JavaProject jproject) {
         this.jproject = jproject;

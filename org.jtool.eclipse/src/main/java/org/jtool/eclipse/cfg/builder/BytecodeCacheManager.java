@@ -201,8 +201,8 @@ class CacheImporter extends DefaultHandler {
     private CFGStore cfgStore;
     
     private JClassCache clazz = null;
-    private List<JMethodCache> cmethods = new ArrayList<JMethodCache>();
-    private List<JFieldCache> cfields = new ArrayList<JFieldCache>();
+    private List<JMethodCache> cmethods = new ArrayList<>();
+    private List<JFieldCache> cfields = new ArrayList<>();
     
     public CacheImporter(CFGStore cfgStore) {
         this.cfgStore = cfgStore;
@@ -246,7 +246,7 @@ class CacheImporter extends DefaultHandler {
     }
     
     private Map<String, String> attributes(Attributes attrs) {
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
         for (int i = 0; i < attrs.getLength(); i++) {
             map.put(attrs.getQName(i), attrs.getValue(i));
         }

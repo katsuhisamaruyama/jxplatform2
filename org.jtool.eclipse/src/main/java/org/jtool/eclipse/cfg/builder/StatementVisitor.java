@@ -99,12 +99,12 @@ public class StatementVisitor extends ASTVisitor {
     protected CFGNode prevNode;
     protected CFGNode nextNode;
     
-    private Stack<CFGNode> blockEntries = new Stack<CFGNode>();
-    private Stack<CFGNode> blockExits = new Stack<CFGNode>();
+    private Stack<CFGNode> blockEntries = new Stack<>();
+    private Stack<CFGNode> blockExits = new Stack<>();
     
-    private Set<Label> labels = new HashSet<Label>();
+    private Set<Label> labels = new HashSet<>();
     
-    private Stack<TryNode> tryNodeStack = new Stack<TryNode>();
+    private Stack<TryNode> tryNodeStack = new Stack<>();
     
     private JInfoStore infoStore;
     
@@ -135,7 +135,7 @@ public class StatementVisitor extends ASTVisitor {
     }
     
     private void reconnect(CFGNode origNode, CFGNode node) {
-        Set<GraphEdge> edges = new HashSet<GraphEdge>(origNode.getIncomingEdges());
+        Set<GraphEdge> edges = new HashSet<>(origNode.getIncomingEdges());
         for (GraphEdge edge : edges) {
             edge.setDstNode(node);
         }
@@ -294,7 +294,7 @@ public class StatementVisitor extends ASTVisitor {
         blockEntries.push(switchNode);
         blockExits.push(exitNode);
         
-        List<Statement> remaining = new ArrayList<Statement>();
+        List<Statement> remaining = new ArrayList<>();
         for (Statement statement : (List<Statement>)node.statements()) {
             remaining.add(statement);
         }
@@ -307,15 +307,15 @@ public class StatementVisitor extends ASTVisitor {
         }
         if (switchNode.hasDefault()) {
             CFGNode successor = switchNode.getSuccessorOfDefault();
-            List<GraphEdge> nextEdges = new ArrayList<GraphEdge>();
+            List<GraphEdge> nextEdges = new ArrayList<>();
             for (GraphEdge edge : nextNode.getIncomingEdges()) {
                 nextEdges.add(edge);
             }
-            List<GraphEdge> incomingEdges = new ArrayList<GraphEdge>();
+            List<GraphEdge> incomingEdges = new ArrayList<>();
             for (GraphEdge edge : switchNode.getDefaultStartNode().getIncomingEdges()) {
                 incomingEdges.add(edge);
             }
-            List<GraphEdge> outgoingEdges = new ArrayList<GraphEdge>();
+            List<GraphEdge> outgoingEdges = new ArrayList<>();
             for (GraphEdge edge : successor.getIncomingEdges()) {
                 outgoingEdges.add(edge);
             }
@@ -753,7 +753,7 @@ public class StatementVisitor extends ASTVisitor {
     }
     
     private void findCatchNodes(TryNode tryNode) {
-        Set<TryNode.ExceptionOccurrence> occurrences = new HashSet<TryNode.ExceptionOccurrence>(tryNode.getExceptionOccurrences());
+        Set<TryNode.ExceptionOccurrence> occurrences = new HashSet<>(tryNode.getExceptionOccurrences());
         for (TryNode.ExceptionOccurrence occurence : occurrences) {
             for (CFGCatch catchNode : getCatchNodes(occurence.getType(), tryNode.getCatchNodes())) {
                 ControlFlow exceptionEdge = createFlow(occurence.getNode(), catchNode);
@@ -821,7 +821,7 @@ public class StatementVisitor extends ASTVisitor {
     }
     
     private Set<CFGCatch> getCatchNodes(ITypeBinding tbinding, List<? extends CFGNode> catchNodes) {
-        Set<CFGCatch> nodes = new HashSet<CFGCatch>();
+        Set<CFGCatch> nodes = new HashSet<>();
         while (tbinding != null) {
             for (CFGNode node : catchNodes) {
                 CFGCatch catchNode = (CFGCatch)node;

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -125,10 +125,10 @@ public class JavaField extends JavaVariable {
     }
     
     protected boolean resolved = false;
-    protected Set<JavaMethod> calledMethods = new HashSet<JavaMethod>();
-    protected Set<JavaMethod> accessingMethods = new HashSet<JavaMethod>();
-    protected Set<JavaField> accessedFields = new HashSet<JavaField>();
-    protected Set<JavaField> accessingFields = new HashSet<JavaField>();
+    protected Set<JavaMethod> calledMethods = new HashSet<>();
+    protected Set<JavaMethod> accessingMethods = new HashSet<>();
+    protected Set<JavaField> accessedFields = new HashSet<>();
+    protected Set<JavaField> accessingFields = new HashSet<>();
     
     protected void collectInfo() {
         if (!inProject || resolved) {
@@ -199,12 +199,18 @@ public class JavaField extends JavaVariable {
     
     public Set<JavaField> getAccessedFieldsInProject() {
         collectInfo();
-        return accessedFields.stream().filter(jf -> jf.isInProject()).collect(Collectors.toCollection(HashSet::new));
+        return accessedFields
+                .stream()
+                .filter(jf -> jf.isInProject())
+                .collect(Collectors.toSet());
     }
     
     public Set<JavaField> getAccessingFieldsInProject() {
         collectInfo();
-        return accessingFields.stream().filter(jf -> jf.isInProject()).collect(Collectors.toCollection(HashSet::new));
+        return accessingFields
+                .stream()
+                .filter(jf -> jf.isInProject())
+                .collect(Collectors.toSet());
     }
     
     public Set<JavaMethod> getCalledMethods() {
@@ -219,11 +225,17 @@ public class JavaField extends JavaVariable {
     
     public Set<JavaMethod> getCalledMethodsInProject() {
         collectInfo();
-        return calledMethods.stream().filter(jm -> jm.isInProject()).collect(Collectors.toCollection(HashSet::new));
+        return calledMethods
+                .stream()
+                .filter(jm -> jm.isInProject())
+                .collect(Collectors.toSet());
     }
     
     public Set<JavaMethod> getAccessingMethodsInProject() {
         collectInfo();
-        return accessingMethods.stream().filter(jm -> jm.isInProject()).collect(Collectors.toCollection(HashSet::new));
+        return accessingMethods
+                .stream()
+                .filter(jm -> jm.isInProject())
+                .collect(Collectors.toSet());
     }
 }

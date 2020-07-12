@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -14,8 +14,8 @@ import org.jtool.eclipse.javamodel.JavaMethod;
 import org.jtool.eclipse.javamodel.JavaField;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.HashSet;
 
 /**
  * An object that represents a method inside the project.
@@ -41,7 +41,7 @@ public class JMethodInternal extends JMethod {
     
     @Override
     protected JMethod[] findAccessedMethods() {
-        Set<JMethod> methods = new HashSet<JMethod>();
+        Set<JMethod> methods = new HashSet<>();
         for (JavaMethod jm : jmethod.getCalledMethods()) {
             JClass clazz = cfgStore.getJInfoStore().getJClass(jm.getDeclaringClass().getQualifiedName());
             if (clazz != null) {
@@ -56,7 +56,7 @@ public class JMethodInternal extends JMethod {
     
     @Override
     protected JField[] findAccessedFields() {
-        Set<JField> fields = new HashSet<JField>();
+        Set<JField> fields = new HashSet<>();
         for (JavaField jf : jmethod.getAccessedFields()) {
             JClass clazz = cfgStore.getJInfoStore().getJClass(jf.getDeclaringClass().getQualifiedName());
             if (clazz != null) {
@@ -71,7 +71,7 @@ public class JMethodInternal extends JMethod {
     
     @Override
     protected JMethod[] findOverridingMethods() {
-        List<JMethod> methods = new ArrayList<JMethod>();
+        List<JMethod> methods = new ArrayList<>();
         for (JavaMethod jm : jmethod.getOverridingMethods()) {
             JClass clazz = cfgStore.getJInfoStore().getJClass(jm.getDeclaringClass().getQualifiedName());
             if (clazz != null) {
@@ -86,7 +86,7 @@ public class JMethodInternal extends JMethod {
     
     @Override
     protected JMethod[] findOverriddenMethods() {
-        List<JMethod> methods = new ArrayList<JMethod>();
+        List<JMethod> methods = new ArrayList<>();
         for (JavaMethod jm : jmethod.getOverriddenMethods()) {
             JClass clazz = cfgStore.getJInfoStore().getJClass(jm.getDeclaringClass().getQualifiedName());
             if (clazz != null) {
@@ -101,7 +101,7 @@ public class JMethodInternal extends JMethod {
     
     @Override
     protected void findDefUseFieldsInThisMethod(Set<JMethod> visited, boolean recursivelyCollect) {
-        Set<JMethod> current = new HashSet<JMethod>(visited);
+        Set<JMethod> current = new HashSet<>(visited);
         
         CFG cfg = cfgStore.getCFG(jmethod, visited, false);
         for (CFGNode node : cfg.getNodes()) {
@@ -132,7 +132,7 @@ public class JMethodInternal extends JMethod {
     
     @Override
     protected void findDefUseFieldsInAccessedMethods(Set<JMethod> visited, boolean recursivelyCollect) {
-        Set<JMethod> current = new HashSet<JMethod>(visited);
+        Set<JMethod> current = new HashSet<>(visited);
         
         for (JMethod method : getOverridingMethods()) {
             if (!visited.contains(method)) {

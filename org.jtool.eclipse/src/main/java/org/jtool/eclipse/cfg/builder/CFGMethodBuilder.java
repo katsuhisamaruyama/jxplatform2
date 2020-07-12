@@ -42,7 +42,7 @@ public class CFGMethodBuilder {
         if (jmethod.getMethodBinding() == null) {
             return null;
         }
-        return build(jmethod, infoStore, new HashSet<JMethod>());
+        return build(jmethod, infoStore, new HashSet<>());
     }
     
     @SuppressWarnings("unchecked")
@@ -57,7 +57,7 @@ public class CFGMethodBuilder {
                 params = node.parameters();
             }
         } else {
-            params = new ArrayList<VariableDeclaration>();
+            params = new ArrayList<>();
         }
         return build(jmethod, jmethod.getMethodBinding(), params, infoStore, visited);
     }
@@ -145,14 +145,14 @@ public class CFGMethodBuilder {
     }
     
     private static void replace(CFG cfg, CFGNode tmpNode, CFGNode node) {
-        Set<GraphEdge> edges = new HashSet<GraphEdge>(tmpNode.getIncomingEdges());
+        Set<GraphEdge> edges = new HashSet<>(tmpNode.getIncomingEdges());
         for (GraphEdge edge : edges) {
             edge.setDstNode(node);
         }
     }
     
     private static Set<CFGCatch> createExceptionNodes(JavaMethod jmethod, CFGMethodEntry entry, CFG cfg, JInfoStore infoStore) {
-        Set<CFGCatch> nodes = new HashSet<CFGCatch>();
+        Set<CFGCatch> nodes = new HashSet<>();
         for (Type type : jmethod.getExceptionTypeNodes().values()) {
             CFGCatch exceptionNode = createExceptionNode(entry, cfg, type.resolveBinding().getTypeDeclaration());
             nodes.add(exceptionNode);
@@ -202,7 +202,7 @@ public class CFGMethodBuilder {
     }
     
     private static List<CFGParameter> createFormalOut(List<VariableDeclaration> params, CFG cfg, CFGMethodEntry entry, CFGNode nextNode) {
-        List<CFGParameter> formalOuts = new ArrayList<CFGParameter>();
+        List<CFGParameter> formalOuts = new ArrayList<>();
         for (int ordinal = 0; ordinal < params.size(); ordinal++) {
             VariableDeclaration param = params.get(ordinal);
             CFGParameter formalOutNode = new CFGParameter(param, CFGNode.Kind.formalOut, ordinal);

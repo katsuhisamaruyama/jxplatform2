@@ -34,7 +34,7 @@ public class CFGFieldBuilder {
         if (jfield.getVariableBinding() == null) {
             return null;
         }
-        return build(jfield, infoStore, new HashSet<JMethod>());
+        return build(jfield, infoStore, new HashSet<>());
     }
     
     public static CFG build(JavaField jfield, JInfoStore infoStore, Set<JMethod> visited) {

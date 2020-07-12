@@ -99,7 +99,7 @@ public class JMethodExternal extends JMethod {
     
     @Override
     protected JMethod[] findAccessedMethods() {
-        Set<JMethod> methods = new HashSet<JMethod>();
+        Set<JMethod> methods = new HashSet<>();
         try {
             ctMethod.instrument(new ExprEditor() {
                 
@@ -137,7 +137,7 @@ public class JMethodExternal extends JMethod {
     
     @Override
     protected JField[] findAccessedFields() {
-        Set<JField> fields = new HashSet<JField>();
+        Set<JField> fields = new HashSet<>();
         try {
             ctMethod.instrument(new ExprEditor() {
                 
@@ -165,7 +165,7 @@ public class JMethodExternal extends JMethod {
             return new JMethod[0];
         }
         
-        List<JMethod> methods = new ArrayList<JMethod>();
+        List<JMethod> methods = new ArrayList<>();
         for (JClass clazz : declaringClass.getDescendants()) {
             for (JMethod method : clazz.getMethods()) {
                 if (!isPrivate() && getSignature().equals(method.getSignature())) {
@@ -178,7 +178,7 @@ public class JMethodExternal extends JMethod {
     
     @Override
     protected JMethod[] findOverriddenMethods() {
-        List<JMethod> methods = new ArrayList<JMethod>();
+        List<JMethod> methods = new ArrayList<>();
         for (JClass clazz : declaringClass.getAncestors()) {
             for (JMethod method : clazz.getMethods()) {
                 if (!isPrivate() && getSignature().equals(method.getSignature())) {
@@ -212,7 +212,7 @@ public class JMethodExternal extends JMethod {
     
     @Override
     protected void findDefUseFieldsInAccessedMethods(Set<JMethod> visited, boolean recursivelyCollect) {
-        Set<JMethod> current = new HashSet<JMethod>(visited);
+        Set<JMethod> current = new HashSet<>(visited);
         
         for (JMethod method : getOverridingMethods()) {
             if (!visited.contains(method)) {

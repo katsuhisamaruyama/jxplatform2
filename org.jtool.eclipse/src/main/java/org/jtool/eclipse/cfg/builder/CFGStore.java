@@ -29,8 +29,8 @@ public class CFGStore {
     
     private JInfoStore infoStore;
     
-    private Map<String, CFG> cfgMap = new HashMap<String, CFG>();
-    private Map<String, CCFG> ccfgMap = new HashMap<String, CCFG>();
+    private Map<String, CFG> cfgMap = new HashMap<>();
+    private Map<String, CCFG> ccfgMap = new HashMap<>();
     
     public CFGStore() {
         infoStore = new JInfoStore();
@@ -75,11 +75,11 @@ public class CFGStore {
     }
     
     public CFG getCFG(JavaMethod jmethod, boolean force) {
-        return getCFG(jmethod, new HashSet<JMethod>(), force);
+        return getCFG(jmethod, new HashSet<>(), force);
     }
     
     public CFG getCFG(JavaField jfield, boolean force) {
-        return getCFG(jfield, new HashSet<JMethod>(), force);
+        return getCFG(jfield, new HashSet<>(), force);
     }
     
     public CCFG getCCFG(JavaClass jclass, boolean force) {

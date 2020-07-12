@@ -29,7 +29,7 @@ class ReceiverCollector {
             if (node.isMethodCall()) {
                 CFGMethodCall callNode = (CFGMethodCall)node;
                 
-                List<JReference> vars = new ArrayList<JReference>(callNode.getDefVariables());
+                List<JReference> vars = new ArrayList<>(callNode.getDefVariables());
                 int count = 0;
                 for (JReference var : vars) {
                     if (!var.isInProject()) {

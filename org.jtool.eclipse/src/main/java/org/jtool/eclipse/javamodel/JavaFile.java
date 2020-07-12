@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -28,9 +28,9 @@ public class JavaFile {
     protected String charset;
     
     protected JavaPackage jpackage;
-    protected Set<JavaClass> classes = new HashSet<JavaClass>();
+    protected Set<JavaClass> classes = new HashSet<>();
     
-    protected List<ASTNode> imports = new ArrayList<ASTNode>();
+    protected List<ASTNode> imports = new ArrayList<>();
     
     public JavaFile(CompilationUnit cu, String path, String code, String charset, JavaProject jproject) {
         this.compilationUnit = cu;

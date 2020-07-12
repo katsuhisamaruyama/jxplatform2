@@ -59,7 +59,7 @@ abstract class JMethod extends JElement {
     
     @Override
     protected void cache() {
-        cacheData = new HashMap<String, String>();
+        cacheData = new HashMap<>();
         cacheData.put(FqnAttr, fqn);
         cacheData.put(ClassNameAttr, className);
         cacheData.put(SignatureAttr, signature);
@@ -192,8 +192,8 @@ abstract class JMethod extends JElement {
     
     protected void findDefUseFields(Set<JMethod> visited, boolean recursivelyCollect) {
         if (defFields == null) {
-            defFields = new HashSet<String>();
-            useFields = new HashSet<String>();
+            defFields = new HashSet<>();
+            useFields = new HashSet<>();
         }
         
         if (visited.contains(this)) {

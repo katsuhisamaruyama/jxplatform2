@@ -46,7 +46,7 @@ abstract class JField extends JElement {
     
     @Override
     protected void cache() {
-        cacheData = new HashMap<String, String>();
+        cacheData = new HashMap<>();
         cacheData.put(FqnAttr, fqn);
         cacheData.put(ClassNameAttr, className);
         cacheData.put(SignatureAttr, signature);

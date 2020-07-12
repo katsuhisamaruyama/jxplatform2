@@ -117,7 +117,7 @@ public class ExpressionVisitor extends ASTVisitor {
     
     protected static int temporaryVariableId = 1;
     
-    private Stack<AnalysisMode> analysisMode = new Stack<AnalysisMode>();
+    private Stack<AnalysisMode> analysisMode = new Stack<>();
     private enum AnalysisMode {
         DEF, USE,
     }
@@ -150,7 +150,7 @@ public class ExpressionVisitor extends ASTVisitor {
     }
     
     protected void insertBeforeCurrentNode(CFGStatement node) {
-        Set<GraphEdge> edges = new HashSet<GraphEdge>(curNode.getIncomingEdges());
+        Set<GraphEdge> edges = new HashSet<>(curNode.getIncomingEdges());
         for (GraphEdge edge : edges) {
             ControlFlow flow = (ControlFlow)edge;
             flow.setDstNode(node);
@@ -426,7 +426,7 @@ public class ExpressionVisitor extends ASTVisitor {
     }
     
     private Set<JMethod> setDefUseFieldsInCalledMethod(JMethodReference jcall) {
-        Set<JMethod> methods = new HashSet<JMethod>();
+        Set<JMethod> methods = new HashSet<>();
         JMethod method = infoStore.getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
         if (method != null) {
             if (!method.defuseDecided() && visited != null && !visited.contains(method)) {
