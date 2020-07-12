@@ -22,7 +22,7 @@ public class ProjectStore {
     
     private static ProjectStore instance = new ProjectStore();
     
-    private Map<String, JavaProject> projectStore = new HashMap<String, JavaProject>();
+    private Map<String, JavaProject> projectStore = new HashMap<>();
     
     protected JavaProject currentProject;
     
@@ -69,6 +69,6 @@ public class ProjectStore {
     }
     
     public List<JavaProject> getProjects() {
-        return new ArrayList<JavaProject>(projectStore.values());
+        return new ArrayList<>(projectStore.values());
     }
 }

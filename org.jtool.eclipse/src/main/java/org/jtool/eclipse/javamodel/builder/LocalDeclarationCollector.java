@@ -41,7 +41,7 @@ import java.util.HashSet;
 public class LocalDeclarationCollector extends ASTVisitor {
     
     private JavaMethod jmethod;
-    private Set<JavaLocalVar> localDeclarations = new HashSet<JavaLocalVar>();
+    private Set<JavaLocalVar> localDeclarations = new HashSet<>();
     private boolean bindingOk = true;
     
     public LocalDeclarationCollector(JavaMethod jmethod) {

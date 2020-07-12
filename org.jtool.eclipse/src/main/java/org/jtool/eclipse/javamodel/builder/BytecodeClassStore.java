@@ -61,13 +61,13 @@ public class BytecodeClassStore {
             
             Set<String> classNames = collectBytecodeClassNames();
             classNames.addAll(commonLibraryClassPaths
-                      .stream()
-                      .flatMap(path -> collectBytecodeClassNames(path).stream())
-                      .collect(Collectors.toSet()));
+                    .stream()
+                    .flatMap(path -> collectBytecodeClassNames(path).stream())
+                    .collect(Collectors.toSet()));
             classNames.addAll(classPaths
-                      .stream()
-                      .flatMap(path -> collectBytecodeClassNames(path).stream())
-                      .collect(Collectors.toSet()));
+                    .stream()
+                    .flatMap(path -> collectBytecodeClassNames(path).stream())
+                    .collect(Collectors.toSet()));
             return classNames;
         } catch (NotFoundException e) {
             return new HashSet<String>();
@@ -76,7 +76,7 @@ public class BytecodeClassStore {
     
     private List<String> getClassPath(JavaProject jproject) {
         String[] projectClassPath = jproject.getClassPath();
-        List<String> classpaths = new ArrayList<String>();
+        List<String> classpaths = new ArrayList<>();
         for (int i = 0; i < projectClassPath.length; i++) {
             File file = new File(projectClassPath[i]);
             if (file.exists()) {
@@ -87,7 +87,7 @@ public class BytecodeClassStore {
     }
     
     private List<String> getCommonLibraryClassPath() {
-        List<String> classpaths = new ArrayList<String>();
+        List<String> classpaths = new ArrayList<>();
         
         String bootClassPath = System.getProperty("sun.boot.class.path");
         if (bootClassPath != null) {
@@ -125,7 +125,7 @@ public class BytecodeClassStore {
     }
     
     private Set<String> collectBytecodeClassNames(String path) {
-        Set<String> classNames = new HashSet<String>();
+        Set<String> classNames = new HashSet<>();
         File file = new File(path);
         if (file.isDirectory()) {
             collectClassFiles(classNames, path, "");
@@ -137,7 +137,7 @@ public class BytecodeClassStore {
     
     private Set<String> collectBytecodeClassNames() {
         ModuleFinder finder = ModuleFinder.ofSystem();
-        Set<String> classNames = new HashSet<String>();
+        Set<String> classNames = new HashSet<>();
         ModuleLayer.boot().modules()
                 .stream()
                 .map(module -> module.getName())
@@ -146,10 +146,10 @@ public class BytecodeClassStore {
                     modref.ifPresent(ref -> {
                         try {
                             ref.open().list()
-                                      .filter(n -> n.endsWith(".class"))
-                                      .map(n -> n.substring(0, n.length() - 6))
-                                      .map(n -> n.replaceAll(File.separator, "."))
-                                      .forEach(n -> classNames.add(n));
+                                .filter(n -> n.endsWith(".class"))
+                                .map(n -> n.substring(0, n.length() - 6))
+                                .map(n -> n.replaceAll(File.separator, "."))
+                                .forEach(n -> classNames.add(n));
                         } catch (IOException e) { /* empty */ }
                     });
                 });
@@ -157,7 +157,7 @@ public class BytecodeClassStore {
     }
     
     public Set<CtClass> getCtClasses(JavaProject jproject) {
-        Set<CtClass> classes = new HashSet<CtClass>();
+        Set<CtClass> classes = new HashSet<>();
         Map<String, BytecodeClassInfo> classInfoMap = bytecodeClassInfo.get(jproject.getPath());
         if (classInfoMap != null) {
             for (BytecodeClassInfo classInfo : classInfoMap.values()) {
@@ -216,7 +216,7 @@ public class BytecodeClassStore {
                         .map(list -> list.stream()).collect(Collectors.toSet());
             }
         }
-        return new HashSet<JavaClass>();
+        return new HashSet<>();
     }
     
     private boolean isChildOf(JavaClass jclass, String fqn) {
@@ -225,10 +225,6 @@ public class BytecodeClassStore {
         }
         return jclass.getSuperInterfaceNames().stream().anyMatch(name -> name.equals(fqn));
     }
-    
-    
-    
-    
     
     private void collectClassFiles(Set<String> classNames, String classPath, String name) {
         File file = new File(classPath + File.separator + name);
@@ -272,7 +268,7 @@ public class BytecodeClassStore {
         if (classInfoMap != null) {
             return true;
         }
-        classInfoMap = new HashMap<String, BytecodeClassInfo>();
+        classInfoMap = new HashMap<>();
         bytecodeClassInfo.put(jproject.getPath(), classInfoMap);
         return false;
     }

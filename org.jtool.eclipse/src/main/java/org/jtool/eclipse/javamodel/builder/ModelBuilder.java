@@ -125,7 +125,7 @@ public abstract class ModelBuilder {
     }
     
     protected Set<IProblem> getParseErrors(CompilationUnit cu) {
-        Set<IProblem> errors = new HashSet<IProblem>();
+        Set<IProblem> errors = new HashSet<>();
         IProblem[] problems = cu.getProblems();
         if (problems.length > 0) {
             for (IProblem problem : problems) {
@@ -139,7 +139,7 @@ public abstract class ModelBuilder {
     }
     
     public Set<JavaClass> getAllClassesForward(JavaClass jclass) {
-        Set<JavaClass> classes = new HashSet<JavaClass>();
+        Set<JavaClass> classes = new HashSet<>();
         collectAllClassesForward(jclass, classes);
         return classes;
     }
@@ -173,7 +173,7 @@ public abstract class ModelBuilder {
     }
     
     public Set<JavaMethod> getAllMethodsForward(JavaMethod jmethod) {
-        Set<JavaMethod> methods = new HashSet<JavaMethod>();
+        Set<JavaMethod> methods = new HashSet<>();
         collectAllMethodsForward(jmethod, methods);
         return methods;
     }
@@ -190,7 +190,7 @@ public abstract class ModelBuilder {
     }
     
     public Set<JavaMethod> getAllMethodsBackward(JavaMethod jmethod) {
-        Set<JavaMethod> methods = new HashSet<JavaMethod>();
+        Set<JavaMethod> methods = new HashSet<>();
         collectAllMethodsBackward(jmethod, methods);
         return methods;
     }

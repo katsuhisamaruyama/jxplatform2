@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -23,11 +23,11 @@ import java.util.HashSet;
 class BytecodeClassInfo {
     
     private CtClass ctClass;
-    private Set<BytecodeClassInfo> parents = new HashSet<BytecodeClassInfo>();
-    private Set<BytecodeClassInfo> children = new HashSet<BytecodeClassInfo>();
+    private Set<BytecodeClassInfo> parents = new HashSet<>();
+    private Set<BytecodeClassInfo> children = new HashSet<>();
     
-    private Set<CtClass> ancestors = new HashSet<CtClass>();
-    private Set<CtClass> descendants = new HashSet<CtClass>();
+    private Set<CtClass> ancestors = new HashSet<>();
+    private Set<CtClass> descendants = new HashSet<>();
     
     BytecodeClassInfo(CtClass ctClass) {
         this.ctClass = ctClass;

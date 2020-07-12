@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -64,7 +64,7 @@ import java.util.ArrayList;
  */
 public class StatementCollector extends ASTVisitor {
     
-    private List<ASTNode> nodes = new ArrayList<ASTNode>();
+    private List<ASTNode> nodes = new ArrayList<>();
     
     private int numberOfNesting;
     private int maxNumberOfNesting;
