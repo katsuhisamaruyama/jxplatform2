@@ -1,5 +1,5 @@
 /*
- *  Copyright 2019
+ *  Copyright 2019-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -126,15 +126,14 @@ public class SliceExtractor extends ASTVisitor {
     
     private void createSliceExtractor(Set<PDGNode> nodes, JavaFile jfile, ASTNode astNode) {
         ASTNodeOnCFGCollector collector = new ASTNodeOnCFGCollector(jfile.getCompilationUnit());
-        Map<Integer, ASTNode> astNodeMap = collector.getNodeMap();
         sliceNodes.add(astNode);
         for (PDGNode pdfnode : nodes) {
-            registerASTNode(pdfnode.getCFGNode().getASTNode(), astNodeMap);
+            registerASTNode(pdfnode.getCFGNode().getASTNode(), collector);
             
             if (pdfnode.isStatement()) {
                 PDGStatement stnode = (PDGStatement)pdfnode;
                 for (JReference var : stnode.getDefVariables()) {
-                    registerASTNode(var.getASTNode(), astNodeMap);
+                    registerASTNode(var.getASTNode(), collector);
                 }
             }
         }
@@ -142,11 +141,10 @@ public class SliceExtractor extends ASTVisitor {
         this.jfile = jfile;
     }
     
-    private void registerASTNode(ASTNode astNode, Map<Integer, ASTNode> astNodeMap) {
-        int pos = astNode.getStartPosition();
-        ASTNode node = astNodeMap.get(pos);
-        if (node != null) {
-            sliceNodes.add(node);
+    private void registerASTNode(ASTNode astNode, ASTNodeOnCFGCollector collector) {
+        ASTNode correspondingNode = collector.get(astNode);
+        if (correspondingNode != null) {
+            sliceNodes.add(correspondingNode);
         }
     }
     
@@ -174,12 +172,10 @@ public class SliceExtractor extends ASTVisitor {
             return false;
         }
         
-        for (ASTNode n : sliceNodes) {
-            if (node.getStartPosition() == n.getStartPosition()) {
-                return true;
-            }
-        }
-        return false;
+        return sliceNodes
+                .stream()
+                .anyMatch(n -> node.getStartPosition() == n.getStartPosition() &&
+                               node.getLength() == n.getLength());
     }
     
     protected boolean containsAnyInSubTree(ASTNode node) {
@@ -402,15 +398,14 @@ public class SliceExtractor extends ASTVisitor {
     
     @Override
     public boolean visit(Assignment node) {
-        Statement statement = getEnclosingStatement(node);
-        if (removeWholeElement(statement)) {
+        if (removeWholeElement(node)) {
             return false;
         }
-        
-        if (contains(statement)) {
+        if (contains(node)) {
             return true;
         }
         
+        Statement statement = getEnclosingStatement(node);
         Expression expr = node.getRightHandSide();
         if (containsAnyInSubTree(expr)) {
             if (statement instanceof ExpressionStatement) {
@@ -456,23 +451,25 @@ public class SliceExtractor extends ASTVisitor {
             return false;
         }
         
-        if (node.getName() != null) {
-            node.getName().accept(this);
-        }
-        if (node.getExpression() != null) {
-            node.getExpression().accept(this);
-        }
-        for (Type type : (List<Type>)node.typeArguments()) {
-            type.accept(this);
-        }
-        for (Expression expr : (List<Expression>)node.arguments()) {
-            expr.accept(this);
-        }
-        
         if (contains(node)) {
             removeMethodCallArgument(node, (List<Expression>)node.arguments());
+            return true;
         } else {
+            if (node.getName() != null) {
+                node.getName().accept(this);
+            }
+            if (node.getExpression() != null) {
+                node.getExpression().accept(this);
+            }
+            for (Type type : (List<Type>)node.typeArguments()) {
+                type.accept(this);
+            }
+            for (Expression expr : (List<Expression>)node.arguments()) {
+                expr.accept(this);
+            }
+            
             pullUpMethodInvocations(statement, (List<Expression>)node.arguments());
+            //statement.delete();
         }
         return false;
     }
