@@ -7,10 +7,12 @@
 package org.jtool.eclipse.cfg.builder;
 
 import org.jtool.eclipse.cfg.CFG;
-import org.jtool.eclipse.cfg.CFGMethodCall;
+
 import org.jtool.eclipse.cfg.CFGNode;
-import org.jtool.eclipse.cfg.CFGParameter;
 import org.jtool.eclipse.cfg.CFGStatement;
+import org.jtool.eclipse.cfg.CFGParameter;
+import org.jtool.eclipse.cfg.CFGMethodCall;
+import org.jtool.eclipse.cfg.CFGMethodCallReceiver;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.cfg.JMethodReference;
@@ -354,7 +356,7 @@ public class ExpressionVisitor extends ASTVisitor {
         
         CFGStatement receiverNode = null;
         if (receiverName != null) {
-            receiverNode = new CFGStatement(node, CFGNode.Kind.methodCallReceiver);
+            receiverNode = new CFGMethodCallReceiver(receiver, CFGNode.Kind.methodCallReceiver);
             jcall.setReceiver(receiverNode);
             receiverNode.addUseVariables(curNode.getUseVariables());
             
