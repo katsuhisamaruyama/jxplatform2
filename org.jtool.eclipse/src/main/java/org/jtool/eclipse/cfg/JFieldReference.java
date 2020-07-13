@@ -72,7 +72,8 @@ public class JFieldReference extends JReference {
         isSuper = node instanceof SuperFieldAccess;
     }
     
-    public JFieldReference(ASTNode node, String className, String name, String rname, String type, boolean primitive, boolean inProject) {
+    public JFieldReference(ASTNode node, String className, String name,
+            String rname, String type, boolean primitive, int modifiers, boolean inProject) {
         super(node);
         
         this.nameNode = node;
@@ -88,7 +89,7 @@ public class JFieldReference extends JReference {
         referenceName = rname;
         this.type = type;
         isPrimitiveType = primitive;
-        modifiers = 0;
+        this.modifiers = modifiers;
         this.inProject = inProject;
         isField = true;
         isEnumConstant = false;

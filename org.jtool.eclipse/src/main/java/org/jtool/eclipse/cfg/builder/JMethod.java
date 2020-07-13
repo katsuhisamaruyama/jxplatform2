@@ -34,27 +34,33 @@ abstract class JMethod extends JElement {
     protected JMethod[] overrindingMethods = null;
     protected JMethod[] overriddenMethods = null;
     
-    protected Set<String> defFields = null;
-    protected Set<String> useFields = null;
+    protected Set<DefOrUseField> defFields = null;
+    protected Set<DefOrUseField> useFields = null;
     
     private static int MaxNumberOfVisitedMethods = 1000000;
-    protected static final String UNKNOWN_FIELD_NAME = "*";
     
     protected JMethod(String fqn, String className, String signature,
                       int modifiers, String returnType, boolean isPrimitive, CFGStore cfgStore) {
         super(fqn, cfgStore);
         this.className = className;
         this.signature = signature;
+        this.modifiers = modifiers;
         this.returnType = returnType;
         this.isPrimitive = isPrimitive;
     }
     
     protected JMethod(CFGStore cfgStore, Map<String, String> cacheData) {
         super(cacheData.get(FqnAttr), cfgStore);
-        this.className = cacheData.get(ClassNameAttr);
-        this.signature = cacheData.get(SignatureAttr);
-        this.returnType = "N/A";
-        this.isPrimitive = false;
+        try {
+            this.className = cacheData.get(ClassNameAttr);
+            this.signature = cacheData.get(SignatureAttr);
+            this.modifiers = Integer.parseInt(cacheData.get(ModifierAttr));
+            this.returnType = cacheData.get(TypeAttr);
+            this.isPrimitive = Boolean.parseBoolean(cacheData.get(isPrimitiveAttr));
+        } catch (NumberFormatException e) {
+            System.err.println("Please remove the file \".bytecode.info\" whose format is obsolete.");
+            System.exit(1);
+        }
     }
     
     @Override
@@ -63,6 +69,8 @@ abstract class JMethod extends JElement {
         cacheData.put(FqnAttr, fqn);
         cacheData.put(ClassNameAttr, className);
         cacheData.put(SignatureAttr, signature);
+        cacheData.put(ModifierAttr, String.valueOf(modifiers));
+        cacheData.put(TypeAttr, returnType);
         cacheData.put(DefAttr, convert(defFields));
         cacheData.put(UseAttr, convert(useFields));
     }
@@ -151,13 +159,13 @@ abstract class JMethod extends JElement {
         return emptyMethodArray;
     }
     
-    protected String convert(Set<String> names) {
-        if (names == null) {
+    protected String convert(Set<DefOrUseField> fields) {
+        if (fields == null) {
             return "";
         }
         StringBuilder buf = new StringBuilder();
-        for (String name : names) {
-            buf.append(name + ";");
+        for (DefOrUseField field : fields) {
+            buf.append(field.toString() + ";");
         }
         return buf.toString();
     }
@@ -166,27 +174,27 @@ abstract class JMethod extends JElement {
         return defFields != null;
     }
     
-    protected void addDefField(String var) {
-        defFields.add(var);
+    protected void addDefField(DefOrUseField field) {
+        defFields.add(field);
     }
     
-    protected void addUseFields(Set<String> vars) {
-        useFields.addAll(vars);
+    protected void addUseField(DefOrUseField field) {
+        useFields.add(field);
     }
     
-    protected void addDefFields(Set<String> vars) {
-        defFields.addAll(vars);
+    protected void addDefFields(Set<DefOrUseField> fields) {
+        defFields.addAll(fields);
     }
     
-    protected void addUseField(String var) {
-        useFields.add(var);
+    protected void addUseFields(Set<DefOrUseField> fields) {
+        useFields.addAll(fields);
     }
     
-    protected Set<String> getDefFields() {
+    protected Set<DefOrUseField> getDefFields() {
         return defFields;
     }
     
-    protected Set<String> getUseFields() {
+    protected Set<DefOrUseField> getUseFields() {
         return useFields;
     }
     
@@ -201,8 +209,8 @@ abstract class JMethod extends JElement {
         }
         
         if (visited.size() > MaxNumberOfVisitedMethods) {
-            addDefField(UNKNOWN_FIELD_NAME);
-            addUseField(UNKNOWN_FIELD_NAME);
+            addDefField(DefOrUseField.UNKNOWN);
+            addUseField(DefOrUseField.UNKNOWN);
             return;
         }
         

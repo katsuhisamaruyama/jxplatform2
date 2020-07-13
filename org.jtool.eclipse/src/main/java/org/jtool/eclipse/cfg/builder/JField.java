@@ -29,19 +29,27 @@ abstract class JField extends JElement {
     protected JField(String fqn, String className, String signature,
             int modifiers, String returnType, boolean isPrimitive, CFGStore cfgStore) {
         super(fqn, cfgStore);
+        
         this.className = className;
         this.signature = signature;
+        this.modifiers = modifiers;
         this.type = returnType;
         this.isPrimitive = isPrimitive;
-        
     }
     
     protected JField(CFGStore cfgStore, Map<String, String> cacheData) {
         super(cacheData.get(FqnAttr), cfgStore);
-        this.className = cacheData.get(ClassNameAttr);
-        this.signature = cacheData.get(SignatureAttr);
-        this.type = "N/A";
-        this.isPrimitive = false;
+        
+        try {
+            this.className = cacheData.get(ClassNameAttr);
+            this.signature = cacheData.get(SignatureAttr);
+            this.modifiers = Integer.parseInt(cacheData.get(ModifierAttr));
+            this.type = cacheData.get(TypeAttr);
+            this.isPrimitive = Boolean.parseBoolean(cacheData.get(isPrimitiveAttr));
+        } catch (NumberFormatException e) {
+            System.err.println("Please remove the file \".bytecode.info\" whose format is obsolete.");
+            System.exit(1);
+        }
     }
     
     @Override
@@ -50,6 +58,9 @@ abstract class JField extends JElement {
         cacheData.put(FqnAttr, fqn);
         cacheData.put(ClassNameAttr, className);
         cacheData.put(SignatureAttr, signature);
+        cacheData.put(ModifierAttr, String.valueOf(modifiers));
+        cacheData.put(TypeAttr, type);
+        cacheData.put(isPrimitiveAttr, String.valueOf(isPrimitive));
     }
     
     protected String getSignature() {

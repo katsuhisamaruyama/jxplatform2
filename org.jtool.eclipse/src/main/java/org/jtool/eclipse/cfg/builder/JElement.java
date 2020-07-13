@@ -21,9 +21,11 @@ abstract class JElement {
     protected static final String SignatureAttr = "sig";
     protected static final String NameAttr = "name";
     protected static final String ModifierAttr = "mod";
-    protected static final String InterfaceAttr = "inf";
+    protected static final String isInterfaceAttr = "inf";
     protected static final String DefAttr = "def";
     protected static final String UseAttr = "use";
+    protected static final String TypeAttr = "type";
+    protected static final String isPrimitiveAttr = "prim";
     
     protected CFGStore cfgStore;
     protected String fqn;

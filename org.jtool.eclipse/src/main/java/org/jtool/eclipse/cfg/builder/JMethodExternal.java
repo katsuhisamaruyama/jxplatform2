@@ -197,17 +197,24 @@ public class JMethodExternal extends JMethod {
                 @Override
                 public void edit(FieldAccess cf) throws CannotCompileException {
                     if (cf.isWriter()) {
-                        addDefField(cf.getClassName() + QualifiedNameSeparator + cf.getFieldName());
+                        try {
+                            addDefField(new DefOrUseField(cf.getClassName(), cf.getFieldName(),
+                                    cf.getField().getType().isPrimitive(), cf.getField().getModifiers()));
+                        } catch (NotFoundException e) {
+                            addDefField(DefOrUseField.UNKNOWN);
+                        }
                     }
                     if (cf.isReader()) {
-                        addUseField(cf.getClassName() + QualifiedNameSeparator + cf.getFieldName());
+                        try {
+                            addUseField(new DefOrUseField(cf.getClassName(), cf.getFieldName(),
+                                    cf.getField().getType().isPrimitive(), cf.getField().getModifiers()));
+                        } catch (NotFoundException e) {
+                            addDefField(DefOrUseField.UNKNOWN);
+                        }
                     }
                 }
             });
-        } catch (CannotCompileException e) {
-            addDefField(UNKNOWN_FIELD_NAME);
-            addDefField(UNKNOWN_FIELD_NAME);
-        }
+        } catch (CannotCompileException e) { /* empty */ }
     }
     
     @Override

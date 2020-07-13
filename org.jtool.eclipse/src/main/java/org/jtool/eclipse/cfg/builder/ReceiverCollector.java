@@ -43,7 +43,7 @@ class ReceiverCollector {
                         callNode.addDefVariable(receiver);
                         
                         String type = callNode.getDeclaringClassName();
-                        JReference var = new JFieldReference(receiver.getASTNode(), type, ExternalFieldName, ExternalFieldName, type, false, false);
+                        JReference var = new JFieldReference(receiver.getASTNode(), type, ExternalFieldName, ExternalFieldName, type, false, 0, false);
                         callNode.addDefVariable(var);
                         
                         callNode.getActualOuts().forEach(param -> param.addDefVariable(receiver));

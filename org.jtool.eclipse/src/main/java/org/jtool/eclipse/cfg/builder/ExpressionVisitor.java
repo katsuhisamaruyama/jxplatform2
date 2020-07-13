@@ -6,7 +6,6 @@
 
 package org.jtool.eclipse.cfg.builder;
 
-import static org.jtool.eclipse.javamodel.JavaElement.QualifiedNameSeparator;
 import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGMethodCall;
 import org.jtool.eclipse.cfg.CFGNode;
@@ -397,7 +396,7 @@ public class ExpressionVisitor extends ASTVisitor {
         
         Set<JMethod> methods = setDefUseFieldsInCalledMethod(jcall);
         for (JMethod method : methods) {
-            for (String def : method.getDefFields()) {
+            for (DefOrUseField def : method.getDefFields()) {
                 JReference ref = createFieldReference(node, def, type, receiverName);
                 callNode.addDefVariable(ref);
                 if (receiverNode != null) {
@@ -405,22 +404,24 @@ public class ExpressionVisitor extends ASTVisitor {
                 }
             }
             
-            for (String use : method.getUseFields()) {
+            for (DefOrUseField use : method.getUseFields()) {
                 JReference ref = createFieldReference(node, use, type, receiverName);
                 callNode.addUseVariable(ref);
             }
         }
     }
     
-    private JReference createFieldReference(ASTNode node, String var, String type, String receiverName) {
-        String[] elem = var.split(QualifiedNameSeparator);
-        String rname = receiverName + "." + elem[1];
+    private JReference createFieldReference(ASTNode node, DefOrUseField field, String type, String receiverName) {
+        //String[] elem = var.split(QualifiedNameSeparator);
+        String rname = receiverName + "." + field.getName();
         
         JReference ref;
-        if (infoStore.findInternalClass(elem[0]) != null) {
-            ref = new JFieldReference(node, elem[0], elem[1], rname, type, false, true);
+        if (infoStore.findInternalClass(field.getClassName()) != null) {
+            ref = new JFieldReference(node, field.getClassName(), field.getName(), rname,
+                    type, field.isPrimitive(), field.getModifier(), true);
         } else {
-            ref = new JFieldReference(node, elem[0], elem[1], rname, type, false, false);
+            ref = new JFieldReference(node, field.getClassName(), field.getName(), rname,
+                    type, field.isPrimitive(), field.getModifier(), false);
         }
         return ref;
     }

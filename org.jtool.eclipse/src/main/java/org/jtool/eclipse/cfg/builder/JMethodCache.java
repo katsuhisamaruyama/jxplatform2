@@ -26,21 +26,22 @@ class JMethodCache extends JMethod {
         this.cacheData = cacheData;
         
         defFields = new HashSet<>();
-        for (String name : convert(cacheData.get(DefAttr))) {
-            if (name.indexOf(QualifiedNameSeparatorChar) != -1) {
-                defFields.add(name);
+        for (String str : collectFields(cacheData.get(DefAttr))) {
+            if (!DefOrUseField.isUnknown(str)) {
+                defFields.add(DefOrUseField.instance(str));
             }
         }
+        
         useFields = new HashSet<>();
-        for (String name : convert(cacheData.get(UseAttr))) {
-            if (name.indexOf(QualifiedNameSeparatorChar) != -1) {
-                useFields.add(name);
+        for (String str : collectFields(cacheData.get(UseAttr))) {
+            if (!DefOrUseField.isUnknown(str)) {
+                useFields.add(DefOrUseField.instance(str));
             }
         }
     }
     
-    protected String[] convert(String nameStr) {
-        return (nameStr == null || nameStr.indexOf(';') == -1) ? new String[0] : nameStr.split(";", 0);
+    protected String[] collectFields(String str) {
+        return (str == null || str.indexOf(';') == -1) ? new String[0] : str.split(";", 0);
     }
     
     @Override

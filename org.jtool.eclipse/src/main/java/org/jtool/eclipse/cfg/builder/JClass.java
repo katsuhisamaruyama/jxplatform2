@@ -20,7 +20,7 @@ import java.util.Arrays;
 abstract class JClass extends JElement {
     
     protected String name;
-    protected int modifier;
+    protected int modifiers;
     protected boolean isInterface;
     
     protected JClass[] ancestors = null;
@@ -29,18 +29,25 @@ abstract class JClass extends JElement {
     protected JField[] fields;
     protected JMethod[] methods;
     
-    protected JClass(String fqn, String name, int modifier, boolean isInterface, CFGStore cfgStore) {
+    protected JClass(String fqn, String name, int modifiers, boolean isInterface, CFGStore cfgStore) {
         super(fqn, cfgStore);
+        
         this.name = name;
-        this.modifier = modifier;
+        this.modifiers = modifiers;
         this.isInterface = isInterface;
     }
     
     protected JClass(CFGStore cfgStore, Map<String, String> cacheData) {
         super(cacheData.get(FqnAttr), cfgStore);
-        this.name = cacheData.get(NameAttr);
-        this.modifier = Integer.parseInt(cacheData.get(ModifierAttr));
-        this.isInterface = Boolean.parseBoolean(cacheData.get(InterfaceAttr));
+        
+        try {
+            this.name = cacheData.get(NameAttr);
+            this.modifiers = Integer.parseInt(cacheData.get(ModifierAttr));
+            this.isInterface = Boolean.parseBoolean(cacheData.get(isInterfaceAttr));
+        } catch (NumberFormatException e) {
+            System.err.println("Please remove the file \".bytecode.info\" whose format is obsolete.");
+            System.exit(1);
+        }
     }
     
     @Override
@@ -48,8 +55,8 @@ abstract class JClass extends JElement {
         cacheData = new HashMap<>();
         cacheData.put(FqnAttr, fqn);
         cacheData.put(NameAttr, name);
-        cacheData.put(ModifierAttr, String.valueOf(modifier));
-        cacheData.put(InterfaceAttr, String.valueOf(isInterface));
+        cacheData.put(ModifierAttr, String.valueOf(modifiers));
+        cacheData.put(isInterfaceAttr, String.valueOf(isInterface));
     }
     
     protected String getName() {
@@ -57,15 +64,15 @@ abstract class JClass extends JElement {
     }
     
     protected boolean isPublic() {
-        return Modifier.isPublic(modifier);
+        return Modifier.isPublic(modifiers);
     }
     
     protected boolean isProtected() {
-        return Modifier.isProtected(modifier);
+        return Modifier.isProtected(modifiers);
     }
     
     protected boolean isPrivate() {
-        return Modifier.isPrivate(modifier);
+        return Modifier.isPrivate(modifiers);
     }
     
     protected boolean isDefault() {
