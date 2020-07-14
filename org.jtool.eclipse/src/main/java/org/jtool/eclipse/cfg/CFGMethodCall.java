@@ -84,7 +84,7 @@ public class CFGMethodCall extends CFGStatement {
         actualIns.addAll(params);
     }
     
-    public void setActualOuts2(List<CFGParameter> params) {
+    public void setActualOuts(List<CFGParameter> params) {
         actualOuts.addAll(params);
     }
     
@@ -128,7 +128,7 @@ public class CFGMethodCall extends CFGStatement {
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append(super.toString());
-        buf.append(" CALL = " + jmethodCall.getSignature());
+        buf.append(" METHOD CALL = " + jmethodCall.getSignature());
         return buf.toString();
     }
 }

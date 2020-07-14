@@ -20,13 +20,13 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
  * 
  * @author Katsuhisa Maruyama
  */
-public class CFGMethodCallReceiver extends CFGStatement {
+public class CFGReceiver extends CFGStatement {
     
     private boolean isMethodRef = false;
     private boolean isFieldRef = false;
     private int modifiers;
     
-    public CFGMethodCallReceiver(ASTNode node, CFGNode.Kind kind) {
+    public CFGReceiver(ASTNode node, CFGNode.Kind kind) {
         super(node, kind);
         if (node instanceof MethodInvocation) {
             IMethodBinding mbinding = ((MethodInvocation)node).resolveMethodBinding();
@@ -63,6 +63,10 @@ public class CFGMethodCallReceiver extends CFGStatement {
     
     public boolean isFieldRef() {
         return isFieldRef;
+    }
+    
+    public String getType() {
+        return "";
     }
     
     public boolean isPublic() {

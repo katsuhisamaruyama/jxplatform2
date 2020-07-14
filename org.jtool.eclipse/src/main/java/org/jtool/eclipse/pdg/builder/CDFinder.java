@@ -54,7 +54,7 @@ public class CDFinder {
             postDominatorForBranch.add(branchDstNode);
             
             for (CFGNode cfgnode : postDominatorForBranch) {
-                if (cfgnode.isStatementNotParameter() && !cfgnode.isMethodCallReceiver() &&
+                if (cfgnode.isStatementNotParameter() && !cfgnode.isReceiver() &&
                   !branchNode.equals(cfgnode) && !postDominator.contains(cfgnode)) {
                     CD edge = new CD(branchNode.getPDGNode(), cfgnode.getPDGNode());
                     if (branch.isTrue()) {
@@ -104,7 +104,7 @@ public class CDFinder {
         CFGNode entryNode = cfg.getEntryNode();
         Set<CFGNode> postDominator = cfg.postDominator(entryNode);
         for (CFGNode cfgnode : postDominator) {
-            if ((cfgnode.isStatementNotParameter() && !cfgnode.isMethodCallReceiver()) || cfgnode.isFormal()) {
+            if ((cfgnode.isStatementNotParameter() && !cfgnode.isReceiver()) || cfgnode.isFormal()) {
                 CD edge = new CD(entryNode.getPDGNode(), cfgnode.getPDGNode());
                 edge.setTrue();
                 pdg.add(edge);

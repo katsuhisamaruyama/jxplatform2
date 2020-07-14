@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018
+ *  Copyright 2018-2020
  *  Software Science and Technology Lab.
  *  Department of Computer Science, Ritsumeikan University
  */
@@ -27,10 +27,11 @@ public class JFieldReference extends JReference {
     private boolean isLocal;
     private boolean isSuper;
     
+    private CFGStatement receiver = null;
     protected ASTNode nameNode;
     protected Expression receiverNode;
     
-    public JFieldReference(ASTNode node, ASTNode nameNode, String rname, IVariableBinding vbinding) {
+    public JFieldReference(ASTNode node, ASTNode nameNode, String receiverName, IVariableBinding vbinding) {
         super(node);
         
         this.nameNode = nameNode;
@@ -49,14 +50,14 @@ public class JFieldReference extends JReference {
         name = binding.getName();
         signature = declaringClassName + QualifiedNameSeparator + name;
         fqn = signature;
-        if (rname.indexOf(".") == -1) {
+        if (receiverName.indexOf(".") == -1) {
             if (Modifier.isStatic(vbinding.getModifiers())) {
-                referenceName = declaringClassName + "." + rname;
+                referenceName = declaringClassName + "." + receiverName;
             } else {
-                referenceName = "this." + rname;
+                referenceName = "this." + receiverName;
             }
         } else {
-            referenceName = rname;
+            referenceName = receiverName;
         }
         type = binding.getType().getQualifiedName();
         isPrimitiveType = binding.getType().isPrimitive();
@@ -73,7 +74,7 @@ public class JFieldReference extends JReference {
     }
     
     public JFieldReference(ASTNode node, String className, String name,
-            String rname, String type, boolean primitive, int modifiers, boolean inProject) {
+            String receiverName, String type, boolean primitive, int modifiers, boolean inProject) {
         super(node);
         
         this.nameNode = node;
@@ -86,7 +87,7 @@ public class JFieldReference extends JReference {
         this.name = name;
         signature = declaringClassName + QualifiedNameSeparator + name;
         fqn = signature;
-        referenceName = rname;
+        referenceName = receiverName;
         this.type = type;
         isPrimitiveType = primitive;
         this.modifiers = modifiers;
@@ -99,6 +100,18 @@ public class JFieldReference extends JReference {
     
     public ASTNode getNameNode() {
         return nameNode;
+    }
+    
+    public boolean hasReceiver() {
+        return receiver != null;
+    }
+    
+    public void setReceiver(CFGStatement receiver) {
+        this.receiver = receiver;
+    }
+    
+    public CFGStatement getReceiver() {
+        return receiver;
     }
     
     public void setReceiverNode(Expression exp) {

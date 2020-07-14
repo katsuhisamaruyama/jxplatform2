@@ -11,8 +11,9 @@ import org.jtool.eclipse.cfg.CFG;
 import org.jtool.eclipse.cfg.CFGNode;
 import org.jtool.eclipse.cfg.CFGStatement;
 import org.jtool.eclipse.cfg.CFGParameter;
+import org.jtool.eclipse.cfg.CFGFieldAccess;
 import org.jtool.eclipse.cfg.CFGMethodCall;
-import org.jtool.eclipse.cfg.CFGMethodCallReceiver;
+import org.jtool.eclipse.cfg.CFGReceiver;
 import org.jtool.eclipse.cfg.ControlFlow;
 import org.jtool.eclipse.cfg.JReference;
 import org.jtool.eclipse.cfg.JMethodReference;
@@ -257,12 +258,40 @@ public class ExpressionVisitor extends ASTVisitor {
     
     @Override
     public boolean visit(FieldAccess node) {
-        Expression expr = node.getExpression();
-        analysisMode.push(AnalysisMode.USE);
-        expr.accept(this);
-        analysisMode.pop();
+        String receiverName = null;
+        Expression receiver = node.getExpression();
+        if (receiver != null) {
+            analysisMode.push(AnalysisMode.USE);
+            receiver.accept(this);
+            analysisMode.pop();
+            
+            List<JReference> uses = curNode.getUseVariables();
+            if (uses.size() > 0) {
+                JReference ref = uses.get(uses.size() - 1);
+                receiverName = ref.getReferenceName();
+            }
+        }
         
-        registVariable(node.getExpression(), node.getName());
+        JFieldReference jfacc = registVariable(node.getExpression(), node.getName());
+        CFGFieldAccess filedAccessNode = new CFGFieldAccess(node, jfacc, CFGNode.Kind.fieldAccess);
+        
+        CFGReceiver receiverNode = null;
+        if (receiverName != null) {
+            receiverNode = new CFGReceiver(receiver, CFGNode.Kind.receiver);
+            jfacc.setReceiver(receiverNode);
+            receiverNode.addUseVariables(curNode.getUseVariables());
+            
+            if (receiverNode.isMethodRef()) {
+                JReference receiverVar = new JSpecialVarReference(receiver, "$" + String.valueOf(temporaryVariableId),
+                        receiverNode.getType(), false);
+                receiverNode.setDefVariable(receiverVar);
+                filedAccessNode.addUseVariable(receiverVar);
+            } else {
+                filedAccessNode.addUseVariables(curNode.getUseVariables());
+            }
+        }
+        
+        insertBeforeCurrentNode(filedAccessNode);
         return false;
     }
     
@@ -271,6 +300,7 @@ public class ExpressionVisitor extends ASTVisitor {
         SimpleName name = node.getName();
         name.accept(this);
         return false;
+
     }
     
     @Override
@@ -350,15 +380,24 @@ public class ExpressionVisitor extends ASTVisitor {
             }
         }
         
-        JMethodReference jcall = new JMethodReference(node, node.getName(), node.getExpression(), receiverName, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, node.getName(), node.getExpression(),
+                receiverName, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.methodCall);
-        callNode.addUseVariables(curNode.getUseVariables());
         
-        CFGStatement receiverNode = null;
+        CFGReceiver receiverNode = null;
         if (receiverName != null) {
-            receiverNode = new CFGMethodCallReceiver(receiver, CFGNode.Kind.methodCallReceiver);
+            receiverNode = new CFGReceiver(receiver, CFGNode.Kind.receiver);
             jcall.setReceiver(receiverNode);
             receiverNode.addUseVariables(curNode.getUseVariables());
+            
+            if (receiverNode.isMethodRef()) {
+                JReference receiverVar = new JSpecialVarReference(receiver, "$" + String.valueOf(temporaryVariableId),
+                        receiverNode.getType(), false);
+                receiverNode.setDefVariable(receiverVar);
+                callNode.addUseVariable(receiverVar);
+            } else {
+                callNode.addUseVariables(curNode.getUseVariables());
+            }
             
             setDefUseFields(callNode, jcall, receiverNode, receiverName);
         }
@@ -366,79 +405,6 @@ public class ExpressionVisitor extends ASTVisitor {
         setActualNodes(callNode, node.arguments(), receiverNode);
         setExceptionFlow(callNode, jcall);
         return false;
-    }
-    
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean visit(ClassInstanceCreation node) {
-        IMethodBinding mbinding = node.resolveConstructorBinding();
-        if (mbinding == null) {
-            return false;
-        }
-        
-        Expression receiver = node.getExpression();
-        if (receiver != null) {
-            analysisMode.push(AnalysisMode.USE);
-            receiver.accept(this);
-            analysisMode.pop();
-        }
-        
-        JMethodReference jcall = new JMethodReference(node, node.getType(), node.getExpression(), null, mbinding, node.arguments());
-        CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.instanceCreation);
-        callNode.addUseVariables(curNode.getUseVariables());
-        
-        setActualNodes(callNode, node.arguments(), null);
-        setExceptionFlow(callNode, jcall);
-        return false;
-    }
-    
-    private void setDefUseFields(CFGMethodCall callNode, JMethodReference jcall, CFGStatement receiverNode, String receiverName) {
-        ASTNode node = callNode.getASTNode();
-        String type = jcall.getDeclaringClassName();
-        
-        Set<JMethod> methods = setDefUseFieldsInCalledMethod(jcall);
-        for (JMethod method : methods) {
-            for (DefOrUseField def : method.getDefFields()) {
-                JReference ref = createFieldReference(node, def, type, receiverName);
-                callNode.addDefVariable(ref);
-                if (receiverNode != null) {
-                    receiverNode.addUseVariable(ref);
-                }
-            }
-            
-            for (DefOrUseField use : method.getUseFields()) {
-                JReference ref = createFieldReference(node, use, type, receiverName);
-                callNode.addUseVariable(ref);
-            }
-        }
-    }
-    
-    private JReference createFieldReference(ASTNode node, DefOrUseField field, String type, String receiverName) {
-        //String[] elem = var.split(QualifiedNameSeparator);
-        String rname = receiverName + "." + field.getName();
-        
-        JReference ref;
-        if (infoStore.findInternalClass(field.getClassName()) != null) {
-            ref = new JFieldReference(node, field.getClassName(), field.getName(), rname,
-                    type, field.isPrimitive(), field.getModifier(), true);
-        } else {
-            ref = new JFieldReference(node, field.getClassName(), field.getName(), rname,
-                    type, field.isPrimitive(), field.getModifier(), false);
-        }
-        return ref;
-    }
-    
-    private Set<JMethod> setDefUseFieldsInCalledMethod(JMethodReference jcall) {
-        Set<JMethod> methods = new HashSet<>();
-        JMethod method = infoStore.getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
-        if (method != null) {
-            if (!method.defuseDecided() && visited != null && !visited.contains(method)) {
-                method.findDefUseFields(visited, true);
-                visited.add(method);
-            }
-            methods.add(method);
-        }
-        return methods;
     }
     
     @Override
@@ -451,22 +417,6 @@ public class ExpressionVisitor extends ASTVisitor {
         
         JMethodReference jcall = new JMethodReference(node, node.getName(), null, null, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.methodCall);
-        
-        setActualNodes(callNode, node.arguments(), null);
-        setExceptionFlow(callNode, jcall);
-        return false;
-    }
-    
-    @Override
-    @SuppressWarnings("unchecked")
-    public boolean visit(EnumConstantDeclaration node) {
-        IMethodBinding mbinding = node.resolveConstructorBinding();
-        if (mbinding == null) {
-            return false;
-        }
-        
-        JMethodReference jcall = new JMethodReference(node, node.getName(), null, null, mbinding, node.arguments());
-        CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
         
         setActualNodes(callNode, node.arguments(), null);
         setExceptionFlow(callNode, jcall);
@@ -503,6 +453,91 @@ public class ExpressionVisitor extends ASTVisitor {
         setActualNodes(callNode, node.arguments(), null);
         setExceptionFlow(callNode, jcall);
         return false;
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean visit(ClassInstanceCreation node) {
+        IMethodBinding mbinding = node.resolveConstructorBinding();
+        if (mbinding == null) {
+            return false;
+        }
+        
+        Expression receiver = node.getExpression();
+        if (receiver != null) {
+            analysisMode.push(AnalysisMode.USE);
+            receiver.accept(this);
+            analysisMode.pop();
+        }
+        
+        JMethodReference jcall = new JMethodReference(node, node.getType(), node.getExpression(), null, mbinding, node.arguments());
+        CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.instanceCreation);
+        callNode.addUseVariables(curNode.getUseVariables());
+        
+        setActualNodes(callNode, node.arguments(), null);
+        setExceptionFlow(callNode, jcall);
+        return false;
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean visit(EnumConstantDeclaration node) {
+        IMethodBinding mbinding = node.resolveConstructorBinding();
+        if (mbinding == null) {
+            return false;
+        }
+        
+        JMethodReference jcall = new JMethodReference(node, node.getName(), null, null, mbinding, node.arguments());
+        CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.constructorCall);
+        
+        setActualNodes(callNode, node.arguments(), null);
+        setExceptionFlow(callNode, jcall);
+        return false;
+    }
+    
+    private void setDefUseFields(CFGMethodCall callNode, JMethodReference jcall, CFGStatement receiverNode, String receiverName) {
+        ASTNode node = callNode.getASTNode();
+        String type = jcall.getDeclaringClassName();
+        
+        Set<JMethod> methods = setDefUseFieldsInCalledMethod(jcall);
+        for (JMethod method : methods) {
+            for (DefOrUseField def : method.getDefFields()) {
+                JReference ref = createFieldReference(node, def, type, receiverName);
+                callNode.addDefVariable(ref);
+                if (receiverNode != null) {
+                    receiverNode.addUseVariable(ref);
+                }
+            }
+            
+            for (DefOrUseField use : method.getUseFields()) {
+                JReference ref = createFieldReference(node, use, type, receiverName);
+                callNode.addUseVariable(ref);
+            }
+        }
+    }
+    
+    private JReference createFieldReference(ASTNode node, DefOrUseField field, String type, String receiverName) {
+        String rname = receiverName + "." + field.getName();
+        if (infoStore.findInternalClass(field.getClassName()) != null) {
+            return new JFieldReference(node, field.getClassName(), field.getName(), rname,
+                    type, field.isPrimitive(), field.getModifier(), true);
+        } else {
+            return new JFieldReference(node, field.getClassName(), field.getName(), rname,
+                    type, field.isPrimitive(), field.getModifier(), false);
+        }
+    }
+    
+    private Set<JMethod> setDefUseFieldsInCalledMethod(JMethodReference jcall) {
+        Set<JMethod> methods = new HashSet<>();
+        JMethod method = infoStore.getJMethod(jcall.getDeclaringClassName(), jcall.getSignature());
+        if (method != null) {
+            if (!method.defuseDecided() && visited != null && !visited.contains(method)) {
+                method.findDefUseFields(visited, true);
+                visited.add(method);
+            }
+            methods.add(method);
+        }
+        return methods;
     }
     
     private void setActualNodes(CFGMethodCall callNode, List<Expression> arguments, CFGStatement receiverNode) {

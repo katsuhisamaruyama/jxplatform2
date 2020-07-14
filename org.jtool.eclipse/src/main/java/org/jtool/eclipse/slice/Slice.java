@@ -116,7 +116,7 @@ public class Slice {
     private void eliminateReceiverNodes(Set<PDGNode> nodes) {
         Set<PDGNode> receiverNodes = new HashSet<>();
         for (PDGNode node : nodes) {
-            if (node.getCFGNode().isMethodCallReceiver()) {
+            if (node.getCFGNode().isReceiver()) {
                 receiverNodes.add(node);
             }
         }
@@ -174,7 +174,7 @@ public class Slice {
                 }
                     
             } else if (edge.isLIDD() || edge.isLCDD()) {
-                if (src.getCFGNode().isMethodCall() && node.getCFGNode().isMethodCallReceiver()) {
+                if (src.getCFGNode().isMethodCall() && node.getCFGNode().isReceiver()) {
                     PDGNode callNode = getDominantNode(src);
                     if (callNodes.contains(callNode)) {
                         traverseBackward(src);
@@ -189,7 +189,7 @@ public class Slice {
                     if (callNodes.contains(src)) {
                         traverseBackward(src);
                     }
-                } else if (src.getCFGNode().isMethodCallReceiver()) {
+                } else if (src.getCFGNode().isReceiver()) {
                     if (callNodes.contains(src)) {
                         traverseBackward(src);
                     }

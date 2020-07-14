@@ -53,9 +53,10 @@ public class CFGNode extends GraphNode {
         enumConstantExit,           // CFGExit
         
         assignment,                 // CFGStatement (Assignment)
-        methodCall,                 // CFGMethodInvocation (MethodInvocation/SuperMethodInvocation)
-        constructorCall,            // CFGMethodInvocation (ConstructorInvocation/SuperConstructorInvocation)
-        instanceCreation,           // CFGMethodInvocation (InstanceCreation)
+        fieldAccess,                // CFGFieldAccess (FieldAccess/SuperFieldAccess)
+        methodCall,                 // CFGMethodCall (MethodInvocation/SuperMethodInvocation)
+        constructorCall,            // CFGMethodCall (ConstructorInvocation/SuperConstructorInvocation)
+        instanceCreation,           // CFGMethodCall (InstanceCreation)
         
         fieldDeclaration,           // CFGStatement (VariableDeclarationFragment)
         enumConstantDeclaration,    // CFGStatement (VariableDeclarationFragment)
@@ -85,7 +86,7 @@ public class CFGNode extends GraphNode {
         formalOut,                  // CFGParameter
         actualIn,                   // CFGParameter
         actualOut,                  // CFGParameter
-        methodCallReceiver,         // CFGStatement
+        receiver,                   // CFGStatement
         
         merge,                      // CFGMerge (for merge)
         dummy;                      // CFGDummy (for dummy)
@@ -360,8 +361,8 @@ public class CFGNode extends GraphNode {
         return kind == Kind.actualOut;
     }
     
-    public boolean isMethodCallReceiver() {
-        return kind == Kind.methodCallReceiver;
+    public boolean isReceiver() {
+        return kind == Kind.receiver;
     }
     
     public boolean isStatementNotParameter() {
