@@ -300,7 +300,6 @@ public class ExpressionVisitor extends ASTVisitor {
         SimpleName name = node.getName();
         name.accept(this);
         return false;
-
     }
     
     @Override
@@ -369,12 +368,13 @@ public class ExpressionVisitor extends ASTVisitor {
         String receiverName = null;
         Expression receiver = node.getExpression();
         if (receiver != null) {
+            int useNum = curNode.getUseVariables().size();
             analysisMode.push(AnalysisMode.USE);
             receiver.accept(this);
             analysisMode.pop();
             
             List<JReference> uses = curNode.getUseVariables();
-            if (uses.size() > 0) {
+            if (uses.size() - useNum > 0) {
                 JReference ref = uses.get(uses.size() - 1);
                 receiverName = ref.getReferenceName();
             }
@@ -383,21 +383,13 @@ public class ExpressionVisitor extends ASTVisitor {
         JMethodReference jcall = new JMethodReference(node, node.getName(), node.getExpression(),
                 receiverName, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.methodCall);
+        callNode.addUseVariables(curNode.getUseVariables());
         
-        CFGReceiver receiverNode = null;
+        CFGStatement receiverNode = null;
         if (receiverName != null) {
-            receiverNode = new CFGReceiver(receiver, CFGNode.Kind.receiver);
+            receiverNode = new CFGStatement(node, CFGNode.Kind.receiver);
             jcall.setReceiver(receiverNode);
             receiverNode.addUseVariables(curNode.getUseVariables());
-            
-            if (receiverNode.isMethodRef()) {
-                JReference receiverVar = new JSpecialVarReference(receiver, "$" + String.valueOf(temporaryVariableId),
-                        receiverNode.getType(), false);
-                receiverNode.setDefVariable(receiverVar);
-                callNode.addUseVariable(receiverVar);
-            } else {
-                callNode.addUseVariables(curNode.getUseVariables());
-            }
             
             setDefUseFields(callNode, jcall, receiverNode, receiverName);
         }
@@ -463,18 +455,36 @@ public class ExpressionVisitor extends ASTVisitor {
             return false;
         }
         
+        String receiverName = null;
         Expression receiver = node.getExpression();
         if (receiver != null) {
+            int useNum = curNode.getUseVariables().size();
             analysisMode.push(AnalysisMode.USE);
             receiver.accept(this);
             analysisMode.pop();
+            
+            List<JReference> uses = curNode.getUseVariables();
+            if (uses.size() - useNum > 0) {
+                JReference ref = uses.get(uses.size() - 1);
+                receiverName = ref.getReferenceName();
+            }
         }
         
-        JMethodReference jcall = new JMethodReference(node, node.getType(), node.getExpression(), null, mbinding, node.arguments());
+        JMethodReference jcall = new JMethodReference(node, node.getType(), node.getExpression(),
+                null, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.instanceCreation);
         callNode.addUseVariables(curNode.getUseVariables());
         
-        setActualNodes(callNode, node.arguments(), null);
+        CFGStatement receiverNode = null;
+        if (receiverName != null) {
+            receiverNode = new CFGStatement(node, CFGNode.Kind.receiver);
+            jcall.setReceiver(receiverNode);
+            receiverNode.addUseVariables(curNode.getUseVariables());
+            
+            setDefUseFields(callNode, jcall, receiverNode, receiverName);
+        }
+        
+        setActualNodes(callNode, node.arguments(), receiverNode);
         setExceptionFlow(callNode, jcall);
         return false;
     }
@@ -576,7 +586,8 @@ public class ExpressionVisitor extends ASTVisitor {
         
         String type = callNode.getMethodCall().getArgumentType(ordinal);
         boolean primitive = callNode.getMethodCall().getArgumentPrimitiveType(ordinal);
-        JReference actualIn = new JSpecialVarReference(node, "$" + String.valueOf(temporaryVariableId), type, primitive);
+        JReference actualIn = new JSpecialVarReference(node,
+                "$" + String.valueOf(temporaryVariableId), type, primitive);
         
         actualInNode.addDefVariable(actualIn);
         temporaryVariableId++;
@@ -599,7 +610,8 @@ public class ExpressionVisitor extends ASTVisitor {
     }
     
     private void createActualOut(CFGMethodCall callNode, CFGParameter actualIn) {
-        CFGParameter actualOutNode = new CFGParameter(actualIn.getASTNode(), CFGNode.Kind.actualOut, actualIn.getOrdinal());
+        CFGParameter actualOutNode = new CFGParameter(actualIn.getASTNode(),
+                CFGNode.Kind.actualOut, actualIn.getOrdinal());
         actualOutNode.setParent(callNode);
         callNode.addActualOut(actualOutNode);
         
@@ -619,21 +631,23 @@ public class ExpressionVisitor extends ASTVisitor {
             return;
         }
         
-        CFGParameter returnNode = new CFGParameter(callNode.getASTNode(), CFGNode.Kind.actualOut, 0);
-        returnNode.setParent(callNode);
-        callNode.setActualOutForReturn(returnNode);
+        CFGParameter actualOutNodeForReturn = new CFGParameter(callNode.getASTNode(), CFGNode.Kind.actualOut, 0);
+        actualOutNodeForReturn.setParent(callNode);
+        callNode.setActualOutForReturn(actualOutNodeForReturn);
         
         String type = callNode.getReturnType();
         boolean primitive = callNode.isPrimitiveType();
-        JReference actualIn = new JSpecialVarReference(callNode.getASTNode(), "$" + String.valueOf(temporaryVariableId), type, primitive);
-        JReference actualOut = new JSpecialVarReference(callNode.getASTNode(), "$" + String.valueOf(temporaryVariableId), type, primitive);
-        returnNode.addDefVariable(actualIn);
-        returnNode.addUseVariable(actualOut);
+        JReference actualIn = new JSpecialVarReference(callNode.getASTNode(),
+                "$" + String.valueOf(temporaryVariableId), type, primitive);
+        JReference actualOut = new JSpecialVarReference(callNode.getASTNode(),
+                "$" + String.valueOf(temporaryVariableId), type, primitive);
+        actualOutNodeForReturn.addDefVariable(actualIn);
+        actualOutNodeForReturn.addUseVariable(actualOut);
         temporaryVariableId++;
         
-        insertBeforeCurrentNode(returnNode);
+        insertBeforeCurrentNode(actualOutNodeForReturn);
         
-        curNode.addUseVariable(returnNode.getDefVariable());
+        curNode.addUseVariable(actualOutNodeForReturn.getDefVariable());
     }
     
     private void mergeActualIn(CFGMethodCall callNode, List<Expression> arguments) {
