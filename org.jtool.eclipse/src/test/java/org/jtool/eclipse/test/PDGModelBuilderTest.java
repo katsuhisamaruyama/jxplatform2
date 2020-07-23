@@ -135,7 +135,7 @@ public class PDGModelBuilderTest {
         builder.unbuild();
     }
     
-    private void run(String name) {
+    void run(String name) {
         String target = testDirOutside + name + "/";
         
         File dir = new File(target);
@@ -183,7 +183,7 @@ public class PDGModelBuilderTest {
         PDGModelBuilderTest tester = new PDGModelBuilderTest();
         
         /* The files are stored inside the workspace */
-        //tester.testSimple();
+        tester.testSimple();
         //tester.testDrawTool();
         //tester.testLambda();
         //tester.testJrb();
@@ -193,7 +193,7 @@ public class PDGModelBuilderTest {
         //print();
         
         /* The files are stored outside the workspace */
-        tester.run("ant-1.9.14");
+        //tester.run("ant-1.9.14");
         //tester.run("ant-1.10.8");
         //tester.run("antlr4-4.8");
         //tester.run("closure-compiler-v20200614");  // Long time

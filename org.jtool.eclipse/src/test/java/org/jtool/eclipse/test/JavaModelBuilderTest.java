@@ -104,7 +104,7 @@ public class JavaModelBuilderTest {
         builder.unbuild();
     }
     
-    private void run(String name) {
+    void run(String name) {
         String target = testDirOutside + name + "/";
         
         File dir = new File(target);
@@ -128,7 +128,7 @@ public class JavaModelBuilderTest {
         JavaModelBuilderTest tester = new JavaModelBuilderTest();
         
         /* The files are stored inside the workspace */
-        //tester.testSimple();
+        tester.testSimple();
         //tester.testSimpleBytecode();
         //tester.testDrawTool();
         //tester.testLambda();
@@ -139,7 +139,7 @@ public class JavaModelBuilderTest {
         //print();
         
         /* The files are stored outside the workspace */
-        tester.run("ant-1.9.14");                     // Ant
+        //tester.run("ant-1.9.14");                     // Ant
         //tester.run("ant-1.10.8");                     // Ant
         //tester.run("antlr4-4.8");                     // Maven
         //tester.run("closure-compiler-v20200614");     // Maven

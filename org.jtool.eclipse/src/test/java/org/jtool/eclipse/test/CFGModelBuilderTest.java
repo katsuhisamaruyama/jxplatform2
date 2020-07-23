@@ -145,7 +145,7 @@ public class CFGModelBuilderTest {
         builder.unbuild();
     }
     
-    private void run(String name) {
+    void run(String name) {
         String target = testDirOutside + name + "/";
         
         File dir = new File(target);
