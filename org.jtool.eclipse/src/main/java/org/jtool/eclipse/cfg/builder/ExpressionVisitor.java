@@ -417,7 +417,7 @@ public class ExpressionVisitor extends ASTVisitor {
     
     @Override
     @SuppressWarnings("unchecked")
-    public boolean visit(ConstructorInvocation node) {  
+    public boolean visit(ConstructorInvocation node) {
         IMethodBinding mbinding = node.resolveConstructorBinding();
         if (mbinding == null) {
             return false;
@@ -471,7 +471,7 @@ public class ExpressionVisitor extends ASTVisitor {
         }
         
         JMethodReference jcall = new JMethodReference(node, node.getType(), node.getExpression(),
-                null, mbinding, node.arguments());
+                receiverName, mbinding, node.arguments());
         CFGMethodCall callNode = new CFGMethodCall(node, jcall, CFGNode.Kind.instanceCreation);
         callNode.addUseVariables(curNode.getUseVariables());
         
@@ -554,11 +554,11 @@ public class ExpressionVisitor extends ASTVisitor {
         boolean actual = callNode.getMethodCall().isInProject() && !callNode.getMethodCall().callSelfDirectly();
         if (actual) {
             createActualIns(callNode, arguments);
+            insertBeforeCurrentNode(callNode);
         } else {
+            insertBeforeCurrentNode(callNode);
             mergeActualIn(callNode, arguments);
         }
-        
-        insertBeforeCurrentNode(callNode);
         
         if (receiverNode != null) {
             insertBeforeCurrentNode(receiverNode);
