@@ -18,6 +18,7 @@ import javassist.CannotCompileException;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
 import javassist.expr.ConstructorCall;
+import javassist.expr.NewExpr;
 import javassist.expr.FieldAccess;
 import java.util.List;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class JMethodExternal extends JMethod {
     
     JMethodExternal(CtMethod ctMethod, JClass declaringClass, CFGStore cfgStore) {
         super(declaringClass.getQualifiedName(), declaringClass.getQualifiedName(),
-                getSignature(ctMethod, cfgStore), getModfifiers(ctMethod),
+                getMethodSignature(ctMethod, cfgStore), getModfifiers(ctMethod),
                 findReturnType(ctMethod), checkPrimitiveReturnType(ctMethod), cfgStore);
         fqn = fqn + QualifiedNameSeparator + signature;
         this.declaringClass = declaringClass;
@@ -45,20 +46,20 @@ public class JMethodExternal extends JMethod {
     
     public JMethodExternal(CtConstructor ctMethod, JClass declaringClass, CFGStore cfgStore) {
         super(declaringClass.getQualifiedName(), declaringClass.getQualifiedName(),
-                getSignature(ctMethod, cfgStore), getModfifiers(ctMethod),
+                getConstructorSignature(ctMethod, cfgStore), getModfifiers(ctMethod),
                 declaringClass.getQualifiedName(), false, cfgStore);
         fqn = fqn + QualifiedNameSeparator + signature;
         this.declaringClass = declaringClass;
         this.ctMethod = ctMethod;
     }
     
-    private static String getSignature(CtMethod ctMethod, CFGStore cfgStore) {
-        return ctMethod.getName() + MethodSignature.methodSignatureToString(ctMethod.getSignature(), cfgStore);
+    private static String getMethodSignature(CtBehavior cm, CFGStore cfgStore) {
+        return cm.getName() + MethodSignature.methodSignatureToString(cm.getSignature(), cfgStore);
     }
     
-    private static String getSignature(CtConstructor ctMethod, CFGStore cfgStore) {
-        String className = BytecodeClassStore.getCanonicalSimpleClassName(ctMethod.getDeclaringClass()); 
-        return className + MethodSignature.methodSignatureToString(ctMethod.getSignature(), cfgStore);
+    private static String getConstructorSignature(CtBehavior cm, CFGStore cfgStore) {
+        String className = BytecodeClassStore.getCanonicalSimpleClassName(cm.getDeclaringClass()); 
+        return className + MethodSignature.methodSignatureToString(cm.getSignature(), cfgStore);
     }
     
     private static int getModfifiers(CtBehavior ctMethod) {
@@ -109,7 +110,7 @@ public class JMethodExternal extends JMethod {
                         CtClass cc = cm.getMethod().getDeclaringClass();
                         JClass clazz = cfgStore.getJInfoStore().getJClass(BytecodeClassStore.getCanonicalClassName(cc));
                         if (clazz != null) {
-                            JMethod method = clazz.getMethod(getSignature(cm.getMethod(), cfgStore));
+                            JMethod method = clazz.getMethod(getMethodSignature(cm.getMethod(), cfgStore));
                             if (method != null) {
                                 methods.add(method);
                             }
@@ -123,13 +124,28 @@ public class JMethodExternal extends JMethod {
                         CtClass cc = cm.getMethod().getDeclaringClass();
                         JClass clazz = cfgStore.getJInfoStore().getJClass(BytecodeClassStore.getCanonicalClassName(cc));
                         if (clazz != null) {
-                            JMethod method = clazz.getMethod(getSignature(cm.getMethod(), cfgStore));
+                            JMethod method = clazz.getMethod(getConstructorSignature(cm.getMethod(), cfgStore));
                             if (method != null) {
                                 methods.add(method);
                             }
                         }
                     } catch (NotFoundException e) { /* empty */ }
                 }
+                
+                @Override
+                public void edit(NewExpr cm) throws CannotCompileException {
+                    try {
+                        CtClass cc = cm.getConstructor().getDeclaringClass();
+                        JClass clazz = cfgStore.getJInfoStore().getJClass(BytecodeClassStore.getCanonicalClassName(cc));
+                        if (clazz != null) {
+                            JMethod method = clazz.getMethod(getConstructorSignature(cm.getConstructor(), cfgStore));
+                            if (method != null) {
+                                methods.add(method);
+                            }
+                        }
+                    } catch (NotFoundException e) { /* empty */ }
+                }
+                
             });
         } catch (CannotCompileException e) { /* empty */ }
         return methods.toArray(new JMethod[methods.size()]);
