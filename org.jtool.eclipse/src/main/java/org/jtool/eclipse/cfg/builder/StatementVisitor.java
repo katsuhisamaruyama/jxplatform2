@@ -175,9 +175,9 @@ public class StatementVisitor extends ASTVisitor {
         reconnect(expNode);
         
         Expression expression = node.getExpression();
-        ExpressionVisitor visitor = new ExpressionVisitor(this, cfg, expNode, infoStore, visited);
-        expression.accept(visitor);
-        CFGNode curNode = visitor.getExitNode();
+        ExpressionVisitor exprVisitor = new ExpressionVisitor(this, cfg, expNode, infoStore, visited);
+        expression.accept(exprVisitor);
+        CFGNode curNode = exprVisitor.getExitNode();
         
         ControlFlow edge = createFlow(curNode, nextNode);
         edge.setTrue();
@@ -203,9 +203,9 @@ public class StatementVisitor extends ASTVisitor {
             CFGStatement declNode = new CFGStatement(node, CFGNode.Kind.assignment);
             reconnect(declNode);
             
-            ExpressionVisitor visitor = new ExpressionVisitor(this, cfg, declNode, infoStore, visited);
-            frag.accept(visitor);
-            CFGNode curNode = visitor.getExitNode();
+            ExpressionVisitor exprVisitor = new ExpressionVisitor(this, cfg, declNode, infoStore, visited);
+            frag.accept(exprVisitor);
+            CFGNode curNode = exprVisitor.getExitNode();
             
             ControlFlow edge = createFlow(curNode, nextNode);
             edge.setTrue();
@@ -217,9 +217,9 @@ public class StatementVisitor extends ASTVisitor {
         CFGStatement invNode = new CFGStatement(node, CFGNode.Kind.assignment);
         reconnect(invNode);
         
-        ExpressionVisitor visitor = new ExpressionVisitor(this, cfg, invNode, infoStore, visited);
-        node.accept(visitor);
-        CFGNode curNode = visitor.getExitNode();
+        ExpressionVisitor prefixVisitor = new ExpressionVisitor(this, cfg, invNode, infoStore, visited);
+        node.accept(prefixVisitor);
+        CFGNode curNode = prefixVisitor.getExitNode();
         
         ControlFlow edge = createFlow(curNode, nextNode);
         edge.setTrue();
@@ -231,9 +231,9 @@ public class StatementVisitor extends ASTVisitor {
         CFGStatement invNode = new CFGStatement(node, CFGNode.Kind.assignment);
         reconnect(invNode);
         
-        ExpressionVisitor visitor = new ExpressionVisitor(this, cfg, invNode, infoStore, visited);
-        node.accept(visitor);
-        CFGNode curNode = visitor.getExitNode();
+        ExpressionVisitor prefixVisitor = new ExpressionVisitor(this, cfg, invNode, infoStore, visited);
+        node.accept(prefixVisitor);
+        CFGNode curNode = prefixVisitor.getExitNode();
         
         ControlFlow edge = createFlow(curNode, nextNode);
         edge.setTrue();
@@ -729,6 +729,18 @@ public class StatementVisitor extends ASTVisitor {
         
         ControlFlow edge = createFlow(tryNode, nextNode);
         edge.setTrue();
+        
+        for (Expression resource : (List<Expression>)node.resources()) {
+            CFGStatement resourceNode = new CFGStatement(node, CFGNode.Kind.assignment);
+            reconnect(resourceNode);
+            
+            ExpressionVisitor resourceVisitor = new ExpressionVisitor(this, cfg, resourceNode, infoStore, visited);
+            resource.accept(resourceVisitor);
+            CFGNode curNode = resourceVisitor.getExitNode();
+            
+            ControlFlow e = createFlow(curNode, nextNode);
+            e.setTrue();
+        }
         
         Statement body = node.getBody();
         body.accept(this);
