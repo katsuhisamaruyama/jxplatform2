@@ -59,12 +59,12 @@ import org.eclipse.jdt.core.dom.TypeDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-
 import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * Extracts a slice and returns Java source code corresponding to the slice.
@@ -310,35 +310,44 @@ public class SliceExtractor extends ASTVisitor {
     }
     
     @SuppressWarnings("unchecked")
-    protected void pullUpExpressionInVariableDeclaration(ASTNode astnode, Expression expr) {
+    protected Map<Expression, Expression> pullUpExpressionInVariableDeclaration(ASTNode astnode, Expression expr) {
+        Map<Expression, Expression> pullupMap = new HashMap<>();
+        
         if (expr != null && containsAnyInSubTree(expr)) {
             ASTNode parent = getEnclosingStatement(astnode.getParent()).getParent();
             
             if (parent instanceof Block) {
                 Expression newExpression = (Expression)ASTNode.copySubtree(expr.getAST(), expr);
-                ExpressionStatement newStatement = (ExpressionStatement)expr.getAST().newExpressionStatement(newExpression);
+                ExpressionStatement newStatement = (ExpressionStatement)expr.getAST()
+                        .newExpressionStatement(newExpression);
+                pullupMap.put(expr, newExpression);
                 
                 Block block = (Block)parent;
                 for (int index = 0; index < block.statements().size(); index++) {
                     Statement target = (Statement)block.statements().get(index);
-                    if (target.getStartPosition() == astnode.getParent().getStartPosition() && target.getLength() == astnode.getParent().getLength()) {
+                    if (target.getStartPosition() == astnode.getParent().getStartPosition() &&
+                            target.getLength() == astnode.getParent().getLength()) {
                         block.statements().add(index, newStatement);
                         target.delete();
-                        return;
+                        return pullupMap;
                     }
                 }
             }
         }
+        return pullupMap;
     }
     
-    protected void pullUpMethodInvocations(Statement statement, Expression expr) {
+    protected Map<MethodInvocation, MethodInvocation> pullUpMethodInvocations(Statement statement, Expression expr) {
         List<Expression> exprs = new ArrayList<>();
         exprs.add(expr);
-        pullUpMethodInvocations(statement, exprs);
+        return pullUpMethodInvocations(statement, exprs);
     }
     
     @SuppressWarnings("unchecked")
-    protected void pullUpMethodInvocations(Statement statement, List<Expression> exprs) {
+    protected Map<MethodInvocation, MethodInvocation> pullUpMethodInvocations(Statement statement,
+            List<Expression> exprs) {
+        Map<MethodInvocation, MethodInvocation> pullupMap = new HashMap<>();
+        
         List<MethodInvocation> invocations = new ArrayList<>();
         for (Expression expr : exprs) {
             MethodInvocationCollector collector = new MethodInvocationCollector(expr);
@@ -350,21 +359,30 @@ public class SliceExtractor extends ASTVisitor {
         }
         
         if (invocations.size() == 1) {
-            Expression newExpression = (Expression)ASTNode.copySubtree(statement.getAST(), invocations.get(0));
-            ExpressionStatement newStatement = (ExpressionStatement)statement.getAST().newExpressionStatement(newExpression);
+            MethodInvocation newInvocation = (MethodInvocation)ASTNode.copySubtree(statement.getAST(),
+                    invocations.get(0));
+            ExpressionStatement newStatement = (ExpressionStatement)statement.getAST()
+                    .newExpressionStatement(newInvocation);
+            pullupMap.put(invocations.get(0), newInvocation);
             
             replaceStatementWithStatement(statement, newStatement);
+            return pullupMap;
             
         } else if (invocations.size() > 1) {
             Block newBlock = (Block)statement.getAST().newBlock();
             for (int index = 0; index < invocations.size(); index++) {
-                Expression newExpression = (Expression)ASTNode.copySubtree(statement.getAST(), invocations.get(index));
-                ExpressionStatement newStatement = (ExpressionStatement)statement.getAST().newExpressionStatement(newExpression);
+                MethodInvocation newInvocation = (MethodInvocation)ASTNode.copySubtree(statement.getAST(),
+                        invocations.get(index));
+                ExpressionStatement newStatement = (ExpressionStatement)statement.getAST()
+                        .newExpressionStatement(newInvocation);
                 newBlock.statements().add(newStatement);
+                pullupMap.put(invocations.get(index), newInvocation);
             }
             
             replaceStatementWithBlock(statement, newBlock);
+            return pullupMap;
         }
+        return pullupMap;
     }
     
     @SuppressWarnings("unchecked")
@@ -706,13 +724,15 @@ public class SliceExtractor extends ASTVisitor {
     }
     
     @SuppressWarnings("unchecked")
-    protected Block pullUpMethodInvocationInReturn(ReturnStatement statement) {
+    protected Map<MethodInvocation, MethodInvocation> pullUpMethodInvocationInReturn(ReturnStatement statement) {
+        Map<MethodInvocation, MethodInvocation> invocationMap = new HashMap<>();
+        
         Expression returnExpression = getReturnExpression(statement);
         
         Expression expr = statement.getExpression();
         if (!containsAnyInSubTree(expr)) {
             statement.setExpression(returnExpression);
-            return null;
+            return invocationMap;
         }
         
         List<MethodInvocation> invocations = new ArrayList<>();
@@ -726,9 +746,12 @@ public class SliceExtractor extends ASTVisitor {
         if (invocations.size() > 0) {
             Block block = (Block)statement.getAST().newBlock();
             for (int index = 0; index < invocations.size(); index++) {
-                Expression newExpression = (Expression)ASTNode.copySubtree(statement.getAST(), invocations.get(index));
-                ExpressionStatement newStatement = (ExpressionStatement)statement.getAST().newExpressionStatement(newExpression);
+                MethodInvocation invocationExpression = (MethodInvocation)ASTNode.copySubtree(statement.getAST(),
+                        invocations.get(index));
+                ExpressionStatement newStatement = (ExpressionStatement)statement.getAST()
+                        .newExpressionStatement(invocationExpression);
                 block.statements().add(newStatement);
+                invocationMap.put(invocations.get(index), invocationExpression);
             }
             
             ReturnStatement newStatement = (ReturnStatement)ASTNode.copySubtree(statement.getAST(), statement);
@@ -736,11 +759,11 @@ public class SliceExtractor extends ASTVisitor {
             block.statements().add(newStatement);
             
             replaceStatementWithBlock(statement, block);
-            return block;
+            return invocationMap;
             
         } else {
             statement.setExpression(returnExpression);
-            return null;
+            return invocationMap;
         }
     }
     
