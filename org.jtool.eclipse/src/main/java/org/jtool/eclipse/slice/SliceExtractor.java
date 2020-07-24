@@ -687,7 +687,6 @@ public class SliceExtractor extends ASTVisitor {
         return null;
     }
     
-    @SuppressWarnings("unchecked")
     @Override
     public boolean visit(ReturnStatement node) {
         if (contains(node)) {
@@ -699,17 +698,45 @@ public class SliceExtractor extends ASTVisitor {
             return false;
         }
         
-        Expression returnExpression = getReturnExpression(node);
-        Block newBlock = pullUpMethodInvocationInReturn(node);
-        if (newBlock != null) {
-            node.delete();
-            ReturnStatement newStatement = (ReturnStatement)ASTNode.copySubtree(node.getAST(), node);
-            newStatement.setExpression(returnExpression);
-            newBlock.statements().add(newStatement);
-        } else {
-            node.setExpression(returnExpression);
-        }
+        pullUpMethodInvocationInReturn(node);
         return true;
+    }
+    
+    @SuppressWarnings("unchecked")
+    protected Block pullUpMethodInvocationInReturn(ReturnStatement statement) {
+        Expression returnExpression = getReturnExpression(statement);
+        
+        Expression expr = statement.getExpression();
+        if (!containsAnyInSubTree(expr)) {
+            statement.setExpression(returnExpression);
+            return null;
+        }
+        
+        List<MethodInvocation> invocations = new ArrayList<>();
+        MethodInvocationCollector collector = new MethodInvocationCollector(expr);
+        for (ASTNode astnode : collector.getNodes()) {
+            if (astnode instanceof MethodInvocation) {
+                invocations.add((MethodInvocation)astnode);
+            }
+        }
+        
+        if (invocations.size() > 0) {
+            Block block = (Block)statement.getAST().newBlock();
+            replaceStatementWithBlock(statement, block);
+            
+            for (int index = 0; index < invocations.size(); index++) {
+                Expression newExpression = (Expression)ASTNode.copySubtree(statement.getAST(), invocations.get(index));
+                ExpressionStatement newStatement = (ExpressionStatement)statement.getAST().newExpressionStatement(newExpression);
+                block.statements().add(newStatement);
+            }
+            ReturnStatement newStatement = (ReturnStatement)ASTNode.copySubtree(statement.getAST(), statement);
+            newStatement.setExpression(returnExpression);
+            block.statements().add(newStatement);
+            return block;
+        } else {
+            statement.setExpression(returnExpression);
+            return null;
+        }
     }
     
     protected Expression getReturnExpression(ReturnStatement node) {
@@ -738,39 +765,6 @@ public class SliceExtractor extends ASTVisitor {
             newExpression = node.getAST().newNullLiteral();
         }
         return newExpression;
-    }
-    
-    @SuppressWarnings("unchecked")
-    protected Block pullUpMethodInvocationInReturn(ReturnStatement statement) {
-        Expression expr = statement.getExpression();
-        if (!containsAnyInSubTree(expr)) {
-            return null;
-        }
-        
-        List<MethodInvocation> invocations = new ArrayList<>();
-        MethodInvocationCollector collector = new MethodInvocationCollector(expr);
-        for (ASTNode astnode : collector.getNodes()) {
-            if (astnode instanceof MethodInvocation) {
-                invocations.add((MethodInvocation)astnode);
-            }
-        }
-        if (invocations.size() == 0) {
-            return null;
-        }
-        
-        Block parentBlock;
-        if (statement.getParent() instanceof Block) {
-            parentBlock = (Block)statement.getParent();
-        } else {
-            parentBlock = (Block)statement.getAST().newBlock();
-            replaceStatementWithBlock(statement, parentBlock);
-        }
-        for (int index = 0; index < invocations.size(); index++) {
-            Expression newExpression = (Expression)ASTNode.copySubtree(statement.getAST(), invocations.get(index));
-            ExpressionStatement newStatement = (ExpressionStatement)statement.getAST().newExpressionStatement(newExpression);
-            parentBlock.statements().add(newStatement);
-        }
-        return parentBlock;
     }
     
     @Override
