@@ -74,7 +74,7 @@ import java.util.Map;
 public class SliceExtractor extends ASTVisitor {
     
     protected JavaFile jfile;
-    protected Set<ASTNode> sliceNodes = new HashSet<ASTNode>();
+    protected Set<ASTNode> sliceNodes = new HashSet<>();
     protected ASTNode astNode;
     
     public SliceExtractor(ModelBuilder builder, Slice slice, JavaClass jclass) {
@@ -211,7 +211,7 @@ public class SliceExtractor extends ASTVisitor {
             return false;
         }
         
-        Set<ASTNode> removeNodes = new HashSet<ASTNode>();
+        Set<ASTNode> removeNodes = new HashSet<>();
         for (Object obj : node.parameters()) {
             SingleVariableDeclaration param = (SingleVariableDeclaration)obj;
             if (!containsAnyInSubTree(param)) {
@@ -296,7 +296,7 @@ public class SliceExtractor extends ASTVisitor {
     }
     
     protected void checkDeclaration(ASTNode node, List<VariableDeclarationFragment> fragments) {
-        List<VariableDeclarationFragment> removeNodes = new ArrayList<VariableDeclarationFragment>();
+        List<VariableDeclarationFragment> removeNodes = new ArrayList<>();
         for (VariableDeclarationFragment frag : fragments) {
             if (!containsAnyInSubTree(frag)) {
                 removeNodes.add(frag);
@@ -332,14 +332,14 @@ public class SliceExtractor extends ASTVisitor {
     }
     
     protected void pullUpMethodInvocations(Statement statement, Expression expr) {
-        List<Expression> exprs = new ArrayList<Expression>();
+        List<Expression> exprs = new ArrayList<>();
         exprs.add(expr);
         pullUpMethodInvocations(statement, exprs);
     }
     
     @SuppressWarnings("unchecked")
     protected void pullUpMethodInvocations(Statement statement, List<Expression> exprs) {
-        List<MethodInvocation> invocations = new ArrayList<MethodInvocation>();
+        List<MethodInvocation> invocations = new ArrayList<>();
         for (Expression expr : exprs) {
             MethodInvocationCollector collector = new MethodInvocationCollector(expr);
             for (ASTNode n : collector.getNodes()) {
@@ -436,6 +436,7 @@ public class SliceExtractor extends ASTVisitor {
         if (tnode != null) {
             return tnode.resolveBinding().getQualifiedName();
         }
+        
         EnumDeclaration enode = (EnumDeclaration)JavaElement.getAncestor(node, ASTNode.ENUM_DECLARATION);
         if (enode != null) {
             return enode.resolveBinding().getQualifiedName();
@@ -454,6 +455,7 @@ public class SliceExtractor extends ASTVisitor {
         if (contains(node)) {
             removeMethodCallArgument(node, (List<Expression>)node.arguments());
             return true;
+            
         } else {
             if (node.getName() != null) {
                 node.getName().accept(this);
@@ -469,7 +471,6 @@ public class SliceExtractor extends ASTVisitor {
             }
             
             pullUpMethodInvocations(statement, (List<Expression>)node.arguments());
-            //statement.delete();
         }
         return false;
     }
@@ -485,7 +486,7 @@ public class SliceExtractor extends ASTVisitor {
     }
     
     protected void removeMethodCallArgument(List<Expression> arguments) {
-        List<Expression> removeNodes = new ArrayList<Expression>();
+        List<Expression> removeNodes = new ArrayList<>();
         for (Expression expr : arguments) {
             if (!containsAnyInSubTree(expr)) {
                 removeNodes.add(expr);
@@ -599,7 +600,7 @@ public class SliceExtractor extends ASTVisitor {
         }
         
         if (!containsAnyInSubTree(node.getBody()) && node.updaters().size() == 0) {
-            List<Expression> exprs = new ArrayList<Expression>();
+            List<Expression> exprs = new ArrayList<>();
             exprs.addAll((List<Expression>)node.initializers());
             exprs.add(node.getExpression());
             exprs.addAll((List<Expression>)node.updaters());
@@ -608,7 +609,7 @@ public class SliceExtractor extends ASTVisitor {
             return false;
         }
         
-        List<Expression> removeNodes = new ArrayList<Expression>();
+        List<Expression> removeNodes = new ArrayList<>();
         for (Expression expr : (List<Expression>)node.updaters()) {
             if (!contains(expr)) {
                 removeNodes.add(expr);
@@ -701,6 +702,7 @@ public class SliceExtractor extends ASTVisitor {
         Expression returnExpression = getReturnExpression(node);
         Block newBlock = pullUpMethodInvocationInReturn(node);
         if (newBlock != null) {
+            node.delete();
             ReturnStatement newStatement = (ReturnStatement)ASTNode.copySubtree(node.getAST(), node);
             newStatement.setExpression(returnExpression);
             newBlock.statements().add(newStatement);
@@ -745,7 +747,7 @@ public class SliceExtractor extends ASTVisitor {
             return null;
         }
         
-        List<MethodInvocation> invocations = new ArrayList<MethodInvocation>();
+        List<MethodInvocation> invocations = new ArrayList<>();
         MethodInvocationCollector collector = new MethodInvocationCollector(expr);
         for (ASTNode astnode : collector.getNodes()) {
             if (astnode instanceof MethodInvocation) {
