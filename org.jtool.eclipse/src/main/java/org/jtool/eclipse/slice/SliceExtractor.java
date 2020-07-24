@@ -352,15 +352,18 @@ public class SliceExtractor extends ASTVisitor {
         if (invocations.size() == 1) {
             Expression newExpression = (Expression)ASTNode.copySubtree(statement.getAST(), invocations.get(0));
             ExpressionStatement newStatement = (ExpressionStatement)statement.getAST().newExpressionStatement(newExpression);
+            
             replaceStatementWithStatement(statement, newStatement);
+            
         } else if (invocations.size() > 1) {
             Block newBlock = (Block)statement.getAST().newBlock();
-            replaceStatementWithBlock(statement, newBlock);
             for (int index = 0; index < invocations.size(); index++) {
                 Expression newExpression = (Expression)ASTNode.copySubtree(statement.getAST(), invocations.get(index));
                 ExpressionStatement newStatement = (ExpressionStatement)statement.getAST().newExpressionStatement(newExpression);
                 newBlock.statements().add(newStatement);
             }
+            
+            replaceStatementWithBlock(statement, newBlock);
         }
     }
     
@@ -722,17 +725,19 @@ public class SliceExtractor extends ASTVisitor {
         
         if (invocations.size() > 0) {
             Block block = (Block)statement.getAST().newBlock();
-            replaceStatementWithBlock(statement, block);
-            
             for (int index = 0; index < invocations.size(); index++) {
                 Expression newExpression = (Expression)ASTNode.copySubtree(statement.getAST(), invocations.get(index));
                 ExpressionStatement newStatement = (ExpressionStatement)statement.getAST().newExpressionStatement(newExpression);
                 block.statements().add(newStatement);
             }
+            
             ReturnStatement newStatement = (ReturnStatement)ASTNode.copySubtree(statement.getAST(), statement);
             newStatement.setExpression(returnExpression);
             block.statements().add(newStatement);
+            
+            replaceStatementWithBlock(statement, block);
             return block;
+            
         } else {
             statement.setExpression(returnExpression);
             return null;
