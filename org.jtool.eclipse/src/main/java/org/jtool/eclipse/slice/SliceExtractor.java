@@ -64,7 +64,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.HashMap;
 
 /**
  * Extracts a slice and returns Java source code corresponding to the slice.
@@ -77,16 +76,12 @@ public class SliceExtractor extends ASTVisitor {
     protected Set<ASTNode> sliceNodes = new HashSet<>();
     protected ASTNode astNode;
     
-    protected CopiedNodeCollector copiedCollector = new CopiedNodeCollector();
-    
     public SliceExtractor(ModelBuilder builder, Slice slice, JavaClass jclass) {
         this(builder, slice.getNodes(), jclass);
     }
     
     public SliceExtractor(ModelBuilder builder, Set<PDGNode> nodes, JavaClass jclass) {
         JavaFile jfile = builder.copyJavaFile(jclass.getFile());
-        copiedCollector.collect(jclass.getFile().getCompilationUnit(), jfile.getCompilationUnit());
-        
         for (JavaClass jc : jfile.getClasses()) {
             if (jc.getQualifiedName().equals(jclass.getQualifiedName())) {
                 createSliceExtractor(nodes, jfile, jc.getASTNode());
@@ -100,8 +95,6 @@ public class SliceExtractor extends ASTVisitor {
     
     public SliceExtractor(ModelBuilder builder, Set<PDGNode> nodes, JavaMethod jmethod) {
         JavaFile jfile = builder.copyJavaFile(jmethod.getDeclaringClass().getFile());
-        copiedCollector.collect(jmethod.getDeclaringClass().getFile().getCompilationUnit(), jfile.getCompilationUnit());
-        
         for (JavaClass jc : jfile.getClasses()) {
             if (jc.getQualifiedName().equals(jmethod.getDeclaringClass().getQualifiedName())) {
                 for (JavaMethod jm : jc.getMethods()) {
@@ -119,8 +112,6 @@ public class SliceExtractor extends ASTVisitor {
     
     public SliceExtractor(ModelBuilder builder, Set<PDGNode> nodes, JavaField jfield) {
         JavaFile jfile = builder.copyJavaFile(jfield.getDeclaringClass().getFile());
-        copiedCollector.collect(jfield.getDeclaringClass().getFile().getCompilationUnit(), jfile.getCompilationUnit());
-        
         for (JavaClass jc : jfile.getClasses()) {
             if (jc.getQualifiedName().equals(jfield.getDeclaringClass().getQualifiedName())) {
                 for (JavaField jf : jc.getFields()) {
@@ -173,14 +164,6 @@ public class SliceExtractor extends ASTVisitor {
         
         String code = codeGenerator.generate(astNode, jfile.getCode(), sliceNodes);
         return code;
-    }
-    
-    public Map<Expression, Expression> getExpressionMap() {
-        return copiedCollector.getExpressionMap();
-    }
-    
-    public Map<Statement, Statement> getStatementMap() {
-        return copiedCollector.getStatementMap();
     }
     
     protected boolean contains(ASTNode node) {
@@ -332,7 +315,6 @@ public class SliceExtractor extends ASTVisitor {
             
             if (parent instanceof Block) {
                 Expression newExpression = (Expression)ASTNode.copySubtree(expr.getAST(), expr);
-                copiedCollector.collect(expr, newExpression);
                 ExpressionStatement newStatement = (ExpressionStatement)expr.getAST()
                         .newExpressionStatement(newExpression);
                 
@@ -372,7 +354,6 @@ public class SliceExtractor extends ASTVisitor {
             MethodInvocation oldInvocation = invocations.get(0);
             MethodInvocation newInvocation = (MethodInvocation)ASTNode
                     .copySubtree(statement.getAST(), oldInvocation);
-            copiedCollector.collect(oldInvocation, newInvocation);
             ExpressionStatement newStatement = (ExpressionStatement)statement.getAST()
                     .newExpressionStatement(newInvocation);
             
@@ -384,7 +365,6 @@ public class SliceExtractor extends ASTVisitor {
                 MethodInvocation oldInvocation = invocations.get(index);
                 MethodInvocation newInvocation = (MethodInvocation)ASTNode
                         .copySubtree(statement.getAST(), oldInvocation);
-                copiedCollector.collect(oldInvocation, newInvocation);
                 ExpressionStatement newStatement = (ExpressionStatement)statement.getAST()
                         .newExpressionStatement(newInvocation);
                 newBlock.statements().add(newStatement);
@@ -419,7 +399,6 @@ public class SliceExtractor extends ASTVisitor {
                 int index = property.indexOf(statement);
                 for (Statement st : (List<Statement>)block.statements()) {
                     Statement newStatement = (Statement)ASTNode.copySubtree(st.getAST(), st);
-                    copiedCollector.collect(st, newStatement);
                     property.add(index, newStatement);
                     index++;
                 }
@@ -442,7 +421,6 @@ public class SliceExtractor extends ASTVisitor {
         if (containsAnyInSubTree(expr)) {
             if (statement instanceof ExpressionStatement) {
                 Expression newExpression = (Expression)ASTNode.copySubtree(expr.getAST(), expr);
-                copiedCollector.collect(expr, newExpression);
                 
                 ExpressionStatement parentExpression = (ExpressionStatement)statement;
                 parentExpression.setExpression(newExpression);
@@ -736,14 +714,13 @@ public class SliceExtractor extends ASTVisitor {
     }
     
     @SuppressWarnings("unchecked")
-    protected Map<MethodInvocation, MethodInvocation> pullUpMethodInvocationInReturn(ReturnStatement statement) {
-        Map<MethodInvocation, MethodInvocation> pullupMap = new HashMap<>();
+    protected void pullUpMethodInvocationInReturn(ReturnStatement statement) {
         Expression returnExpression = getReturnExpression(statement);
         
         Expression expr = statement.getExpression();
         if (!containsAnyInSubTree(expr)) {
             statement.setExpression(returnExpression);
-            return pullupMap;
+            return;
         }
         
         List<MethodInvocation> invocations = new ArrayList<>();
@@ -760,15 +737,12 @@ public class SliceExtractor extends ASTVisitor {
                 MethodInvocation oldInvocation = invocations.get(index);
                 MethodInvocation newInvocation = (MethodInvocation)ASTNode
                         .copySubtree(statement.getAST(), oldInvocation);
-                copiedCollector.collect(oldInvocation, newInvocation);
                 ExpressionStatement newStatement = (ExpressionStatement)statement.getAST()
                         .newExpressionStatement(newInvocation);
                 block.statements().add(newStatement);
-                pullupMap.put(oldInvocation, newInvocation);
             }
             
             ReturnStatement newStatement = (ReturnStatement)ASTNode.copySubtree(statement.getAST(), statement);
-            copiedCollector.collect(statement, newStatement);
             newStatement.setExpression(returnExpression);
             block.statements().add(newStatement);
             
@@ -777,7 +751,6 @@ public class SliceExtractor extends ASTVisitor {
         } else {
             statement.setExpression(returnExpression);
         }
-        return pullupMap;
     }
     
     protected Expression getReturnExpression(ReturnStatement node) {
