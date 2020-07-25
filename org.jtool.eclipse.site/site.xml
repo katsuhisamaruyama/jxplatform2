@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/org.jtool.eclipse.feature_1.0.0.202007240003.jar" id="org.jtool.eclipse.feature" version="1.0.0.202007240003">
+   <feature url="features/org.jtool.eclipse.feature_1.0.0.202007260149.jar" id="org.jtool.eclipse.feature" version="1.0.0.202007260149">
       <category name="JxPlatform2"/>
    </feature>
    <category-def name="JxPlatform2" label="JxPlatform2"/>
