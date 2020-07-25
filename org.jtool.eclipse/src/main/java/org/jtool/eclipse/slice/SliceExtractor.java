@@ -85,6 +85,8 @@ public class SliceExtractor extends ASTVisitor {
     
     public SliceExtractor(ModelBuilder builder, Set<PDGNode> nodes, JavaClass jclass) {
         JavaFile jfile = builder.copyJavaFile(jclass.getFile());
+        copiedCollector.collect(jclass.getFile().getCompilationUnit(), jfile.getCompilationUnit());
+        
         for (JavaClass jc : jfile.getClasses()) {
             if (jc.getQualifiedName().equals(jclass.getQualifiedName())) {
                 createSliceExtractor(nodes, jfile, jc.getASTNode());
@@ -98,6 +100,8 @@ public class SliceExtractor extends ASTVisitor {
     
     public SliceExtractor(ModelBuilder builder, Set<PDGNode> nodes, JavaMethod jmethod) {
         JavaFile jfile = builder.copyJavaFile(jmethod.getDeclaringClass().getFile());
+        copiedCollector.collect(jmethod.getDeclaringClass().getFile().getCompilationUnit(), jfile.getCompilationUnit());
+        
         for (JavaClass jc : jfile.getClasses()) {
             if (jc.getQualifiedName().equals(jmethod.getDeclaringClass().getQualifiedName())) {
                 for (JavaMethod jm : jc.getMethods()) {
@@ -115,6 +119,8 @@ public class SliceExtractor extends ASTVisitor {
     
     public SliceExtractor(ModelBuilder builder, Set<PDGNode> nodes, JavaField jfield) {
         JavaFile jfile = builder.copyJavaFile(jfield.getDeclaringClass().getFile());
+        copiedCollector.collect(jfield.getDeclaringClass().getFile().getCompilationUnit(), jfile.getCompilationUnit());
+        
         for (JavaClass jc : jfile.getClasses()) {
             if (jc.getQualifiedName().equals(jfield.getDeclaringClass().getQualifiedName())) {
                 for (JavaField jf : jc.getFields()) {
