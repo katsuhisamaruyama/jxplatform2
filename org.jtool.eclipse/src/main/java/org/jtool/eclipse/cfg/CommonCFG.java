@@ -25,7 +25,7 @@ public class CommonCFG extends Graph<CFGNode, ControlFlow> {
     public CommonCFG() {
     }
     
-    public void setStartNode(CFGEntry node) {
+    public void setEntryNode(CFGEntry node) {
         entry = node;
         entry.setCFG(this);
     }

@@ -48,7 +48,7 @@ public class CCFGBuilder {
         } else {
             entry = new CFGClassEntry(jclass, CFGNode.Kind.classEntry);
         }
-        ccfg.setStartNode(entry);
+        ccfg.setEntryNode(entry);
         ccfg.add(entry);
         
         for (JavaMethod jmethod : jclass.getMethods()) {

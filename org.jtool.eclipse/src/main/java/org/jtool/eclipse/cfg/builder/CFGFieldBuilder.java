@@ -53,7 +53,7 @@ public class CFGFieldBuilder {
         } else {
             entry = new CFGFieldEntry(jfield, CFGNode.Kind.fieldEntry);
         }
-        cfg.setStartNode(entry);
+        cfg.setEntryNode(entry);
         cfg.add(entry);
         
         CFGStatement declNode = new CFGStatement(jfield.getASTNode(), CFGNode.Kind.fieldDeclaration);

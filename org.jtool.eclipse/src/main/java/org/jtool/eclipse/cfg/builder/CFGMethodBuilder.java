@@ -77,7 +77,7 @@ public class CFGMethodBuilder {
             }
         }
         
-        cfg.setStartNode(entry);
+        cfg.setEntryNode(entry);
         cfg.add(entry);
         
         CFGNode tmpExit = new CFGNode();
