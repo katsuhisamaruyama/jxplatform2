@@ -11,8 +11,8 @@ JxPlatform2 builds a Java source code model consisting of the following elements
 * JavaPackage - Provides information on a package 
 * JavaClass - Provides information on a class, an interface, an enum, or an enum constant 
 * JavaMethod - Provides information on a method, a constructor, or an initializer 
-* JavaField (extends JavaVaraible) - Provides information on a field
-* JavaLocalVar (extends JavaVaraible) - Provides information on a local variable or a parameter 
+* JavaField (extends JavaVariable) - Provides information on a field
+* JavaLocalVar (extends JavaVariable) - Provides information on a local variable or a parameter 
 
 ### CFG (Control Flow Graph) 
 
