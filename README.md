@@ -50,7 +50,7 @@ JxPlatform2 creates a PDG from a CFG for each method existing in Java source cod
 
 * PDGStore - Stores a collection of PDGs created from CFGs 
 * PDG (extends CommonCFG) - Provides information about a PDG of a method or a field 
-* ClDG (extends CommonCFG)- Provides information about a class dependence graph (ClDG) a PDG of a method or a class 
+* ClDG (extends CommonCFG)- Provides information about a class dependence graph (ClDG) of a class 
 * SDG (extends CommonCFG) - Provides information about a system dependence graph (SDG) the whole source code
 
 Each PDG consists of nodes and edges between two nodes. 
