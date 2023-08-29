@@ -2,7 +2,7 @@
 
 JxPlatform2 is a module that provides three types of easy-to-use models of Java source code. It facilitates the development and maintenance of various kinds of software tools. 
 
-### New version of Jxplatform is now available.
+### New version of Jxplatform is now available!
 https://github.com/katsuhisamaruyama/jxplatform3
 
 ### Source Code Model 
